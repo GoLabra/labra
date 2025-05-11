@@ -8,6 +8,7 @@ Built with Go for performance and React for a clean, modern admin UI, it’s fas
 
 Think of it as your backend brain—powerful enough to manage complex data models, events, and permissions, without drowning you in endless configurations.
 
+![](https://github.com/GoLabra/labra/blob/develop/labra.jpeg)
 
 # Why does LabraGo exist?
 
