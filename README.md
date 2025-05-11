@@ -1,4 +1,4 @@
-# Running Admin Panel for GoLabra CMS
+# Running LabraGo Admin Panel
 
 ## Prerequisites
 To run this project, ensure you have the following installed on your system:
@@ -79,7 +79,7 @@ Refer to the `.env` file for a complete list of required variables.
 
 Note: Rebuild the application after making changes to environment variables.
 
-# Running LabraGO CMS – Backend/API
+# Running LabraGO – Backend/API
 
 ## Prerequisites
 
