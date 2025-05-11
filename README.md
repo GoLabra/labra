@@ -1,3 +1,10 @@
+Why does LabraGo exist? :
+
+Because we exist 🙂
+And because we’ve run into enough problems building data-heavy apps, we decided to do something about it.
+This project is our way of making things simpler, cleaner, and more fun for anyone facing the same challenges.
+
+
 # Running LabraGo Admin Panel
 
 ## Prerequisites
