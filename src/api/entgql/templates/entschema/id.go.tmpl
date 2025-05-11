@@ -1,0 +1,9 @@
+{{- define "ID"}}
+		field.String("id").DefaultFunc(cuid.New).Annotations(
+			entgql.OrderField("id"),
+			annotations.Field{
+				Caption:   "Id",
+				Type: entity.FieldTypeID,
+			},
+		),
+{{- end}}

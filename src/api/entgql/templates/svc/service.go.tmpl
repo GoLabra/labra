@@ -1,0 +1,29 @@
+package svc
+
+import (
+	"app/domain/repo"
+	"app/interfaces/svc"
+	
+	"github.com/GoLabra/labrago/src/api/entgql/generator"
+)
+
+var (
+	ErrServiceNotSetInContext = "service is not set in context"
+	ServiceContextValue       = "service"
+)
+
+type Service struct {
+	// Node                  svc.Node
+    {{- range $n := $.Nodes }}
+	{{$n.Name}}              svc.{{$n.Name}}
+    {{- end }}
+}
+
+func New(repository *repo.Repository, schemaManager generator.SchemaManager) *Service {
+	return &Service{
+		// Node:                  NewNode(repository),
+        {{- range $n := $.Nodes }}
+        {{$n.Name}}:              New{{$n.Name}}(repository),
+        {{- end }}
+	}
+}

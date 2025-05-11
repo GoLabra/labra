@@ -1,0 +1,12 @@
+
+input MigrationWhereUniqueInput {
+  id: ID
+}
+input RoleWhereUniqueInput {
+  id: ID
+}
+input UserWhereUniqueInput {
+  id: ID
+  email: String
+}
+

@@ -1,0 +1,33 @@
+extend type Query {
+    roles(where: RoleWhereInput, orderBy: RoleOrder, skip: Int, first: Int, last: Int): [Role!]
+    rolesConnection(where: RoleWhereInput, orderBy: RoleOrder, skip: Int, first: Int, last: Int): RoleConnection!
+}
+
+extend type Mutation {
+    createRole(data: CreateRoleInput!): Role!
+    createManyRoles(data: [CreateRoleInput!]!): [Role]!
+    updateRole(where: RoleWhereUniqueInput!, data: UpdateRoleInput!): Role!
+    updateManyRoles(where: RoleWhereInput!, data: UpdateRoleInput!): Int!
+    upsertRole(data: CreateRoleInput!): Role!
+    upsertManyRoles(data: [CreateRoleInput!]!): Int!
+    deleteRole(where: RoleWhereUniqueInput!): Role!
+    deleteManyRoles(where: RoleWhereInput!): Int!
+}
+extend input CreateRoleInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+}
+extend input UpdateRoleInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+}
+
+input CreateOneRoleInput {
+    create: CreateRoleInput
+    connect: RoleWhereUniqueInput
+}
+
+input CreateManyRoleInput {
+    create: [CreateRoleInput!]
+    connect: [RoleWhereUniqueInput!]
+}

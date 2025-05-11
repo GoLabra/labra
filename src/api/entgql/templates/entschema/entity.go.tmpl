@@ -1,0 +1,86 @@
+package schema
+
+import (
+	"entgo.io/contrib/entgql"
+	"entgo.io/ent"
+	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
+	"github.com/lucsky/cuid"
+    {{- range $import, $ok := Imports $.Fields }}
+    "{{$import}}"
+    {{- end}}
+    
+	"github.com/GoLabra/labrago/src/api/entgql/annotations"
+	"github.com/GoLabra/labrago/src/api/entgql/entity"
+)
+
+// {{$.Entity.EntName}} holds the schema definition for the  {{$.Entity.EntName}} entity.
+type {{$.Entity.EntName}} struct {
+	ent.Schema
+}
+
+func ({{$.Entity.EntName}}) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.MultiOrder(),
+		entgql.RelayConnection(),
+		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
+		annotations.Entity{
+			Caption: "{{$.Entity.Caption}}",
+			Owner:   entity.EntityOwnerUser,
+            DisplayField: "{{$.Entity.DisplayFieldName}}",
+		},
+	}
+}
+
+// Fields of the  {{$.Entity.EntName}}.
+func ({{$.Entity.EntName}}) Fields() []ent.Field {
+	return []ent.Field{
+        {{- range $f := $.Fields}}
+        {{- if eq $f.Type "Enum"}}
+            {{template "Enum" $f}}
+        {{- else if eq $f.Type "Enums"}}
+            {{template "Enums" $f}}
+        {{- else if eq $f.Type "ID" }}
+            {{template "ID" $f}}
+        {{- else if eq $f.Type "ShortText" }}
+            {{template "ShortText" $f}}
+        {{- else if eq $f.Type "LongText" }}
+            {{template "LongText" $f}}
+        {{- else if eq $f.Type "RichText" }}
+            {{template "RichText" $f}}
+        {{- else if eq $f.Type "Email" }}
+            {{template "Email" $f}}
+        {{- else if eq $f.Type "Integer" }}
+            {{template "Integer" $f}}
+        {{- else if eq $f.Type "Decimal" }}
+            {{template "Decimal" $f}}
+        {{- else if eq $f.Type "Float" }}
+            {{template "Float" $f}}
+        {{- else if eq $f.Type "Boolean" }}
+            {{template "Boolean" $f}}
+        {{- else if eq $f.Type "SingleChoice" }}
+            {{template "SingleChoice" $f}}
+        {{- else if eq $f.Type "MultipleChoice" }}
+            {{template "MultipleChoice" $f}}
+        {{- else if eq $f.Type "DateTime" }}
+            {{template "DateTime" $f}}
+        {{- else if eq $f.Type "Date" }}
+            {{template "Date" $f}}
+        {{- else if eq $f.Type "Time" }}
+            {{template "Time" $f}}
+        {{- else if eq $f.Type "Json" }}
+            {{template "Json" $f}}
+        {{- end }}
+        {{- end }}
+	}
+}
+
+// Edges of the {{$.Entity.EntName}}.
+func ({{$.Entity.EntName}}) Edges() []ent.Edge {
+	return []ent.Edge{
+        {{- range $e := $.Edges}}
+        {{template "edge" GetFieldRef $e $.Edges}}
+        {{- end}}
+	}
+}

@@ -1,0 +1,39 @@
+{{- define "Decimal"}}
+        field.Float("{{$.EntName}}").
+			{{- if $.Required | IsFalse  }}
+			Optional().
+            Nillable().
+			{{- end}}
+			{{- if $.Unique | IsTrue }}
+			Unique().
+			{{- end}}
+			{{- if ne $.DefaultValue nil }}
+			Default({{$.DefaultValue}}).
+			{{- end}}
+            {{- if ne $.Min nil }}
+            Min({{$.Min}}).
+            {{- end }}
+            {{- if ne $.Max nil }}
+            Max({{$.Max}}).
+            {{- end }}
+            SchemaType(map[string]string{
+                dialect.MySQL:    "decimal(6, 4)",
+                dialect.Postgres: "decimal(6, 4)",
+            }).
+			Annotations(
+				entgql.OrderField("{{$.EntName | CamelCase}}"),
+				annotations.Field{
+					Caption: "{{$.Caption}}",
+					Type:    entity.FieldTypeFloat,
+					{{- if $.Min}}
+					Min:     "{{$.Min}}",
+					{{- end }}
+					{{- if $.Max}}
+					Max:     "{{$.Max}}",
+					{{- end }}
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+				},
+			),
+{{- end}}

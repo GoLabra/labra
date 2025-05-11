@@ -1,0 +1,33 @@
+{{- define "SingleChoice"}}
+		field.String("{{$.EntName}}").
+			{{- if $.Required | IsFalse  }}
+			Optional().
+            Nillable().
+			{{- end}}
+			{{- if ne $.DefaultValue nil }}
+			Default("{{$.DefaultValue}}").
+			{{- end}}
+			{{- if $.Unique | IsTrue }}
+			Unique().
+			{{- end}}
+			Validate(func(val string) error {
+				for _, acceptedValue := range []string{ {{ StringsJoin $.AcceptedValues }} } {
+					if val == acceptedValue {
+						return nil
+					}
+				}
+
+				return fmt.Errorf("value \"%s\" is not an accepted value", val)
+			}).
+			Annotations(
+				entgql.OrderField("{{$.EntName | CamelCase}}"),
+				annotations.Field{
+					Caption:   "{{$.Caption}}",
+					Type: entity.FieldTypeSingleChoice,
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+					AcceptedValues: []string{ {{ StringsJoin $.AcceptedValues }} },
+				},
+			),
+{{- end}}

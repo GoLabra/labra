@@ -1,0 +1,61 @@
+extend type Query {
+    {{$.Node.Name | Plural | LowerFirstLetter}}(where: {{$.Node.Name}}WhereInput, orderBy: {{$.Node.Name}}Order, skip: Int, first: Int, last: Int): [{{$.Node.Name}}!]
+    {{$.Node.Name | Plural | LowerFirstLetter}}Connection(where: {{$.Node.Name}}WhereInput, orderBy: {{$.Node.Name}}Order, skip: Int, first: Int, last: Int): {{$.Node.Name}}Connection!
+}
+
+extend type Mutation {
+    create{{$.Node.Name}}(data: Create{{$.Node.Name}}Input!): {{$.Node.Name}}!
+    createMany{{$.Node.Name | Plural}}(data: [Create{{$.Node.Name}}Input!]!): [{{$.Node.Name}}]!
+    update{{$.Node.Name}}(where: {{$.Node.Name}}WhereUniqueInput!, data: Update{{$.Node.Name}}Input!): {{$.Node.Name}}!
+    updateMany{{$.Node.Name | Plural}}(where: {{$.Node.Name}}WhereInput!, data: Update{{$.Node.Name}}Input!): Int!
+    upsert{{$.Node.Name}}(data: Create{{$.Node.Name}}Input!): {{$.Node.Name}}!
+    upsertMany{{$.Node.Name | Plural}}(data: [Create{{$.Node.Name}}Input!]!): Int!
+    delete{{$.Node.Name}}(where: {{$.Node.Name}}WhereUniqueInput!): {{$.Node.Name}}!
+    deleteMany{{$.Node.Name | Plural}}(where: {{$.Node.Name}}WhereInput!): Int!
+}
+
+{{- if $.Node.Edges }}
+extend input Create{{$.Node.Name}}Input {
+    {{- range $e := $.Node.Edges }}
+    {{ Camel $e.Name }}: {{ GraphqlInputName true $.Node $e }}
+    {{- end}}
+}
+extend input Update{{$.Node.Name}}Input {
+    {{- range $e := $.Node.Edges }}
+    {{- if not $e.Immutable }}
+    {{ Camel $e.Name }}: {{ GraphqlInputName false $.Node $e }}
+    {{- end }}
+    {{- end}}
+}
+{{- end}}
+
+input CreateOne{{$.Node.Name}}Input {
+    create: Create{{$.Node.Name}}Input
+    connect: {{$.Node.Name}}WhereUniqueInput
+}
+
+input CreateMany{{$.Node.Name}}Input {
+    create: [Create{{$.Node.Name}}Input!]
+    connect: [{{$.Node.Name}}WhereUniqueInput!]
+}
+
+
+input UpdateOne{{$.Node.Name}}Input {
+    create: Create{{$.Node.Name}}Input
+    connect: {{$.Node.Name}}WhereUniqueInput
+    unset: Boolean
+}
+
+input UpdateMany{{$.Node.Name}}Input {
+    create: [Create{{$.Node.Name}}Input!]
+    connect: [{{$.Node.Name}}WhereUniqueInput!]
+    disconnect: [{{$.Node.Name}}WhereUniqueInput!]
+}
+
+{{- range $inputName, $input := $.CreateInputs }}
+input {{ $inputName }} {
+    {{- range $name, $type := $input }}
+    {{ $name }}: {{ $type }}
+    {{- end }}
+}
+{{- end }}

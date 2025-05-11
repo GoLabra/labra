@@ -1,0 +1,20 @@
+# TODO find better location for this file
+
+scalar DateOnly
+
+scalar TimeOnly
+
+scalar DateTime
+
+{{- range $n := $.Graph.Nodes }}
+input {{$n.Name}}WhereUniqueInput {
+  id: ID
+  {{- range $f := $n.Fields }}
+  {{- if $f.Unique }}
+  {{ $f.Name | Camel }}: {{index $.TypesTemplate  $f.Type.String}}
+  {{- end }}
+  {{- end }}
+}
+
+{{- end }}
+

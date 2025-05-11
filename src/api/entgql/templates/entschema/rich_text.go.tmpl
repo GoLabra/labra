@@ -1,0 +1,21 @@
+{{- define "RichText"}}
+		field.String("{{$.EntName}}").
+			{{- if $.Required | IsFalse  }}
+			Optional().
+            Nillable().
+			{{- end}}
+			SchemaType(map[string]string{
+				dialect.MySQL:    "MEDIUMTEXT",
+				dialect.Postgres: "TEXT",
+			}).
+			Annotations(
+				entgql.OrderField("{{$.EntName | CamelCase}}"),
+				annotations.Field{
+					Caption:   "{{$.Caption}}",
+					Type: entity.FieldTypeRichText,
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+				},
+			),
+{{- end}}

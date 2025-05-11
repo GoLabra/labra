@@ -1,0 +1,22 @@
+{{- define "Json"}}
+		field.JSON("{{$.EntName}}", map[string]interface{}{}).
+            {{- if $.Required | IsFalse  }}
+            Optional().
+            {{- end}}
+            {{- if ne $.DefaultValue nil }}
+			Default(entity.JSONDefaultValue[map[string]interface{}](`{{$.DefaultValue}}`)).
+            {{- end}}
+            Annotations(
+                entgql.Type("Map"),    
+                annotations.Field{
+                    Caption:   "{{$.Caption}}",
+                    Type: entity.FieldTypeJson,
+                    {{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+                    {{- if $.DefaultValue }}
+                    DefaultValue: `{{$.DefaultValue}}`,
+                    {{- end }}
+                },
+            ),
+{{- end}}

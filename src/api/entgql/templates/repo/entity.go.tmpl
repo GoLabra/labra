@@ -1,0 +1,475 @@
+package repo
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"app/ent"
+
+	"github.com/GoLabra/labrago/src/api/constants"
+	"github.com/mitchellh/mapstructure"
+)
+
+type {{$.Name}} struct {
+	client *ent.Client
+}
+
+func New{{$.Name}}(c *ent.Client) *{{$.Name}} {
+	return &{{$.Name}}{client: c}
+}
+
+func (r *{{$.Name}}) Get(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error) {
+	var (
+        query = r.client.{{$.Name}}.Query()
+        err   error
+    )
+    if where != nil {
+        query, err = where.Filter(query)
+        if err != nil {
+            return nil, err
+        }
+    }
+
+    if orderBy == nil {
+		orderBy = &ent.{{$.Name}}Order{
+			Direction: ent.Default{{$.Name}}Order.Direction,
+			Field:     ent.Default{{$.Name}}Order.Field,
+		}
+    }
+
+    if last != nil {
+		orderBy.Direction = orderBy.Direction.Reverse()
+    }
+
+    query = query.Order(OrderFunc(orderBy.Direction, orderBy.Field.String()))
+
+    if first != nil {
+        query.Limit(*first)
+    } else if last != nil {
+        query.Limit(*last)
+    }
+
+    if skip != nil {
+        query.Offset(*skip)
+    }
+
+    return query.All(ctx)
+}
+
+func (r *{{$.Name}}) Connection(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) (*ent.{{$.Name}}Connection, error) {
+	var (
+		query = r.client.{{$.Name}}.Query()
+		err   error
+	)
+	if where != nil {
+		query, err = where.Filter(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if orderBy != nil {
+		query = query.Order(OrderFunc(orderBy.Direction, orderBy.Field.String()))
+	}
+
+    if skip != nil {
+        query.Offset(*skip)
+    }
+
+    return query.Paginate(ctx, nil, first, nil, last)
+}
+
+func (r *{{$.Name}}) GetOne(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	query := r.client.{{$.Name}}.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+	}
+	return query.First(ctx)
+}
+
+func (r *{{$.Name}}) GetTx(ctx context.Context, tx *ent.Tx, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error) {
+	var (
+		query = tx.{{$.Name}}.Query()
+		err   error
+	)
+	if where != nil {
+		query, err = where.Filter(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if orderBy == nil {
+		orderBy = &ent.{{$.Name}}Order{
+			Direction: ent.Default{{$.Name}}Order.Direction,
+			Field:     ent.Default{{$.Name}}Order.Field,
+		}
+	}
+
+	if last != nil {
+		orderBy.Direction = orderBy.Direction.Reverse()
+	}
+
+	query = query.Order(OrderFunc(orderBy.Direction, orderBy.Field.String()))
+
+	if first != nil {
+		query.Limit(*first)
+	} else if last != nil {
+		query.Limit(*last)
+	}
+
+	if skip != nil {
+		query.Offset(*skip)
+	}
+
+	return query.All(ctx)
+}
+
+func (r *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	query := tx.{{$.Name}}.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+	}
+	return query.First(ctx)
+}
+
+
+func (r *{{$.Name}}) Create(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+
+	if !ok {
+		return nil, errors.New(ErrRepositoryNotSetInContext)
+	}
+
+	tx, err := repository.Tx.Create(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	createdInput, err := repository.{{$.Name}}.CreateTx(ctx, tx, data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createdInput, err
+}
+
+func (r *{{$.Name}}) CreateTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	var err error
+    repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	if !ok {
+		return nil, errors.New(ErrRepositoryNotSetInContext)
+	}
+
+    {{- range $e := $.Edges}}
+    {{- if or (not $e.Optional) (or (not $e.Ref) ($e.Ref.Optional)) }}
+    {{- if $e.Optional }}
+    if data.{{ Pascal $e.Name }} != nil {
+        {{ template "recursive_operations_before" $e }}
+    }
+    {{- else }}
+    {{ template "recursive_operations_before" $e }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+	createdInput, err := tx.{{$.Name}}.Create().SetInput(data).Save(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	{{- range $e := $.Edges}}
+    {{- if and ($e.Optional) (and $e.Ref (not $e.Ref.Optional)) }}
+    {{- if $e.Optional }}
+    if data.{{ Pascal $e.Name }} != nil {
+        {{ template "recursive_operations_after" $e }}
+    }   
+    {{- else }}
+    if data.{{ Pascal $e.Name }} != nil {
+        {{ template "recursive_operations_after" $e }}
+    }
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+	return createdInput.Unwrap(), err
+}
+
+func (r *{{$.Name}}) CreateMany(ctx context.Context, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error) {
+	var createMap []*ent.{{$.Name}}Create
+	for _, createInput := range data {
+        createMap = append(createMap, r.client.{{$.Name}}.Create().SetInput(createInput))
+    }
+	createdItems, err := r.client.{{$.Name}}.CreateBulk(createMap...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error creating items: %v", err)
+	}
+	return createdItems, nil
+}
+
+func (r *{{$.Name}}) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error) {
+	var createMap []*ent.{{$.Name}}Create
+	for _, createInput := range data {
+        createMap = append(createMap, tx.{{$.Name}}.Create().SetInput(createInput))
+    }
+	createdItems, err := tx.{{$.Name}}.CreateBulk(createMap...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error creating items: %v", err)
+	}
+	return createdItems, nil
+}
+
+func (r *{{$.Name}}) Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	if !ok {
+		return nil, errors.New(ErrRepositoryNotSetInContext)
+	}
+
+	tx, err := repository.Tx.Create(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	updatedInput, err := repository.{{$.Name}}.UpdateTx(ctx, tx, where, data)
+
+	if err != nil {
+		return nil, err
+	}
+	
+	err = tx.Commit()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedInput.Unwrap(), nil
+}
+
+func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	
+    repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	if !ok {
+		return nil, errors.New(ErrRepositoryNotSetInContext)
+	}
+	
+	query := tx.{{$.Name}}.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+	}
+	item, err := query.First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting item to update: %v", err)
+	}
+
+	{{- range $e := $.Edges}}
+    {{- if or (not $e.Optional) (or (not $e.Ref) ($e.Ref.Optional)) }}
+    {{- if $e.Optional }}
+    if data.{{ Pascal $e.Name }} != nil {
+        {{ template "recursive_operations_before_update" $e }}
+    }
+    {{- else }}
+    {{ template "recursive_operations_before_update" $e }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+	updatedInput, err := tx.{{$.Name}}.UpdateOne(item).SetInput(data).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error updating item: %v", err)
+	}
+
+	{{- range $e := $.Edges}}
+    {{- if and ($e.Optional) (and $e.Ref (not $e.Ref.Optional)) }}
+    {{- if $e.Optional }}
+    if data.{{ Pascal $e.Name }} != nil {
+        {{ template "recursive_operations_after_update" $e }}
+    }   
+    {{- else }}
+    if data.{{ Pascal $e.Name }} != nil {
+        {{ template "recursive_operations_after_update" $e }}
+    }
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+	return updatedInput, nil
+}
+
+func (r *{{$.Name}}) UpdateMany(ctx context.Context, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error) {
+	ps, err := where.P()
+
+	if err != nil {
+		return 0, err
+	}
+
+	updatedRows, err := r.client.{{$.Name}}.Update().Where(ps).SetInput(data).Save(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return updatedRows, nil
+}
+
+func (r *{{$.Name}}) UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error) {
+	ps, err := where.P()
+
+	if err != nil {
+		return 0, err
+	}
+
+	updatedRows, err := tx.{{$.Name}}.Update().Where(ps).SetInput(data).Save(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return updatedRows, nil
+}
+
+func (r *{{$.Name}}) Upsert(ctx context.Context, data ent.Create{{$.Name}}Input) (upserted{{$.Name}} *ent.{{$.Name}}, err error) {
+	if CompareUniqueInput(data, ent.{{$.Name}}WhereUniqueInput{}) {
+		var where ent.{{$.Name}}WhereUniqueInput
+		err = mapstructure.Decode(data, &where)
+		if err != nil {
+			return nil, fmt.Errorf("error decoding where condition: %v", err)
+		}
+		err = r.client.{{$.Name}}.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("error upserting item: %v", err)
+		}
+		upserted{{$.Name}}, err = r.GetOne(ctx, where)
+		if err != nil {
+			return nil, fmt.Errorf("error getting upserted item: %v", err)
+		}
+		return upserted{{$.Name}}, nil
+	}
+	upserted{{$.Name}}, err = r.client.{{$.Name}}.Create().SetInput(data).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error upserting item: %v", err)
+	}
+	return upserted{{$.Name}}, nil
+}
+
+func (r *{{$.Name}}) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (upserted{{$.Name}} *ent.{{$.Name}}, err error) {
+	if CompareUniqueInput(data, ent.{{$.Name}}WhereUniqueInput{}) {
+		var where ent.{{$.Name}}WhereUniqueInput
+		err = mapstructure.Decode(data, &where)
+		if err != nil {
+			return nil, fmt.Errorf("error decoding where condition: %v", err)
+		}
+		err = tx.{{$.Name}}.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("error upserting item: %v", err)
+		}
+		upserted{{$.Name}}, err = r.GetOne(ctx, where)
+		if err != nil {
+			return nil, fmt.Errorf("error getting upserted item: %v", err)
+		}
+		return upserted{{$.Name}}, nil
+	}
+	upserted{{$.Name}}, err = tx.{{$.Name}}.Create().SetInput(data).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error upserting item: %v", err)
+	}
+	return upserted{{$.Name}}, nil
+}
+
+func (r *{{$.Name}}) UpsertMany(ctx context.Context, data []ent.Create{{$.Name}}Input) (int, error) {
+	var upsertMap []*ent.{{$.Name}}Create
+	for _, upsertInput := range data {
+		upsertMap = append(upsertMap, r.client.{{$.Name}}.Create().SetInput(upsertInput))
+	}
+	err := r.client.{{$.Name}}.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("error upserting items: %v", err)
+	}
+	return len(data), nil
+}
+
+func (r *{{$.Name}}) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Create{{$.Name}}Input) (int, error) {
+	var upsertMap []*ent.{{$.Name}}Create
+	for _, upsertInput := range data {
+        upsertMap = append(upsertMap, tx.{{$.Name}}.Create().SetInput(upsertInput))
+    }
+	err := tx.{{$.Name}}.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("error upserting items: %v", err)
+	}
+	return len(data), nil
+}
+
+func (r *{{$.Name}}) Delete(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	query := r.client.{{$.Name}}.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+	}
+	item, err := query.First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting item to delete: %v", err)
+	}
+
+	err = r.client.{{$.Name}}.DeleteOne(item).Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error deleting item: %v", err)
+	}
+	return item, err
+}
+
+func (r *{{$.Name}}) DeleteTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	query := tx.{{$.Name}}.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+	}
+	item, err := query.First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting item to delete: %v", err)
+	}
+
+	err = tx.{{$.Name}}.DeleteOne(item).Exec(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error deleting item: %v", err)
+	}
+	return item, err
+}
+
+func (r *{{$.Name}}) DeleteMany(ctx context.Context, where ent.{{$.Name}}WhereInput) (int, error) {
+	ps, err := where.P()
+	if err != nil {
+		return 0, err
+	}
+
+	deletedRows, err := r.client.{{$.Name}}.Delete().Where(ps).Exec(ctx)
+
+	if err != nil {
+		return 0, err
+	}
+	return deletedRows, nil
+}
+
+func (r *{{$.Name}}) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput) (int, error) {
+	ps, err := where.P()
+	if err != nil {
+		return 0, err
+	}
+
+	deletedRows, err := tx.{{$.Name}}.Delete().Where(ps).Exec(ctx)
+
+	if err != nil {
+		return 0, err
+	}
+	return deletedRows, nil
+}

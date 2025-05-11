@@ -1,0 +1,68 @@
+package ent
+
+import (
+    "errors"
+
+	"app/ent/predicate"
+
+    {{- range $n := $.Nodes}}
+    "app/ent/{{$n.Name | ToLower}}"
+    {{- end}}
+)
+
+{{- range $n := $.Nodes}}
+
+var ErrEmpty{{$n.Name}}WhereUniqueInput = errors.New("empty predicate {{$n.Name}}WhereUniqueInput")
+
+// RoleWhereInput represents a where input for filtering Role queries.
+type {{$n.Name}}WhereUniqueInput struct {
+	Predicates []predicate.{{$n.Name}}  `json:"-"`
+
+	ID             *string  `json:"id,omitempty"`
+    {{- range $f := $n.Fields}}
+    {{- if or ($f.Unique) (eq $f.Name "ID")}}
+    {{$f.Name | Camel | ToTitle}} *{{$f.Type}} `json:"{{$f.Name | Camel}},omitempty"`
+    {{- end}}
+    {{- end}}
+}
+
+func (i *{{$n.Name}}WhereUniqueInput) AddPredicates(predicates ...predicate.{{$n.Name}}) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+func (i *{{$n.Name}}WhereUniqueInput) Filter(q *{{$n.Name}}Query) (*{{$n.Name}}Query, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+func (i *{{$n.Name}}WhereUniqueInput) P() (predicate.{{$n.Name}}, error) {
+	var predicates []predicate.{{$n.Name}}
+
+	if i.ID != nil {
+		predicates = append(predicates, {{$n.Name | ToLower}}.IDEQ(*i.ID))
+	}
+
+	{{- range $f := $n.Fields}}
+    {{- if $f.Unique }}
+	if i.{{$f.Name | Camel | ToTitle}} != nil {
+		predicates = append(predicates, {{$n.Name | ToLower}}.{{$f.Name| Camel | ToTitle}}EQ(*i.{{$f.Name | Camel | ToTitle}}))
+	}
+	{{- end}}
+	{{- end}}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmpty{{$n.Name}}WhereUniqueInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return {{$n.Name | ToLower}}.And(predicates...), nil
+	}
+}
+{{- end}}

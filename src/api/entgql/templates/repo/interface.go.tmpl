@@ -1,0 +1,30 @@
+package repo
+
+import (
+	"app/ent"
+	"context"
+)
+
+type {{$.Name}} interface {
+    Get(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error)
+    Connection(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) (*ent.{{$.Name}}Connection, error)
+    GetOne(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
+    GetTx(ctx context.Context, tx *ent.Tx, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error)
+    GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
+    Create(ctx context.Context, u ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
+    CreateTx(ctx context.Context, tx *ent.Tx, u ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
+    CreateMany(ctx context.Context, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error)
+    CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error)
+    Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error)
+    UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error)
+    Upsert(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
+    UpsertTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
+    UpsertMany(ctx context.Context, data []ent.Create{{$.Name}}Input) (int, error)
+    UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Create{{$.Name}}Input) (int, error)
+    UpdateMany(ctx context.Context, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error)
+    UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error)
+    Delete(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
+    DeleteTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
+    DeleteMany(ctx context.Context, where ent.{{$.Name}}WhereInput) (int, error)
+    DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput) (int, error)
+}

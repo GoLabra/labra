@@ -1,0 +1,10 @@
+{{- define "ref"}}
+        edge.From("{{$.EntName}}", {{$.ActualType}}.Type).
+            {{- if $.Required | IsFalse  }}
+            Required().
+            {{- end}}
+            Ref("{{$.Ref}}").
+            Annotations(
+                {{template "annotations" $}}
+            ),
+{{- end}}

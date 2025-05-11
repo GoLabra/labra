@@ -1,0 +1,13 @@
+{
+    "dataTable": {
+        "rowsPerPage": 10,
+        "skeletonRowsCount": 6
+    },
+    "entityList": {
+        "skeletonRowsCount": 6
+    },
+    "snackbar": {
+        "maxSnack": 4
+    }
+
+}

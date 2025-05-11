@@ -1,0 +1,77 @@
+{{- define "recursive_operations_after_update" }}
+    {{- if $.Unique }}
+        if data.{{ Pascal $.Name }}.Connect != nil {
+            toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *data.{{ Pascal $.Name }}.Connect)
+            if err != nil {
+                return nil, err
+            }
+            data.{{ Pascal $.Name }}ID = &toConnect.ID
+        }
+        {{- if $.Optional }}
+		if data.{{ Pascal $.Name }}.Unset != nil && *data.{{ Pascal $.Name }}.Unset {
+			data.Clear{{ Pascal $.Name }} = true
+		}
+        {{- end }}
+        if data.{{ Pascal $.Name }}.Create != nil {
+            var createInput ent.Create{{ $.Type.Name }}Input
+            err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
+
+            if err != nil {
+                return nil, err
+            }
+
+            createInput.{{ Pascal $.Ref.Name }}ID = createdInput.ID
+
+            toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+
+            if err != nil {
+                return nil, err
+            }
+
+            data.{{ Pascal $.Name }}ID = &toConnect.ID
+        }
+    {{- else }}
+        if data.{{ Pascal $.Name }}.Connect != nil {
+            for _, connect := range data.{{ Pascal $.Name }}.Connect {
+                toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, connect)
+
+                if err != nil {
+                    return nil, err
+                }
+                
+                data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
+            }
+        }
+		if data.{{ Pascal $.Name }}.Disconnect != nil {
+			for _, disconnect := range data.{{ Pascal $.Name }}.Disconnect {
+				toDisconnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, disconnect)
+
+				if err != nil {
+					return nil, err
+				}
+
+				data.Remove{{ Singular (Pascal $.Name) }}IDs = append(data.Remove{{ Singular (Pascal $.Name) }}IDs, toDisconnect.ID)
+			}
+		}
+        if data.{{ Pascal $.Name }}.Create != nil {
+            for _, create := range data.{{ Pascal $.Name }}.Create {
+                var createInput ent.Create{{ $.Type.Name }}Input
+                err = mapstructure.Decode(create, &createInput)
+
+                if err != nil {
+                    return nil, err
+                }
+
+                createInput.{{ Pascal $.Ref.Name }}ID = createdInput.ID
+
+                toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+
+                if err != nil {
+                    return nil, err
+                }
+
+                data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
+            }
+        }
+    {{- end }}
+{{- end }}

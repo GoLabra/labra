@@ -1,0 +1,35 @@
+{{- define "Float"}}
+      	field.Float("{{$.EntName}}").
+			{{- if $.Required | IsFalse  }}
+			Optional().
+            Nillable().
+			{{- end}}
+			{{- if $.Unique | IsTrue }}
+			Unique().
+			{{- end}}
+			{{- if ne $.DefaultValue nil }}
+			Default({{$.DefaultValue}}).
+			{{- end}}
+            {{- if ne $.Min nil }}
+            Min({{$.Min}}).
+            {{- end }}
+            {{- if ne $.Max nil }}
+            Max({{$.Max}}).
+            {{- end }}
+			Annotations(
+				entgql.OrderField("{{$.EntName | CamelCase}}"),
+				annotations.Field{
+					Caption: "{{$.Caption}}",
+					Type:    entity.FieldTypeFloat,
+					{{- if $.Min}}
+					Min:     "{{$.Min}}",
+					{{- end }}
+					{{- if $.Max}}
+					Max:     "{{$.Max}}",
+					{{- end }}
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+				},
+			),
+{{- end}}

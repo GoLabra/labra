@@ -1,0 +1,62 @@
+    {{- define "recursive_operations_after" }}
+    {{- $isPointer := $.Optional }}
+    {{- if $.Unique }}
+        if data.{{ Pascal $.Name }}.Connect != nil {
+            toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *data.{{ Pascal $.Name }}.Connect)
+            if err != nil {
+                return nil, err
+            }
+            data.{{ Pascal $.Name }}ID =  {{ if $isPointer }}&{{ end }}toConnect.ID
+        }
+        if data.{{ Pascal $.Name }}.Create != nil {
+            var createInput ent.Create{{ $.Type.Name }}Input
+            err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
+
+            if err != nil {
+                return nil, err
+            }
+
+            createInput.{{ Pascal $.Ref.Name }}ID = createdInput.ID
+
+            toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+
+            if err != nil {
+                return nil, err
+            }
+
+            data.{{ Pascal $.Name }}ID = {{ if $isPointer }}&{{ end }}toConnect.ID
+        }
+        {{- else }}
+        if data.{{ Pascal $.Name }}.Connect != nil {
+            for _, connect := range data.{{ Pascal $.Name }}.Connect {
+                toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, connect)
+
+                if err != nil {
+                    return nil, err
+                }
+                
+                data.{{ Singular (Pascal $.Name) }}IDs = append(data.{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
+            }
+        }
+        if data.{{ Pascal $.Name }}.Create != nil {
+            for _, create := range data.{{ Pascal $.Name }}.Create {
+                var createInput ent.Create{{ $.Type.Name }}Input
+                err = mapstructure.Decode(create, &createInput)
+
+                if err != nil {
+                    return nil, err
+                }
+
+                createInput.{{ Pascal $.Ref.Name }}ID = createdInput.ID
+
+                toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+
+                if err != nil {
+                    return nil, err
+                }
+
+                data.{{ Singular (Pascal $.Name) }}IDs = append(data.{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
+            }
+        }
+        {{- end }}
+    {{- end }}

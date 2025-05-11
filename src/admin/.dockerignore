@@ -1,0 +1,26 @@
+# Ignore Next.js build cache and output
+.next/
+.next/cache/
+
+# Ignore dependency directories (only needed inside the container)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore version control files
+.git/
+.gitignore
+
+# Ignore local environment files (they should be managed separately)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignore Docker artifacts
+Dockerfile
+docker-compose.yml
+
+# Ignore documentation and project-specific files
+README.md

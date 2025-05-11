@@ -1,0 +1,33 @@
+{{/*
+GO template for the many relations, the expected parameter to the template is a struct with following template:
+struct {
+    Field *custom_model.FieldModel // The field which owns the relation
+    Ref   *custom_model.FieldModel // The reference to the self relation inverse which is nil in case of most fields but not nil if we have a self relation
+}
+ */}}
+{{- define "many"}}
+        edge.To("{{$.Field.EntName}}", {{$.Field.ActualType}}.Type).
+            {{- if $.Field.Required }}
+            Required().
+            {{- end}}
+            {{- if ne $.Field.Edge nil }}
+            {{- $sk := $.Field.Edge.StorageKey }}
+            {{- if ne $sk nil }}
+            StorageKey(edge.Table("{{ $sk.Table }}")).
+            {{- end }}
+            {{- end }}
+            Annotations(
+                {{template "annotations" $.Field}}
+                 {{- if ne $.Field.DefaultValue nil }}
+                    annotations.DefaultValue(`{{$.Field.DefaultValue}}`),
+                {{- end}}
+            {{- if eq $.Ref nil}}
+            ),
+            {{- else}}
+            ).
+            From("{{$.Ref.EntName}}").
+			Annotations(
+                {{template "annotations" $.Ref}}
+			),
+            {{- end}}
+{{- end}}

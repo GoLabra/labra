@@ -1,0 +1,20 @@
+{{- define "Boolean"}}
+        field.Bool("{{$.EntName}}").
+            {{- if $.Required | IsFalse  }}
+            Optional().
+            Nillable().
+            {{- end}}
+            {{- if ne $.DefaultValue nil }}
+            Default({{$.DefaultValue}}).
+            {{- end}}
+            Annotations(
+                entgql.OrderField("{{$.EntName | CamelCase}}"),
+                annotations.Field{
+                    Caption:   "{{$.Caption}}",
+                    Type: entity.FieldTypeBoolean,
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+                },
+            ),
+{{- end}}

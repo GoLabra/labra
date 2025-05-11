@@ -1,0 +1,46 @@
+{{- define "Time"}}
+        field.Time("{{$.EntName}}").
+            {{- if $.Required | IsFalse  }}
+            Optional().
+            Nillable().
+            {{- end}}
+            {{- if ne $.DefaultValue nil }}
+            Default(func(val string) time.Time {
+                if val == "now" {
+                    return time.Now()
+                }
+                v, err := time.Parse(date.TimeOnlyFormat, val)
+                if err != nil {
+                    return time.Now()
+                }
+                return v
+            }("{{$.DefaultValue}}")).
+            {{- end}}
+            {{- if $.Unique | IsTrue }}
+            Unique().
+            {{- end}}
+            SchemaType(map[string]string{
+                dialect.MySQL:    "time",
+                dialect.Postgres: "time",
+            }).
+            Annotations(
+                entgql.Type("TimeOnly"),
+				entgql.OrderField("{{$.EntName | CamelCase}}"),
+                annotations.Field{
+                    Caption:   "{{$.Caption}}",
+                    Type: entity.FieldTypeTime,
+                    {{- if $.Min}}
+                    Min: "{{$.Min}}",
+                    {{- end }}
+                    {{- if $.Max}}
+                    Max: "{{$.Max}}",
+                    {{- end }}
+                    {{- if $.Private }}
+                    Private: {{$.Private}},
+                    {{- end }}
+                    {{- if $.DefaultValue }}
+                    DefaultValue: "{{$.DefaultValue}}",
+                    {{- end }}
+                },
+            ),
+{{- end}}

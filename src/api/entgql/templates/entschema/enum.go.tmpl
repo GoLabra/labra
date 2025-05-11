@@ -1,0 +1,13 @@
+{{- define "Enum" }}
+		field.Enum("{{$.EntName}}").
+			GoType(enum.{{$.Type}}("")).
+            {{- if $.Required | IsFalse  }}
+            Optional().
+            {{- end}}
+            {{- if $.DefaultValue}}
+			Default(string(enum.{{$.Type}}{{$.DefaultValue}})).
+            {{- end}}
+			Annotations(
+                entgql.Type("{{$.Type}}"),
+			),
+{{- end }}

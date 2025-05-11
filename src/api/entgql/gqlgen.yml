@@ -1,0 +1,88 @@
+# schema tells gqlgen when the GraphQL schema is located.
+schema:
+  - ./graphql/*.graphql
+
+
+exec:
+  filename: ./generated/generated.go
+  package: gqlgen
+
+resolver:
+  layout: follow-schema
+  dir: ./resolvers
+  package: resolvers
+
+model:
+  filename: ./generated/models_gen.go
+  package: gqlgen
+
+# gqlgen will search for any type names in the schema in these go packages
+# if they match it will use them, otherwise it will generate them.
+# omit_slice_element_pointers: true
+
+# autobind tells gqlgen to search for any type names in the GraphQL schema in the
+# provided package. If they match it will use them, otherwise it will generate new.
+autobind:
+  - github.com/99designs/gqlgen/graphql/introspection
+  - github.com/GoLabra/labrago/src/api/entgql/entity
+
+# This section declares type mapping between the GraphQL and Go type systems.
+models:
+  Node:
+    model:
+      - ./ent.Noder
+  DateOnly:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/date.DateOnly
+  TimeOnly:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/date.TimeOnly
+  DateTime:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/date.DateTime
+  Field:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.Field
+  Edge:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.Edge
+  Entity:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.Entity
+  EntityWhereUniqueInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.EntityWhereUniqueInput
+  UpdateEntityInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.UpdateEntityInput
+  CreateEntityInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.CreateEntityInput
+  RoleType:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/enum.CreateEntityInput
+  RelationType:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.RelationType
+  EntityOwner:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.EntityOwner
+  FieldWhereUniqueInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.FieldWhereUniqueInput
+  CreateManyFieldsInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.CreateManyFieldsInput
+  CreateManyEdgesInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.CreateManyEdgesInput
+  UpdateManyFieldsInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.UpdateManyFieldsInput
+  UpdateManyEdgesInput:
+    model:
+      - github.com/GoLabra/labrago/src/api/entgql/entity.UpdateManyEdgesInput
+  AppStatus:
+    model:
+      - github.com/GoLabra/labrago/src/api/subscription.AppStatus
+

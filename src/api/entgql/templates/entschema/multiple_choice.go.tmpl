@@ -1,0 +1,36 @@
+{{- define "MultipleChoice"}}
+		field.Strings("{{$.EntName}}").
+            {{- if $.Required | IsFalse  }}
+            Optional().
+            {{- end}}
+            {{- if ne $.DefaultValue nil }}
+			Default(entity.JSONDefaultValue[[]string](`{{$.DefaultValue}}`)).
+            {{- end}}
+            Validate(func(vals []string) error {
+                acceptedValues := map[string]bool{}
+                for _, acceptedValue := range []string { {{ StringsJoin $.AcceptedValues }} } {
+                    acceptedValues[acceptedValue] = true
+                }
+
+                for _, val := range vals {
+                    if accepted, ok := acceptedValues[val]; !accepted || !ok {
+                        return fmt.Errorf("value \"%s\" is not an accepted value", val)
+                    }
+                }
+                return nil
+            }).
+            Annotations(
+                entgql.Type("[String!]"),    
+                annotations.Field{
+                    Caption:   "{{$.Caption}}",
+                    Type: entity.FieldTypeMultipleChoice,
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+                    {{- if $.DefaultValue }}
+                    DefaultValue: `{{$.DefaultValue}}`,
+                    {{- end }}
+					AcceptedValues: []string{ {{ StringsJoin $.AcceptedValues }} },
+                },
+            ),
+{{- end}}

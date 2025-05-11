@@ -1,0 +1,25 @@
+{{- range $n := $.Graph.Nodes }}
+{{- $extendedFields := ($n.Fields | GetExtendedTypes) }}
+{{- if gt (len $extendedFields) 0 }}
+extend type {{$n.Name}} {
+{{- range $f := $extendedFields }}
+{{- if eq $f.Annotations.CustomType "Model"}}
+{{- if eq $f.Annotations.ActualType "Text"}}
+    {{$f.Name | CustomFieldName | Camel}}: Model
+{{- end}}
+{{- if eq $f.Annotations.ActualType "List"}}
+    {{$f.Name | CustomFieldName | Camel | Plural}}: [Model]
+{{- end}}
+{{- end}}
+{{- if eq $f.Annotations.CustomType "Field"}}
+{{- if eq $f.Annotations.ActualType "Text"}}
+    {{$f.Name | CustomFieldName | Camel}}: FieldModel
+{{- end}}
+{{- if eq $f.Annotations.ActualType "List"}}
+    {{$f.Name | CustomFieldName | Camel | Plural}}: [FieldModel]
+{{- end}}
+{{- end}}
+{{- end}}
+}
+{{- end }}
+{{- end }}

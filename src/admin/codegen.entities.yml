@@ -1,0 +1,14 @@
+schema: "http://localhost:4000/entity"
+documents:
+#  - "src/app/**/*.{ts,tsx}"
+#  - "src/components/**/*.{ts,tsx}"
+#  - "src/core-features/**/*.{ts,tsx}"
+#  - "src/features/**/*.{ts,tsx}"
+#  - "src/hooks/**/*.{ts,tsx}"
+overwrite: true
+generates:
+  src/lib/apollo/graphql.entities.tsx:
+    plugins:
+      - "typescript"
+#      - typescript-operations
+#      - typescript-react-apollo

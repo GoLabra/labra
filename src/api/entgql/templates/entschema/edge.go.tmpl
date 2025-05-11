@@ -1,0 +1,35 @@
+{{- define "edge"}}
+        edge.{{ if eq $.Edge.Ref "" }}To{{ else }}From{{end}}("{{$.Edge.EntName}}", {{$.Edge.Type}}.Type).
+            {{- if $.Edge.Required | IsTrue  }}
+            Required().
+            {{- end}}
+            {{- if ne $.Edge.Ref "" }}
+            Ref("{{ $.Edge.Ref }}").
+            {{- end}}
+            {{- if  or (eq $.Edge.RelationType "OneToOne") (eq $.Edge.RelationType "OneToMany") (eq $.Edge.RelationType "One")}}
+            Unique().
+            {{- end }}
+            Annotations(
+				annotations.Edge{
+					Caption:      "{{$.Edge.Caption}}",
+                    RelationType: entity.RelationType{{$.Edge.RelationType.VariableName}},
+				},
+            {{- if eq $.Ref nil}}
+            ),
+            {{- else}}
+            ).
+            From("{{$.Ref.EntName}}").
+            {{- if $.Ref.Required | IsTrue  }}
+            Required().
+            {{- end}}
+            {{- if  or (eq $.Ref.RelationType "O2O") (eq $.Ref.RelationType "O2M") (eq $.Ref.RelationType "One")}}
+            Unique().
+            {{- end }}
+			Annotations(
+				annotations.Edge{
+					Caption:      "{{$.Ref.Caption}}",
+                    RelationType: entity.RelationType{{$.Edge.RelationType.VariableName}},
+				},
+			),
+            {{- end}}
+{{- end}}

@@ -1,0 +1,27 @@
+{{- define "ShortText"}}
+		field.String("{{$.EntName}}").
+			{{- if $.Required | IsFalse  }}
+			Optional().
+            Nillable().
+			{{- end}}
+			{{- if ne $.DefaultValue nil }}
+			Default("{{$.DefaultValue}}").
+			{{- end}}
+			{{- if $.Unique | IsTrue }}
+			Unique().
+			{{- end}}
+			SchemaType(map[string]string{
+				dialect.MySQL:    "VARCHAR(255)",
+				dialect.Postgres: "VARCHAR(255)",
+			}).
+			Annotations(
+				entgql.OrderField("{{$.EntName | CamelCase}}"),
+				annotations.Field{
+					Caption:   "{{$.Caption}}",
+					Type: entity.FieldTypeShortText,
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+				},
+			),
+{{- end}}

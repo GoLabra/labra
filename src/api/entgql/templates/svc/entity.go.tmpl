@@ -1,0 +1,108 @@
+package svc
+
+import (
+	"context"
+	"app/ent"
+    "app/domain/repo"
+)
+
+type {{$.Name}} struct {
+    repository *repo.Repository
+}
+
+func New{{$.Name}}(r *repo.Repository) *{{$.Name}} {
+	return &{{$.Name}}{repository: r}
+}
+
+
+func (s *{{$.Name}}) Get(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.Get(ctx, where, orderBy, skip, first, last)
+}
+
+func (s *{{$.Name}}) Connection(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) (*ent.{{$.Name}}Connection, error) {
+	return s.repository.{{$.Name}}.Connection(ctx, where, orderBy, skip, first, last)
+}
+
+func (s *{{$.Name}}) GetOne(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.GetOne(ctx, where)
+}
+
+func (s *{{$.Name}}) GetTx(ctx context.Context, tx *ent.Tx, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.GetTx(ctx, tx, where, orderBy, skip, first, last)
+}
+
+func (s *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.GetOneTx(ctx, tx, where)
+}
+
+func (s *{{$.Name}}) CreateTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	createdInput, err := s.repository.{{$.Name}}.CreateTx(ctx, tx, data)
+	if err != nil {
+		return nil, err
+	}
+	return createdInput, err
+}
+
+func (s *{{$.Name}}) Create(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	createdInput, err := s.repository.{{$.Name}}.Create(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+	return createdInput, err
+}
+
+func (s *{{$.Name}}) CreateMany(ctx context.Context, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.CreateMany(ctx, data)
+}
+
+func (s *{{$.Name}}) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.CreateManyTx(ctx, tx, data)
+}
+
+func (s *{{$.Name}}) Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.Update(ctx, where, data)
+}
+
+func (s *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.UpdateTx(ctx, tx, where, data)
+}
+
+func (s *{{$.Name}}) UpdateMany(ctx context.Context, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error) {
+	return s.repository.{{$.Name}}.UpdateMany(ctx, where, data)
+}
+
+func (s *{{$.Name}}) UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error) {
+	return s.repository.{{$.Name}}.UpdateManyTx(ctx, tx, where, data)
+}
+
+func (s *{{$.Name}}) Upsert(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.Upsert(ctx, data)
+}
+
+func (s *{{$.Name}}) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.UpsertTx(ctx, tx, data)
+}
+
+func (s *{{$.Name}}) UpsertMany(ctx context.Context, data []ent.Create{{$.Name}}Input) (int, error) {
+	return s.repository.{{$.Name}}.UpsertMany(ctx, data)
+}
+
+func (s *{{$.Name}}) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Create{{$.Name}}Input) (int, error) {
+	return s.repository.{{$.Name}}.UpsertManyTx(ctx, tx, data)
+}
+
+func (s *{{$.Name}}) Delete(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.Delete(ctx, where)
+}
+
+func (s *{{$.Name}}) DeleteTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.DeleteTx(ctx, tx, where)
+}
+
+func (s *{{$.Name}}) DeleteMany(ctx context.Context, where ent.{{$.Name}}WhereInput) (int, error) {
+	return s.repository.{{$.Name}}.DeleteMany(ctx, where)
+}
+
+func (s *{{$.Name}}) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput) (int, error) {
+	return s.repository.{{$.Name}}.DeleteManyTx(ctx, tx, where)
+}

@@ -1,0 +1,24 @@
+{{- define "Email"}}
+	  	field.String("{{$.EntName}}").
+			{{- if $.Required | IsFalse  }}
+			Optional().
+            Nillable().
+			{{- end}}
+			{{- if ne $.DefaultValue nil }}
+			Default("{{$.DefaultValue}}").
+			{{- end}}
+			{{- if $.Unique | IsTrue }}
+			Unique().
+			{{- end}}
+			Validate(entity.ValidateEmail).
+			Annotations(
+				entgql.OrderField("{{$.EntName | CamelCase}}"),
+				annotations.Field{
+					Caption:   "{{$.Caption}}",
+					Type: entity.FieldTypeEmail,
+					{{- if $.Private }}
+					Private: {{$.Private}},
+					{{- end }}
+				},
+			),
+{{- end}}
