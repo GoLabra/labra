@@ -1,4 +1,4 @@
-# Why does LabraGo exist? :
+# Why does LabraGo exist?
 
 ## Because we exist 🙂
 
