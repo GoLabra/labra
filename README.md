@@ -178,7 +178,7 @@ You should see startup logs indicating successful DB connection and GraphQL endp
 2. In `/app/go.mod`, replace the placeholder with your local path:
 
    ```go
-   replace github.com/GoLabra/labrago/src/api => ../api
+   replace github.com/GoLabra/labra/src/api => ../api
    ```
 
    or run the command bellow

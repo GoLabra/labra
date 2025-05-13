@@ -17,8 +17,8 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
-	"github.com/GoLabra/labrago/src/api/entgql/enum"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/enum"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -1917,7 +1917,7 @@ enum RoleOrderField {
 """
 RoleRoleType is enum for the field type
 """
-enum RoleRoleType @goModel(model: "github.com/GoLabra/labrago/src/api/entgql/enum.RoleType") {
+enum RoleRoleType @goModel(model: "github.com/GoLabra/labra/src/api/entgql/enum.RoleType") {
   Admin
   Api
 }

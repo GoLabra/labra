@@ -14,8 +14,8 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
-	"github.com/GoLabra/labrago/src/api/subscription"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/subscription"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )

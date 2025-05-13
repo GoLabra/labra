@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/GoLabra/labrago/src/api/cache"
-	"github.com/GoLabra/labrago/src/api/domain/svc"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
-	"github.com/GoLabra/labrago/src/api/mocks"
-	. "github.com/GoLabra/labrago/src/api/utils"
+	"github.com/GoLabra/labra/src/api/cache"
+	"github.com/GoLabra/labra/src/api/domain/svc"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/mocks"
+	. "github.com/GoLabra/labra/src/api/utils"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"

@@ -1,4 +1,4 @@
-module github.com/GoLabra/labrago/src/api
+module github.com/GoLabra/labra/src/api
 
 go 1.23.0
 
@@ -7,6 +7,7 @@ toolchain go1.23.7
 require (
 	entgo.io/ent v0.13.1
 	github.com/99designs/gqlgen v0.17.66
+	github.com/GoLabra/labrago/src/api v0.1.2
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/centrifugal/gocent/v3 v3.3.0
 	github.com/gertd/go-pluralize v0.2.1

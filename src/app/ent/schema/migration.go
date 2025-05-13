@@ -1,15 +1,16 @@
 package schema
 
 import (
-	"entgo.io/ent/schema/edge"
 	"time"
+
+	"entgo.io/ent/schema/edge"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
-	"github.com/GoLabra/labrago/src/api/entgql/annotations"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/annotations"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/lucsky/cuid"
 )
 

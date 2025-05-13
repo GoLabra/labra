@@ -348,7 +348,7 @@ enum RoleOrderField {
 """
 RoleRoleType is enum for the field type
 """
-enum RoleRoleType @goModel(model: "github.com/GoLabra/labrago/src/api/entgql/enum.RoleType") {
+enum RoleRoleType @goModel(model: "github.com/GoLabra/labra/src/api/entgql/enum.RoleType") {
   Admin
   Api
 }

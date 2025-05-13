@@ -10,11 +10,11 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/GoLabra/labrago/src/api/entgql/date"
+	"github.com/GoLabra/labra/src/api/entgql/date"
 	"github.com/lucsky/cuid"
 
-	"github.com/GoLabra/labrago/src/api/entgql/annotations"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/annotations"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
 )
 
 // Permission holds the schema definition for the  Permission entity.

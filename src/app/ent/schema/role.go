@@ -8,9 +8,9 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/GoLabra/labrago/src/api/entgql/annotations"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
-	"github.com/GoLabra/labrago/src/api/entgql/enum"
+	"github.com/GoLabra/labra/src/api/entgql/annotations"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/enum"
 	"github.com/lucsky/cuid"
 )
 

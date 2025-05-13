@@ -10,10 +10,10 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
-	"github.com/GoLabra/labrago/src/api/entgql/templates"
-	"github.com/GoLabra/labrago/src/api/strcase"
-	"github.com/GoLabra/labrago/src/api/subscription"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/templates"
+	"github.com/GoLabra/labra/src/api/strcase"
+	"github.com/GoLabra/labra/src/api/subscription"
 )
 
 type FileSystem interface {
@@ -29,8 +29,8 @@ type SubscriptionClient interface {
 }
 
 type SchemaManager struct {
-	fs                 FileSystem
-	subscriptionClient SubscriptionClient
+	fs                            FileSystem
+	subscriptionClient            SubscriptionClient
 	schemaDateImportPath          string
 	generateLocation              string
 	entschemaTemplateRelativePath string
@@ -44,7 +44,7 @@ func NewSchemaManager(fs FileSystem, schemaPath string, generateLocation string,
 	return SchemaManager{
 		fs:                            fs,
 		subscriptionClient:            subscriptionClient,
-		schemaDateImportPath:          "github.com/GoLabra/labrago/src/api/entgql/date",
+		schemaDateImportPath:          "github.com/GoLabra/labra/src/api/entgql/date",
 		generateLocation:              generateLocation,
 		entschemaTemplateRelativePath: "entschema/*",
 		userSchemaRelativePath:        fmt.Sprintf("%s/_user/", schemaPath),
@@ -214,7 +214,7 @@ func Imports(fields []entity.Field) map[string]bool {
 			imports["entgo.io/ent/dialect"] = true
 			if field.DefaultValue != nil {
 				imports["time"] = true
-				imports["github.com/GoLabra/labrago/src/api/entgql/date"] = true
+				imports["github.com/GoLabra/labra/src/api/entgql/date"] = true
 			}
 			if field.UpdateDefault {
 				imports["time"] = true
@@ -223,13 +223,13 @@ func Imports(fields []entity.Field) map[string]bool {
 			imports["entgo.io/ent/dialect"] = true
 			if field.DefaultValue != nil {
 				imports["time"] = true
-				imports["github.com/GoLabra/labrago/src/api/entgql/date"] = true
+				imports["github.com/GoLabra/labra/src/api/entgql/date"] = true
 			}
 		case entity.FieldTypeTime:
 			imports["entgo.io/ent/dialect"] = true
 			if field.DefaultValue != nil {
 				imports["time"] = true
-				imports["github.com/GoLabra/labrago/src/api/entgql/date"] = true
+				imports["github.com/GoLabra/labra/src/api/entgql/date"] = true
 			}
 		case entity.FieldTypeJson:
 		case entity.FieldTypeEnum:
