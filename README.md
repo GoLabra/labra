@@ -32,8 +32,8 @@ Follow these steps to set up the project on your local machine:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/GoLabra/labrago.git
-   cd labrago
+   git clone https://github.com/GoLabra/labra.git
+   cd labra
    ```
 
 2. Navigate to the admin project directory:
@@ -111,8 +111,8 @@ Note: Rebuild the application after making changes to environment variables.
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/GoLabra/labrago.git
-   cd labrago/src
+   git clone https://github.com/GoLabra/labra.git
+   cd labra/src
    ```
 
 2. Set Environment Variables
@@ -188,7 +188,7 @@ You should see startup logs indicating successful DB connection and GraphQL endp
    ```
 
    ```bash
-   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labrago\/src\/api => ../api" go.mod
+   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
    ```
 
 ## Contributing
