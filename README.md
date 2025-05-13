@@ -78,10 +78,16 @@ To start the app in production mode:
 
 3. Open your browser and navigate to the production URL (e.g., `http://localhost:3000`).
 
-## Environment Variables
-This project requires environment variables to be set up for proper functionality. Create a `.env.local` file in the root directory and define your variables there. Example:
+## Set Environment Variables
+Before running the app, you’ll need to configure your environment by copying the example file and filling in the values that match your local setup:
 
+```bash
+cd app
+cp .env.example .env
 ```
+
+Here's a sample .env
+```bash
 NEXT_PUBLIC_BRAND_PRODUCT_NAME = "Labra·GO"
 NEXT_PUBLIC_BRAND_COLOR = "blue"
 
@@ -96,9 +102,8 @@ NEXT_PUBLIC_GRAPHQL_ENTITY_PLAYGROUND_URL = "http://your-domain.com:4000/eplaygr
 NEXT_PUBLIC_CENTRIFUGO_URL = "ws://your-domain.com:8000/connection/websocket"
 ```
 
-Refer to the `.env` file for a complete list of required variables.
-
 Note: Rebuild the application after making changes to environment variables.
+
 
 # Running LabraGO – Backend/API
 
@@ -169,13 +174,7 @@ You should see startup logs indicating successful DB connection and GraphQL endp
 
 ## API Development
 
-1. Configure Go to pull from your private GitHub repo
-   
-   ```bash
-   export GOPRIVATE=github.com/PATH_TO_YOUR_REPO
-   ``` 
-
-2. In `/app/go.mod`, replace the placeholder with your local path:
+ In `/app/go.mod`, replace the placeholder with your local path:
 
    ```go
    replace github.com/GoLabra/labra/src/api => ../api
