@@ -11,7 +11,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/GoLabra/labrago/src/api/entgql/enum"
 )
 
 // Role is the model entity for the Role schema.
@@ -21,8 +20,6 @@ type Role struct {
 	ID string `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Type holds the value of the "type" field.
-	Type enum.RoleType `json:"type,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -41,11 +38,18 @@ type RoleEdges struct {
 	CreatedBy *User `json:"created_by,omitempty"`
 	// UpdatedBy holds the value of the updated_by edge.
 	UpdatedBy *User `json:"updated_by,omitempty"`
+	// UserRoles holds the value of the user_roles edge.
+	UserRoles []*User `json:"user_roles,omitempty"`
+	// Permissions holds the value of the permissions edge.
+	Permissions []*Permission `json:"permissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [4]map[string]int
+
+	namedUserRoles   map[string][]*User
+	namedPermissions map[string][]*Permission
 }
 
 // CreatedByOrErr returns the CreatedBy value or an error if the edge
@@ -70,12 +74,30 @@ func (e RoleEdges) UpdatedByOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "updated_by"}
 }
 
+// UserRolesOrErr returns the UserRoles value or an error if the edge
+// was not loaded in eager-loading.
+func (e RoleEdges) UserRolesOrErr() ([]*User, error) {
+	if e.loadedTypes[2] {
+		return e.UserRoles, nil
+	}
+	return nil, &NotLoadedError{edge: "user_roles"}
+}
+
+// PermissionsOrErr returns the Permissions value or an error if the edge
+// was not loaded in eager-loading.
+func (e RoleEdges) PermissionsOrErr() ([]*Permission, error) {
+	if e.loadedTypes[3] {
+		return e.Permissions, nil
+	}
+	return nil, &NotLoadedError{edge: "permissions"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Role) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case role.FieldID, role.FieldName, role.FieldType:
+		case role.FieldID, role.FieldName:
 			values[i] = new(sql.NullString)
 		case role.FieldCreatedAt, role.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -109,12 +131,6 @@ func (r *Role) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				r.Name = value.String
-			}
-		case role.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
-			} else if value.Valid {
-				r.Type = enum.RoleType(value.String)
 			}
 		case role.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -167,6 +183,16 @@ func (r *Role) QueryUpdatedBy() *UserQuery {
 	return NewRoleClient(r.config).QueryUpdatedBy(r)
 }
 
+// QueryUserRoles queries the "user_roles" edge of the Role entity.
+func (r *Role) QueryUserRoles() *UserQuery {
+	return NewRoleClient(r.config).QueryUserRoles(r)
+}
+
+// QueryPermissions queries the "permissions" edge of the Role entity.
+func (r *Role) QueryPermissions() *PermissionQuery {
+	return NewRoleClient(r.config).QueryPermissions(r)
+}
+
 // Update returns a builder for updating this Role.
 // Note that you need to call Role.Unwrap() before calling this method if this Role
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -193,9 +219,6 @@ func (r *Role) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(r.Name)
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", r.Type))
-	builder.WriteString(", ")
 	if v := r.CreatedAt; v != nil {
 		builder.WriteString("created_at=")
 		builder.WriteString(v.Format(time.ANSIC))
@@ -207,6 +230,54 @@ func (r *Role) String() string {
 	}
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedUserRoles returns the UserRoles named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Role) NamedUserRoles(name string) ([]*User, error) {
+	if r.Edges.namedUserRoles == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedUserRoles[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Role) appendNamedUserRoles(name string, edges ...*User) {
+	if r.Edges.namedUserRoles == nil {
+		r.Edges.namedUserRoles = make(map[string][]*User)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedUserRoles[name] = []*User{}
+	} else {
+		r.Edges.namedUserRoles[name] = append(r.Edges.namedUserRoles[name], edges...)
+	}
+}
+
+// NamedPermissions returns the Permissions named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Role) NamedPermissions(name string) ([]*Permission, error) {
+	if r.Edges.namedPermissions == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedPermissions[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Role) appendNamedPermissions(name string, edges ...*Permission) {
+	if r.Edges.namedPermissions == nil {
+		r.Edges.namedPermissions = make(map[string][]*Permission)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedPermissions[name] = []*Permission{}
+	} else {
+		r.Edges.namedPermissions[name] = append(r.Edges.namedPermissions[name], edges...)
+	}
 }
 
 // Roles is a parsable slice of Role.

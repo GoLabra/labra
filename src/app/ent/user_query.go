@@ -28,12 +28,14 @@ type UserQuery struct {
 	withCreatedBy         *UserQuery
 	withRefUpdatedBy      *UserQuery
 	withUpdatedBy         *UserQuery
-	withRole              *RoleQuery
+	withRoles             *RoleQuery
+	withDefaultRole       *RoleQuery
 	withFKs               bool
 	modifiers             []func(*sql.Selector)
 	loadTotal             []func(context.Context, []*User) error
 	withNamedRefCreatedBy map[string]*UserQuery
 	withNamedRefUpdatedBy map[string]*UserQuery
+	withNamedRoles        map[string]*RoleQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -158,8 +160,8 @@ func (uq *UserQuery) QueryUpdatedBy() *UserQuery {
 	return query
 }
 
-// QueryRole chains the current query on the "role" edge.
-func (uq *UserQuery) QueryRole() *RoleQuery {
+// QueryRoles chains the current query on the "roles" edge.
+func (uq *UserQuery) QueryRoles() *RoleQuery {
 	query := (&RoleClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
@@ -172,7 +174,29 @@ func (uq *UserQuery) QueryRole() *RoleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, user.RoleTable, user.RoleColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.RolesTable, user.RolesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDefaultRole chains the current query on the "default_role" edge.
+func (uq *UserQuery) QueryDefaultRole() *RoleQuery {
+	query := (&RoleClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, user.DefaultRoleTable, user.DefaultRoleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -376,7 +400,8 @@ func (uq *UserQuery) Clone() *UserQuery {
 		withCreatedBy:    uq.withCreatedBy.Clone(),
 		withRefUpdatedBy: uq.withRefUpdatedBy.Clone(),
 		withUpdatedBy:    uq.withUpdatedBy.Clone(),
-		withRole:         uq.withRole.Clone(),
+		withRoles:        uq.withRoles.Clone(),
+		withDefaultRole:  uq.withDefaultRole.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -427,14 +452,25 @@ func (uq *UserQuery) WithUpdatedBy(opts ...func(*UserQuery)) *UserQuery {
 	return uq
 }
 
-// WithRole tells the query-builder to eager-load the nodes that are connected to
-// the "role" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithRole(opts ...func(*RoleQuery)) *UserQuery {
+// WithRoles tells the query-builder to eager-load the nodes that are connected to
+// the "roles" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithRoles(opts ...func(*RoleQuery)) *UserQuery {
 	query := (&RoleClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withRole = query
+	uq.withRoles = query
+	return uq
+}
+
+// WithDefaultRole tells the query-builder to eager-load the nodes that are connected to
+// the "default_role" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithDefaultRole(opts ...func(*RoleQuery)) *UserQuery {
+	query := (&RoleClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withDefaultRole = query
 	return uq
 }
 
@@ -517,15 +553,16 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			uq.withRefCreatedBy != nil,
 			uq.withCreatedBy != nil,
 			uq.withRefUpdatedBy != nil,
 			uq.withUpdatedBy != nil,
-			uq.withRole != nil,
+			uq.withRoles != nil,
+			uq.withDefaultRole != nil,
 		}
 	)
-	if uq.withCreatedBy != nil || uq.withUpdatedBy != nil || uq.withRole != nil {
+	if uq.withCreatedBy != nil || uq.withUpdatedBy != nil || uq.withDefaultRole != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -578,9 +615,16 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withRole; query != nil {
-		if err := uq.loadRole(ctx, query, nodes, nil,
-			func(n *User, e *Role) { n.Edges.Role = e }); err != nil {
+	if query := uq.withRoles; query != nil {
+		if err := uq.loadRoles(ctx, query, nodes,
+			func(n *User) { n.Edges.Roles = []*Role{} },
+			func(n *User, e *Role) { n.Edges.Roles = append(n.Edges.Roles, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withDefaultRole; query != nil {
+		if err := uq.loadDefaultRole(ctx, query, nodes, nil,
+			func(n *User, e *Role) { n.Edges.DefaultRole = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -595,6 +639,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadRefUpdatedBy(ctx, query, nodes,
 			func(n *User) { n.appendNamedRefUpdatedBy(name) },
 			func(n *User, e *User) { n.appendNamedRefUpdatedBy(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range uq.withNamedRoles {
+		if err := uq.loadRoles(ctx, query, nodes,
+			func(n *User) { n.appendNamedRoles(name) },
+			func(n *User, e *Role) { n.appendNamedRoles(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -732,14 +783,75 @@ func (uq *UserQuery) loadUpdatedBy(ctx context.Context, query *UserQuery, nodes 
 	}
 	return nil
 }
-func (uq *UserQuery) loadRole(ctx context.Context, query *RoleQuery, nodes []*User, init func(*User), assign func(*User, *Role)) error {
+func (uq *UserQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes []*User, init func(*User), assign func(*User, *Role)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[string]*User)
+	nids := make(map[string]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.RolesTable)
+		s.Join(joinT).On(s.C(role.FieldID), joinT.C(user.RolesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.RolesPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.RolesPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullString)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Role](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "roles" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadDefaultRole(ctx context.Context, query *RoleQuery, nodes []*User, init func(*User), assign func(*User, *Role)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*User)
 	for i := range nodes {
-		if nodes[i].user_role == nil {
+		if nodes[i].user_default_role == nil {
 			continue
 		}
-		fk := *nodes[i].user_role
+		fk := *nodes[i].user_default_role
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -756,7 +868,7 @@ func (uq *UserQuery) loadRole(ctx context.Context, query *RoleQuery, nodes []*Us
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_role" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_default_role" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -874,6 +986,20 @@ func (uq *UserQuery) WithNamedRefUpdatedBy(name string, opts ...func(*UserQuery)
 		uq.withNamedRefUpdatedBy = make(map[string]*UserQuery)
 	}
 	uq.withNamedRefUpdatedBy[name] = query
+	return uq
+}
+
+// WithNamedRoles tells the query-builder to eager-load the nodes that are connected to the "roles"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithNamedRoles(name string, opts ...func(*RoleQuery)) *UserQuery {
+	query := (&RoleClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if uq.withNamedRoles == nil {
+		uq.withNamedRoles = make(map[string]*RoleQuery)
+	}
+	uq.withNamedRoles[name] = query
 	return uq
 }
 

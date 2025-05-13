@@ -4,20 +4,30 @@ package ent
 
 import (
 	"context"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
-func (m *Migration) CreatedBy(ctx context.Context) (*User, error) {
-	result, err := m.Edges.CreatedByOrErr()
+func (pe *Permission) CreatedBy(ctx context.Context) (*User, error) {
+	result, err := pe.Edges.CreatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = m.QueryCreatedBy().Only(ctx)
+		result, err = pe.QueryCreatedBy().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
 
-func (m *Migration) UpdatedBy(ctx context.Context) (*User, error) {
-	result, err := m.Edges.UpdatedByOrErr()
+func (pe *Permission) UpdatedBy(ctx context.Context) (*User, error) {
+	result, err := pe.Edges.UpdatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = m.QueryUpdatedBy().Only(ctx)
+		result, err = pe.QueryUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (pe *Permission) Role(ctx context.Context) (*Role, error) {
+	result, err := pe.Edges.RoleOrErr()
+	if IsNotLoaded(err) {
+		result, err = pe.QueryRole().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
@@ -38,6 +48,30 @@ func (r *Role) UpdatedBy(ctx context.Context) (*User, error) {
 	return result, MaskNotFound(err)
 }
 
+func (r *Role) UserRoles(ctx context.Context) (result []*User, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedUserRoles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.UserRolesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryUserRoles().All(ctx)
+	}
+	return result, err
+}
+
+func (r *Role) Permissions(ctx context.Context) (result []*Permission, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedPermissions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.PermissionsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryPermissions().All(ctx)
+	}
+	return result, err
+}
+
 func (u *User) CreatedBy(ctx context.Context) (*User, error) {
 	result, err := u.Edges.CreatedByOrErr()
 	if IsNotLoaded(err) {
@@ -54,10 +88,22 @@ func (u *User) UpdatedBy(ctx context.Context) (*User, error) {
 	return result, MaskNotFound(err)
 }
 
-func (u *User) Role(ctx context.Context) (*Role, error) {
-	result, err := u.Edges.RoleOrErr()
+func (u *User) Roles(ctx context.Context) (result []*Role, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = u.NamedRoles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = u.Edges.RolesOrErr()
+	}
 	if IsNotLoaded(err) {
-		result, err = u.QueryRole().Only(ctx)
+		result, err = u.QueryRoles().All(ctx)
+	}
+	return result, err
+}
+
+func (u *User) DefaultRole(ctx context.Context) (*Role, error) {
+	result, err := u.Edges.DefaultRoleOrErr()
+	if IsNotLoaded(err) {
+		result, err = u.QueryDefaultRole().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }

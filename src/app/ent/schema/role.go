@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/GoLabra/labra/src/api/entgql/annotations"
 	"github.com/GoLabra/labra/src/api/entgql/entity"
-	"github.com/GoLabra/labra/src/api/entgql/enum"
 	"github.com/lucsky/cuid"
 )
 
@@ -46,21 +45,12 @@ func (Role) Fields() []ent.Field {
 			),
 		field.String("name").
 			NotEmpty().
+			Unique().
 			Annotations(
 				entgql.OrderField("name"),
 				annotations.Field{
 					Caption: "Name",
 					Type:    entity.FieldTypeShortText,
-				},
-			),
-
-		field.Enum("type").
-			GoType(enum.RoleType("")).
-			Annotations(
-				entgql.OrderField("type"),
-				annotations.Field{
-					Caption: "Type",
-					Type:    entity.FieldType("RoleType"),
 				},
 			),
 
@@ -114,6 +104,24 @@ func (Role) Edges() []ent.Edge {
 				annotations.Edge{
 					Caption:      "Updated By",
 					RelationType: entity.RelationTypeO2M,
+				},
+			),
+
+		edge.From("user_roles", User.Type).
+			Ref("roles").
+			Annotations(
+				annotations.Edge{
+					Caption:      "Role Users",
+					RelationType: entity.RelationTypeM2M,
+				},
+			),
+
+		edge.From("permissions", Permission.Type).
+			Ref("role").
+			Annotations(
+				annotations.Edge{
+					Caption:      "Permissions",
+					RelationType: entity.RelationTypeM2O,
 				},
 			),
 	}

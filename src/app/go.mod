@@ -13,7 +13,6 @@ require (
 	github.com/GoLabra/labra/src/api v0.1.0
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/centrifugal/gocent/v3 v3.3.0
-	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/jwtauth/v5 v5.3.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -39,6 +38,7 @@ require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
+	github.com/gertd/go-pluralize v0.2.1 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect

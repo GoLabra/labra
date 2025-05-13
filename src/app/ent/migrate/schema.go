@@ -8,34 +8,39 @@ import (
 )
 
 var (
-	// MigrationsColumns holds the columns for the "migrations" table.
-	MigrationsColumns = []*schema.Column{
+	// PermissionsColumns holds the columns for the "permissions" table.
+	PermissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
-		{Name: "name", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"sql", "graphql", "go"}},
-		{Name: "direction", Type: field.TypeEnum, Enums: []string{"up", "down"}},
-		{Name: "plugin", Type: field.TypeString, Nullable: true},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "migration_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "migration_updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
+		{Name: "entity", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
+		{Name: "operation", Type: field.TypeString, Default: ""},
+		{Name: "permission_created_by", Type: field.TypeString, Nullable: true},
+		{Name: "permission_updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "permission_role", Type: field.TypeString, Nullable: true},
 	}
-	// MigrationsTable holds the schema information for the "migrations" table.
-	MigrationsTable = &schema.Table{
-		Name:       "migrations",
-		Columns:    MigrationsColumns,
-		PrimaryKey: []*schema.Column{MigrationsColumns[0]},
+	// PermissionsTable holds the schema information for the "permissions" table.
+	PermissionsTable = &schema.Table{
+		Name:       "permissions",
+		Columns:    PermissionsColumns,
+		PrimaryKey: []*schema.Column{PermissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "migrations_users_created_by",
-				Columns:    []*schema.Column{MigrationsColumns[7]},
+				Symbol:     "permissions_users_created_by",
+				Columns:    []*schema.Column{PermissionsColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "migrations_users_updated_by",
-				Columns:    []*schema.Column{MigrationsColumns[8]},
+				Symbol:     "permissions_users_updated_by",
+				Columns:    []*schema.Column{PermissionsColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "permissions_roles_role",
+				Columns:    []*schema.Column{PermissionsColumns[7]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -43,8 +48,7 @@ var (
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
-		{Name: "name", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"Admin", "Api"}},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "role_created_by", Type: field.TypeString, Nullable: true},
@@ -58,13 +62,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "roles_users_created_by",
-				Columns:    []*schema.Column{RolesColumns[5]},
+				Columns:    []*schema.Column{RolesColumns[4]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "roles_users_updated_by",
-				Columns:    []*schema.Column{RolesColumns[6]},
+				Columns:    []*schema.Column{RolesColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -73,13 +77,16 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "password", Type: field.TypeString},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "user_created_by", Type: field.TypeString, Nullable: true},
 		{Name: "user_updated_by", Type: field.TypeString, Nullable: true},
-		{Name: "user_role", Type: field.TypeString, Nullable: true},
+		{Name: "user_default_role", Type: field.TypeString, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -89,38 +96,67 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_users_created_by",
-				Columns:    []*schema.Column{UsersColumns[5]},
+				Columns:    []*schema.Column{UsersColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "users_users_updated_by",
-				Columns:    []*schema.Column{UsersColumns[6]},
+				Columns:    []*schema.Column{UsersColumns[9]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "users_roles_role",
-				Columns:    []*schema.Column{UsersColumns[7]},
+				Symbol:     "users_roles_default_role",
+				Columns:    []*schema.Column{UsersColumns[10]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 	}
+	// UserRolesColumns holds the columns for the "user_roles" table.
+	UserRolesColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeString},
+		{Name: "role_id", Type: field.TypeString},
+	}
+	// UserRolesTable holds the schema information for the "user_roles" table.
+	UserRolesTable = &schema.Table{
+		Name:       "user_roles",
+		Columns:    UserRolesColumns,
+		PrimaryKey: []*schema.Column{UserRolesColumns[0], UserRolesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_roles_user_id",
+				Columns:    []*schema.Column{UserRolesColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_roles_role_id",
+				Columns:    []*schema.Column{UserRolesColumns[1]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		MigrationsTable,
+		PermissionsTable,
 		RolesTable,
 		UsersTable,
+		UserRolesTable,
 	}
 )
 
 func init() {
-	MigrationsTable.ForeignKeys[0].RefTable = UsersTable
-	MigrationsTable.ForeignKeys[1].RefTable = UsersTable
+	PermissionsTable.ForeignKeys[0].RefTable = UsersTable
+	PermissionsTable.ForeignKeys[1].RefTable = UsersTable
+	PermissionsTable.ForeignKeys[2].RefTable = RolesTable
 	RolesTable.ForeignKeys[0].RefTable = UsersTable
 	RolesTable.ForeignKeys[1].RefTable = UsersTable
 	UsersTable.ForeignKeys[0].RefTable = UsersTable
 	UsersTable.ForeignKeys[1].RefTable = UsersTable
 	UsersTable.ForeignKeys[2].RefTable = RolesTable
+	UserRolesTable.ForeignKeys[0].RefTable = UsersTable
+	UserRolesTable.ForeignKeys[1].RefTable = RolesTable
 }

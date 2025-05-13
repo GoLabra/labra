@@ -3,31 +3,28 @@
 package ent
 
 // UpdatedFields returns all fields and edges that were changed during this mutation.
-func (m *MigrationMutation) UpdatedFields() map[string]Value {
+func (m *PermissionMutation) UpdatedFields() map[string]Value {
 	var updatedFields = make(map[string]Value)
-	if m.name != nil {
-		updatedFields["name"] = m.name
-	}
-	if m._type != nil {
-		updatedFields["type"] = m._type
-	}
-	if m.direction != nil {
-		updatedFields["direction"] = m.direction
-	}
-	if m.plugin != nil {
-		updatedFields["plugin"] = m.plugin
-	}
 	if m.created_at != nil {
 		updatedFields["created_at"] = m.created_at
 	}
 	if m.updated_at != nil {
 		updatedFields["updated_at"] = m.updated_at
 	}
+	if m.entity != nil {
+		updatedFields["entity"] = m.entity
+	}
+	if m.operation != nil {
+		updatedFields["operation"] = m.operation
+	}
 	if m.created_by != nil {
 		updatedFields["created_by"] = m.created_by
 	}
 	if m.updated_by != nil {
 		updatedFields["updated_by"] = m.updated_by
+	}
+	if m.role != nil {
+		updatedFields["role"] = m.role
 	}
 	return updatedFields
 }
@@ -38,9 +35,6 @@ func (m *RoleMutation) UpdatedFields() map[string]Value {
 	if m.name != nil {
 		updatedFields["name"] = m.name
 	}
-	if m._type != nil {
-		updatedFields["type"] = m._type
-	}
 	if m.created_at != nil {
 		updatedFields["created_at"] = m.created_at
 	}
@@ -52,6 +46,12 @@ func (m *RoleMutation) UpdatedFields() map[string]Value {
 	}
 	if m.updated_by != nil {
 		updatedFields["updated_by"] = m.updated_by
+	}
+	if m.user_roles != nil {
+		updatedFields["user_roles"] = m.user_roles
+	}
+	if m.permissions != nil {
+		updatedFields["permissions"] = m.permissions
 	}
 	return updatedFields
 }
@@ -64,6 +64,15 @@ func (m *UserMutation) UpdatedFields() map[string]Value {
 	}
 	if m.email != nil {
 		updatedFields["email"] = m.email
+	}
+	if m.password != nil {
+		updatedFields["password"] = m.password
+	}
+	if m.first_name != nil {
+		updatedFields["first_name"] = m.first_name
+	}
+	if m.last_name != nil {
+		updatedFields["last_name"] = m.last_name
 	}
 	if m.created_at != nil {
 		updatedFields["created_at"] = m.created_at
@@ -83,8 +92,11 @@ func (m *UserMutation) UpdatedFields() map[string]Value {
 	if m.updated_by != nil {
 		updatedFields["updated_by"] = m.updated_by
 	}
-	if m.role != nil {
-		updatedFields["role"] = m.role
+	if m.roles != nil {
+		updatedFields["roles"] = m.roles
+	}
+	if m.default_role != nil {
+		updatedFields["default_role"] = m.default_role
 	}
 	return updatedFields
 }

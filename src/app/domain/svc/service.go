@@ -3,10 +3,8 @@ package svc
 import (
 	"app/domain/repo"
 	"app/interfaces/svc"
-
-	labraSvc "github.com/GoLabra/labra/src/api/domain/svc"
+	
 	"github.com/GoLabra/labra/src/api/entgql/generator"
-	labraISvc "github.com/GoLabra/labra/src/api/interfaces/svc"
 )
 
 var (
@@ -16,18 +14,16 @@ var (
 
 type Service struct {
 	// Node                  svc.Node
-	Entity    labraISvc.Entity
-	Migration svc.Migration
-	Role      svc.Role
-	User      svc.User
+	Permission              svc.Permission
+	Role              svc.Role
+	User              svc.User
 }
 
 func New(repository *repo.Repository, schemaManager generator.SchemaManager) *Service {
 	return &Service{
 		// Node:                  NewNode(repository),
-		Entity:    labraSvc.NewEntity(schemaManager),
-		Migration: NewMigration(repository),
-		Role:      NewRole(repository),
-		User:      NewUser(repository),
+        Permission:              NewPermission(repository),
+        Role:              NewRole(repository),
+        User:              NewUser(repository),
 	}
 }

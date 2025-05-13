@@ -8,16 +8,16 @@ import (
 	"fmt"
 )
 
-// The MigrationFunc type is an adapter to allow the use of ordinary
-// function as Migration mutator.
-type MigrationFunc func(context.Context, *ent.MigrationMutation) (ent.Value, error)
+// The PermissionFunc type is an adapter to allow the use of ordinary
+// function as Permission mutator.
+type PermissionFunc func(context.Context, *ent.PermissionMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f MigrationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.MigrationMutation); ok {
+func (f PermissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PermissionMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MigrationMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PermissionMutation", m)
 }
 
 // The RoleFunc type is an adapter to allow the use of ordinary

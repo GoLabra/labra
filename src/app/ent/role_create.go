@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"app/ent/permission"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -14,7 +15,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/GoLabra/labrago/src/api/entgql/enum"
 )
 
 // RoleCreate is the builder for creating a Role entity.
@@ -28,12 +28,6 @@ type RoleCreate struct {
 // SetName sets the "name" field.
 func (rc *RoleCreate) SetName(s string) *RoleCreate {
 	rc.mutation.SetName(s)
-	return rc
-}
-
-// SetType sets the "type" field.
-func (rc *RoleCreate) SetType(et enum.RoleType) *RoleCreate {
-	rc.mutation.SetType(et)
 	return rc
 }
 
@@ -117,6 +111,36 @@ func (rc *RoleCreate) SetUpdatedBy(u *User) *RoleCreate {
 	return rc.SetUpdatedByID(u.ID)
 }
 
+// AddUserRoleIDs adds the "user_roles" edge to the User entity by IDs.
+func (rc *RoleCreate) AddUserRoleIDs(ids ...string) *RoleCreate {
+	rc.mutation.AddUserRoleIDs(ids...)
+	return rc
+}
+
+// AddUserRoles adds the "user_roles" edges to the User entity.
+func (rc *RoleCreate) AddUserRoles(u ...*User) *RoleCreate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return rc.AddUserRoleIDs(ids...)
+}
+
+// AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
+func (rc *RoleCreate) AddPermissionIDs(ids ...string) *RoleCreate {
+	rc.mutation.AddPermissionIDs(ids...)
+	return rc
+}
+
+// AddPermissions adds the "permissions" edges to the Permission entity.
+func (rc *RoleCreate) AddPermissions(p ...*Permission) *RoleCreate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return rc.AddPermissionIDs(ids...)
+}
+
 // Mutation returns the RoleMutation object of the builder.
 func (rc *RoleCreate) Mutation() *RoleMutation {
 	return rc.mutation
@@ -176,14 +200,6 @@ func (rc *RoleCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Role.name": %w`, err)}
 		}
 	}
-	if _, ok := rc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Role.type"`)}
-	}
-	if v, ok := rc.mutation.GetType(); ok {
-		if err := role.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Role.type": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -223,10 +239,6 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 		_node.Name = value
-	}
-	if value, ok := rc.mutation.GetType(); ok {
-		_spec.SetField(role.FieldType, field.TypeEnum, value)
-		_node.Type = value
 	}
 	if value, ok := rc.mutation.CreatedAt(); ok {
 		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
@@ -268,6 +280,38 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.role_updated_by = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.UserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.UserRolesTable,
+			Columns: role.UserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.PermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   role.PermissionsTable,
+			Columns: []string{role.PermissionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -331,18 +375,6 @@ func (u *RoleUpsert) SetName(v string) *RoleUpsert {
 // UpdateName sets the "name" field to the value that was provided on create.
 func (u *RoleUpsert) UpdateName() *RoleUpsert {
 	u.SetExcluded(role.FieldName)
-	return u
-}
-
-// SetType sets the "type" field.
-func (u *RoleUpsert) SetType(v enum.RoleType) *RoleUpsert {
-	u.Set(role.FieldType, v)
-	return u
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateType() *RoleUpsert {
-	u.SetExcluded(role.FieldType)
 	return u
 }
 
@@ -426,20 +458,6 @@ func (u *RoleUpsertOne) SetName(v string) *RoleUpsertOne {
 func (u *RoleUpsertOne) UpdateName() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateName()
-	})
-}
-
-// SetType sets the "type" field.
-func (u *RoleUpsertOne) SetType(v enum.RoleType) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetType(v)
-	})
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateType() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateType()
 	})
 }
 
@@ -693,20 +711,6 @@ func (u *RoleUpsertBulk) SetName(v string) *RoleUpsertBulk {
 func (u *RoleUpsertBulk) UpdateName() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateName()
-	})
-}
-
-// SetType sets the "type" field.
-func (u *RoleUpsertBulk) SetType(v enum.RoleType) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetType(v)
-	})
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateType() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateType()
 	})
 }
 

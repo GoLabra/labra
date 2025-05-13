@@ -3,23 +3,21 @@
 package ent
 
 import (
-	"app/ent/migration"
+	"app/ent/permission"
 	"app/ent/predicate"
 	"app/ent/role"
 	"app/ent/user"
 	"errors"
 	"fmt"
 	"time"
-
-	"github.com/GoLabra/labrago/src/api/entgql/enum"
 )
 
-// MigrationWhereInput represents a where input for filtering Migration queries.
-type MigrationWhereInput struct {
-	Predicates []predicate.Migration  `json:"-"`
-	Not        *MigrationWhereInput   `json:"not,omitempty"`
-	Or         []*MigrationWhereInput `json:"or,omitempty"`
-	And        []*MigrationWhereInput `json:"and,omitempty"`
+// PermissionWhereInput represents a where input for filtering Permission queries.
+type PermissionWhereInput struct {
+	Predicates []predicate.Permission  `json:"-"`
+	Not        *PermissionWhereInput   `json:"not,omitempty"`
+	Or         []*PermissionWhereInput `json:"or,omitempty"`
+	And        []*PermissionWhereInput `json:"and,omitempty"`
 
 	// "id" field predicates.
 	ID             *string  `json:"id,omitempty"`
@@ -32,50 +30,6 @@ type MigrationWhereInput struct {
 	IDLTE          *string  `json:"idLTE,omitempty"`
 	IDEqualFold    *string  `json:"idEqualFold,omitempty"`
 	IDContainsFold *string  `json:"idContainsFold,omitempty"`
-
-	// "name" field predicates.
-	Name             *string  `json:"name,omitempty"`
-	NameNEQ          *string  `json:"nameNEQ,omitempty"`
-	NameIn           []string `json:"nameIn,omitempty"`
-	NameNotIn        []string `json:"nameNotIn,omitempty"`
-	NameGT           *string  `json:"nameGT,omitempty"`
-	NameGTE          *string  `json:"nameGTE,omitempty"`
-	NameLT           *string  `json:"nameLT,omitempty"`
-	NameLTE          *string  `json:"nameLTE,omitempty"`
-	NameContains     *string  `json:"nameContains,omitempty"`
-	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
-	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
-	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
-	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "type" field predicates.
-	Type      *migration.Type  `json:"type,omitempty"`
-	TypeNEQ   *migration.Type  `json:"typeNEQ,omitempty"`
-	TypeIn    []migration.Type `json:"typeIn,omitempty"`
-	TypeNotIn []migration.Type `json:"typeNotIn,omitempty"`
-
-	// "direction" field predicates.
-	Direction      *migration.Direction  `json:"direction,omitempty"`
-	DirectionNEQ   *migration.Direction  `json:"directionNEQ,omitempty"`
-	DirectionIn    []migration.Direction `json:"directionIn,omitempty"`
-	DirectionNotIn []migration.Direction `json:"directionNotIn,omitempty"`
-
-	// "plugin" field predicates.
-	Plugin             *string  `json:"plugin,omitempty"`
-	PluginNEQ          *string  `json:"pluginNEQ,omitempty"`
-	PluginIn           []string `json:"pluginIn,omitempty"`
-	PluginNotIn        []string `json:"pluginNotIn,omitempty"`
-	PluginGT           *string  `json:"pluginGT,omitempty"`
-	PluginGTE          *string  `json:"pluginGTE,omitempty"`
-	PluginLT           *string  `json:"pluginLT,omitempty"`
-	PluginLTE          *string  `json:"pluginLTE,omitempty"`
-	PluginContains     *string  `json:"pluginContains,omitempty"`
-	PluginHasPrefix    *string  `json:"pluginHasPrefix,omitempty"`
-	PluginHasSuffix    *string  `json:"pluginHasSuffix,omitempty"`
-	PluginIsNil        bool     `json:"pluginIsNil,omitempty"`
-	PluginNotNil       bool     `json:"pluginNotNil,omitempty"`
-	PluginEqualFold    *string  `json:"pluginEqualFold,omitempty"`
-	PluginContainsFold *string  `json:"pluginContainsFold,omitempty"`
 
 	// "created_at" field predicates.
 	CreatedAt       *time.Time  `json:"createdAt,omitempty"`
@@ -101,6 +55,36 @@ type MigrationWhereInput struct {
 	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
 	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
 
+	// "entity" field predicates.
+	Entity             *string  `json:"entity,omitempty"`
+	EntityNEQ          *string  `json:"entityNEQ,omitempty"`
+	EntityIn           []string `json:"entityIn,omitempty"`
+	EntityNotIn        []string `json:"entityNotIn,omitempty"`
+	EntityGT           *string  `json:"entityGT,omitempty"`
+	EntityGTE          *string  `json:"entityGTE,omitempty"`
+	EntityLT           *string  `json:"entityLT,omitempty"`
+	EntityLTE          *string  `json:"entityLTE,omitempty"`
+	EntityContains     *string  `json:"entityContains,omitempty"`
+	EntityHasPrefix    *string  `json:"entityHasPrefix,omitempty"`
+	EntityHasSuffix    *string  `json:"entityHasSuffix,omitempty"`
+	EntityEqualFold    *string  `json:"entityEqualFold,omitempty"`
+	EntityContainsFold *string  `json:"entityContainsFold,omitempty"`
+
+	// "operation" field predicates.
+	Operation             *string  `json:"operation,omitempty"`
+	OperationNEQ          *string  `json:"operationNEQ,omitempty"`
+	OperationIn           []string `json:"operationIn,omitempty"`
+	OperationNotIn        []string `json:"operationNotIn,omitempty"`
+	OperationGT           *string  `json:"operationGT,omitempty"`
+	OperationGTE          *string  `json:"operationGTE,omitempty"`
+	OperationLT           *string  `json:"operationLT,omitempty"`
+	OperationLTE          *string  `json:"operationLTE,omitempty"`
+	OperationContains     *string  `json:"operationContains,omitempty"`
+	OperationHasPrefix    *string  `json:"operationHasPrefix,omitempty"`
+	OperationHasSuffix    *string  `json:"operationHasSuffix,omitempty"`
+	OperationEqualFold    *string  `json:"operationEqualFold,omitempty"`
+	OperationContainsFold *string  `json:"operationContainsFold,omitempty"`
+
 	// "created_by" edge predicates.
 	HasCreatedBy     *bool             `json:"hasCreatedBy,omitempty"`
 	HasCreatedByWith []*UserWhereInput `json:"hasCreatedByWith,omitempty"`
@@ -108,21 +92,25 @@ type MigrationWhereInput struct {
 	// "updated_by" edge predicates.
 	HasUpdatedBy     *bool             `json:"hasUpdatedBy,omitempty"`
 	HasUpdatedByWith []*UserWhereInput `json:"hasUpdatedByWith,omitempty"`
+
+	// "role" edge predicates.
+	HasRole     *bool             `json:"hasRole,omitempty"`
+	HasRoleWith []*RoleWhereInput `json:"hasRoleWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
-func (i *MigrationWhereInput) AddPredicates(predicates ...predicate.Migration) {
+func (i *PermissionWhereInput) AddPredicates(predicates ...predicate.Permission) {
 	i.Predicates = append(i.Predicates, predicates...)
 }
 
-// Filter applies the MigrationWhereInput filter on the MigrationQuery builder.
-func (i *MigrationWhereInput) Filter(q *MigrationQuery) (*MigrationQuery, error) {
+// Filter applies the PermissionWhereInput filter on the PermissionQuery builder.
+func (i *PermissionWhereInput) Filter(q *PermissionQuery) (*PermissionQuery, error) {
 	if i == nil {
 		return q, nil
 	}
 	p, err := i.P()
 	if err != nil {
-		if err == ErrEmptyMigrationWhereInput {
+		if err == ErrEmptyPermissionWhereInput {
 			return q, nil
 		}
 		return nil, err
@@ -130,19 +118,19 @@ func (i *MigrationWhereInput) Filter(q *MigrationQuery) (*MigrationQuery, error)
 	return q.Where(p), nil
 }
 
-// ErrEmptyMigrationWhereInput is returned in case the MigrationWhereInput is empty.
-var ErrEmptyMigrationWhereInput = errors.New("ent: empty predicate MigrationWhereInput")
+// ErrEmptyPermissionWhereInput is returned in case the PermissionWhereInput is empty.
+var ErrEmptyPermissionWhereInput = errors.New("ent: empty predicate PermissionWhereInput")
 
-// P returns a predicate for filtering migrations.
+// P returns a predicate for filtering permissions.
 // An error is returned if the input is empty or invalid.
-func (i *MigrationWhereInput) P() (predicate.Migration, error) {
-	var predicates []predicate.Migration
+func (i *PermissionWhereInput) P() (predicate.Permission, error) {
+	var predicates []predicate.Permission
 	if i.Not != nil {
 		p, err := i.Not.P()
 		if err != nil {
 			return nil, fmt.Errorf("%w: field 'not'", err)
 		}
-		predicates = append(predicates, migration.Not(p))
+		predicates = append(predicates, permission.Not(p))
 	}
 	switch n := len(i.Or); {
 	case n == 1:
@@ -152,7 +140,7 @@ func (i *MigrationWhereInput) P() (predicate.Migration, error) {
 		}
 		predicates = append(predicates, p)
 	case n > 1:
-		or := make([]predicate.Migration, 0, n)
+		or := make([]predicate.Permission, 0, n)
 		for _, w := range i.Or {
 			p, err := w.P()
 			if err != nil {
@@ -160,7 +148,7 @@ func (i *MigrationWhereInput) P() (predicate.Migration, error) {
 			}
 			or = append(or, p)
 		}
-		predicates = append(predicates, migration.Or(or...))
+		predicates = append(predicates, permission.Or(or...))
 	}
 	switch n := len(i.And); {
 	case n == 1:
@@ -170,7 +158,7 @@ func (i *MigrationWhereInput) P() (predicate.Migration, error) {
 		}
 		predicates = append(predicates, p)
 	case n > 1:
-		and := make([]predicate.Migration, 0, n)
+		and := make([]predicate.Permission, 0, n)
 		for _, w := range i.And {
 			p, err := w.P()
 			if err != nil {
@@ -178,212 +166,182 @@ func (i *MigrationWhereInput) P() (predicate.Migration, error) {
 			}
 			and = append(and, p)
 		}
-		predicates = append(predicates, migration.And(and...))
+		predicates = append(predicates, permission.And(and...))
 	}
 	predicates = append(predicates, i.Predicates...)
 	if i.ID != nil {
-		predicates = append(predicates, migration.IDEQ(*i.ID))
+		predicates = append(predicates, permission.IDEQ(*i.ID))
 	}
 	if i.IDNEQ != nil {
-		predicates = append(predicates, migration.IDNEQ(*i.IDNEQ))
+		predicates = append(predicates, permission.IDNEQ(*i.IDNEQ))
 	}
 	if len(i.IDIn) > 0 {
-		predicates = append(predicates, migration.IDIn(i.IDIn...))
+		predicates = append(predicates, permission.IDIn(i.IDIn...))
 	}
 	if len(i.IDNotIn) > 0 {
-		predicates = append(predicates, migration.IDNotIn(i.IDNotIn...))
+		predicates = append(predicates, permission.IDNotIn(i.IDNotIn...))
 	}
 	if i.IDGT != nil {
-		predicates = append(predicates, migration.IDGT(*i.IDGT))
+		predicates = append(predicates, permission.IDGT(*i.IDGT))
 	}
 	if i.IDGTE != nil {
-		predicates = append(predicates, migration.IDGTE(*i.IDGTE))
+		predicates = append(predicates, permission.IDGTE(*i.IDGTE))
 	}
 	if i.IDLT != nil {
-		predicates = append(predicates, migration.IDLT(*i.IDLT))
+		predicates = append(predicates, permission.IDLT(*i.IDLT))
 	}
 	if i.IDLTE != nil {
-		predicates = append(predicates, migration.IDLTE(*i.IDLTE))
+		predicates = append(predicates, permission.IDLTE(*i.IDLTE))
 	}
 	if i.IDEqualFold != nil {
-		predicates = append(predicates, migration.IDEqualFold(*i.IDEqualFold))
+		predicates = append(predicates, permission.IDEqualFold(*i.IDEqualFold))
 	}
 	if i.IDContainsFold != nil {
-		predicates = append(predicates, migration.IDContainsFold(*i.IDContainsFold))
-	}
-	if i.Name != nil {
-		predicates = append(predicates, migration.NameEQ(*i.Name))
-	}
-	if i.NameNEQ != nil {
-		predicates = append(predicates, migration.NameNEQ(*i.NameNEQ))
-	}
-	if len(i.NameIn) > 0 {
-		predicates = append(predicates, migration.NameIn(i.NameIn...))
-	}
-	if len(i.NameNotIn) > 0 {
-		predicates = append(predicates, migration.NameNotIn(i.NameNotIn...))
-	}
-	if i.NameGT != nil {
-		predicates = append(predicates, migration.NameGT(*i.NameGT))
-	}
-	if i.NameGTE != nil {
-		predicates = append(predicates, migration.NameGTE(*i.NameGTE))
-	}
-	if i.NameLT != nil {
-		predicates = append(predicates, migration.NameLT(*i.NameLT))
-	}
-	if i.NameLTE != nil {
-		predicates = append(predicates, migration.NameLTE(*i.NameLTE))
-	}
-	if i.NameContains != nil {
-		predicates = append(predicates, migration.NameContains(*i.NameContains))
-	}
-	if i.NameHasPrefix != nil {
-		predicates = append(predicates, migration.NameHasPrefix(*i.NameHasPrefix))
-	}
-	if i.NameHasSuffix != nil {
-		predicates = append(predicates, migration.NameHasSuffix(*i.NameHasSuffix))
-	}
-	if i.NameEqualFold != nil {
-		predicates = append(predicates, migration.NameEqualFold(*i.NameEqualFold))
-	}
-	if i.NameContainsFold != nil {
-		predicates = append(predicates, migration.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Type != nil {
-		predicates = append(predicates, migration.TypeEQ(*i.Type))
-	}
-	if i.TypeNEQ != nil {
-		predicates = append(predicates, migration.TypeNEQ(*i.TypeNEQ))
-	}
-	if len(i.TypeIn) > 0 {
-		predicates = append(predicates, migration.TypeIn(i.TypeIn...))
-	}
-	if len(i.TypeNotIn) > 0 {
-		predicates = append(predicates, migration.TypeNotIn(i.TypeNotIn...))
-	}
-	if i.Direction != nil {
-		predicates = append(predicates, migration.DirectionEQ(*i.Direction))
-	}
-	if i.DirectionNEQ != nil {
-		predicates = append(predicates, migration.DirectionNEQ(*i.DirectionNEQ))
-	}
-	if len(i.DirectionIn) > 0 {
-		predicates = append(predicates, migration.DirectionIn(i.DirectionIn...))
-	}
-	if len(i.DirectionNotIn) > 0 {
-		predicates = append(predicates, migration.DirectionNotIn(i.DirectionNotIn...))
-	}
-	if i.Plugin != nil {
-		predicates = append(predicates, migration.PluginEQ(*i.Plugin))
-	}
-	if i.PluginNEQ != nil {
-		predicates = append(predicates, migration.PluginNEQ(*i.PluginNEQ))
-	}
-	if len(i.PluginIn) > 0 {
-		predicates = append(predicates, migration.PluginIn(i.PluginIn...))
-	}
-	if len(i.PluginNotIn) > 0 {
-		predicates = append(predicates, migration.PluginNotIn(i.PluginNotIn...))
-	}
-	if i.PluginGT != nil {
-		predicates = append(predicates, migration.PluginGT(*i.PluginGT))
-	}
-	if i.PluginGTE != nil {
-		predicates = append(predicates, migration.PluginGTE(*i.PluginGTE))
-	}
-	if i.PluginLT != nil {
-		predicates = append(predicates, migration.PluginLT(*i.PluginLT))
-	}
-	if i.PluginLTE != nil {
-		predicates = append(predicates, migration.PluginLTE(*i.PluginLTE))
-	}
-	if i.PluginContains != nil {
-		predicates = append(predicates, migration.PluginContains(*i.PluginContains))
-	}
-	if i.PluginHasPrefix != nil {
-		predicates = append(predicates, migration.PluginHasPrefix(*i.PluginHasPrefix))
-	}
-	if i.PluginHasSuffix != nil {
-		predicates = append(predicates, migration.PluginHasSuffix(*i.PluginHasSuffix))
-	}
-	if i.PluginIsNil {
-		predicates = append(predicates, migration.PluginIsNil())
-	}
-	if i.PluginNotNil {
-		predicates = append(predicates, migration.PluginNotNil())
-	}
-	if i.PluginEqualFold != nil {
-		predicates = append(predicates, migration.PluginEqualFold(*i.PluginEqualFold))
-	}
-	if i.PluginContainsFold != nil {
-		predicates = append(predicates, migration.PluginContainsFold(*i.PluginContainsFold))
+		predicates = append(predicates, permission.IDContainsFold(*i.IDContainsFold))
 	}
 	if i.CreatedAt != nil {
-		predicates = append(predicates, migration.CreatedAtEQ(*i.CreatedAt))
+		predicates = append(predicates, permission.CreatedAtEQ(*i.CreatedAt))
 	}
 	if i.CreatedAtNEQ != nil {
-		predicates = append(predicates, migration.CreatedAtNEQ(*i.CreatedAtNEQ))
+		predicates = append(predicates, permission.CreatedAtNEQ(*i.CreatedAtNEQ))
 	}
 	if len(i.CreatedAtIn) > 0 {
-		predicates = append(predicates, migration.CreatedAtIn(i.CreatedAtIn...))
+		predicates = append(predicates, permission.CreatedAtIn(i.CreatedAtIn...))
 	}
 	if len(i.CreatedAtNotIn) > 0 {
-		predicates = append(predicates, migration.CreatedAtNotIn(i.CreatedAtNotIn...))
+		predicates = append(predicates, permission.CreatedAtNotIn(i.CreatedAtNotIn...))
 	}
 	if i.CreatedAtGT != nil {
-		predicates = append(predicates, migration.CreatedAtGT(*i.CreatedAtGT))
+		predicates = append(predicates, permission.CreatedAtGT(*i.CreatedAtGT))
 	}
 	if i.CreatedAtGTE != nil {
-		predicates = append(predicates, migration.CreatedAtGTE(*i.CreatedAtGTE))
+		predicates = append(predicates, permission.CreatedAtGTE(*i.CreatedAtGTE))
 	}
 	if i.CreatedAtLT != nil {
-		predicates = append(predicates, migration.CreatedAtLT(*i.CreatedAtLT))
+		predicates = append(predicates, permission.CreatedAtLT(*i.CreatedAtLT))
 	}
 	if i.CreatedAtLTE != nil {
-		predicates = append(predicates, migration.CreatedAtLTE(*i.CreatedAtLTE))
+		predicates = append(predicates, permission.CreatedAtLTE(*i.CreatedAtLTE))
 	}
 	if i.CreatedAtIsNil {
-		predicates = append(predicates, migration.CreatedAtIsNil())
+		predicates = append(predicates, permission.CreatedAtIsNil())
 	}
 	if i.CreatedAtNotNil {
-		predicates = append(predicates, migration.CreatedAtNotNil())
+		predicates = append(predicates, permission.CreatedAtNotNil())
 	}
 	if i.UpdatedAt != nil {
-		predicates = append(predicates, migration.UpdatedAtEQ(*i.UpdatedAt))
+		predicates = append(predicates, permission.UpdatedAtEQ(*i.UpdatedAt))
 	}
 	if i.UpdatedAtNEQ != nil {
-		predicates = append(predicates, migration.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+		predicates = append(predicates, permission.UpdatedAtNEQ(*i.UpdatedAtNEQ))
 	}
 	if len(i.UpdatedAtIn) > 0 {
-		predicates = append(predicates, migration.UpdatedAtIn(i.UpdatedAtIn...))
+		predicates = append(predicates, permission.UpdatedAtIn(i.UpdatedAtIn...))
 	}
 	if len(i.UpdatedAtNotIn) > 0 {
-		predicates = append(predicates, migration.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+		predicates = append(predicates, permission.UpdatedAtNotIn(i.UpdatedAtNotIn...))
 	}
 	if i.UpdatedAtGT != nil {
-		predicates = append(predicates, migration.UpdatedAtGT(*i.UpdatedAtGT))
+		predicates = append(predicates, permission.UpdatedAtGT(*i.UpdatedAtGT))
 	}
 	if i.UpdatedAtGTE != nil {
-		predicates = append(predicates, migration.UpdatedAtGTE(*i.UpdatedAtGTE))
+		predicates = append(predicates, permission.UpdatedAtGTE(*i.UpdatedAtGTE))
 	}
 	if i.UpdatedAtLT != nil {
-		predicates = append(predicates, migration.UpdatedAtLT(*i.UpdatedAtLT))
+		predicates = append(predicates, permission.UpdatedAtLT(*i.UpdatedAtLT))
 	}
 	if i.UpdatedAtLTE != nil {
-		predicates = append(predicates, migration.UpdatedAtLTE(*i.UpdatedAtLTE))
+		predicates = append(predicates, permission.UpdatedAtLTE(*i.UpdatedAtLTE))
 	}
 	if i.UpdatedAtIsNil {
-		predicates = append(predicates, migration.UpdatedAtIsNil())
+		predicates = append(predicates, permission.UpdatedAtIsNil())
 	}
 	if i.UpdatedAtNotNil {
-		predicates = append(predicates, migration.UpdatedAtNotNil())
+		predicates = append(predicates, permission.UpdatedAtNotNil())
+	}
+	if i.Entity != nil {
+		predicates = append(predicates, permission.EntityEQ(*i.Entity))
+	}
+	if i.EntityNEQ != nil {
+		predicates = append(predicates, permission.EntityNEQ(*i.EntityNEQ))
+	}
+	if len(i.EntityIn) > 0 {
+		predicates = append(predicates, permission.EntityIn(i.EntityIn...))
+	}
+	if len(i.EntityNotIn) > 0 {
+		predicates = append(predicates, permission.EntityNotIn(i.EntityNotIn...))
+	}
+	if i.EntityGT != nil {
+		predicates = append(predicates, permission.EntityGT(*i.EntityGT))
+	}
+	if i.EntityGTE != nil {
+		predicates = append(predicates, permission.EntityGTE(*i.EntityGTE))
+	}
+	if i.EntityLT != nil {
+		predicates = append(predicates, permission.EntityLT(*i.EntityLT))
+	}
+	if i.EntityLTE != nil {
+		predicates = append(predicates, permission.EntityLTE(*i.EntityLTE))
+	}
+	if i.EntityContains != nil {
+		predicates = append(predicates, permission.EntityContains(*i.EntityContains))
+	}
+	if i.EntityHasPrefix != nil {
+		predicates = append(predicates, permission.EntityHasPrefix(*i.EntityHasPrefix))
+	}
+	if i.EntityHasSuffix != nil {
+		predicates = append(predicates, permission.EntityHasSuffix(*i.EntityHasSuffix))
+	}
+	if i.EntityEqualFold != nil {
+		predicates = append(predicates, permission.EntityEqualFold(*i.EntityEqualFold))
+	}
+	if i.EntityContainsFold != nil {
+		predicates = append(predicates, permission.EntityContainsFold(*i.EntityContainsFold))
+	}
+	if i.Operation != nil {
+		predicates = append(predicates, permission.OperationEQ(*i.Operation))
+	}
+	if i.OperationNEQ != nil {
+		predicates = append(predicates, permission.OperationNEQ(*i.OperationNEQ))
+	}
+	if len(i.OperationIn) > 0 {
+		predicates = append(predicates, permission.OperationIn(i.OperationIn...))
+	}
+	if len(i.OperationNotIn) > 0 {
+		predicates = append(predicates, permission.OperationNotIn(i.OperationNotIn...))
+	}
+	if i.OperationGT != nil {
+		predicates = append(predicates, permission.OperationGT(*i.OperationGT))
+	}
+	if i.OperationGTE != nil {
+		predicates = append(predicates, permission.OperationGTE(*i.OperationGTE))
+	}
+	if i.OperationLT != nil {
+		predicates = append(predicates, permission.OperationLT(*i.OperationLT))
+	}
+	if i.OperationLTE != nil {
+		predicates = append(predicates, permission.OperationLTE(*i.OperationLTE))
+	}
+	if i.OperationContains != nil {
+		predicates = append(predicates, permission.OperationContains(*i.OperationContains))
+	}
+	if i.OperationHasPrefix != nil {
+		predicates = append(predicates, permission.OperationHasPrefix(*i.OperationHasPrefix))
+	}
+	if i.OperationHasSuffix != nil {
+		predicates = append(predicates, permission.OperationHasSuffix(*i.OperationHasSuffix))
+	}
+	if i.OperationEqualFold != nil {
+		predicates = append(predicates, permission.OperationEqualFold(*i.OperationEqualFold))
+	}
+	if i.OperationContainsFold != nil {
+		predicates = append(predicates, permission.OperationContainsFold(*i.OperationContainsFold))
 	}
 
 	if i.HasCreatedBy != nil {
-		p := migration.HasCreatedBy()
+		p := permission.HasCreatedBy()
 		if !*i.HasCreatedBy {
-			p = migration.Not(p)
+			p = permission.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
@@ -396,12 +354,12 @@ func (i *MigrationWhereInput) P() (predicate.Migration, error) {
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, migration.HasCreatedByWith(with...))
+		predicates = append(predicates, permission.HasCreatedByWith(with...))
 	}
 	if i.HasUpdatedBy != nil {
-		p := migration.HasUpdatedBy()
+		p := permission.HasUpdatedBy()
 		if !*i.HasUpdatedBy {
-			p = migration.Not(p)
+			p = permission.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
@@ -414,15 +372,33 @@ func (i *MigrationWhereInput) P() (predicate.Migration, error) {
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, migration.HasUpdatedByWith(with...))
+		predicates = append(predicates, permission.HasUpdatedByWith(with...))
+	}
+	if i.HasRole != nil {
+		p := permission.HasRole()
+		if !*i.HasRole {
+			p = permission.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRoleWith) > 0 {
+		with := make([]predicate.Role, 0, len(i.HasRoleWith))
+		for _, w := range i.HasRoleWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRoleWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, permission.HasRoleWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
-		return nil, ErrEmptyMigrationWhereInput
+		return nil, ErrEmptyPermissionWhereInput
 	case 1:
 		return predicates[0], nil
 	default:
-		return migration.And(predicates...), nil
+		return permission.And(predicates...), nil
 	}
 }
 
@@ -460,12 +436,6 @@ type RoleWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "type" field predicates.
-	Type      *enum.RoleType  `json:"type,omitempty"`
-	TypeNEQ   *enum.RoleType  `json:"typeNEQ,omitempty"`
-	TypeIn    []enum.RoleType `json:"typeIn,omitempty"`
-	TypeNotIn []enum.RoleType `json:"typeNotIn,omitempty"`
-
 	// "created_at" field predicates.
 	CreatedAt       *time.Time  `json:"createdAt,omitempty"`
 	CreatedAtNEQ    *time.Time  `json:"createdAtNEQ,omitempty"`
@@ -497,6 +467,14 @@ type RoleWhereInput struct {
 	// "updated_by" edge predicates.
 	HasUpdatedBy     *bool             `json:"hasUpdatedBy,omitempty"`
 	HasUpdatedByWith []*UserWhereInput `json:"hasUpdatedByWith,omitempty"`
+
+	// "user_roles" edge predicates.
+	HasUserRoles     *bool             `json:"hasUserRoles,omitempty"`
+	HasUserRolesWith []*UserWhereInput `json:"hasUserRolesWith,omitempty"`
+
+	// "permissions" edge predicates.
+	HasPermissions     *bool                   `json:"hasPermissions,omitempty"`
+	HasPermissionsWith []*PermissionWhereInput `json:"hasPermissionsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -639,18 +617,6 @@ func (i *RoleWhereInput) P() (predicate.Role, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, role.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Type != nil {
-		predicates = append(predicates, role.TypeEQ(*i.Type))
-	}
-	if i.TypeNEQ != nil {
-		predicates = append(predicates, role.TypeNEQ(*i.TypeNEQ))
-	}
-	if len(i.TypeIn) > 0 {
-		predicates = append(predicates, role.TypeIn(i.TypeIn...))
-	}
-	if len(i.TypeNotIn) > 0 {
-		predicates = append(predicates, role.TypeNotIn(i.TypeNotIn...))
-	}
 	if i.CreatedAt != nil {
 		predicates = append(predicates, role.CreatedAtEQ(*i.CreatedAt))
 	}
@@ -748,6 +714,42 @@ func (i *RoleWhereInput) P() (predicate.Role, error) {
 		}
 		predicates = append(predicates, role.HasUpdatedByWith(with...))
 	}
+	if i.HasUserRoles != nil {
+		p := role.HasUserRoles()
+		if !*i.HasUserRoles {
+			p = role.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasUserRolesWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasUserRolesWith))
+		for _, w := range i.HasUserRolesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasUserRolesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, role.HasUserRolesWith(with...))
+	}
+	if i.HasPermissions != nil {
+		p := role.HasPermissions()
+		if !*i.HasPermissions {
+			p = role.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasPermissionsWith) > 0 {
+		with := make([]predicate.Permission, 0, len(i.HasPermissionsWith))
+		for _, w := range i.HasPermissionsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasPermissionsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, role.HasPermissionsWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyRoleWhereInput
@@ -789,6 +791,8 @@ type UserWhereInput struct {
 	NameContains     *string  `json:"nameContains,omitempty"`
 	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameIsNil        bool     `json:"nameIsNil,omitempty"`
+	NameNotNil       bool     `json:"nameNotNil,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
@@ -806,6 +810,51 @@ type UserWhereInput struct {
 	EmailHasSuffix    *string  `json:"emailHasSuffix,omitempty"`
 	EmailEqualFold    *string  `json:"emailEqualFold,omitempty"`
 	EmailContainsFold *string  `json:"emailContainsFold,omitempty"`
+
+	// "password" field predicates.
+	Password             *string  `json:"password,omitempty"`
+	PasswordNEQ          *string  `json:"passwordNEQ,omitempty"`
+	PasswordIn           []string `json:"passwordIn,omitempty"`
+	PasswordNotIn        []string `json:"passwordNotIn,omitempty"`
+	PasswordGT           *string  `json:"passwordGT,omitempty"`
+	PasswordGTE          *string  `json:"passwordGTE,omitempty"`
+	PasswordLT           *string  `json:"passwordLT,omitempty"`
+	PasswordLTE          *string  `json:"passwordLTE,omitempty"`
+	PasswordContains     *string  `json:"passwordContains,omitempty"`
+	PasswordHasPrefix    *string  `json:"passwordHasPrefix,omitempty"`
+	PasswordHasSuffix    *string  `json:"passwordHasSuffix,omitempty"`
+	PasswordEqualFold    *string  `json:"passwordEqualFold,omitempty"`
+	PasswordContainsFold *string  `json:"passwordContainsFold,omitempty"`
+
+	// "first_name" field predicates.
+	FirstName             *string  `json:"firstName,omitempty"`
+	FirstNameNEQ          *string  `json:"firstNameNEQ,omitempty"`
+	FirstNameIn           []string `json:"firstNameIn,omitempty"`
+	FirstNameNotIn        []string `json:"firstNameNotIn,omitempty"`
+	FirstNameGT           *string  `json:"firstNameGT,omitempty"`
+	FirstNameGTE          *string  `json:"firstNameGTE,omitempty"`
+	FirstNameLT           *string  `json:"firstNameLT,omitempty"`
+	FirstNameLTE          *string  `json:"firstNameLTE,omitempty"`
+	FirstNameContains     *string  `json:"firstNameContains,omitempty"`
+	FirstNameHasPrefix    *string  `json:"firstNameHasPrefix,omitempty"`
+	FirstNameHasSuffix    *string  `json:"firstNameHasSuffix,omitempty"`
+	FirstNameEqualFold    *string  `json:"firstNameEqualFold,omitempty"`
+	FirstNameContainsFold *string  `json:"firstNameContainsFold,omitempty"`
+
+	// "last_name" field predicates.
+	LastName             *string  `json:"lastName,omitempty"`
+	LastNameNEQ          *string  `json:"lastNameNEQ,omitempty"`
+	LastNameIn           []string `json:"lastNameIn,omitempty"`
+	LastNameNotIn        []string `json:"lastNameNotIn,omitempty"`
+	LastNameGT           *string  `json:"lastNameGT,omitempty"`
+	LastNameGTE          *string  `json:"lastNameGTE,omitempty"`
+	LastNameLT           *string  `json:"lastNameLT,omitempty"`
+	LastNameLTE          *string  `json:"lastNameLTE,omitempty"`
+	LastNameContains     *string  `json:"lastNameContains,omitempty"`
+	LastNameHasPrefix    *string  `json:"lastNameHasPrefix,omitempty"`
+	LastNameHasSuffix    *string  `json:"lastNameHasSuffix,omitempty"`
+	LastNameEqualFold    *string  `json:"lastNameEqualFold,omitempty"`
+	LastNameContainsFold *string  `json:"lastNameContainsFold,omitempty"`
 
 	// "created_at" field predicates.
 	CreatedAt       *time.Time  `json:"createdAt,omitempty"`
@@ -839,9 +888,13 @@ type UserWhereInput struct {
 	HasUpdatedBy     *bool             `json:"hasUpdatedBy,omitempty"`
 	HasUpdatedByWith []*UserWhereInput `json:"hasUpdatedByWith,omitempty"`
 
-	// "role" edge predicates.
-	HasRole     *bool             `json:"hasRole,omitempty"`
-	HasRoleWith []*RoleWhereInput `json:"hasRoleWith,omitempty"`
+	// "roles" edge predicates.
+	HasRoles     *bool             `json:"hasRoles,omitempty"`
+	HasRolesWith []*RoleWhereInput `json:"hasRolesWith,omitempty"`
+
+	// "default_role" edge predicates.
+	HasDefaultRole     *bool             `json:"hasDefaultRole,omitempty"`
+	HasDefaultRoleWith []*RoleWhereInput `json:"hasDefaultRoleWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -978,6 +1031,12 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	if i.NameHasSuffix != nil {
 		predicates = append(predicates, user.NameHasSuffix(*i.NameHasSuffix))
 	}
+	if i.NameIsNil {
+		predicates = append(predicates, user.NameIsNil())
+	}
+	if i.NameNotNil {
+		predicates = append(predicates, user.NameNotNil())
+	}
 	if i.NameEqualFold != nil {
 		predicates = append(predicates, user.NameEqualFold(*i.NameEqualFold))
 	}
@@ -1022,6 +1081,123 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	}
 	if i.EmailContainsFold != nil {
 		predicates = append(predicates, user.EmailContainsFold(*i.EmailContainsFold))
+	}
+	if i.Password != nil {
+		predicates = append(predicates, user.PasswordEQ(*i.Password))
+	}
+	if i.PasswordNEQ != nil {
+		predicates = append(predicates, user.PasswordNEQ(*i.PasswordNEQ))
+	}
+	if len(i.PasswordIn) > 0 {
+		predicates = append(predicates, user.PasswordIn(i.PasswordIn...))
+	}
+	if len(i.PasswordNotIn) > 0 {
+		predicates = append(predicates, user.PasswordNotIn(i.PasswordNotIn...))
+	}
+	if i.PasswordGT != nil {
+		predicates = append(predicates, user.PasswordGT(*i.PasswordGT))
+	}
+	if i.PasswordGTE != nil {
+		predicates = append(predicates, user.PasswordGTE(*i.PasswordGTE))
+	}
+	if i.PasswordLT != nil {
+		predicates = append(predicates, user.PasswordLT(*i.PasswordLT))
+	}
+	if i.PasswordLTE != nil {
+		predicates = append(predicates, user.PasswordLTE(*i.PasswordLTE))
+	}
+	if i.PasswordContains != nil {
+		predicates = append(predicates, user.PasswordContains(*i.PasswordContains))
+	}
+	if i.PasswordHasPrefix != nil {
+		predicates = append(predicates, user.PasswordHasPrefix(*i.PasswordHasPrefix))
+	}
+	if i.PasswordHasSuffix != nil {
+		predicates = append(predicates, user.PasswordHasSuffix(*i.PasswordHasSuffix))
+	}
+	if i.PasswordEqualFold != nil {
+		predicates = append(predicates, user.PasswordEqualFold(*i.PasswordEqualFold))
+	}
+	if i.PasswordContainsFold != nil {
+		predicates = append(predicates, user.PasswordContainsFold(*i.PasswordContainsFold))
+	}
+	if i.FirstName != nil {
+		predicates = append(predicates, user.FirstNameEQ(*i.FirstName))
+	}
+	if i.FirstNameNEQ != nil {
+		predicates = append(predicates, user.FirstNameNEQ(*i.FirstNameNEQ))
+	}
+	if len(i.FirstNameIn) > 0 {
+		predicates = append(predicates, user.FirstNameIn(i.FirstNameIn...))
+	}
+	if len(i.FirstNameNotIn) > 0 {
+		predicates = append(predicates, user.FirstNameNotIn(i.FirstNameNotIn...))
+	}
+	if i.FirstNameGT != nil {
+		predicates = append(predicates, user.FirstNameGT(*i.FirstNameGT))
+	}
+	if i.FirstNameGTE != nil {
+		predicates = append(predicates, user.FirstNameGTE(*i.FirstNameGTE))
+	}
+	if i.FirstNameLT != nil {
+		predicates = append(predicates, user.FirstNameLT(*i.FirstNameLT))
+	}
+	if i.FirstNameLTE != nil {
+		predicates = append(predicates, user.FirstNameLTE(*i.FirstNameLTE))
+	}
+	if i.FirstNameContains != nil {
+		predicates = append(predicates, user.FirstNameContains(*i.FirstNameContains))
+	}
+	if i.FirstNameHasPrefix != nil {
+		predicates = append(predicates, user.FirstNameHasPrefix(*i.FirstNameHasPrefix))
+	}
+	if i.FirstNameHasSuffix != nil {
+		predicates = append(predicates, user.FirstNameHasSuffix(*i.FirstNameHasSuffix))
+	}
+	if i.FirstNameEqualFold != nil {
+		predicates = append(predicates, user.FirstNameEqualFold(*i.FirstNameEqualFold))
+	}
+	if i.FirstNameContainsFold != nil {
+		predicates = append(predicates, user.FirstNameContainsFold(*i.FirstNameContainsFold))
+	}
+	if i.LastName != nil {
+		predicates = append(predicates, user.LastNameEQ(*i.LastName))
+	}
+	if i.LastNameNEQ != nil {
+		predicates = append(predicates, user.LastNameNEQ(*i.LastNameNEQ))
+	}
+	if len(i.LastNameIn) > 0 {
+		predicates = append(predicates, user.LastNameIn(i.LastNameIn...))
+	}
+	if len(i.LastNameNotIn) > 0 {
+		predicates = append(predicates, user.LastNameNotIn(i.LastNameNotIn...))
+	}
+	if i.LastNameGT != nil {
+		predicates = append(predicates, user.LastNameGT(*i.LastNameGT))
+	}
+	if i.LastNameGTE != nil {
+		predicates = append(predicates, user.LastNameGTE(*i.LastNameGTE))
+	}
+	if i.LastNameLT != nil {
+		predicates = append(predicates, user.LastNameLT(*i.LastNameLT))
+	}
+	if i.LastNameLTE != nil {
+		predicates = append(predicates, user.LastNameLTE(*i.LastNameLTE))
+	}
+	if i.LastNameContains != nil {
+		predicates = append(predicates, user.LastNameContains(*i.LastNameContains))
+	}
+	if i.LastNameHasPrefix != nil {
+		predicates = append(predicates, user.LastNameHasPrefix(*i.LastNameHasPrefix))
+	}
+	if i.LastNameHasSuffix != nil {
+		predicates = append(predicates, user.LastNameHasSuffix(*i.LastNameHasSuffix))
+	}
+	if i.LastNameEqualFold != nil {
+		predicates = append(predicates, user.LastNameEqualFold(*i.LastNameEqualFold))
+	}
+	if i.LastNameContainsFold != nil {
+		predicates = append(predicates, user.LastNameContainsFold(*i.LastNameContainsFold))
 	}
 	if i.CreatedAt != nil {
 		predicates = append(predicates, user.CreatedAtEQ(*i.CreatedAt))
@@ -1120,23 +1296,41 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 		}
 		predicates = append(predicates, user.HasUpdatedByWith(with...))
 	}
-	if i.HasRole != nil {
-		p := user.HasRole()
-		if !*i.HasRole {
+	if i.HasRoles != nil {
+		p := user.HasRoles()
+		if !*i.HasRoles {
 			p = user.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasRoleWith) > 0 {
-		with := make([]predicate.Role, 0, len(i.HasRoleWith))
-		for _, w := range i.HasRoleWith {
+	if len(i.HasRolesWith) > 0 {
+		with := make([]predicate.Role, 0, len(i.HasRolesWith))
+		for _, w := range i.HasRolesWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasRoleWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasRolesWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, user.HasRoleWith(with...))
+		predicates = append(predicates, user.HasRolesWith(with...))
+	}
+	if i.HasDefaultRole != nil {
+		p := user.HasDefaultRole()
+		if !*i.HasDefaultRole {
+			p = user.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasDefaultRoleWith) > 0 {
+		with := make([]predicate.Role, 0, len(i.HasDefaultRoleWith))
+		for _, w := range i.HasDefaultRoleWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasDefaultRoleWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, user.HasDefaultRoleWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

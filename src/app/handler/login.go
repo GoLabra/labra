@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/GoLabra/labrago/src/api/constants"
+	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )

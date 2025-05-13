@@ -16,10 +16,14 @@ extend type Mutation {
 extend input CreateRoleInput {
     createdBy: CreateOneUserInput
     updatedBy: CreateOneUserInput
+    userRoles: CreateManyUserInput
+    permissions: CreateManyPermissionInput
 }
 extend input UpdateRoleInput {
-    createdBy: CreateOneUserInput
-    updatedBy: CreateOneUserInput
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+    userRoles: UpdateManyUserInput
+    permissions: UpdateManyPermissionInput
 }
 
 input CreateOneRoleInput {
@@ -30,4 +34,17 @@ input CreateOneRoleInput {
 input CreateManyRoleInput {
     create: [CreateRoleInput!]
     connect: [RoleWhereUniqueInput!]
+}
+
+
+input UpdateOneRoleInput {
+    create: CreateRoleInput
+    connect: RoleWhereUniqueInput
+    unset: Boolean
+}
+
+input UpdateManyRoleInput {
+    create: [CreateRoleInput!]
+    connect: [RoleWhereUniqueInput!]
+    disconnect: [RoleWhereUniqueInput!]
 }

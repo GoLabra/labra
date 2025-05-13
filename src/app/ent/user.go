@@ -22,17 +22,23 @@ type User struct {
 	Name string `json:"name,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
+	// Password holds the value of the "password" field.
+	Password string `json:"password,omitempty"`
+	// FirstName holds the value of the "first_name" field.
+	FirstName string `json:"first_name,omitempty"`
+	// LastName holds the value of the "last_name" field.
+	LastName string `json:"last_name,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges           UserEdges `json:"edges"`
-	user_created_by *string
-	user_updated_by *string
-	user_role       *string
-	selectValues    sql.SelectValues
+	Edges             UserEdges `json:"edges"`
+	user_created_by   *string
+	user_updated_by   *string
+	user_default_role *string
+	selectValues      sql.SelectValues
 }
 
 // UserEdges holds the relations/edges for other nodes in the graph.
@@ -45,16 +51,19 @@ type UserEdges struct {
 	RefUpdatedBy []*User `json:"ref_updated_by,omitempty"`
 	// UpdatedBy holds the value of the updated_by edge.
 	UpdatedBy *User `json:"updated_by,omitempty"`
-	// Role holds the value of the role edge.
-	Role *Role `json:"role,omitempty"`
+	// Roles holds the value of the roles edge.
+	Roles []*Role `json:"roles,omitempty"`
+	// DefaultRole holds the value of the default_role edge.
+	DefaultRole *Role `json:"default_role,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
 	namedRefCreatedBy map[string][]*User
 	namedRefUpdatedBy map[string][]*User
+	namedRoles        map[string][]*Role
 }
 
 // RefCreatedByOrErr returns the RefCreatedBy value or an error if the edge
@@ -97,15 +106,24 @@ func (e UserEdges) UpdatedByOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "updated_by"}
 }
 
-// RoleOrErr returns the Role value or an error if the edge
+// RolesOrErr returns the Roles value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) RolesOrErr() ([]*Role, error) {
+	if e.loadedTypes[4] {
+		return e.Roles, nil
+	}
+	return nil, &NotLoadedError{edge: "roles"}
+}
+
+// DefaultRoleOrErr returns the DefaultRole value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) RoleOrErr() (*Role, error) {
-	if e.Role != nil {
-		return e.Role, nil
-	} else if e.loadedTypes[4] {
+func (e UserEdges) DefaultRoleOrErr() (*Role, error) {
+	if e.DefaultRole != nil {
+		return e.DefaultRole, nil
+	} else if e.loadedTypes[5] {
 		return nil, &NotFoundError{label: role.Label}
 	}
-	return nil, &NotLoadedError{edge: "role"}
+	return nil, &NotLoadedError{edge: "default_role"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -113,7 +131,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldName, user.FieldEmail:
+		case user.FieldID, user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldFirstName, user.FieldLastName:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -121,7 +139,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case user.ForeignKeys[1]: // user_updated_by
 			values[i] = new(sql.NullString)
-		case user.ForeignKeys[2]: // user_role
+		case user.ForeignKeys[2]: // user_default_role
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -156,6 +174,24 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Email = value.String
 			}
+		case user.FieldPassword:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field password", values[i])
+			} else if value.Valid {
+				u.Password = value.String
+			}
+		case user.FieldFirstName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field first_name", values[i])
+			} else if value.Valid {
+				u.FirstName = value.String
+			}
+		case user.FieldLastName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field last_name", values[i])
+			} else if value.Valid {
+				u.LastName = value.String
+			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -186,10 +222,10 @@ func (u *User) assignValues(columns []string, values []any) error {
 			}
 		case user.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user_role", values[i])
+				return fmt.Errorf("unexpected type %T for field user_default_role", values[i])
 			} else if value.Valid {
-				u.user_role = new(string)
-				*u.user_role = value.String
+				u.user_default_role = new(string)
+				*u.user_default_role = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -224,9 +260,14 @@ func (u *User) QueryUpdatedBy() *UserQuery {
 	return NewUserClient(u.config).QueryUpdatedBy(u)
 }
 
-// QueryRole queries the "role" edge of the User entity.
-func (u *User) QueryRole() *RoleQuery {
-	return NewUserClient(u.config).QueryRole(u)
+// QueryRoles queries the "roles" edge of the User entity.
+func (u *User) QueryRoles() *RoleQuery {
+	return NewUserClient(u.config).QueryRoles(u)
+}
+
+// QueryDefaultRole queries the "default_role" edge of the User entity.
+func (u *User) QueryDefaultRole() *RoleQuery {
+	return NewUserClient(u.config).QueryDefaultRole(u)
 }
 
 // Update returns a builder for updating this User.
@@ -257,6 +298,15 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(u.Email)
+	builder.WriteString(", ")
+	builder.WriteString("password=")
+	builder.WriteString(u.Password)
+	builder.WriteString(", ")
+	builder.WriteString("first_name=")
+	builder.WriteString(u.FirstName)
+	builder.WriteString(", ")
+	builder.WriteString("last_name=")
+	builder.WriteString(u.LastName)
 	builder.WriteString(", ")
 	if v := u.CreatedAt; v != nil {
 		builder.WriteString("created_at=")
@@ -316,6 +366,30 @@ func (u *User) appendNamedRefUpdatedBy(name string, edges ...*User) {
 		u.Edges.namedRefUpdatedBy[name] = []*User{}
 	} else {
 		u.Edges.namedRefUpdatedBy[name] = append(u.Edges.namedRefUpdatedBy[name], edges...)
+	}
+}
+
+// NamedRoles returns the Roles named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedRoles(name string) ([]*Role, error) {
+	if u.Edges.namedRoles == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedRoles[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedRoles(name string, edges ...*Role) {
+	if u.Edges.namedRoles == nil {
+		u.Edges.namedRoles = make(map[string][]*Role)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedRoles[name] = []*Role{}
+	} else {
+		u.Edges.namedRoles[name] = append(u.Edges.namedRoles[name], edges...)
 	}
 }
 

@@ -3,22 +3,29 @@
 package ent
 
 import (
+	"app/ent/role"
 	"app/ent/user"
 	"fmt"
 )
 
 // AddEdges sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema
-func (m *MigrationMutation) AddEdges(name string, values []string) error {
+func (m *PermissionMutation) AddEdges(name string, values []string) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown Migration edge %s", name)
+	return fmt.Errorf("unknown Permission edge %s", name)
 }
 
 // AddEdges sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema
 func (m *RoleMutation) AddEdges(name string, values []string) error {
 	switch name {
+	case role.EdgeUserRoles:
+		m.AddUserRoleIDs(values...)
+		return nil
+	case role.EdgePermissions:
+		m.AddPermissionIDs(values...)
+		return nil
 	}
 	return fmt.Errorf("unknown Role edge %s", name)
 }
@@ -32,6 +39,9 @@ func (m *UserMutation) AddEdges(name string, values []string) error {
 		return nil
 	case user.EdgeRefUpdatedBy:
 		m.AddRefUpdatedByIDs(values...)
+		return nil
+	case user.EdgeRoles:
+		m.AddRoleIDs(values...)
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

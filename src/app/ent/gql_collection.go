@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"app/ent/migration"
+	"app/ent/permission"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -13,23 +13,23 @@ import (
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (m *MigrationQuery) CollectFields(ctx context.Context, satisfies ...string) (*MigrationQuery, error) {
+func (pe *PermissionQuery) CollectFields(ctx context.Context, satisfies ...string) (*PermissionQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
-		return m, nil
+		return pe, nil
 	}
-	if err := m.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := pe.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
-	return m, nil
+	return pe, nil
 }
 
-func (m *MigrationQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (pe *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
-		fieldSeen      = make(map[string]struct{}, len(migration.Columns))
-		selectedFields = []string{migration.FieldID}
+		fieldSeen      = make(map[string]struct{}, len(permission.Columns))
+		selectedFields = []string{permission.FieldID}
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
@@ -38,52 +38,53 @@ func (m *MigrationQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: m.config}).Query()
+				query = (&UserClient{config: pe.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
-			m.withCreatedBy = query
+			pe.withCreatedBy = query
 
 		case "updatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: m.config}).Query()
+				query = (&UserClient{config: pe.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
-			m.withUpdatedBy = query
-		case "name":
-			if _, ok := fieldSeen[migration.FieldName]; !ok {
-				selectedFields = append(selectedFields, migration.FieldName)
-				fieldSeen[migration.FieldName] = struct{}{}
+			pe.withUpdatedBy = query
+
+		case "role":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RoleClient{config: pe.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
+				return err
 			}
-		case "type":
-			if _, ok := fieldSeen[migration.FieldType]; !ok {
-				selectedFields = append(selectedFields, migration.FieldType)
-				fieldSeen[migration.FieldType] = struct{}{}
-			}
-		case "direction":
-			if _, ok := fieldSeen[migration.FieldDirection]; !ok {
-				selectedFields = append(selectedFields, migration.FieldDirection)
-				fieldSeen[migration.FieldDirection] = struct{}{}
-			}
-		case "plugin":
-			if _, ok := fieldSeen[migration.FieldPlugin]; !ok {
-				selectedFields = append(selectedFields, migration.FieldPlugin)
-				fieldSeen[migration.FieldPlugin] = struct{}{}
-			}
+			pe.withRole = query
 		case "createdAt":
-			if _, ok := fieldSeen[migration.FieldCreatedAt]; !ok {
-				selectedFields = append(selectedFields, migration.FieldCreatedAt)
-				fieldSeen[migration.FieldCreatedAt] = struct{}{}
+			if _, ok := fieldSeen[permission.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, permission.FieldCreatedAt)
+				fieldSeen[permission.FieldCreatedAt] = struct{}{}
 			}
 		case "updatedAt":
-			if _, ok := fieldSeen[migration.FieldUpdatedAt]; !ok {
-				selectedFields = append(selectedFields, migration.FieldUpdatedAt)
-				fieldSeen[migration.FieldUpdatedAt] = struct{}{}
+			if _, ok := fieldSeen[permission.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, permission.FieldUpdatedAt)
+				fieldSeen[permission.FieldUpdatedAt] = struct{}{}
+			}
+		case "entity":
+			if _, ok := fieldSeen[permission.FieldEntity]; !ok {
+				selectedFields = append(selectedFields, permission.FieldEntity)
+				fieldSeen[permission.FieldEntity] = struct{}{}
+			}
+		case "operation":
+			if _, ok := fieldSeen[permission.FieldOperation]; !ok {
+				selectedFields = append(selectedFields, permission.FieldOperation)
+				fieldSeen[permission.FieldOperation] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -92,19 +93,19 @@ func (m *MigrationQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 		}
 	}
 	if !unknownSeen {
-		m.Select(selectedFields...)
+		pe.Select(selectedFields...)
 	}
 	return nil
 }
 
-type migrationPaginateArgs struct {
+type permissionPaginateArgs struct {
 	first, last   *int
 	after, before *Cursor
-	opts          []MigrationPaginateOption
+	opts          []PermissionPaginateOption
 }
 
-func newMigrationPaginateArgs(rv map[string]any) *migrationPaginateArgs {
-	args := &migrationPaginateArgs{}
+func newPermissionPaginateArgs(rv map[string]any) *permissionPaginateArgs {
+	args := &permissionPaginateArgs{}
 	if rv == nil {
 		return args
 	}
@@ -122,10 +123,10 @@ func newMigrationPaginateArgs(rv map[string]any) *migrationPaginateArgs {
 	}
 	if v, ok := rv[orderByField]; ok {
 		switch v := v.(type) {
-		case []*MigrationOrder:
-			args.opts = append(args.opts, WithMigrationOrder(v))
+		case []*PermissionOrder:
+			args.opts = append(args.opts, WithPermissionOrder(v))
 		case []any:
-			var orders []*MigrationOrder
+			var orders []*PermissionOrder
 			for i := range v {
 				mv, ok := v[i].(map[string]any)
 				if !ok {
@@ -133,7 +134,7 @@ func newMigrationPaginateArgs(rv map[string]any) *migrationPaginateArgs {
 				}
 				var (
 					err1, err2 error
-					order      = &MigrationOrder{Field: &MigrationOrderField{}, Direction: entgql.OrderDirectionAsc}
+					order      = &PermissionOrder{Field: &PermissionOrderField{}, Direction: entgql.OrderDirectionAsc}
 				)
 				if d, ok := mv[directionField]; ok {
 					err1 = order.Direction.UnmarshalGQL(d)
@@ -145,11 +146,11 @@ func newMigrationPaginateArgs(rv map[string]any) *migrationPaginateArgs {
 					orders = append(orders, order)
 				}
 			}
-			args.opts = append(args.opts, WithMigrationOrder(orders))
+			args.opts = append(args.opts, WithPermissionOrder(orders))
 		}
 	}
-	if v, ok := rv[whereField].(*MigrationWhereInput); ok {
-		args.opts = append(args.opts, WithMigrationFilter(v.Filter))
+	if v, ok := rv[whereField].(*PermissionWhereInput); ok {
+		args.opts = append(args.opts, WithPermissionFilter(v.Filter))
 	}
 	return args
 }
@@ -197,15 +198,36 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 				return err
 			}
 			r.withUpdatedBy = query
+
+		case "userRoles":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			r.WithNamedUserRoles(alias, func(wq *UserQuery) {
+				*wq = *query
+			})
+
+		case "permissions":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&PermissionClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, permissionImplementors)...); err != nil {
+				return err
+			}
+			r.WithNamedPermissions(alias, func(wq *PermissionQuery) {
+				*wq = *query
+			})
 		case "name":
 			if _, ok := fieldSeen[role.FieldName]; !ok {
 				selectedFields = append(selectedFields, role.FieldName)
 				fieldSeen[role.FieldName] = struct{}{}
-			}
-		case "type":
-			if _, ok := fieldSeen[role.FieldType]; !ok {
-				selectedFields = append(selectedFields, role.FieldType)
-				fieldSeen[role.FieldType] = struct{}{}
 			}
 		case "createdAt":
 			if _, ok := fieldSeen[role.FieldCreatedAt]; !ok {
@@ -330,7 +352,20 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			}
 			u.withUpdatedBy = query
 
-		case "role":
+		case "roles":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RoleClient{config: u.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
+				return err
+			}
+			u.WithNamedRoles(alias, func(wq *RoleQuery) {
+				*wq = *query
+			})
+
+		case "defaultRole":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -339,7 +374,7 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
 				return err
 			}
-			u.withRole = query
+			u.withDefaultRole = query
 		case "name":
 			if _, ok := fieldSeen[user.FieldName]; !ok {
 				selectedFields = append(selectedFields, user.FieldName)
@@ -349,6 +384,21 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			if _, ok := fieldSeen[user.FieldEmail]; !ok {
 				selectedFields = append(selectedFields, user.FieldEmail)
 				fieldSeen[user.FieldEmail] = struct{}{}
+			}
+		case "password":
+			if _, ok := fieldSeen[user.FieldPassword]; !ok {
+				selectedFields = append(selectedFields, user.FieldPassword)
+				fieldSeen[user.FieldPassword] = struct{}{}
+			}
+		case "firstName":
+			if _, ok := fieldSeen[user.FieldFirstName]; !ok {
+				selectedFields = append(selectedFields, user.FieldFirstName)
+				fieldSeen[user.FieldFirstName] = struct{}{}
+			}
+		case "lastName":
+			if _, ok := fieldSeen[user.FieldLastName]; !ok {
+				selectedFields = append(selectedFields, user.FieldLastName)
+				fieldSeen[user.FieldLastName] = struct{}{}
 			}
 		case "createdAt":
 			if _, ok := fieldSeen[user.FieldCreatedAt]; !ok {

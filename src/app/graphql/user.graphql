@@ -18,14 +18,16 @@ extend input CreateUserInput {
     createdBy: CreateOneUserInput
     refUpdatedBy: CreateManyUserInput
     updatedBy: CreateOneUserInput
-    role: CreateOneRoleInput
+    roles: CreateManyRoleInput
+    defaultRole: CreateOneRoleInput
 }
 extend input UpdateUserInput {
-    refCreatedBy: CreateManyUserInput
-    createdBy: CreateOneUserInput
-    refUpdatedBy: CreateManyUserInput
-    updatedBy: CreateOneUserInput
-    role: CreateOneRoleInput
+    refCreatedBy: UpdateManyUserInput
+    createdBy: UpdateOneUserInput
+    refUpdatedBy: UpdateManyUserInput
+    updatedBy: UpdateOneUserInput
+    roles: UpdateManyRoleInput
+    defaultRole: UpdateOneRoleInput
 }
 
 input CreateOneUserInput {
@@ -36,4 +38,17 @@ input CreateOneUserInput {
 input CreateManyUserInput {
     create: [CreateUserInput!]
     connect: [UserWhereUniqueInput!]
+}
+
+
+input UpdateOneUserInput {
+    create: CreateUserInput
+    connect: UserWhereUniqueInput
+    unset: Boolean
+}
+
+input UpdateManyUserInput {
+    create: [CreateUserInput!]
+    connect: [UserWhereUniqueInput!]
+    disconnect: [UserWhereUniqueInput!]
 }

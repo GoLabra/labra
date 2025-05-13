@@ -4,25 +4,25 @@ import (
     "errors"
 
 	"app/ent/predicate"
-    "app/ent/migration"
+    "app/ent/permission"
     "app/ent/role"
     "app/ent/user"
 )
 
-var ErrEmptyMigrationWhereUniqueInput = errors.New("empty predicate MigrationWhereUniqueInput")
+var ErrEmptyPermissionWhereUniqueInput = errors.New("empty predicate PermissionWhereUniqueInput")
 
 // RoleWhereInput represents a where input for filtering Role queries.
-type MigrationWhereUniqueInput struct {
-	Predicates []predicate.Migration  `json:"-"`
+type PermissionWhereUniqueInput struct {
+	Predicates []predicate.Permission  `json:"-"`
 
 	ID             *string  `json:"id,omitempty"`
 }
 
-func (i *MigrationWhereUniqueInput) AddPredicates(predicates ...predicate.Migration) {
+func (i *PermissionWhereUniqueInput) AddPredicates(predicates ...predicate.Permission) {
 	i.Predicates = append(i.Predicates, predicates...)
 }
 
-func (i *MigrationWhereUniqueInput) Filter(q *MigrationQuery) (*MigrationQuery, error) {
+func (i *PermissionWhereUniqueInput) Filter(q *PermissionQuery) (*PermissionQuery, error) {
 	if i == nil {
 		return q, nil
 	}
@@ -33,20 +33,20 @@ func (i *MigrationWhereUniqueInput) Filter(q *MigrationQuery) (*MigrationQuery, 
 	return q.Where(p), nil
 }
 
-func (i *MigrationWhereUniqueInput) P() (predicate.Migration, error) {
-	var predicates []predicate.Migration
+func (i *PermissionWhereUniqueInput) P() (predicate.Permission, error) {
+	var predicates []predicate.Permission
 
 	if i.ID != nil {
-		predicates = append(predicates, migration.IDEQ(*i.ID))
+		predicates = append(predicates, permission.IDEQ(*i.ID))
 	}
 
 	switch len(predicates) {
 	case 0:
-		return nil, ErrEmptyMigrationWhereUniqueInput
+		return nil, ErrEmptyPermissionWhereUniqueInput
 	case 1:
 		return predicates[0], nil
 	default:
-		return migration.And(predicates...), nil
+		return permission.And(predicates...), nil
 	}
 }
 
@@ -57,6 +57,7 @@ type RoleWhereUniqueInput struct {
 	Predicates []predicate.Role  `json:"-"`
 
 	ID             *string  `json:"id,omitempty"`
+    Name *string `json:"name,omitempty"`
 }
 
 func (i *RoleWhereUniqueInput) AddPredicates(predicates ...predicate.Role) {
@@ -79,6 +80,9 @@ func (i *RoleWhereUniqueInput) P() (predicate.Role, error) {
 
 	if i.ID != nil {
 		predicates = append(predicates, role.IDEQ(*i.ID))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, role.NameEQ(*i.Name))
 	}
 
 	switch len(predicates) {

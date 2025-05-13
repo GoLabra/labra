@@ -11,7 +11,7 @@ import (
 
 	"app/ent/migrate"
 
-	"app/ent/migration"
+	"app/ent/permission"
 	"app/ent/role"
 	"app/ent/user"
 
@@ -28,8 +28,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Migration is the client for interacting with the Migration builders.
-	Migration *MigrationClient
+	// Permission is the client for interacting with the Permission builders.
+	Permission *PermissionClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
@@ -45,7 +45,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Migration = NewMigrationClient(c.config)
+	c.Permission = NewPermissionClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -138,11 +138,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		Migration: NewMigrationClient(cfg),
-		Role:      NewRoleClient(cfg),
-		User:      NewUserClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		Permission: NewPermissionClient(cfg),
+		Role:       NewRoleClient(cfg),
+		User:       NewUserClient(cfg),
 	}, nil
 }
 
@@ -160,18 +160,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		Migration: NewMigrationClient(cfg),
-		Role:      NewRoleClient(cfg),
-		User:      NewUserClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		Permission: NewPermissionClient(cfg),
+		Role:       NewRoleClient(cfg),
+		User:       NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Migration.
+//		Permission.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -193,7 +193,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Migration.Use(hooks...)
+	c.Permission.Use(hooks...)
 	c.Role.Use(hooks...)
 	c.User.Use(hooks...)
 }
@@ -201,7 +201,7 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Migration.Intercept(interceptors...)
+	c.Permission.Intercept(interceptors...)
 	c.Role.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
@@ -209,8 +209,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *MigrationMutation:
-		return c.Migration.mutate(ctx, m)
+	case *PermissionMutation:
+		return c.Permission.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
 	case *UserMutation:
@@ -220,107 +220,107 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	}
 }
 
-// MigrationClient is a client for the Migration schema.
-type MigrationClient struct {
+// PermissionClient is a client for the Permission schema.
+type PermissionClient struct {
 	config
 }
 
-// NewMigrationClient returns a client for the Migration from the given config.
-func NewMigrationClient(c config) *MigrationClient {
-	return &MigrationClient{config: c}
+// NewPermissionClient returns a client for the Permission from the given config.
+func NewPermissionClient(c config) *PermissionClient {
+	return &PermissionClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `migration.Hooks(f(g(h())))`.
-func (c *MigrationClient) Use(hooks ...Hook) {
-	c.hooks.Migration = append(c.hooks.Migration, hooks...)
+// A call to `Use(f, g, h)` equals to `permission.Hooks(f(g(h())))`.
+func (c *PermissionClient) Use(hooks ...Hook) {
+	c.hooks.Permission = append(c.hooks.Permission, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `migration.Intercept(f(g(h())))`.
-func (c *MigrationClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Migration = append(c.inters.Migration, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `permission.Intercept(f(g(h())))`.
+func (c *PermissionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Permission = append(c.inters.Permission, interceptors...)
 }
 
-// Create returns a builder for creating a Migration entity.
-func (c *MigrationClient) Create() *MigrationCreate {
-	mutation := newMigrationMutation(c.config, OpCreate)
-	return &MigrationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Permission entity.
+func (c *PermissionClient) Create() *PermissionCreate {
+	mutation := newPermissionMutation(c.config, OpCreate)
+	return &PermissionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Migration entities.
-func (c *MigrationClient) CreateBulk(builders ...*MigrationCreate) *MigrationCreateBulk {
-	return &MigrationCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Permission entities.
+func (c *PermissionClient) CreateBulk(builders ...*PermissionCreate) *PermissionCreateBulk {
+	return &PermissionCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *MigrationClient) MapCreateBulk(slice any, setFunc func(*MigrationCreate, int)) *MigrationCreateBulk {
+func (c *PermissionClient) MapCreateBulk(slice any, setFunc func(*PermissionCreate, int)) *PermissionCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &MigrationCreateBulk{err: fmt.Errorf("calling to MigrationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &PermissionCreateBulk{err: fmt.Errorf("calling to PermissionClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*MigrationCreate, rv.Len())
+	builders := make([]*PermissionCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &MigrationCreateBulk{config: c.config, builders: builders}
+	return &PermissionCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Migration.
-func (c *MigrationClient) Update() *MigrationUpdate {
-	mutation := newMigrationMutation(c.config, OpUpdate)
-	return &MigrationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Permission.
+func (c *PermissionClient) Update() *PermissionUpdate {
+	mutation := newPermissionMutation(c.config, OpUpdate)
+	return &PermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MigrationClient) UpdateOne(m *Migration) *MigrationUpdateOne {
-	mutation := newMigrationMutation(c.config, OpUpdateOne, withMigration(m))
-	return &MigrationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *PermissionClient) UpdateOne(pe *Permission) *PermissionUpdateOne {
+	mutation := newPermissionMutation(c.config, OpUpdateOne, withPermission(pe))
+	return &PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *MigrationClient) UpdateOneID(id string) *MigrationUpdateOne {
-	mutation := newMigrationMutation(c.config, OpUpdateOne, withMigrationID(id))
-	return &MigrationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *PermissionClient) UpdateOneID(id string) *PermissionUpdateOne {
+	mutation := newPermissionMutation(c.config, OpUpdateOne, withPermissionID(id))
+	return &PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Migration.
-func (c *MigrationClient) Delete() *MigrationDelete {
-	mutation := newMigrationMutation(c.config, OpDelete)
-	return &MigrationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Permission.
+func (c *PermissionClient) Delete() *PermissionDelete {
+	mutation := newPermissionMutation(c.config, OpDelete)
+	return &PermissionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MigrationClient) DeleteOne(m *Migration) *MigrationDeleteOne {
-	return c.DeleteOneID(m.ID)
+func (c *PermissionClient) DeleteOne(pe *Permission) *PermissionDeleteOne {
+	return c.DeleteOneID(pe.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *MigrationClient) DeleteOneID(id string) *MigrationDeleteOne {
-	builder := c.Delete().Where(migration.ID(id))
+func (c *PermissionClient) DeleteOneID(id string) *PermissionDeleteOne {
+	builder := c.Delete().Where(permission.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &MigrationDeleteOne{builder}
+	return &PermissionDeleteOne{builder}
 }
 
-// Query returns a query builder for Migration.
-func (c *MigrationClient) Query() *MigrationQuery {
-	return &MigrationQuery{
+// Query returns a query builder for Permission.
+func (c *PermissionClient) Query() *PermissionQuery {
+	return &PermissionQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeMigration},
+		ctx:    &QueryContext{Type: TypePermission},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Migration entity by its id.
-func (c *MigrationClient) Get(ctx context.Context, id string) (*Migration, error) {
-	return c.Query().Where(migration.ID(id)).Only(ctx)
+// Get returns a Permission entity by its id.
+func (c *PermissionClient) Get(ctx context.Context, id string) (*Permission, error) {
+	return c.Query().Where(permission.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *MigrationClient) GetX(ctx context.Context, id string) *Migration {
+func (c *PermissionClient) GetX(ctx context.Context, id string) *Permission {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -328,60 +328,76 @@ func (c *MigrationClient) GetX(ctx context.Context, id string) *Migration {
 	return obj
 }
 
-// QueryCreatedBy queries the created_by edge of a Migration.
-func (c *MigrationClient) QueryCreatedBy(m *Migration) *UserQuery {
+// QueryCreatedBy queries the created_by edge of a Permission.
+func (c *PermissionClient) QueryCreatedBy(pe *Permission) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := m.ID
+		id := pe.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(migration.Table, migration.FieldID, id),
+			sqlgraph.From(permission.Table, permission.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, migration.CreatedByTable, migration.CreatedByColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, permission.CreatedByTable, permission.CreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryUpdatedBy queries the updated_by edge of a Migration.
-func (c *MigrationClient) QueryUpdatedBy(m *Migration) *UserQuery {
+// QueryUpdatedBy queries the updated_by edge of a Permission.
+func (c *PermissionClient) QueryUpdatedBy(pe *Permission) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := m.ID
+		id := pe.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(migration.Table, migration.FieldID, id),
+			sqlgraph.From(permission.Table, permission.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, migration.UpdatedByTable, migration.UpdatedByColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, permission.UpdatedByTable, permission.UpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRole queries the role edge of a Permission.
+func (c *PermissionClient) QueryRole(pe *Permission) *RoleQuery {
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pe.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(permission.Table, permission.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, permission.RoleTable, permission.RoleColumn),
+		)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *MigrationClient) Hooks() []Hook {
-	return c.hooks.Migration
+func (c *PermissionClient) Hooks() []Hook {
+	return c.hooks.Permission
 }
 
 // Interceptors returns the client interceptors.
-func (c *MigrationClient) Interceptors() []Interceptor {
-	return c.inters.Migration
+func (c *PermissionClient) Interceptors() []Interceptor {
+	return c.inters.Permission
 }
 
-func (c *MigrationClient) mutate(ctx context.Context, m *MigrationMutation) (Value, error) {
+func (c *PermissionClient) mutate(ctx context.Context, m *PermissionMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&MigrationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PermissionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&MigrationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&MigrationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&MigrationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&PermissionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Migration mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Permission mutation op: %q", m.Op())
 	}
 }
 
@@ -518,6 +534,38 @@ func (c *RoleClient) QueryUpdatedBy(r *Role) *UserQuery {
 			sqlgraph.From(role.Table, role.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, role.UpdatedByTable, role.UpdatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserRoles queries the user_roles edge of a Role.
+func (c *RoleClient) QueryUserRoles(r *Role) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(role.Table, role.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, role.UserRolesTable, role.UserRolesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPermissions queries the permissions edge of a Role.
+func (c *RoleClient) QueryPermissions(r *Role) *PermissionQuery {
+	query := (&PermissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(role.Table, role.FieldID, id),
+			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, role.PermissionsTable, role.PermissionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -722,15 +770,31 @@ func (c *UserClient) QueryUpdatedBy(u *User) *UserQuery {
 	return query
 }
 
-// QueryRole queries the role edge of a User.
-func (c *UserClient) QueryRole(u *User) *RoleQuery {
+// QueryRoles queries the roles edge of a User.
+func (c *UserClient) QueryRoles(u *User) *RoleQuery {
 	query := (&RoleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, user.RoleTable, user.RoleColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.RolesTable, user.RolesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDefaultRole queries the default_role edge of a User.
+func (c *UserClient) QueryDefaultRole(u *User) *RoleQuery {
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, user.DefaultRoleTable, user.DefaultRoleColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -766,10 +830,10 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Migration, Role, User []ent.Hook
+		Permission, Role, User []ent.Hook
 	}
 	inters struct {
-		Migration, Role, User []ent.Interceptor
+		Permission, Role, User []ent.Interceptor
 	}
 )
 

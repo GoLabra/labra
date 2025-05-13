@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/GoLabra/labrago/src/api/constants"
+	"github.com/GoLabra/labra/src/api/constants"
 	jwt_hs "github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
@@ -22,7 +22,7 @@ func Authenticator(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		
+
 		service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service)
 		if !ok {
 			w.WriteHeader(http.StatusInternalServerError)

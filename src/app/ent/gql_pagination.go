@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"app/ent/migration"
+	"app/ent/permission"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -100,20 +100,20 @@ func paginateLimit(first, last *int) int {
 	return limit
 }
 
-// MigrationEdge is the edge representation of Migration.
-type MigrationEdge struct {
-	Node   *Migration `json:"node"`
-	Cursor Cursor     `json:"cursor"`
+// PermissionEdge is the edge representation of Permission.
+type PermissionEdge struct {
+	Node   *Permission `json:"node"`
+	Cursor Cursor      `json:"cursor"`
 }
 
-// MigrationConnection is the connection containing edges to Migration.
-type MigrationConnection struct {
-	Edges      []*MigrationEdge `json:"edges"`
-	PageInfo   PageInfo         `json:"pageInfo"`
-	TotalCount int              `json:"totalCount"`
+// PermissionConnection is the connection containing edges to Permission.
+type PermissionConnection struct {
+	Edges      []*PermissionEdge `json:"edges"`
+	PageInfo   PageInfo          `json:"pageInfo"`
+	TotalCount int               `json:"totalCount"`
 }
 
-func (c *MigrationConnection) build(nodes []*Migration, pager *migrationPager, after *Cursor, first *int, before *Cursor, last *int) {
+func (c *PermissionConnection) build(nodes []*Permission, pager *permissionPager, after *Cursor, first *int, before *Cursor, last *int) {
 	c.PageInfo.HasNextPage = before != nil
 	c.PageInfo.HasPreviousPage = after != nil
 	if first != nil && *first+1 == len(nodes) {
@@ -123,21 +123,21 @@ func (c *MigrationConnection) build(nodes []*Migration, pager *migrationPager, a
 		c.PageInfo.HasPreviousPage = true
 		nodes = nodes[:len(nodes)-1]
 	}
-	var nodeAt func(int) *Migration
+	var nodeAt func(int) *Permission
 	if last != nil {
 		n := len(nodes) - 1
-		nodeAt = func(i int) *Migration {
+		nodeAt = func(i int) *Permission {
 			return nodes[n-i]
 		}
 	} else {
-		nodeAt = func(i int) *Migration {
+		nodeAt = func(i int) *Permission {
 			return nodes[i]
 		}
 	}
-	c.Edges = make([]*MigrationEdge, len(nodes))
+	c.Edges = make([]*PermissionEdge, len(nodes))
 	for i := range nodes {
 		node := nodeAt(i)
-		c.Edges[i] = &MigrationEdge{
+		c.Edges[i] = &PermissionEdge{
 			Node:   node,
 			Cursor: pager.toCursor(node),
 		}
@@ -151,12 +151,12 @@ func (c *MigrationConnection) build(nodes []*Migration, pager *migrationPager, a
 	}
 }
 
-// MigrationPaginateOption enables pagination customization.
-type MigrationPaginateOption func(*migrationPager) error
+// PermissionPaginateOption enables pagination customization.
+type PermissionPaginateOption func(*permissionPager) error
 
-// WithMigrationOrder configures pagination ordering.
-func WithMigrationOrder(order []*MigrationOrder) MigrationPaginateOption {
-	return func(pager *migrationPager) error {
+// WithPermissionOrder configures pagination ordering.
+func WithPermissionOrder(order []*PermissionOrder) PermissionPaginateOption {
+	return func(pager *permissionPager) error {
 		for _, o := range order {
 			if err := o.Direction.Validate(); err != nil {
 				return err
@@ -167,25 +167,25 @@ func WithMigrationOrder(order []*MigrationOrder) MigrationPaginateOption {
 	}
 }
 
-// WithMigrationFilter configures pagination filter.
-func WithMigrationFilter(filter func(*MigrationQuery) (*MigrationQuery, error)) MigrationPaginateOption {
-	return func(pager *migrationPager) error {
+// WithPermissionFilter configures pagination filter.
+func WithPermissionFilter(filter func(*PermissionQuery) (*PermissionQuery, error)) PermissionPaginateOption {
+	return func(pager *permissionPager) error {
 		if filter == nil {
-			return errors.New("MigrationQuery filter cannot be nil")
+			return errors.New("PermissionQuery filter cannot be nil")
 		}
 		pager.filter = filter
 		return nil
 	}
 }
 
-type migrationPager struct {
+type permissionPager struct {
 	reverse bool
-	order   []*MigrationOrder
-	filter  func(*MigrationQuery) (*MigrationQuery, error)
+	order   []*PermissionOrder
+	filter  func(*PermissionQuery) (*PermissionQuery, error)
 }
 
-func newMigrationPager(opts []MigrationPaginateOption, reverse bool) (*migrationPager, error) {
-	pager := &migrationPager{reverse: reverse}
+func newPermissionPager(opts []PermissionPaginateOption, reverse bool) (*permissionPager, error) {
+	pager := &permissionPager{reverse: reverse}
 	for _, opt := range opts {
 		if err := opt(pager); err != nil {
 			return nil, err
@@ -199,22 +199,22 @@ func newMigrationPager(opts []MigrationPaginateOption, reverse bool) (*migration
 	return pager, nil
 }
 
-func (p *migrationPager) applyFilter(query *MigrationQuery) (*MigrationQuery, error) {
+func (p *permissionPager) applyFilter(query *PermissionQuery) (*PermissionQuery, error) {
 	if p.filter != nil {
 		return p.filter(query)
 	}
 	return query, nil
 }
 
-func (p *migrationPager) toCursor(m *Migration) Cursor {
+func (p *permissionPager) toCursor(pe *Permission) Cursor {
 	cs_ := make([]any, 0, len(p.order))
 	for _, o_ := range p.order {
-		cs_ = append(cs_, o_.Field.toCursor(m).Value)
+		cs_ = append(cs_, o_.Field.toCursor(pe).Value)
 	}
-	return Cursor{ID: m.ID, Value: cs_}
+	return Cursor{ID: pe.ID, Value: cs_}
 }
 
-func (p *migrationPager) applyCursors(query *MigrationQuery, after, before *Cursor) (*MigrationQuery, error) {
+func (p *permissionPager) applyCursors(query *PermissionQuery, after, before *Cursor) (*PermissionQuery, error) {
 	idDirection := entgql.OrderDirectionAsc
 	if p.reverse {
 		idDirection = entgql.OrderDirectionDesc
@@ -229,7 +229,7 @@ func (p *migrationPager) applyCursors(query *MigrationQuery, after, before *Curs
 		directions = append(directions, direction)
 	}
 	predicates, err := entgql.MultiCursorsPredicate(after, before, &entgql.MultiCursorsOptions{
-		FieldID:     DefaultMigrationOrder.Field.column,
+		FieldID:     DefaultPermissionOrder.Field.column,
 		DirectionID: idDirection,
 		Fields:      fields,
 		Directions:  directions,
@@ -243,7 +243,7 @@ func (p *migrationPager) applyCursors(query *MigrationQuery, after, before *Curs
 	return query, nil
 }
 
-func (p *migrationPager) applyOrder(query *MigrationQuery) *MigrationQuery {
+func (p *permissionPager) applyOrder(query *PermissionQuery) *PermissionQuery {
 	var defaultOrdered bool
 	for _, o := range p.order {
 		direction := o.Direction
@@ -251,7 +251,7 @@ func (p *migrationPager) applyOrder(query *MigrationQuery) *MigrationQuery {
 			direction = direction.Reverse()
 		}
 		query = query.Order(o.Field.toTerm(direction.OrderTermOption()))
-		if o.Field.column == DefaultMigrationOrder.Field.column {
+		if o.Field.column == DefaultPermissionOrder.Field.column {
 			defaultOrdered = true
 		}
 		if len(query.ctx.Fields) > 0 {
@@ -263,12 +263,12 @@ func (p *migrationPager) applyOrder(query *MigrationQuery) *MigrationQuery {
 		if p.reverse {
 			direction = direction.Reverse()
 		}
-		query = query.Order(DefaultMigrationOrder.Field.toTerm(direction.OrderTermOption()))
+		query = query.Order(DefaultPermissionOrder.Field.toTerm(direction.OrderTermOption()))
 	}
 	return query
 }
 
-func (p *migrationPager) orderExpr(query *MigrationQuery) sql.Querier {
+func (p *permissionPager) orderExpr(query *PermissionQuery) sql.Querier {
 	if len(query.ctx.Fields) > 0 {
 		for _, o := range p.order {
 			query.ctx.AppendFieldOnce(o.Field.column)
@@ -287,31 +287,31 @@ func (p *migrationPager) orderExpr(query *MigrationQuery) sql.Querier {
 		if p.reverse {
 			direction = direction.Reverse()
 		}
-		b.Ident(DefaultMigrationOrder.Field.column).Pad().WriteString(string(direction))
+		b.Ident(DefaultPermissionOrder.Field.column).Pad().WriteString(string(direction))
 	})
 }
 
-// Paginate executes the query and returns a relay based cursor connection to Migration.
-func (m *MigrationQuery) Paginate(
+// Paginate executes the query and returns a relay based cursor connection to Permission.
+func (pe *PermissionQuery) Paginate(
 	ctx context.Context, after *Cursor, first *int,
-	before *Cursor, last *int, opts ...MigrationPaginateOption,
-) (*MigrationConnection, error) {
+	before *Cursor, last *int, opts ...PermissionPaginateOption,
+) (*PermissionConnection, error) {
 	if err := validateFirstLast(first, last); err != nil {
 		return nil, err
 	}
-	pager, err := newMigrationPager(opts, last != nil)
+	pager, err := newPermissionPager(opts, last != nil)
 	if err != nil {
 		return nil, err
 	}
-	if m, err = pager.applyFilter(m); err != nil {
+	if pe, err = pager.applyFilter(pe); err != nil {
 		return nil, err
 	}
-	conn := &MigrationConnection{Edges: []*MigrationEdge{}}
+	conn := &PermissionConnection{Edges: []*PermissionEdge{}}
 	ignoredEdges := !hasCollectedField(ctx, edgesField)
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			c := m.Clone()
+			c := pe.Clone()
 			c.ctx.Fields = nil
 			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
@@ -323,20 +323,20 @@ func (m *MigrationQuery) Paginate(
 	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
 		return conn, nil
 	}
-	if m, err = pager.applyCursors(m, after, before); err != nil {
+	if pe, err = pager.applyCursors(pe, after, before); err != nil {
 		return nil, err
 	}
 	limit := paginateLimit(first, last)
 	if limit != 0 {
-		m.Limit(limit)
+		pe.Limit(limit)
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := pe.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
-	m = pager.applyOrder(m)
-	nodes, err := m.All(ctx)
+	pe = pager.applyOrder(pe)
+	nodes, err := pe.All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -345,198 +345,126 @@ func (m *MigrationQuery) Paginate(
 }
 
 var (
-	// MigrationOrderFieldID orders Migration by id.
-	MigrationOrderFieldID = &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.ID, nil
+	// PermissionOrderFieldID orders Permission by id.
+	PermissionOrderFieldID = &PermissionOrderField{
+		Value: func(pe *Permission) (ent.Value, error) {
+			return pe.ID, nil
 		},
-		column: migration.FieldID,
-		toTerm: migration.ByID,
-		toCursor: func(m *Migration) Cursor {
+		column: permission.FieldID,
+		toTerm: permission.ByID,
+		toCursor: func(pe *Permission) Cursor {
 			return Cursor{
-				ID:    m.ID,
-				Value: m.ID,
+				ID:    pe.ID,
+				Value: pe.ID,
 			}
 		},
 	}
-	// MigrationOrderFieldName orders Migration by name.
-	MigrationOrderFieldName = &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.Name, nil
+	// PermissionOrderFieldEntity orders Permission by entity.
+	PermissionOrderFieldEntity = &PermissionOrderField{
+		Value: func(pe *Permission) (ent.Value, error) {
+			return pe.Entity, nil
 		},
-		column: migration.FieldName,
-		toTerm: migration.ByName,
-		toCursor: func(m *Migration) Cursor {
+		column: permission.FieldEntity,
+		toTerm: permission.ByEntity,
+		toCursor: func(pe *Permission) Cursor {
 			return Cursor{
-				ID:    m.ID,
-				Value: m.Name,
+				ID:    pe.ID,
+				Value: pe.Entity,
 			}
 		},
 	}
-	// MigrationOrderFieldType orders Migration by type.
-	MigrationOrderFieldType = &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.Type, nil
+	// PermissionOrderFieldOperation orders Permission by operation.
+	PermissionOrderFieldOperation = &PermissionOrderField{
+		Value: func(pe *Permission) (ent.Value, error) {
+			return pe.Operation, nil
 		},
-		column: migration.FieldType,
-		toTerm: migration.ByType,
-		toCursor: func(m *Migration) Cursor {
+		column: permission.FieldOperation,
+		toTerm: permission.ByOperation,
+		toCursor: func(pe *Permission) Cursor {
 			return Cursor{
-				ID:    m.ID,
-				Value: m.Type,
-			}
-		},
-	}
-	// MigrationOrderFieldDirection orders Migration by direction.
-	MigrationOrderFieldDirection = &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.Direction, nil
-		},
-		column: migration.FieldDirection,
-		toTerm: migration.ByDirection,
-		toCursor: func(m *Migration) Cursor {
-			return Cursor{
-				ID:    m.ID,
-				Value: m.Direction,
-			}
-		},
-	}
-	// MigrationOrderFieldPlugin orders Migration by plugin.
-	MigrationOrderFieldPlugin = &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.Plugin, nil
-		},
-		column: migration.FieldPlugin,
-		toTerm: migration.ByPlugin,
-		toCursor: func(m *Migration) Cursor {
-			return Cursor{
-				ID:    m.ID,
-				Value: m.Plugin,
-			}
-		},
-	}
-	// MigrationOrderFieldCreatedAt orders Migration by created_at.
-	MigrationOrderFieldCreatedAt = &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.CreatedAt, nil
-		},
-		column: migration.FieldCreatedAt,
-		toTerm: migration.ByCreatedAt,
-		toCursor: func(m *Migration) Cursor {
-			return Cursor{
-				ID:    m.ID,
-				Value: m.CreatedAt,
-			}
-		},
-	}
-	// MigrationOrderFieldUpdatedAt orders Migration by updated_at.
-	MigrationOrderFieldUpdatedAt = &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.UpdatedAt, nil
-		},
-		column: migration.FieldUpdatedAt,
-		toTerm: migration.ByUpdatedAt,
-		toCursor: func(m *Migration) Cursor {
-			return Cursor{
-				ID:    m.ID,
-				Value: m.UpdatedAt,
+				ID:    pe.ID,
+				Value: pe.Operation,
 			}
 		},
 	}
 )
 
 // String implement fmt.Stringer interface.
-func (f MigrationOrderField) String() string {
+func (f PermissionOrderField) String() string {
 	var str string
 	switch f.column {
-	case MigrationOrderFieldID.column:
+	case PermissionOrderFieldID.column:
 		str = "id"
-	case MigrationOrderFieldName.column:
-		str = "name"
-	case MigrationOrderFieldType.column:
-		str = "type"
-	case MigrationOrderFieldDirection.column:
-		str = "direction"
-	case MigrationOrderFieldPlugin.column:
-		str = "plugin"
-	case MigrationOrderFieldCreatedAt.column:
-		str = "createdAt"
-	case MigrationOrderFieldUpdatedAt.column:
-		str = "updatedAt"
+	case PermissionOrderFieldEntity.column:
+		str = "entity"
+	case PermissionOrderFieldOperation.column:
+		str = "operation"
 	}
 	return str
 }
 
 // MarshalGQL implements graphql.Marshaler interface.
-func (f MigrationOrderField) MarshalGQL(w io.Writer) {
+func (f PermissionOrderField) MarshalGQL(w io.Writer) {
 	io.WriteString(w, strconv.Quote(f.String()))
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (f *MigrationOrderField) UnmarshalGQL(v interface{}) error {
+func (f *PermissionOrderField) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("MigrationOrderField %T must be a string", v)
+		return fmt.Errorf("PermissionOrderField %T must be a string", v)
 	}
 	switch str {
 	case "id":
-		*f = *MigrationOrderFieldID
-	case "name":
-		*f = *MigrationOrderFieldName
-	case "type":
-		*f = *MigrationOrderFieldType
-	case "direction":
-		*f = *MigrationOrderFieldDirection
-	case "plugin":
-		*f = *MigrationOrderFieldPlugin
-	case "createdAt":
-		*f = *MigrationOrderFieldCreatedAt
-	case "updatedAt":
-		*f = *MigrationOrderFieldUpdatedAt
+		*f = *PermissionOrderFieldID
+	case "entity":
+		*f = *PermissionOrderFieldEntity
+	case "operation":
+		*f = *PermissionOrderFieldOperation
 	default:
-		return fmt.Errorf("%s is not a valid MigrationOrderField", str)
+		return fmt.Errorf("%s is not a valid PermissionOrderField", str)
 	}
 	return nil
 }
 
-// MigrationOrderField defines the ordering field of Migration.
-type MigrationOrderField struct {
-	// Value extracts the ordering value from the given Migration.
-	Value    func(*Migration) (ent.Value, error)
+// PermissionOrderField defines the ordering field of Permission.
+type PermissionOrderField struct {
+	// Value extracts the ordering value from the given Permission.
+	Value    func(*Permission) (ent.Value, error)
 	column   string // field or computed.
-	toTerm   func(...sql.OrderTermOption) migration.OrderOption
-	toCursor func(*Migration) Cursor
+	toTerm   func(...sql.OrderTermOption) permission.OrderOption
+	toCursor func(*Permission) Cursor
 }
 
-// MigrationOrder defines the ordering of Migration.
-type MigrationOrder struct {
-	Direction OrderDirection       `json:"direction"`
-	Field     *MigrationOrderField `json:"field"`
+// PermissionOrder defines the ordering of Permission.
+type PermissionOrder struct {
+	Direction OrderDirection        `json:"direction"`
+	Field     *PermissionOrderField `json:"field"`
 }
 
-// DefaultMigrationOrder is the default ordering of Migration.
-var DefaultMigrationOrder = &MigrationOrder{
+// DefaultPermissionOrder is the default ordering of Permission.
+var DefaultPermissionOrder = &PermissionOrder{
 	Direction: entgql.OrderDirectionAsc,
-	Field: &MigrationOrderField{
-		Value: func(m *Migration) (ent.Value, error) {
-			return m.ID, nil
+	Field: &PermissionOrderField{
+		Value: func(pe *Permission) (ent.Value, error) {
+			return pe.ID, nil
 		},
-		column: migration.FieldID,
-		toTerm: migration.ByID,
-		toCursor: func(m *Migration) Cursor {
-			return Cursor{ID: m.ID}
+		column: permission.FieldID,
+		toTerm: permission.ByID,
+		toCursor: func(pe *Permission) Cursor {
+			return Cursor{ID: pe.ID}
 		},
 	},
 }
 
-// ToEdge converts Migration into MigrationEdge.
-func (m *Migration) ToEdge(order *MigrationOrder) *MigrationEdge {
+// ToEdge converts Permission into PermissionEdge.
+func (pe *Permission) ToEdge(order *PermissionOrder) *PermissionEdge {
 	if order == nil {
-		order = DefaultMigrationOrder
+		order = DefaultPermissionOrder
 	}
-	return &MigrationEdge{
-		Node:   m,
-		Cursor: order.Field.toCursor(m),
+	return &PermissionEdge{
+		Node:   pe,
+		Cursor: order.Field.toCursor(pe),
 	}
 }
 
@@ -813,20 +741,6 @@ var (
 			}
 		},
 	}
-	// RoleOrderFieldType orders Role by type.
-	RoleOrderFieldType = &RoleOrderField{
-		Value: func(r *Role) (ent.Value, error) {
-			return r.Type, nil
-		},
-		column: role.FieldType,
-		toTerm: role.ByType,
-		toCursor: func(r *Role) Cursor {
-			return Cursor{
-				ID:    r.ID,
-				Value: r.Type,
-			}
-		},
-	}
 	// RoleOrderFieldCreatedAt orders Role by created_at.
 	RoleOrderFieldCreatedAt = &RoleOrderField{
 		Value: func(r *Role) (ent.Value, error) {
@@ -865,8 +779,6 @@ func (f RoleOrderField) String() string {
 		str = "id"
 	case RoleOrderFieldName.column:
 		str = "name"
-	case RoleOrderFieldType.column:
-		str = "type"
 	case RoleOrderFieldCreatedAt.column:
 		str = "createdAt"
 	case RoleOrderFieldUpdatedAt.column:
@@ -891,8 +803,6 @@ func (f *RoleOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *RoleOrderFieldID
 	case "name":
 		*f = *RoleOrderFieldName
-	case "type":
-		*f = *RoleOrderFieldType
 	case "createdAt":
 		*f = *RoleOrderFieldCreatedAt
 	case "updatedAt":
@@ -1231,6 +1141,34 @@ var (
 			}
 		},
 	}
+	// UserOrderFieldFirstName orders User by first_name.
+	UserOrderFieldFirstName = &UserOrderField{
+		Value: func(u *User) (ent.Value, error) {
+			return u.FirstName, nil
+		},
+		column: user.FieldFirstName,
+		toTerm: user.ByFirstName,
+		toCursor: func(u *User) Cursor {
+			return Cursor{
+				ID:    u.ID,
+				Value: u.FirstName,
+			}
+		},
+	}
+	// UserOrderFieldLastName orders User by last_name.
+	UserOrderFieldLastName = &UserOrderField{
+		Value: func(u *User) (ent.Value, error) {
+			return u.LastName, nil
+		},
+		column: user.FieldLastName,
+		toTerm: user.ByLastName,
+		toCursor: func(u *User) Cursor {
+			return Cursor{
+				ID:    u.ID,
+				Value: u.LastName,
+			}
+		},
+	}
 	// UserOrderFieldCreatedAt orders User by created_at.
 	UserOrderFieldCreatedAt = &UserOrderField{
 		Value: func(u *User) (ent.Value, error) {
@@ -1271,6 +1209,10 @@ func (f UserOrderField) String() string {
 		str = "name"
 	case UserOrderFieldEmail.column:
 		str = "email"
+	case UserOrderFieldFirstName.column:
+		str = "firstName"
+	case UserOrderFieldLastName.column:
+		str = "lastName"
 	case UserOrderFieldCreatedAt.column:
 		str = "createdAt"
 	case UserOrderFieldUpdatedAt.column:
@@ -1297,6 +1239,10 @@ func (f *UserOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *UserOrderFieldName
 	case "email":
 		*f = *UserOrderFieldEmail
+	case "firstName":
+		*f = *UserOrderFieldFirstName
+	case "lastName":
+		*f = *UserOrderFieldLastName
 	case "createdAt":
 		*f = *UserOrderFieldCreatedAt
 	case "updatedAt":

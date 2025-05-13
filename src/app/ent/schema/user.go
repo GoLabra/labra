@@ -43,8 +43,9 @@ func (User) Fields() []ent.Field {
 					Type:    entity.FieldTypeID,
 				},
 			),
+
 		field.String("name").
-			NotEmpty().
+			Optional().
 			Annotations(
 				entgql.OrderField("name"),
 				annotations.Field{
@@ -52,6 +53,7 @@ func (User) Fields() []ent.Field {
 					Type:    entity.FieldTypeShortText,
 				},
 			),
+
 		field.String("email").
 			Unique().
 			NotEmpty().
@@ -60,6 +62,36 @@ func (User) Fields() []ent.Field {
 				annotations.Field{
 					Caption: "Email",
 					Type:    entity.FieldTypeEmail,
+				},
+			),
+
+		field.String("password").
+			NotEmpty().
+			Annotations(
+				annotations.Field{
+					Caption: "Password",
+					Type:    entity.FieldTypeShortText,
+					Private: true,
+				},
+			),
+
+		field.String("first_name").
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("firstName"),
+				annotations.Field{
+					Caption: "First Name",
+					Type:    entity.FieldTypeShortText,
+				},
+			),
+
+		field.String("last_name").
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("lastName"),
+				annotations.Field{
+					Caption: "Last Name",
+					Type:    entity.FieldTypeShortText,
 				},
 			),
 
@@ -131,13 +163,21 @@ func (User) Edges() []ent.Edge {
 					RelationType: entity.RelationTypeM2O,
 				},
 			),
-		edge.To("role", Role.Type).
+
+		edge.To("roles", Role.Type).
+			Annotations(
+				annotations.Edge{
+					Caption:      "Roles",
+					RelationType: entity.RelationTypeM2M,
+				},
+			),
+
+		edge.To("default_role", Role.Type).
 			Unique().
 			Annotations(
-				entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Edge{
-					Caption:      "Role",
-					RelationType: entity.RelationTypeO2M,
+					Caption:      "Default Role",
+					RelationType: entity.RelationTypeOne,
 				},
 			),
 	}

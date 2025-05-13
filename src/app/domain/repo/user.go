@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"app/ent"
 
-	"github.com/GoLabra/labrago/src/api/constants"
+	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -286,20 +286,51 @@ func (r *User) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateUserInpu
         data.UpdatedByID = &toConnect.ID
     }
     }
-    if data.Role != nil {
+    if data.Roles != nil {
         
-    if data.Role.Connect != nil {    
-        toConnect, err := repository.Role.GetOneTx(ctx, tx, *data.Role.Connect)
+    if data.Roles.Connect != nil {
+        for _, connect := range data.Roles.Connect {
+            toConnect, err := repository.Role.GetOneTx(ctx, tx, *connect)
+
+            if err != nil {
+                return nil, err
+            }
+
+            data.RoleIDs = append(data.RoleIDs , toConnect.ID)
+        }
+    }
+    if data.Roles.Create != nil {
+        for _, create := range data.Roles.Create {
+            var createInput ent.CreateRoleInput
+            err = mapstructure.Decode(create, &createInput)
+            if err != nil {
+                return nil, err
+            }
+
+            toConnect, err := repository.Role.CreateTx(ctx, tx, createInput)
+
+            if err != nil {
+                return nil, err
+            }
+
+            data.RoleIDs = append(data.RoleIDs , toConnect.ID)
+        }
+    }
+    }
+    if data.DefaultRole != nil {
+        
+    if data.DefaultRole.Connect != nil {    
+        toConnect, err := repository.Role.GetOneTx(ctx, tx, *data.DefaultRole.Connect)
 
         if err != nil {
             return nil, err
         }
 
-        data.RoleID =  &toConnect.ID
+        data.DefaultRoleID =  &toConnect.ID
     }
-    if data.Role.Create != nil {
+    if data.DefaultRole.Create != nil {
         var createInput ent.CreateRoleInput
-        err = mapstructure.Decode(data.Role.Create, &createInput)
+        err = mapstructure.Decode(data.DefaultRole.Create, &createInput)
         if err != nil {
             return nil, err
         }
@@ -310,7 +341,7 @@ func (r *User) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateUserInpu
             return nil, err
         }
 
-        data.RoleID = &toConnect.ID
+        data.DefaultRoleID = &toConnect.ID
     }
     }
 
@@ -403,6 +434,17 @@ func (r *User) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniq
             data.AddRefCreatedByIDs = append(data.AddRefCreatedByIDs , toConnect.ID)
         }
     }
+    if data.RefCreatedBy.Disconnect != nil {
+        for _, disconnect := range data.RefCreatedBy.Disconnect {
+            toDisconnect, err := repository.User.GetOneTx(ctx, tx, *disconnect)
+
+            if err != nil {
+                return nil, err
+            }
+
+            data.RemoveRefCreatedByIDs = append(data.RemoveRefCreatedByIDs, toDisconnect.ID)
+        }
+    }
     if data.RefCreatedBy.Create != nil {
         for _, create := range data.RefCreatedBy.Create {
             var createInput ent.CreateUserInput
@@ -423,30 +465,33 @@ func (r *User) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniq
     }
     if data.CreatedBy != nil {
         
-    if data.CreatedBy.Connect != nil {    
-        toConnect, err := repository.User.GetOneTx(ctx, tx, *data.CreatedBy.Connect)
+        if data.CreatedBy.Connect != nil {    
+            toConnect, err := repository.User.GetOneTx(ctx, tx, *data.CreatedBy.Connect)
 
-        if err != nil {
-            return nil, err
+            if err != nil {
+                return nil, err
+            }
+
+            data.CreatedByID = &toConnect.ID
         }
+		if data.CreatedBy.Unset != nil && *data.CreatedBy.Unset {
+			data.ClearCreatedBy = true
+		}
+        if data.CreatedBy.Create != nil {
+            var createInput ent.CreateUserInput
+            err = mapstructure.Decode(data.CreatedBy.Create, &createInput)
+            if err != nil {
+                return nil, err
+            }
+            
+            toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
 
-        data.CreatedByID =  &toConnect.ID
-    }
-    if data.CreatedBy.Create != nil {
-        var createInput ent.CreateUserInput
-        err = mapstructure.Decode(data.CreatedBy.Create, &createInput)
-        if err != nil {
-            return nil, err
+            if err != nil {
+                return nil, err
+            }
+
+            data.CreatedByID = &toConnect.ID
         }
-        
-        toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
-
-        if err != nil {
-            return nil, err
-        }
-
-        data.CreatedByID = &toConnect.ID
-    }
     }
     if data.RefUpdatedBy != nil {
         
@@ -459,6 +504,17 @@ func (r *User) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniq
             }
 
             data.AddRefUpdatedByIDs = append(data.AddRefUpdatedByIDs , toConnect.ID)
+        }
+    }
+    if data.RefUpdatedBy.Disconnect != nil {
+        for _, disconnect := range data.RefUpdatedBy.Disconnect {
+            toDisconnect, err := repository.User.GetOneTx(ctx, tx, *disconnect)
+
+            if err != nil {
+                return nil, err
+            }
+
+            data.RemoveRefUpdatedByIDs = append(data.RemoveRefUpdatedByIDs, toDisconnect.ID)
         }
     }
     if data.RefUpdatedBy.Create != nil {
@@ -481,57 +537,105 @@ func (r *User) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniq
     }
     if data.UpdatedBy != nil {
         
-    if data.UpdatedBy.Connect != nil {    
-        toConnect, err := repository.User.GetOneTx(ctx, tx, *data.UpdatedBy.Connect)
+        if data.UpdatedBy.Connect != nil {    
+            toConnect, err := repository.User.GetOneTx(ctx, tx, *data.UpdatedBy.Connect)
 
-        if err != nil {
-            return nil, err
+            if err != nil {
+                return nil, err
+            }
+
+            data.UpdatedByID = &toConnect.ID
         }
+		if data.UpdatedBy.Unset != nil && *data.UpdatedBy.Unset {
+			data.ClearUpdatedBy = true
+		}
+        if data.UpdatedBy.Create != nil {
+            var createInput ent.CreateUserInput
+            err = mapstructure.Decode(data.UpdatedBy.Create, &createInput)
+            if err != nil {
+                return nil, err
+            }
+            
+            toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
 
-        data.UpdatedByID =  &toConnect.ID
+            if err != nil {
+                return nil, err
+            }
+
+            data.UpdatedByID = &toConnect.ID
+        }
     }
-    if data.UpdatedBy.Create != nil {
-        var createInput ent.CreateUserInput
-        err = mapstructure.Decode(data.UpdatedBy.Create, &createInput)
-        if err != nil {
-            return nil, err
-        }
+    if data.Roles != nil {
         
-        toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
+    if data.Roles.Connect != nil {
+        for _, connect := range data.Roles.Connect {
+            toConnect, err := repository.Role.GetOneTx(ctx, tx, *connect)
 
-        if err != nil {
-            return nil, err
+            if err != nil {
+                return nil, err
+            }
+
+            data.AddRoleIDs = append(data.AddRoleIDs , toConnect.ID)
         }
+    }
+    if data.Roles.Disconnect != nil {
+        for _, disconnect := range data.Roles.Disconnect {
+            toDisconnect, err := repository.Role.GetOneTx(ctx, tx, *disconnect)
 
-        data.UpdatedByID = &toConnect.ID
+            if err != nil {
+                return nil, err
+            }
+
+            data.RemoveRoleIDs = append(data.RemoveRoleIDs, toDisconnect.ID)
+        }
+    }
+    if data.Roles.Create != nil {
+        for _, create := range data.Roles.Create {
+            var createInput ent.CreateRoleInput
+            err = mapstructure.Decode(create, &createInput)
+            if err != nil {
+                return nil, err
+            }
+
+            toConnect, err := repository.Role.CreateTx(ctx, tx, createInput)
+
+            if err != nil {
+                return nil, err
+            }
+
+            data.AddRoleIDs = append(data.AddRoleIDs , toConnect.ID)
+        }
     }
     }
-    if data.Role != nil {
+    if data.DefaultRole != nil {
         
-    if data.Role.Connect != nil {    
-        toConnect, err := repository.Role.GetOneTx(ctx, tx, *data.Role.Connect)
+        if data.DefaultRole.Connect != nil {    
+            toConnect, err := repository.Role.GetOneTx(ctx, tx, *data.DefaultRole.Connect)
 
-        if err != nil {
-            return nil, err
+            if err != nil {
+                return nil, err
+            }
+
+            data.DefaultRoleID = &toConnect.ID
         }
+		if data.DefaultRole.Unset != nil && *data.DefaultRole.Unset {
+			data.ClearDefaultRole = true
+		}
+        if data.DefaultRole.Create != nil {
+            var createInput ent.CreateRoleInput
+            err = mapstructure.Decode(data.DefaultRole.Create, &createInput)
+            if err != nil {
+                return nil, err
+            }
+            
+            toConnect, err := repository.Role.CreateTx(ctx, tx, createInput)
 
-        data.RoleID =  &toConnect.ID
-    }
-    if data.Role.Create != nil {
-        var createInput ent.CreateRoleInput
-        err = mapstructure.Decode(data.Role.Create, &createInput)
-        if err != nil {
-            return nil, err
+            if err != nil {
+                return nil, err
+            }
+
+            data.DefaultRoleID = &toConnect.ID
         }
-        
-        toConnect, err := repository.Role.CreateTx(ctx, tx, createInput)
-
-        if err != nil {
-            return nil, err
-        }
-
-        data.RoleID = &toConnect.ID
-    }
     }
 
 	updatedInput, err := tx.User.UpdateOne(item).SetInput(data).Save(ctx)

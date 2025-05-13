@@ -4,7 +4,7 @@ import (
 	"app/ent"
 	"context"
 
-	"github.com/GoLabra/labrago/src/api/constants"
+	"github.com/GoLabra/labra/src/api/constants"
 )
 
 func CreatedByUpdatedByHook(next ent.Mutator) ent.Mutator {

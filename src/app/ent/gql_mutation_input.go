@@ -3,19 +3,29 @@
 package ent
 
 import (
-	"app/ent/migration"
-
-	"github.com/GoLabra/labrago/src/api/entgql/enum"
+	"time"
 )
 
-type CreateManyMigrationInput struct {
-	Create  []*CreateMigrationInput      `json:"create,omitempty"`
-	Connect []*MigrationWhereUniqueInput `json:"connect,omitempty"`
+type CreateManyPermissionInput struct {
+	Create  []*CreatePermissionInput      `json:"create,omitempty"`
+	Connect []*PermissionWhereUniqueInput `json:"connect,omitempty"`
 }
 
-type CreateOneMigrationInput struct {
-	Create  *CreateMigrationInput      `json:"create,omitempty"`
-	Connect *MigrationWhereUniqueInput `json:"connect,omitempty"`
+type CreateOnePermissionInput struct {
+	Create  *CreatePermissionInput      `json:"create,omitempty"`
+	Connect *PermissionWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyPermissionInput struct {
+	Create     []*CreatePermissionInput      `json:"create,omitempty"`
+	Connect    []*PermissionWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*PermissionWhereUniqueInput `json:"disconnect,omitempty"`
+}
+
+type UpdateOnePermissionInput struct {
+	Create  *CreatePermissionInput      `json:"create,omitempty"`
+	Connect *PermissionWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                       `json:"unset,omitempty"`
 }
 type CreateManyRoleInput struct {
 	Create  []*CreateRoleInput      `json:"create,omitempty"`
@@ -25,6 +35,18 @@ type CreateManyRoleInput struct {
 type CreateOneRoleInput struct {
 	Create  *CreateRoleInput      `json:"create,omitempty"`
 	Connect *RoleWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyRoleInput struct {
+	Create     []*CreateRoleInput      `json:"create,omitempty"`
+	Connect    []*RoleWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*RoleWhereUniqueInput `json:"disconnect,omitempty"`
+}
+
+type UpdateOneRoleInput struct {
+	Create  *CreateRoleInput      `json:"create,omitempty"`
+	Connect *RoleWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                 `json:"unset,omitempty"`
 }
 type CreateManyUserInput struct {
 	Create  []*CreateUserInput      `json:"create,omitempty"`
@@ -36,30 +58,50 @@ type CreateOneUserInput struct {
 	Connect *UserWhereUniqueInput `json:"connect,omitempty"`
 }
 
-// CreateMigrationInput represents a mutation input for creating migrations.
-type CreateMigrationInput struct {
-	Name      string
-	Type      migration.Type
-	Direction migration.Direction
-	Plugin    *string
+type UpdateManyUserInput struct {
+	Create     []*CreateUserInput      `json:"create,omitempty"`
+	Connect    []*UserWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*UserWhereUniqueInput `json:"disconnect,omitempty"`
+}
+
+type UpdateOneUserInput struct {
+	Create  *CreateUserInput      `json:"create,omitempty"`
+	Connect *UserWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                 `json:"unset,omitempty"`
+}
+
+// CreatePermissionInput represents a mutation input for creating permissions.
+type CreatePermissionInput struct {
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+	Entity    string
+	Operation *string
 	/*
-	   CreatedBy  *CreateOneUserWithoutMigrationInput
+	   CreatedBy  *CreateOneUserWithoutPermissionInput
 	   CreatedByID *string
-	   UpdatedBy  *CreateOneUserWithoutMigrationInput
-	   UpdatedByID *string*/
+	   UpdatedBy  *CreateOneUserWithoutPermissionInput
+	   UpdatedByID *string
+	   Role  *CreateOneRoleWithoutPermissionInput
+	   RoleID *string*/
 	CreatedBy   *CreateOneUserInput
 	CreatedByID *string
 	UpdatedBy   *CreateOneUserInput
 	UpdatedByID *string
+	Role        *CreateOneRoleInput
+	RoleID      *string
 }
 
-// Mutate applies the CreateMigrationInput on the MigrationMutation builder.
-func (i *CreateMigrationInput) Mutate(m *MigrationMutation) {
-	m.SetName(i.Name)
-	m.SetType(i.Type)
-	m.SetDirection(i.Direction)
-	if v := i.Plugin; v != nil {
-		m.SetPlugin(*v)
+// Mutate applies the CreatePermissionInput on the PermissionMutation builder.
+func (i *CreatePermissionInput) Mutate(m *PermissionMutation) {
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	m.SetEntity(i.Entity)
+	if v := i.Operation; v != nil {
+		m.SetOperation(*v)
 	}
 	if v := i.CreatedByID; v != nil {
 		m.SetCreatedByID(*v)
@@ -67,52 +109,65 @@ func (i *CreateMigrationInput) Mutate(m *MigrationMutation) {
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
 	}
+	if v := i.RoleID; v != nil {
+		m.SetRoleID(*v)
+	}
 }
 
-// SetInput applies the change-set in the CreateMigrationInput on the MigrationCreate builder.
-func (c *MigrationCreate) SetInput(i CreateMigrationInput) *MigrationCreate {
+// SetInput applies the change-set in the CreatePermissionInput on the PermissionCreate builder.
+func (c *PermissionCreate) SetInput(i CreatePermissionInput) *PermissionCreate {
 	i.Mutate(c.Mutation())
 	return c
 }
 
-// UpdateMigrationInput represents a mutation input for updating migrations.
-type UpdateMigrationInput struct {
-	Name        *string
-	Type        *migration.Type
-	Direction   *migration.Direction
-	ClearPlugin bool
-	Plugin      *string
+// UpdatePermissionInput represents a mutation input for updating permissions.
+type UpdatePermissionInput struct {
+	ClearCreatedAt bool
+	CreatedAt      *time.Time
+	ClearUpdatedAt bool
+	UpdatedAt      *time.Time
+	Entity         *string
+	Operation      *string
 	/*
 	   ClearCreatedBy bool
-	   CreatedBy  *CreateOneUserWithoutMigrationInput
+	   CreatedBy  *CreateOneUserWithoutPermissionInput
 	   CreatedByID *string
 	   ClearUpdatedBy bool
-	   UpdatedBy  *CreateOneUserWithoutMigrationInput
-	   UpdatedByID *string*/
+	   UpdatedBy  *CreateOneUserWithoutPermissionInput
+	   UpdatedByID *string
+	   ClearRole bool
+	   Role  *CreateOneRoleWithoutPermissionInput
+	   RoleID *string*/
 	ClearCreatedBy bool
-	CreatedBy      *CreateOneUserInput
+	CreatedBy      *UpdateOneUserInput
 	CreatedByID    *string
 	ClearUpdatedBy bool
-	UpdatedBy      *CreateOneUserInput
+	UpdatedBy      *UpdateOneUserInput
 	UpdatedByID    *string
+	ClearRole      bool
+	Role           *UpdateOneRoleInput
+	RoleID         *string
 }
 
-// Mutate applies the UpdateMigrationInput on the MigrationMutation builder.
-func (i *UpdateMigrationInput) Mutate(m *MigrationMutation) {
-	if v := i.Name; v != nil {
-		m.SetName(*v)
+// Mutate applies the UpdatePermissionInput on the PermissionMutation builder.
+func (i *UpdatePermissionInput) Mutate(m *PermissionMutation) {
+	if i.ClearCreatedAt {
+		m.ClearCreatedAt()
 	}
-	if v := i.Type; v != nil {
-		m.SetType(*v)
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
 	}
-	if v := i.Direction; v != nil {
-		m.SetDirection(*v)
+	if i.ClearUpdatedAt {
+		m.ClearUpdatedAt()
 	}
-	if i.ClearPlugin {
-		m.ClearPlugin()
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
 	}
-	if v := i.Plugin; v != nil {
-		m.SetPlugin(*v)
+	if v := i.Entity; v != nil {
+		m.SetEntity(*v)
+	}
+	if v := i.Operation; v != nil {
+		m.SetOperation(*v)
 	}
 	if i.ClearCreatedBy {
 		m.ClearCreatedBy()
@@ -126,16 +181,22 @@ func (i *UpdateMigrationInput) Mutate(m *MigrationMutation) {
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
 	}
+	if i.ClearRole {
+		m.ClearRole()
+	}
+	if v := i.RoleID; v != nil {
+		m.SetRoleID(*v)
+	}
 }
 
-// SetInput applies the change-set in the UpdateMigrationInput on the MigrationUpdate builder.
-func (c *MigrationUpdate) SetInput(i UpdateMigrationInput) *MigrationUpdate {
+// SetInput applies the change-set in the UpdatePermissionInput on the PermissionUpdate builder.
+func (c *PermissionUpdate) SetInput(i UpdatePermissionInput) *PermissionUpdate {
 	i.Mutate(c.Mutation())
 	return c
 }
 
-// SetInput applies the change-set in the UpdateMigrationInput on the MigrationUpdateOne builder.
-func (c *MigrationUpdateOne) SetInput(i UpdateMigrationInput) *MigrationUpdateOne {
+// SetInput applies the change-set in the UpdatePermissionInput on the PermissionUpdateOne builder.
+func (c *PermissionUpdateOne) SetInput(i UpdatePermissionInput) *PermissionUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }
@@ -143,27 +204,39 @@ func (c *MigrationUpdateOne) SetInput(i UpdateMigrationInput) *MigrationUpdateOn
 // CreateRoleInput represents a mutation input for creating roles.
 type CreateRoleInput struct {
 	Name string
-	Type enum.RoleType
 	/*
 	   CreatedBy  *CreateOneUserWithoutRoleInput
 	   CreatedByID *string
 	   UpdatedBy  *CreateOneUserWithoutRoleInput
-	   UpdatedByID *string*/
-	CreatedBy   *CreateOneUserInput
-	CreatedByID *string
-	UpdatedBy   *CreateOneUserInput
-	UpdatedByID *string
+	   UpdatedByID *string
+	   UserRoles  *CreateManyUserWithoutRoleInput
+	       UserRoleIDs []string
+	   Permissions  *CreateManyPermissionWithoutRoleInput
+	       PermissionIDs []string*/
+	CreatedBy     *CreateOneUserInput
+	CreatedByID   *string
+	UpdatedBy     *CreateOneUserInput
+	UpdatedByID   *string
+	UserRoles     *CreateManyUserInput
+	UserRoleIDs   []string
+	Permissions   *CreateManyPermissionInput
+	PermissionIDs []string
 }
 
 // Mutate applies the CreateRoleInput on the RoleMutation builder.
 func (i *CreateRoleInput) Mutate(m *RoleMutation) {
 	m.SetName(i.Name)
-	m.SetType(i.Type)
 	if v := i.CreatedByID; v != nil {
 		m.SetCreatedByID(*v)
 	}
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
+	}
+	if v := i.UserRoleIDs; len(v) > 0 {
+		m.AddUserRoleIDs(v...)
+	}
+	if v := i.PermissionIDs; len(v) > 0 {
+		m.AddPermissionIDs(v...)
 	}
 }
 
@@ -176,29 +249,41 @@ func (c *RoleCreate) SetInput(i CreateRoleInput) *RoleCreate {
 // UpdateRoleInput represents a mutation input for updating roles.
 type UpdateRoleInput struct {
 	Name *string
-	Type *enum.RoleType
 	/*
 	   ClearCreatedBy bool
 	   CreatedBy  *CreateOneUserWithoutRoleInput
 	   CreatedByID *string
 	   ClearUpdatedBy bool
 	   UpdatedBy  *CreateOneUserWithoutRoleInput
-	   UpdatedByID *string*/
-	ClearCreatedBy bool
-	CreatedBy      *CreateOneUserInput
-	CreatedByID    *string
-	ClearUpdatedBy bool
-	UpdatedBy      *CreateOneUserInput
-	UpdatedByID    *string
+	   UpdatedByID *string
+	   ClearUserRoles bool
+	   UserRoles  *CreateManyUserWithoutRoleInput
+	       AddUserRoleIDs []string
+	       RemoveUserRoleIDs []string
+	   ClearPermissions bool
+	   Permissions  *CreateManyPermissionWithoutRoleInput
+	       AddPermissionIDs []string
+	       RemovePermissionIDs []string*/
+	ClearCreatedBy      bool
+	CreatedBy           *UpdateOneUserInput
+	CreatedByID         *string
+	ClearUpdatedBy      bool
+	UpdatedBy           *UpdateOneUserInput
+	UpdatedByID         *string
+	ClearUserRoles      bool
+	UserRoles           *UpdateManyUserInput
+	AddUserRoleIDs      []string
+	RemoveUserRoleIDs   []string
+	ClearPermissions    bool
+	Permissions         *UpdateManyPermissionInput
+	AddPermissionIDs    []string
+	RemovePermissionIDs []string
 }
 
 // Mutate applies the UpdateRoleInput on the RoleMutation builder.
 func (i *UpdateRoleInput) Mutate(m *RoleMutation) {
 	if v := i.Name; v != nil {
 		m.SetName(*v)
-	}
-	if v := i.Type; v != nil {
-		m.SetType(*v)
 	}
 	if i.ClearCreatedBy {
 		m.ClearCreatedBy()
@@ -211,6 +296,24 @@ func (i *UpdateRoleInput) Mutate(m *RoleMutation) {
 	}
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
+	}
+	if i.ClearUserRoles {
+		m.ClearUserRoles()
+	}
+	if v := i.AddUserRoleIDs; len(v) > 0 {
+		m.AddUserRoleIDs(v...)
+	}
+	if v := i.RemoveUserRoleIDs; len(v) > 0 {
+		m.RemoveUserRoleIDs(v...)
+	}
+	if i.ClearPermissions {
+		m.ClearPermissions()
+	}
+	if v := i.AddPermissionIDs; len(v) > 0 {
+		m.AddPermissionIDs(v...)
+	}
+	if v := i.RemovePermissionIDs; len(v) > 0 {
+		m.RemovePermissionIDs(v...)
 	}
 }
 
@@ -228,8 +331,11 @@ func (c *RoleUpdateOne) SetInput(i UpdateRoleInput) *RoleUpdateOne {
 
 // CreateUserInput represents a mutation input for creating users.
 type CreateUserInput struct {
-	Name  string
-	Email string
+	Name      *string
+	Email     string
+	Password  string
+	FirstName string
+	LastName  string
 	/*
 	   RefCreatedBy  *CreateManyUserWithoutUserInput
 	       RefCreatedByIDs []string
@@ -239,8 +345,10 @@ type CreateUserInput struct {
 	       RefUpdatedByIDs []string
 	   UpdatedBy  *CreateOneUserWithoutUserInput
 	   UpdatedByID *string
-	   Role  *CreateOneRoleWithoutUserInput
-	   RoleID *string*/
+	   Roles  *CreateManyRoleWithoutUserInput
+	       RoleIDs []string
+	   DefaultRole  *CreateOneRoleWithoutUserInput
+	   DefaultRoleID *string*/
 	RefCreatedBy    *CreateManyUserInput
 	RefCreatedByIDs []string
 	CreatedBy       *CreateOneUserInput
@@ -249,14 +357,21 @@ type CreateUserInput struct {
 	RefUpdatedByIDs []string
 	UpdatedBy       *CreateOneUserInput
 	UpdatedByID     *string
-	Role            *CreateOneRoleInput
-	RoleID          *string
+	Roles           *CreateManyRoleInput
+	RoleIDs         []string
+	DefaultRole     *CreateOneRoleInput
+	DefaultRoleID   *string
 }
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
 func (i *CreateUserInput) Mutate(m *UserMutation) {
-	m.SetName(i.Name)
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
 	m.SetEmail(i.Email)
+	m.SetPassword(i.Password)
+	m.SetFirstName(i.FirstName)
+	m.SetLastName(i.LastName)
 	if v := i.RefCreatedByIDs; len(v) > 0 {
 		m.AddRefCreatedByIDs(v...)
 	}
@@ -269,8 +384,11 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
 	}
-	if v := i.RoleID; v != nil {
-		m.SetRoleID(*v)
+	if v := i.RoleIDs; len(v) > 0 {
+		m.AddRoleIDs(v...)
+	}
+	if v := i.DefaultRoleID; v != nil {
+		m.SetDefaultRoleID(*v)
 	}
 }
 
@@ -282,8 +400,12 @@ func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
 
 // UpdateUserInput represents a mutation input for updating users.
 type UpdateUserInput struct {
-	Name  *string
-	Email *string
+	ClearName bool
+	Name      *string
+	Email     *string
+	Password  *string
+	FirstName *string
+	LastName  *string
 	/*
 	   ClearRefCreatedBy bool
 	   RefCreatedBy  *CreateManyUserWithoutUserInput
@@ -299,35 +421,55 @@ type UpdateUserInput struct {
 	   ClearUpdatedBy bool
 	   UpdatedBy  *CreateOneUserWithoutUserInput
 	   UpdatedByID *string
-	   ClearRole bool
-	   Role  *CreateOneRoleWithoutUserInput
-	   RoleID *string*/
+	   ClearRoles bool
+	   Roles  *CreateManyRoleWithoutUserInput
+	       AddRoleIDs []string
+	       RemoveRoleIDs []string
+	   ClearDefaultRole bool
+	   DefaultRole  *CreateOneRoleWithoutUserInput
+	   DefaultRoleID *string*/
 	ClearRefCreatedBy     bool
-	RefCreatedBy          *CreateManyUserInput
+	RefCreatedBy          *UpdateManyUserInput
 	AddRefCreatedByIDs    []string
 	RemoveRefCreatedByIDs []string
 	ClearCreatedBy        bool
-	CreatedBy             *CreateOneUserInput
+	CreatedBy             *UpdateOneUserInput
 	CreatedByID           *string
 	ClearRefUpdatedBy     bool
-	RefUpdatedBy          *CreateManyUserInput
+	RefUpdatedBy          *UpdateManyUserInput
 	AddRefUpdatedByIDs    []string
 	RemoveRefUpdatedByIDs []string
 	ClearUpdatedBy        bool
-	UpdatedBy             *CreateOneUserInput
+	UpdatedBy             *UpdateOneUserInput
 	UpdatedByID           *string
-	ClearRole             bool
-	Role                  *CreateOneRoleInput
-	RoleID                *string
+	ClearRoles            bool
+	Roles                 *UpdateManyRoleInput
+	AddRoleIDs            []string
+	RemoveRoleIDs         []string
+	ClearDefaultRole      bool
+	DefaultRole           *UpdateOneRoleInput
+	DefaultRoleID         *string
 }
 
 // Mutate applies the UpdateUserInput on the UserMutation builder.
 func (i *UpdateUserInput) Mutate(m *UserMutation) {
+	if i.ClearName {
+		m.ClearName()
+	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
 	}
 	if v := i.Email; v != nil {
 		m.SetEmail(*v)
+	}
+	if v := i.Password; v != nil {
+		m.SetPassword(*v)
+	}
+	if v := i.FirstName; v != nil {
+		m.SetFirstName(*v)
+	}
+	if v := i.LastName; v != nil {
+		m.SetLastName(*v)
 	}
 	if i.ClearRefCreatedBy {
 		m.ClearRefCreatedBy()
@@ -359,11 +501,20 @@ func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
 	}
-	if i.ClearRole {
-		m.ClearRole()
+	if i.ClearRoles {
+		m.ClearRoles()
 	}
-	if v := i.RoleID; v != nil {
-		m.SetRoleID(*v)
+	if v := i.AddRoleIDs; len(v) > 0 {
+		m.AddRoleIDs(v...)
+	}
+	if v := i.RemoveRoleIDs; len(v) > 0 {
+		m.RemoveRoleIDs(v...)
+	}
+	if i.ClearDefaultRole {
+		m.ClearDefaultRole()
+	}
+	if v := i.DefaultRoleID; v != nil {
+		m.SetDefaultRoleID(*v)
 	}
 }
 

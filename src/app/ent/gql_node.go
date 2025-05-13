@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"app/ent/migration"
+	"app/ent/permission"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -19,10 +19,10 @@ type Noder interface {
 	IsNode()
 }
 
-var migrationImplementors = []string{"Migration", "Node"}
+var permissionImplementors = []string{"Permission", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (*Migration) IsNode() {}
+func (*Permission) IsNode() {}
 
 var roleImplementors = []string{"Role", "Node"}
 
@@ -92,11 +92,11 @@ func (c *Client) Noder(ctx context.Context, id string, opts ...NodeOption) (_ No
 
 func (c *Client) noder(ctx context.Context, table string, id string) (Noder, error) {
 	switch table {
-	case migration.Table:
-		query := c.Migration.Query().
-			Where(migration.ID(id))
+	case permission.Table:
+		query := c.Permission.Query().
+			Where(permission.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, migrationImplementors...); err != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, permissionImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -192,10 +192,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
-	case migration.Table:
-		query := c.Migration.Query().
-			Where(migration.IDIn(ids...))
-		query, err := query.CollectFields(ctx, migrationImplementors...)
+	case permission.Table:
+		query := c.Permission.Query().
+			Where(permission.IDIn(ids...))
+		query, err := query.CollectFields(ctx, permissionImplementors...)
 		if err != nil {
 			return nil, err
 		}
