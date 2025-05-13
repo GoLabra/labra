@@ -192,19 +192,4 @@ You should see startup logs indicating successful DB connection and GraphQL endp
    ```
 
 ## Contributing
-We welcome contributions to this project! To contribute:
-
-1. Fork the repository and clone it to your local machine.
-2. Create a new branch for your feature or bugfix:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Commit your changes with descriptive messages:
-   ```bash
-   git commit -m "Add your feature description"
-   ```
-4. Push your branch:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Open a pull request on GitHub.
+Check our [Contributing guide](https://github.com/GoLabra/labra/blob/feature/labra-module/CONTRIBUTING.md)
