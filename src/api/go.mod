@@ -1,4 +1,4 @@
-module github.com/GoLabra/labrago/src/api
+module github.com/GoLabra/labra/src/api
 
 go 1.23.0
 

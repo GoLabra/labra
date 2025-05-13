@@ -3,7 +3,7 @@ package strcase_test
 import (
 	"testing"
 
-	"github.com/GoLabra/labrago/src/api/strcase"
+	"github.com/GoLabra/labra/src/api/strcase"
 )
 
 func TestToCamel(t *testing.T) {

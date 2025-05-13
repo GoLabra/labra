@@ -8,8 +8,8 @@ github.com/99designs/gqlgen v0.17.66 h1:2/SRc+h3115fCOZeTtsqrB5R5gTGm+8qCAwcrZa+
 github.com/99designs/gqlgen v0.17.66/go.mod h1:gucrb5jK5pgCKzAGuOMMVU9C8PnReecHEHd2UxLQwCg=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
-github.com/GoLabra/labrago/src/api v0.1.2 h1:JEyu1cuol77cip35jcvfI4qZQt7BqnCgBeBmYhAHdDw=
-github.com/GoLabra/labrago/src/api v0.1.2/go.mod h1:OrWbcZu9jnHkLGeBaZO+Vv42v3atn6Bz28oyO3C6ovQ=
+github.com/GoLabra/labra/src/api v0.1.1 h1:37kdVe9LuydOEjRiJXWUtc9A2zFpsYaeVRdrOYNM4fM=
+github.com/GoLabra/labra/src/api v0.1.1/go.mod h1:+TIIbWiC4lEF8qZ8OPAFkE807PPirwb7Fr/Yz5cq1b0=
 github.com/MakeNowJust/heredoc v1.0.0 h1:cXCdzVdstXyiTqTvfqk9SDHpKNjxuom+DOlyEeQ4pzQ=
 github.com/MakeNowJust/heredoc v1.0.0/go.mod h1:mG5amYoWBHf8vpLOuehzbGGw0EHxpZZ6lCpQ4fNJ8LE=
 github.com/agext/levenshtein v1.2.1 h1:QmvMAjj2aEICytGiWzmxoE0x2KZvE0fvmqMOfy2tjT8=

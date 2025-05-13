@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/GoLabra/labrago/src/api/constants"
+	"github.com/GoLabra/labra/src/api/constants"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	entity "github.com/GoLabra/labrago/src/api/entgql/entity"
-	generator "github.com/GoLabra/labrago/src/api/entgql/generator"
+	entity "github.com/GoLabra/labra/src/api/entgql/entity"
+	generator "github.com/GoLabra/labra/src/api/entgql/generator"
 	gomock "github.com/golang/mock/gomock"
 )
 

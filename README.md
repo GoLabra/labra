@@ -32,8 +32,8 @@ Follow these steps to set up the project on your local machine:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/GoLabra/labrago.git
-   cd labrago
+   git clone https://github.com/GoLabra/labra.git
+   cd labra
    ```
 
 2. Navigate to the admin project directory:
@@ -111,8 +111,8 @@ Note: Rebuild the application after making changes to environment variables.
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/GoLabra/labrago.git
-   cd labrago/src
+   git clone https://github.com/GoLabra/labra.git
+   cd labra/src
    ```
 
 2. Set Environment Variables
@@ -178,7 +178,7 @@ You should see startup logs indicating successful DB connection and GraphQL endp
 2. In `/app/go.mod`, replace the placeholder with your local path:
 
    ```go
-   replace github.com/GoLabra/labrago/src/api => ../api
+   replace github.com/GoLabra/labra/src/api => ../api
    ```
 
    or run the command bellow
@@ -188,23 +188,8 @@ You should see startup logs indicating successful DB connection and GraphQL endp
    ```
 
    ```bash
-   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labrago\/src\/api => ../api" go.mod
+   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
    ```
 
 ## Contributing
-We welcome contributions to this project! To contribute:
-
-1. Fork the repository and clone it to your local machine.
-2. Create a new branch for your feature or bugfix:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Commit your changes with descriptive messages:
-   ```bash
-   git commit -m "Add your feature description"
-   ```
-4. Push your branch:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. Open a pull request on GitHub.
+Check our [Contributing guide](https://github.com/GoLabra/labra/blob/feature/labra-module/CONTRIBUTING.md)

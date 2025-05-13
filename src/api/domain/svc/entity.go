@@ -4,10 +4,10 @@ import (
 	"context"
 	"sort"
 
-	"github.com/GoLabra/labrago/src/api/cache"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
-	"github.com/GoLabra/labrago/src/api/entgql/generator"
-	"github.com/GoLabra/labrago/src/api/strcase"
+	"github.com/GoLabra/labra/src/api/cache"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/generator"
+	"github.com/GoLabra/labra/src/api/strcase"
 )
 
 type SchemaManager interface {

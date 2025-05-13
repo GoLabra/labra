@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/GoLabra/labrago/src/api/cache"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
-	gqlgen "github.com/GoLabra/labrago/src/api/entgql/generated"
-	"github.com/GoLabra/labrago/src/api/strcase"
-	"github.com/GoLabra/labrago/src/api/subscription"
+	"github.com/GoLabra/labra/src/api/cache"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
+	gqlgen "github.com/GoLabra/labra/src/api/entgql/generated"
+	"github.com/GoLabra/labra/src/api/strcase"
+	"github.com/GoLabra/labra/src/api/subscription"
 	"github.com/gertd/go-pluralize"
 )
 
