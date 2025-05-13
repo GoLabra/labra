@@ -2,8 +2,9 @@ package cache
 
 import (
 	"errors"
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
 	"time"
+
+	"github.com/GoLabra/labra/src/api/entgql/entity"
 )
 
 var (

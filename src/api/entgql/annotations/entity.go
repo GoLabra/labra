@@ -1,7 +1,7 @@
 package annotations
 
 import (
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
 
 	"entgo.io/ent/entc"
 )

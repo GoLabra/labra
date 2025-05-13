@@ -3,7 +3,7 @@ package subscription
 import (
 	"context"
 
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
 )
 
 func NewGraphqlSubscriptionClient() *GraphqlSubscriptionClient {

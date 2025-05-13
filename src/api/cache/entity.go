@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/GoLabra/labrago/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
 )
 
 var (
