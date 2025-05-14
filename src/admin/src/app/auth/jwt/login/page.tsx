@@ -57,12 +57,12 @@ export default function AuthPage() {
                 <Typography variant="h4">
                     Login
                 </Typography>
-                {/* <Button
+                <Button
                         component={NextLink}
-                        href={paths.auth.jwt.register}
+                        href={paths.auth.signup}
                     >
                         Sign Up
-                    </Button> */}
+                    </Button>
             </Stack>
 
             <Form methods={formMethods} onSubmit={formMethods.handleSubmit(onSubmit)} >
