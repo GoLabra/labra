@@ -1,154 +1,108 @@
-# Why does LabraGo exist?
+# LabraGO – Backend/API
 
-## Because we exist 🙂
+## Prerequisites
 
-And because we’ve run into enough problems building data-heavy apps, we decided to do something about it.
+- Go (version 1.18 or later)
+- PostgreSQL with an empty database
 
-This project is our way of making things simpler, cleaner, and more fun for anyone facing the same challenges.
+## Installation
 
----
+1. Clone the repository
+   ```bash
+   git clone https://github.com/GoLabra/labrago.git
+   cd labrago/src
+   ```
 
-# 📦 Installation Options
+2. Set Environment Variables
 
-You can install and run LabraGo in two ways:
+   Before running the app, you’ll need to configure your environment by copying the example file and filling in the values that match your local setup:
+   ```bash
+   cd app
+   cp .env.example .env
+   ```
 
----
+   Here’s a sample .env. If you use these values, don’t forget to replace all secret keys first.
 
-## 1. The Easy Way — Using `labractl` CLI 🚀
+   ```bash
+   DSN="host=localhost port=5432 user=ent dbname=ent password=123 sslmode=disable"
+   DB_DIALECT=postgres
+   SERVER_PORT=4000
+   ENT_SCHEMA_PATH=./ent/schema
+   SECRET_KEY=XyZ7WpPqY2VW3m1O9QkH1fLj8zT6sJgKAsDfGhJ7K0I=
+   SUPER_ADMIN_EMAIL=admin@labrago.eu
+   CENTRIFUGO_API_ADDRESS=http://localhost:8000/api
+   CENTRIFUGO_API_KEY=m4Q9KvJNpY8Gh2LxU7sR0cVf3eZUw1PnKaYtXjBmOq0=
+   ```
 
-The official CLI tool lets you skip the manual process entirely.
+   To generate a strong secret key on Linux or macOS:
+   ```bash
+   head -c 32 /dev/urandom | base64
+   ```
 
-### ✅ Install it with:
 
-```bash
-go install github.com/GoLabra/labractl@v.1.0.0
-```
-
-Make sure `$GOPATH/bin` is in your `$PATH`.
-
-### ✅ Create and start a project:
-
-```bash
-labractl create myproject
-cd myproject
-labractl start
-```
-
-This will:
-
-- Clone LabraGo and configure everything
-- Create `.env` files for backend and frontend
-- Ensure PostgreSQL user and database exist
-- Install dependencies with Yarn
-- Start both backend and frontend in parallel
-
----
-
-## 2. Manual Setup (Advanced)
-
-If you want full control over how things are configured and started, follow the steps below:
-
-- [Running LabraGo Admin Panel](#running-labrago-admin-panel)
-- [Running LabraGO – Backend/API](#running-labrago--backendapi)
-
----
-
-## 🖼️ Running LabraGo Admin Panel
-
-1. Make sure you have **Yarn** and **Node.js** installed.
-2. Navigate to the admin panel directory:
+2. Development
+   Generate code and assets
 
 ```bash
-cd src/admin
-```
-
-3. Install dependencies:
-
-```bash
-yarn install
-```
-
-4. Create a `.env` file based on `.env.example`, or directly:
-
-```env
-NEXT_PUBLIC_BRAND_PRODUCT_NAME="Labra·GO"
-NEXT_PUBLIC_BRAND_COLOR="blue"
-NEXT_PUBLIC_GRAPHQL_API_URL="http://localhost:4001"
-NEXT_PUBLIC_GRAPHQL_QUERY_API_URL="http://localhost:4001/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_SUBSCRIPTION_URL="ws://localhost:4001/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL="http://localhost:4001/playground"
-NEXT_PUBLIC_GRAPHQL_ENTITY_API_URL="http://localhost:4001/entity"
-NEXT_PUBLIC_GRAPHQL_ENTITY_PLAYGROUND_URL="http://localhost:4001/eplayground"
-```
-
-5. Start the frontend:
-
-```bash
-yarn dev
-```
-
----
-
-## ⚙️ Running LabraGO – Backend/API
-
-1. Make sure **Go 1.20+** and **PostgreSQL** are installed.
-2. Navigate to the backend directory:
-
-```bash
-cd src/app
-```
-
-3. Create a `.env` file like this:
-
-```env
-SERVER_PORT=4001
-SECRET_KEY=supersecretdevkey
-DSN=postgres://postgres:postgres@localhost:5432/<your-db>?sslmode=disable
-DB_DIALECT=postgres
-ENT_SCHEMA_PATH=absolute/path/to/src/app/ent/schema
-CENTRIFUGO_API_ADDRESS=http://localhost:8000
-CENTRIFUGO_API_KEY=secretkey
-```
-
-4. Run migrations if needed (if you're using Atlas or manual setup).
-
-5. Run `go mod tidy`:
-
-```bash
-go mod tidy
-```
-
-6. Run `go generate`:
-
-```bash
+cd app
 go generate ./...
 ```
 
-7. Start the backend:
+If you get errors, tidy first and re-generate:
 
 ```bash
+go mod tidy
+go generate ./...
+```
+
+## Running in Development Mode
+The entrypoint lives in the cli subdirectory:
+
+```bash
+cd ../cli
 go run main.go start
 ```
 
----
+You should see startup logs indicating successful DB connection and GraphQL endpoint availability.
 
-## 🛠 Development
+## API Development
 
-If you want to build or test the CLI locally:
+1. Configure Go to pull from your private GitHub repo
 
-```bash
-go build -o labractl main.go
-./labractl help
-```
+   ```bash
+   export GOPRIVATE=github.com/PATH_TO_YOUR_REPO
+   ``` 
 
----
+2. In `/app/go.mod`, replace the placeholder with your local path:
 
-## 🤝 Contributing
+   ```go
+   replace github.com/GoLabra/labra/src/api => ../api
+   ```
 
-PRs welcome. Open an issue or fork away if you want to improve the CLI.
+   or run the command bellow
 
----
+   ```bash
+   cd app
+   ```
 
-## License
+   ```bash
+   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labrago\/src\/api => ../api" go.mod
+   ```
 
-MIT © 2025 GoLabra
+## Contributing
+We welcome contributions to this project! To contribute:
+
+1. Fork the repository and clone it to your local machine.
+2. Create a new branch for your feature or bugfix:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Commit your changes with descriptive messages:
+   ```bash
+   git commit -m "Add your feature description"
+   ```
+4. Push your branch:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+5. Open a pull request on GitHub.

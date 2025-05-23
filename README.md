@@ -18,6 +18,47 @@ And because we’ve run into enough problems building data-heavy apps, we decide
 
 This project is our way of making things simpler, cleaner, and more fun for anyone facing the same challenges.
 
+---
+
+# 📦 How to Install LabraGo
+
+You can install and run LabraGo in two ways:
+
+---
+
+## ✅ The Easy Way — Using `labractl` CLI
+
+```bash
+go install github.com/GoLabra/labractl@v.1.0.0
+```
+
+Then run:
+
+```bash
+labractl create myproject
+cd myproject
+labractl start
+```
+
+This will:
+
+- Clone the repo
+- Patch `go.mod`
+- Set up `.env` files for frontend and backend
+- Run `go mod tidy` and `go generate`
+- Ensure PostgreSQL user and database
+- Install frontend dependencies
+- Start frontend and backend concurrently
+
+🔥 Done in seconds.
+
+---
+
+## 🛠 The Manual Way (Advanced)
+
+See below:
+
+---
 
 # Running LabraGo Admin Panel
 
@@ -30,165 +71,115 @@ To run this project, ensure you have the following installed on your system:
 ## Installation
 Follow these steps to set up the project on your local machine:
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/GoLabra/labra.git
-   cd labra
-   ```
-
-2. Navigate to the admin project directory:
-   ```bash
-   cd src/admin
-   ```   
-
-3. Install dependencies using Yarn:
-   ```bash
-   yarn install
-   ```
+```bash
+git clone https://github.com/GoLabra/labra.git
+cd labra/src/admin
+yarn install
+```
 
 ## Running in Development Mode
-To run the app in development mode:
-
-1. Start the development server:
-   ```bash
-   yarn dev
-   ```
-
-2. Open your browser and navigate to `http://localhost:3000` to view the app.
-
-## Building the Project
-To build the app for production:
-
-1. Run the build command:
-   ```bash
-   yarn build
-   ```
-
-2. The production-ready files will be located in the `.next` directory.
-
-## Starting the Production Server
-To start the app in production mode:
-
-1. Ensure the app is built (see the "Building the Project" section).
-
-2. Run the production server:
-   ```bash
-   yarn start
-   ```
-
-3. Open your browser and navigate to the production URL (e.g., `http://localhost:3000`).
-
-## Set Environment Variables
-Before running the app, you’ll need to configure your environment by copying the example file and filling in the values that match your local setup:
 
 ```bash
-cd app
+yarn dev
+```
+
+Go to `http://localhost:3000` to view the app.
+
+## Building the Project
+
+```bash
+yarn build
+```
+
+## Starting the Production Server
+
+```bash
+yarn start
+```
+
+## Set Environment Variables
+
+```bash
 cp .env.example .env
 ```
 
-Here's a sample .env
-```bash
-NEXT_PUBLIC_BRAND_PRODUCT_NAME = "Labra·GO"
-NEXT_PUBLIC_BRAND_COLOR = "blue"
-
-NEXT_PUBLIC_GRAPHQL_API_URL = "http://your-domain.com:4000"
-NEXT_PUBLIC_GRAPHQL_QUERY_API_URL = "http://your-domain.com:4000/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_SUBSCRIPTION_URL = "ws://your-domain.com:4000/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL = "http://your-domain.com:4000/playground"
-NEXT_PUBLIC_GRAPHQL_ENTITY_API_URL = "http://your-domain.com:4000/entity"
-NEXT_PUBLIC_GRAPHQL_ENTITY_SUBSCRIPTION_URL = "ws://your-domain.com:4000/entity"
-NEXT_PUBLIC_GRAPHQL_ENTITY_PLAYGROUND_URL = "http://your-domain.com:4000/eplayground"
-
-NEXT_PUBLIC_CENTRIFUGO_URL = "ws://your-domain.com:8000/connection/websocket"
+```env
+NEXT_PUBLIC_BRAND_PRODUCT_NAME="Labra·GO"
+NEXT_PUBLIC_BRAND_COLOR="blue"
+NEXT_PUBLIC_GRAPHQL_API_URL="http://localhost:4000"
+NEXT_PUBLIC_GRAPHQL_QUERY_API_URL="http://localhost:4000/query"
+NEXT_PUBLIC_GRAPHQL_QUERY_SUBSCRIPTION_URL="ws://localhost:4000/query"
+NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL="http://localhost:4000/playground"
+NEXT_PUBLIC_GRAPHQL_ENTITY_API_URL="http://localhost:4000/entity"
+NEXT_PUBLIC_GRAPHQL_ENTITY_SUBSCRIPTION_URL="ws://localhost:4000/entity"
+NEXT_PUBLIC_GRAPHQL_ENTITY_PLAYGROUND_URL="http://localhost:4000/eplayground"
+NEXT_PUBLIC_CENTRIFUGO_URL="ws://localhost:8000/connection/websocket"
 ```
 
-Note: Rebuild the application after making changes to environment variables.
-
+---
 
 # Running LabraGO – Backend/API
 
 ## Prerequisites
 
-- Go (version 1.18 or later)
+- Go 1.18 or later
 - PostgreSQL with an empty database
 
-## Installation
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/GoLabra/labra.git
-   cd labra/src
-   ```
-
-2. Set Environment Variables
-
-   Before running the app, you’ll need to configure your environment by copying the example file and filling in the values that match your local setup:
-   ```bash
-   cd app
-   cp .env.example .env
-   ```
-
-   Here’s a sample .env. If you use these values, don’t forget to replace all secret keys first.
-
-   ```bash
-   DSN="host=localhost port=5432 user=ent dbname=ent password=123 sslmode=disable"
-   DB_DIALECT=postgres
-   SERVER_PORT=4000
-   ENT_SCHEMA_PATH=./ent/schema
-   SECRET_KEY=XyZ7WpPqY2VW3m1O9QkH1fLj8zT6sJgKAsDfGhJ7K0I=
-   SUPER_ADMIN_EMAIL=admin@labrago.eu
-   CENTRIFUGO_API_ADDRESS=http://localhost:8000/api
-   CENTRIFUGO_API_KEY=m4Q9KvJNpY8Gh2LxU7sR0cVf3eZUw1PnKaYtXjBmOq0=
-   ```
-
-   To generate a strong secret key on Linux or macOS:
-   ```bash
-   head -c 32 /dev/urandom | base64
-   ```
-
-
-2. Development
-Generate code and assets
+## Setup
 
 ```bash
-cd app
-go generate ./...
+cd labra/src/app
+cp .env.example .env
 ```
 
-If you get errors, tidy first and re-generate:
+Sample `.env`:
+
+```bash
+DSN=postgres://postgres:postgres@localhost:5432/labrago?sslmode=disable
+DB_DIALECT=postgres
+SERVER_PORT=4000
+ENT_SCHEMA_PATH=./ent/schema
+SECRET_KEY=XyZ7WpPqY2VW3m1O9QkH1fLj8zT6sJgKAsDfGhJ7K0I=
+SUPER_ADMIN_EMAIL=admin@labrago.eu
+CENTRIFUGO_API_ADDRESS=http://localhost:8000/api
+CENTRIFUGO_API_KEY=m4Q9KvJNpY8Gh2LxU7sR0cVf3eZUw1PnKaYtXjBmOq0=
+```
+
+Generate a key:
+
+```bash
+head -c 32 /dev/urandom | base64
+```
+
+## Development
 
 ```bash
 go mod tidy
 go generate ./...
 ```
 
-## Running in Development Mode
-The entrypoint lives in the cli subdirectory:
+## Run the API
 
 ```bash
 cd ../cli
 go run main.go start
 ```
 
-You should see startup logs indicating successful DB connection and GraphQL endpoint availability.
+## Local API Dev Shortcut
 
-## API Development
+In `/app/go.mod`:
 
- In `/app/go.mod`, replace the placeholder with your local path:
+```go
+replace github.com/GoLabra/labra/src/api => ../api
+```
 
-   ```go
-   replace github.com/GoLabra/labra/src/api => ../api
-   ```
+or run:
 
-   or run the command bellow
+```bash
+sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
+```
 
-   ```bash
-   cd app
-   ```
-
-   ```bash
-   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
-   ```
+---
 
 ## Contributing
 Check our [Contributing guide](https://github.com/GoLabra/labra/blob/feature/labra-module/CONTRIBUTING.md)
