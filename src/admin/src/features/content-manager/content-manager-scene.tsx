@@ -10,7 +10,7 @@ import { FormOpenMode } from "@/core-features/dynamic-form/form-field"
 import { useDialog } from "@/hooks/use-dialog"
 import { useContentManagerIds } from "./use-content-manger-ids"
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog"
-import { ContentManagerEntryDialogContent } from "./content-manager-new-item"
+import { ContentManagerEntryDialogContent } from "./content-manager-entry-form"
 import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer } from "mosaic-data-table";
 import { useContentManagerContext } from "./use-content-manager-context"
 import { ActionList } from "@/shared/components/action-list";
@@ -23,6 +23,8 @@ import { useDyamicGridFilter } from "./use-dyamic-grid-filter";
 import Defaults from "@/config/Defaults.json";
 import { useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
 import { RelationViewerGridRoot } from "@/core-features/view-item/relation-viewer-grid";
+import { useViewRelationStore } from "@/core-features/view-item/use-view-relation-store";
+import { Edge } from "@/lib/apollo/graphql.entities";
 
 export const ContentManagerScene = () => {
 
@@ -32,13 +34,13 @@ export const ContentManagerScene = () => {
     const [selectionEnabled, setSelectionEnabled] = useState(false);
     const [filterEnabled, setFilterEnabled] = useState<boolean>(!!Object.keys(contentManager.contentManagerSearch.state.filter).length);
     const [showId, setShowId] = useState<boolean>(false);
-    const expansionStore = useRowExpansionStore();
+    const viewRelationStore = useViewRelationStore();
     const dynamicDialog = useDynamicDialog();
     const deleteConfirmationDialog = useDialog();
     const bulkDeleteConfirmationDialog = useDialog();
 
     useEffect(() => {
-        expansionStore.clear();
+        viewRelationStore.closeAll();
     }, [contentManager.contentManagerStore.state.dataLoading]);
 
     const headCells = useDynamicGridColumns({
@@ -46,7 +48,10 @@ export const ContentManagerScene = () => {
         fields: contentManager.fullEntity?.fields,
         edges: contentManager.fullEntity?.edges,
         displayFieldName: contentManager.displayFieldName,
-        expansionStore: expansionStore,
+        //expansionStore: viewRelationStore,
+		openRelation: useCallback((entityName: string, edge: Edge, entryId: string) => {
+			viewRelationStore.addEdge(entryId, entityName, edge, entryId, true);
+		}, [viewRelationStore]),
         showId: showId
     });
 
@@ -132,11 +137,11 @@ export const ContentManagerScene = () => {
         usePluginWithParams(RowExpansionPlugin, {
             showExpanderButton: false,
             onGetRowId: contentManagerIds.getId,
-            expanstionStore: expansionStore,
+            expanstionStore: viewRelationStore.expansionStore,
             getExpansionNode: useCallback((row: any, params: any) => (
                 <AbsoluteHeightContainer>
-                    <RelationViewerGridRoot entityName={params.entityName} edge={params.edge} entryId={params.entryId} showId={showId}/>
-                </AbsoluteHeightContainer>), [showId])
+                    <RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
+                </AbsoluteHeightContainer>), [showId, viewRelationStore])
         }),
         ColumnsFillRowSpacePlugin,
         usePluginWithParams(RowActionsPlugin, {

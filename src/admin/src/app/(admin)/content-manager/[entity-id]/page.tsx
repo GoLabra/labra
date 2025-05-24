@@ -10,7 +10,7 @@ import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic
 import { DynamicDialog } from "@/core-features/dynamic-dialog/src/dynamic-dialog";
 import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import { ContentManagerProvider, useContentManagerContext } from "@/features/content-manager/use-content-manager-context";
-import { ContentManagerEntryDialogContent } from "@/features/content-manager/content-manager-new-item";
+import { ContentManagerEntryDialogContent } from "@/features/content-manager/content-manager-entry-form";
 import { ContentManagerScene } from "@/features/content-manager/content-manager-scene";
 import { PageHeader } from "@/shared/components/page-header";
 import { useAppStatus } from "@/store/app-state/use-app-state";

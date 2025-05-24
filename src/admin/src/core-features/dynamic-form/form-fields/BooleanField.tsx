@@ -16,8 +16,8 @@ interface BooleanFormComponentProps {
     errors?: ReactNode;
 
     value: any;
-    onChange: (event: any) => void;
-    onBlur: (event: any) => void;
+    onChange?: (event: any) => void;
+    onBlur?: (event: any) => void;
 }
 export function BooleanFormComponent(props: BooleanFormComponentProps) {
     const { name, label, placeholder, disabled, errors, value, onChange, onBlur } = props;
@@ -29,7 +29,7 @@ export function BooleanFormComponent(props: BooleanFormComponentProps) {
             <FormControlLabel
                 name={name}
                 control={<Switch checked={value ?? false} onChange={(_, checked: boolean) => {
-                    onChange({ target: { name, value: checked } })
+                    onChange?.({ target: { name, value: checked } })
                 }
                 } />
                 }
