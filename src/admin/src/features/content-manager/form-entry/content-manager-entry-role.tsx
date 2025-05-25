@@ -32,6 +32,7 @@ const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleW
 	roles(where: $where)  {
 		name
 		permissions {
+			id
     		entity
     		operation
     	}
@@ -40,6 +41,7 @@ const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleW
 
 
 type Operation = {
+	id?: string;
 	operation: string;
 	status: EdgeStatus;
 }
@@ -235,11 +237,9 @@ export const schema = z.object({
 					entity: i.entityName,
 					operation: i.operation
 				})),
-			// disconnect: allEntityPermissions.filter(i => i.status == 'disconnect')
-			// 	.map(i => ({
-			// 		entity: i.entityName,
-			// 		operation: i.operation
-			// 	}))
+			disconnect: allEntityPermissions.filter(i => i.status == 'disconnect')
+				.filter(i => i.id)
+				.map(i => ({id: i.id}))
 		}
 	})
 });
@@ -263,7 +263,10 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 		if (!permissionRequest.data?.roles?.length) {
 			return [];
 		}
+
+		console.log('permissionRequest.data!.roles[0].permissions', permissionRequest.data!.roles[0].permissions)
 		return permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({
+			id: i.id,
 			entityName: i.entity,
 			operation: i.operation,
 			status: 'saved',
@@ -279,6 +282,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 		return groupByMap(savedValueItems,
 			item => item.entityName,
 			(item): Operation => ({
+				id: item.id,
 				operation: item.operation,
 				status: item.status
 			})
@@ -360,6 +364,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 });
 
 type PermissionItem = {
+	id?: string;
 	entityName: string;
 	operation: string;
 	status: EdgeStatus;
