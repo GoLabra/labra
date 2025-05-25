@@ -10,7 +10,7 @@ import { BasicAuditTrail } from "@/shared/components/basic-audit-trail";
 import { Id } from "@/shared/components/id";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogContent, Stack, Button, Typography, Checkbox, Box } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { get, useForm, useFormContext } from "react-hook-form";
 import { useContentManagerFormSchema } from "../use-content-manager-form-schema";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
 import { z } from "zod";
@@ -23,6 +23,9 @@ import { EdgeStatus } from "@/lib/utils/edge-status";
 import { groupByMap } from "@/lib/utils/array";
 import { PiMathOperations } from "react-icons/pi";
 import { GenericEvent } from "@/lib/utils/event";
+import { useLiteController } from "@/core-features/dynamic-form/lite-controller";
+import { SavedSearch } from "@mui/icons-material";
+import { permission } from "node:process";
 
 
 const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
@@ -41,10 +44,10 @@ type Operation = {
 	status: EdgeStatus;
 }
 
-type EntityPermissions = {
-	entityName: string;
-	operation: Operation[];
-}
+// type EntityPermissions = {
+// 	entityName: string;
+// 	operation: Operation[];
+// }
 
 type OperationDef = {
 	name: string;
@@ -61,7 +64,7 @@ interface EntityPermissionViewProps {
 const EntityPermissionView = (props: EntityPermissionViewProps) => {
 
 	const onChange = useCallback((event: GenericEvent<boolean>, operationName: string) => {
-		if(event.target.value) {
+		if (event.target.value) {
 			props.valuesChanged?.([...props.operations, operationName]);
 			return;
 		}
@@ -77,55 +80,105 @@ const EntityPermissionView = (props: EntityPermissionViewProps) => {
 
 			<Stack direction="row" gap={1} flexWrap="wrap">
 				{props.operationDefs.map((i: OperationDef) => {
-					return <BooleanFormComponent 
-								key={i.name} 
-								name={`${props.entityCaption}-${i.name}`} 
-								label={i.caption}
-								value={props.operations.includes(i.name)}
-								onChange={(event) => onChange(event, i.name)}
-								 />
+					return <BooleanFormComponent
+						key={i.name}
+						name={`${props.entityCaption}-${i.name}`}
+						label={i.caption}
+						value={props.operations.includes(i.name)}
+						onChange={(event) => onChange(event, i.name)}
+					/>
 				})}
 			</Stack>
 		</Stack>
 	)
 }
 
-export const permissionSchema = z.object({
-  caption4: z.string().nonempty('Caption 4 is required'),
-  caption5: z.string().nonempty('Caption 5 is required'),
-  caption6: z.string().nonempty('Caption 6 is required'),
-  required: z.coerce.boolean().optional()
-});
-
 interface PermissionSectionProps {
-	values: Record<string, Operation[]>;
-	valuesChanged?: (entityName: string,operations: string[]) => void;
-	
+	name: string
 }
 const PermissionSection = (props: PermissionSectionProps) => {
 
 	const { entities } = useEntities();
+	const formContext = useFormContext();
+	const formControllerHandler = useLiteController<Record<string, Operation[]>>({ name: props.name, control: formContext.control });
 
 	const operationDefs = [{
 		caption: 'Create',
 		name: 'Create'
-	},
-	{
+	}, {
 		caption: 'Read',
 		name: 'Read'
-	},
-	{
+	}, {
 		caption: 'Update',
 		name: 'Update'
-	},
-	{
+	}, {
 		caption: 'Delete',
 		name: 'Delete'
 	}];
 
+	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
+
+		const allPermissions = formControllerHandler.value ?? {};
+		const currentEntityPermissions = allPermissions[entityName] ?? [];
+
+		const save = [
+			...currentEntityPermissions.filter(i => operations.includes(i.operation))
+				.filter(i => i.status === 'saved'),
+
+			...currentEntityPermissions.filter(i => operations.includes(i.operation))
+				.filter(i => i.status === 'disconnect')
+				.map(i => ({
+					...i,
+					status: 'saved'
+				}))
+		]
+
+		const disconnect = [
+			...currentEntityPermissions.filter(i => i.status === 'saved')
+				.filter(i => operations.includes(i.operation) == false)
+				.map(i => ({
+					...i,
+					status: 'disconnect'
+				})),
+			...currentEntityPermissions.filter(i => i.status === 'disconnect')
+				.filter(i => operations.includes(i.operation) == false),
+		];
+
+		const savedAndDisconnect = [
+			...save.map(i => i.operation),
+			...disconnect.map(i => i.operation)
+		];
+
+		const create = operations.filter(i => savedAndDisconnect.includes(i) == false)
+			.map(i => ({
+				operation: i,
+				status: 'create'
+			}));
+
+		console.log([
+			...save,
+			...create,
+			...disconnect
+		]);
+
+		formControllerHandler.onChange({
+			target: {
+				name: props.name,
+				value: {
+					...allPermissions,
+					[entityName]: [
+						...save,
+						...create,
+						...disconnect
+					]
+				}
+			}
+		});
+	}, [props.name, formControllerHandler.value, formControllerHandler.onChange]);
+
 	return (
 		<Stack gap={1.5}>
-			
+
 			<SectionTitle title="Permissions" />
 
 			<Box sx={{
@@ -137,12 +190,13 @@ const PermissionSection = (props: PermissionSectionProps) => {
 				{entities.map((entity) => {
 					return <EntityPermissionView
 
-						key={entity.name} 
-						entityCaption={entity.caption} 
-						operationDefs={operationDefs} 
-						operations={props.values[entity.name]?.map(i => i.operation) ?? []} 
+						key={entity.name}
+						entityCaption={entity.caption}
+						operationDefs={operationDefs}
+						operations={(formControllerHandler.value?.[entity.name] ?? []).filter(i => i.status !== 'disconnect')
+							.map(i => i.operation) ?? []}
 						valuesChanged={(values) => {
-							props.valuesChanged?.(entity.name, values);
+							onPermissionValuesChanged(entity.name, values);
 						}} />
 				})}
 			</Box>
@@ -156,32 +210,60 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 
 export const schema = z.object({
-	caption: z.string().nonempty('Caption is required'),
-	required: z.coerce.boolean().optional()
-}).merge(permissionSchema);
+	name: z.string().min(1, 'Caption is required'),
+	permissions: z.any().optional().nullish().transform((val: Record<string, Operation[]> | undefined) => {
+		if (!val) {
+			return val;
+		}
+
+		const allEntityPermissions = Object.keys(val)
+											.flatMap((entityName) => {
+												return val[entityName].map((operation) => ({
+													entityName,
+													...operation
+												}))
+											});
+		
+		return {
+			connect: allEntityPermissions.filter(i => i.status == 'connect')
+				.map(i => ({
+					entity: i.entityName,
+					operation: i.operation
+				})),
+			create: allEntityPermissions.filter(i => i.status == 'create')
+				.map(i => ({
+					entity: i.entityName,
+					operation: i.operation
+				})),
+			// disconnect: allEntityPermissions.filter(i => i.status == 'disconnect')
+			// 	.map(i => ({
+			// 		entity: i.entityName,
+			// 		operation: i.operation
+			// 	}))
+		}
+	})
+});
 
 export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, ContentManagerEntryDialogContentProps>((props, ref) => {
 
 	const myDialogContext = useMyDialogContext();
-	const fullEntity = useFullEntity({ entityName: props.entityName });
-	const formSchema = useContentManagerFormSchema(fullEntity);
 
 	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
 		variables: {
 			where: {
-				name: 'Ham'
+				id: props.defaultValue?.id
 			}
 		},
+		fetchPolicy: 'network-only',
 		skip: myDialogContext.openMode === FormOpenMode.New
 	});
 
 	const savedValueItems = useMemo((): PermissionItem[] => {
-		console.log('permissionRequest', permissionRequest);
 
-		if(!permissionRequest.data?.roles?.length) {
+		if (!permissionRequest.data?.roles?.length) {
 			return [];
 		}
-		return permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({ 
+		return permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({
 			entityName: i.entity,
 			operation: i.operation,
 			status: 'saved',
@@ -189,9 +271,14 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 	}, [permissionRequest.data]);
 
 	const permissionValue = useMemo(() => {
+
+		if (!savedValueItems.length) {
+			return null;
+		}
+
 		return groupByMap(savedValueItems,
 			item => item.entityName,
-			(item): Operation => ({ 
+			(item): Operation => ({
 				operation: item.operation,
 				status: item.status
 			})
@@ -202,35 +289,25 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 		return props.defaultValue?.id;
 	}, [props.defaultValue]);
 
-	const displayValue = useMemo(() => {
-		if (!fullEntity) {
-			return null;
-		}
-
-		const displayFieldProperty = fullEntity?.displayField?.name;
-		if (!displayFieldProperty) {
-			return null;
-		}
-
-		if (displayFieldProperty == 'id') {
-			return null;
-		}
-
-		return props.defaultValue?.[displayFieldProperty];
-	}, [fullEntity, props.defaultValue]);
-
-	const upperValueAsFieldValues = useMemo(() => {
-		return Object.fromEntries(
-			Object.entries(myDialogContext.upperResults ?? {}).map(([key, value]) => {
-				return [key, value];
-			}))
-	}, [myDialogContext.upperResults]);
-
 	const formMethods = useForm({
-		resolver: zodResolver(formSchema.schema),
+		resolver: zodResolver(schema),
 		mode: 'all',
-		defaultValues: {}
+		defaultValues: {
+			name: props.defaultValue?.name,
+			permissions: permissionValue
+		}
 	});
+
+	useEffect(() => {
+		if (!permissionValue) {
+			return;
+		}
+
+		formMethods.reset({
+			...formMethods.getValues(), // Keep other form values
+			permissions: permissionValue
+		});
+	}, [permissionValue]);
 
 	const onSave = useCallback((formData: any) => {
 		myDialogContext.closeWithResults(formData);
@@ -241,10 +318,6 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 			formMethods.handleSubmit(onSave)();
 		}
 	}));
-
-	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
-		console.log(entityName, operations);
-	}, [myDialogContext.closeWithResults]);
 
 	return (
 		<>
@@ -261,10 +334,10 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 
 					<Form methods={formMethods} onSubmit={formMethods.handleSubmit(console.log)} >
 						<Stack gap={1.5}>
-							<TextShortFormField name="name" label="Name" required /> 
+							<TextShortFormField name="name" label="Name" required />
 						</Stack>
 
-						<PermissionSection values={permissionValue} valuesChanged={onPermissionValuesChanged} />
+						<PermissionSection name="permissions" />
 					</Form>
 
 					{myDialogContext.openMode !== FormOpenMode.New && <BasicAuditTrail defaultValues={props.defaultValue} />}
