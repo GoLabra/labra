@@ -1,5 +1,5 @@
 import { ChainDialogContentRef } from "@/core-features/dynamic-dialog/src/dynamic-dialog-types";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
+import { forwardRef, Fragment, use, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
 import { ContentManagerEntryDialogContentProps } from "../content-manager-entry-form";
 import { DynamicDialogFooter } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog-footer";
 import { DynamicDialogHeader } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog-header";
@@ -9,9 +9,9 @@ import { useEntities, useFullEntity } from "@/hooks/use-entities";
 import { BasicAuditTrail } from "@/shared/components/basic-audit-trail";
 import { Id } from "@/shared/components/id";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogContent, Stack, Button, Typography, Checkbox, Box } from "@mui/material";
+import { DialogContent, Stack, Button, Typography, Checkbox, Box, Divider, Chip, Tooltip } from "@mui/material";
 import { get, useForm, useFormContext } from "react-hook-form";
-import { useContentManagerFormSchema } from "../use-content-manager-form-schema";
+import { useContentManagerFormSchema, useGenericEdgeFormSchema, useGenericFiedFormSchema } from "../use-content-manager-form-schema";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
 import { z } from "zod";
 import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/TextShortField";
@@ -26,6 +26,7 @@ import { GenericEvent } from "@/lib/utils/event";
 import { useLiteController } from "@/core-features/dynamic-form/lite-controller";
 import { SavedSearch } from "@mui/icons-material";
 import { permission } from "node:process";
+import React from "react";
 
 
 const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
@@ -75,12 +76,12 @@ const EntityPermissionView = (props: EntityPermissionViewProps) => {
 	}, [props.valuesChanged]);
 
 	return (
-		<Stack gap={1.5} p={1} my={2} borderRadius={0}>
+		<Stack gap={1.5} my={2} borderRadius={0}>
 			<Typography >
 				{props.entityCaption}
 			</Typography>
 
-			<Stack direction="row" gap={1} flexWrap="wrap">
+			<Stack direction="row" gap={1} flexWrap="wrap" justifyContent="space-evenly" width={1}>
 				{props.operationDefs.map((i: OperationDef) => {
 					return <BooleanFormComponent
 						key={i.name}
@@ -157,12 +158,6 @@ const PermissionSection = (props: PermissionSectionProps) => {
 				status: 'create'
 			}));
 
-		console.log([
-			...save,
-			...create,
-			...disconnect
-		]);
-
 		formControllerHandler.onChange({
 			target: {
 				name: props.name,
@@ -178,38 +173,50 @@ const PermissionSection = (props: PermissionSectionProps) => {
 		});
 	}, [props.name, formControllerHandler.value, formControllerHandler.onChange]);
 
+	const permissions = useMemo(() => {
+		return Object.values(formControllerHandler.value).reduce((sum, arr) => [...sum, ...arr], []);
+	}, [formControllerHandler.value]);
+
+	const permissionsCount = useMemo(() => {
+		return permissions.filter(i => i.status != 'disconnect');
+	}, [permissions]);
+
+	const tooltipLabel = useMemo(() => {
+		const added = permissions.filter(i => i.status == 'create').length;
+		const disconnect = permissions.filter(i => i.status == 'disconnect').length;
+		const saved = permissions.filter(i => i.status == 'saved').length;
+
+		return `${saved} existing, ${added} added, ${disconnect} removed`;
+	}, [permissions]);
+
 	return (
 		<Stack gap={1.5}>
 
-			<SectionTitle title="Permissions" />
+			<SectionTitle title="Permissions" >
+				<Tooltip title={tooltipLabel} placement='bottom' arrow>
+					<Chip component="span" label={permissionsCount.length} color="secondary" variant="outlined" size="small" />
+				</Tooltip>
+			</SectionTitle>
 
-			<Box sx={{
-				'> *:nth-child(even)': {
-					backgroundColor: '#99999920'
-				}
-			}}>
+			{entities.map((entity) => {
+				return <Fragment key={entity.name}>
+				<EntityPermissionView
+					entityCaption={entity.caption}
+					operationDefs={operationDefs}
+					operations={(formControllerHandler.value?.[entity.name] ?? []).filter(i => i.status !== 'disconnect')
+						.map(i => i.operation) ?? []}
+					valuesChanged={(values) => {
+						onPermissionValuesChanged(entity.name, values);
+					}} />
 
-				{entities.map((entity) => {
-					return <EntityPermissionView
-
-						key={entity.name}
-						entityCaption={entity.caption}
-						operationDefs={operationDefs}
-						operations={(formControllerHandler.value?.[entity.name] ?? []).filter(i => i.status !== 'disconnect')
-							.map(i => i.operation) ?? []}
-						valuesChanged={(values) => {
-							onPermissionValuesChanged(entity.name, values);
-						}} />
-				})}
-			</Box>
-
+					<Divider />
+				</Fragment>
+			})}
 
 		</Stack>
 	)
 }
 // END OF PERMISSION SECTION
-
-
 
 export const schema = z.object({
 	name: z.string().min(1, 'Caption is required'),
@@ -219,13 +226,13 @@ export const schema = z.object({
 		}
 
 		const allEntityPermissions = Object.keys(val)
-											.flatMap((entityName) => {
-												return val[entityName].map((operation) => ({
-													entityName,
-													...operation
-												}))
-											});
-		
+			.flatMap((entityName) => {
+				return val[entityName].map((operation) => ({
+					entityName,
+					...operation
+				}))
+			});
+
 		return {
 			connect: allEntityPermissions.filter(i => i.status == 'connect')
 				.map(i => ({
@@ -239,7 +246,7 @@ export const schema = z.object({
 				})),
 			disconnect: allEntityPermissions.filter(i => i.status == 'disconnect')
 				.filter(i => i.id)
-				.map(i => ({id: i.id}))
+				.map(i => ({ id: i.id }))
 		}
 	})
 });
@@ -247,7 +254,7 @@ export const schema = z.object({
 export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, ContentManagerEntryDialogContentProps>((props, ref) => {
 
 	const myDialogContext = useMyDialogContext();
-
+	const fullEntity = useFullEntity({ entityName: props.entityName });
 	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
 		variables: {
 			where: {
@@ -258,22 +265,18 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 		skip: myDialogContext.openMode === FormOpenMode.New
 	});
 
-	const savedValueItems = useMemo((): PermissionItem[] => {
+	const permissionValue = useMemo(() => {
 
 		if (!permissionRequest.data?.roles?.length) {
 			return [];
 		}
 
-		console.log('permissionRequest.data!.roles[0].permissions', permissionRequest.data!.roles[0].permissions)
-		return permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({
+		const savedValueItems = permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({
 			id: i.id,
 			entityName: i.entity,
 			operation: i.operation,
 			status: 'saved',
-		})) ?? []
-	}, [permissionRequest.data]);
-
-	const permissionValue = useMemo(() => {
+		})) ?? [];
 
 		if (!savedValueItems.length) {
 			return null;
@@ -287,19 +290,34 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 				status: item.status
 			})
 		);
-	}, [savedValueItems])
+
+	}, [permissionRequest.data]);
+
 
 	const id = useMemo(() => {
 		return props.defaultValue?.id;
 	}, [props.defaultValue]);
 
-	const formMethods = useForm({
-		resolver: zodResolver(schema),
-		mode: 'all',
-		defaultValues: {
+	const usersRoles = useGenericEdgeFormSchema(fullEntity, 'userRoles');
+
+	const computedSchema = useMemo(() => {
+		return schema.merge(z.object({
+			userRoles: usersRoles.schema
+		}));
+	}, [schema, usersRoles.schema]);
+
+	const computedDefaultValues = useMemo(() => {
+		return {
 			name: props.defaultValue?.name,
+			userRoles: usersRoles.convertFromRawValue(props.defaultValue?.userRoles),
 			permissions: permissionValue
 		}
+	}, [props.defaultValue, permissionValue]);
+
+	const formMethods = useForm({
+		resolver: zodResolver(computedSchema),
+		mode: 'all',
+		defaultValues: computedDefaultValues
 	});
 
 	useEffect(() => {
@@ -339,6 +357,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 					<Form methods={formMethods} onSubmit={formMethods.handleSubmit(console.log)} >
 						<Stack gap={1.5}>
 							<TextShortFormField name="name" label="Name" required />
+							{usersRoles.field}
 						</Stack>
 
 						<PermissionSection name="permissions" />

@@ -110,8 +110,6 @@ export const DesignerForm = (props: DesignerFormProps) => {
     const relationType = props.formMethods.watch('relationType');
     const belongsToCaptionHide = useMemo(() => !belongsToCaptionVisible.includes(relationType), [relationType]);
 
-	console.log('props', props);
-	
     return (<Stack gap={1.5}>
         <TextShortFormField name="caption" label="Caption" required />
         <SelectFormField name="relationType" label="Relation Type" disabled={props.openMode == FormOpenMode.Edit} options={relationTypeOptions} required />

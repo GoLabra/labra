@@ -268,22 +268,7 @@ const oneColumnDef = (entityName: string, edge: Edge, openRelation: MutableRefOb
                     padding: 0
                 }}
                 onClick={() => {
-
 					openRelation.current(entityName, edge, row.id);
-
-                    // const rowStatus = expansionStore.current.expansionState[row.id];
-                    // const isExpanded = rowStatus?.isOpen ?? false;
-                    // const shouldBeExpanded = isExpanded == false ? true : (rowStatus.params.entityName != entityName || rowStatus.params.edge.name != edge.name);
-
-                    // expansionStore.current.setParams({
-                    //     rowId: row.id,
-                    //     params: {
-                    //         entityName: entityName,
-                    //         entryId: row.id,
-                    //         edge: edge
-                    //     },
-                    //     openImmediately: shouldBeExpanded
-                    // })
                 }}>
                 <Typography
                     color="text.primary"
@@ -310,19 +295,6 @@ const manyColumnDef = (entityName: string, edge: Edge, openRelation: MutableRefO
 
 					openRelation.current(entityName, edge, row.id);
 
-                    // const rowStatus = expansionStore.current.expansionState[row.id];
-                    // const isExpanded = rowStatus?.isOpen ?? false;
-                    // const shouldBeExpanded = isExpanded == false ? true : (rowStatus.params.entityName != entityName || rowStatus.params.edge.name != edge.name);
-
-                    // expansionStore.current.setParams({
-                    //     rowId: row.id,
-                    //     params: {
-                    //         entityName: entityName,
-                    //         entryId: row.id,
-                    //         edge: edge
-                    //     },
-                    //     openImmediately: shouldBeExpanded
-                    // })
                 }}>
                 <Typography
                     color="text.primary"
