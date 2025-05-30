@@ -30,6 +30,8 @@ import React from "react";
 import { MenuButton } from "@/shared/components/menu/menu-button";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HistoryIcon from "@mui/icons-material/History";
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
 	roles(where: $where)  {
@@ -49,61 +51,46 @@ type Operation = {
 	status: EdgeStatus;
 }
 
-// type EntityPermissions = {
-// 	entityName: string;
-// 	operation: Operation[];
-// }
+const operationDefs = [{
+	caption: 'Create',
+	name: 'Create'
+}, {
+	caption: 'Read',
+	name: 'Read'
+}, {
+	caption: 'Update',
+	name: 'Update'
+}, {
+	caption: 'Delete',
+	name: 'Delete'
+}];
+
 
 type OperationDef = {
 	name: string;
 	caption: string;
 }
 
-const changePermission = (allPermissions: Record<string, Operation[]>, entityName: string, operations: string[]) => {
+const changePermission = (savedPermissions: PermissionItem[], entityName: string, operations: string[]): PermissionItem[] => {
 
-	const currentEntityPermissions = allPermissions[entityName] ?? [];
+	const currentEntityPermissions = savedPermissions.filter(i => i.entityName == entityName);
 
-	const save = [
-		...currentEntityPermissions.filter(i => operations.includes(i.operation))
-			.filter(i => i.status === 'saved'),
+	const disconnect = currentEntityPermissions.filter(i => operations.includes(i.operation) == false)
+												.map((i): PermissionItem => ({
+													...i,
+													status: 'disconnect'
+												}));
+	const create = operations.filter(i => !!savedPermissions.find(j => j.entityName == entityName && j.operation == i) == false)
+							.map((i): PermissionItem => ({
+								entityName: entityName,
+								operation: i,
+								status: 'create'
+							}));
 
-		...currentEntityPermissions.filter(i => operations.includes(i.operation))
-			.filter(i => i.status === 'disconnect')
-			.map(i => ({
-				...i,
-				status: 'saved'
-			}))
-	]
-
-	const disconnect = [
-		...currentEntityPermissions.filter(i => i.status === 'saved')
-			.filter(i => operations.includes(i.operation) == false)
-			.map(i => ({
-				...i,
-				status: 'disconnect'
-			})),
-		...currentEntityPermissions.filter(i => i.status === 'disconnect')
-			.filter(i => operations.includes(i.operation) == false),
-	];
-
-	const savedAndDisconnect = [
-		...save.map(i => i.operation),
-		...disconnect.map(i => i.operation)
-	];
-
-	const create = operations.filter(i => savedAndDisconnect.includes(i) == false)
-		.map(i => ({
-			operation: i,
-			status: 'create'
-		}));
-
-	return {
-		[entityName]: [
-			...save,
-			...create,
-			...disconnect
-		]
-	}
+	return [
+		...create,
+		...disconnect
+	]					
 }
 
 // PERMISSION SECTION
@@ -144,12 +131,12 @@ const EntityPermissionView = (props: EntityPermissionViewProps) => {
 			<Stack direction="row" gap={1} flexWrap="wrap" justifyContent="space-evenly" width={1}>
 
 				<BooleanFormComponent
-						name={`${props.entityCaption}-all`}
-						label="All"
-						color="success"
-						value={isAllChecked}
-						onChange={allChanged}
-					/>
+					name={`${props.entityCaption}-all`}
+					label="All"
+					color="success"
+					value={isAllChecked}
+					onChange={allChanged}
+				/>
 
 				{props.operationDefs.map((i: OperationDef) => {
 					return <BooleanFormComponent
@@ -172,75 +159,131 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 	const { entities } = useEntities();
 	const formContext = useFormContext();
-	const formControllerHandler = useLiteController<Record<string, Operation[]>>({ name: props.name, control: formContext.control });
+	const formControllerHandler = useLiteController<PermissionItem[]>({ name: props.name, control: formContext.control });
+	const myDialogContext = useMyDialogContext();
 
-	const operationDefs = [{
-		caption: 'Create',
-		name: 'Create'
-	}, {
-		caption: 'Read',
-		name: 'Read'
-	}, {
-		caption: 'Update',
-		name: 'Update'
-	}, {
-		caption: 'Delete',
-		name: 'Delete'
-	}];
+
+	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
+		variables: {
+			where: {
+				id: myDialogContext.editId
+			}
+		},
+		fetchPolicy: 'network-only',
+		skip: myDialogContext.openMode === FormOpenMode.New
+	});
+
+
+	const existing = useMemo(() => {
+
+		if (!permissionRequest.data?.roles?.length) {
+			return [];
+		}
+
+		const savedValueItems = permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({
+			id: i.id,
+			entityName: i.entity,
+			operation: i.operation,
+			status: 'saved',
+		}));
+
+		return savedValueItems ?? []; 
+	}, [permissionRequest.data]);
+
+	const currentPermissions = useMemo((): PermissionItem[] => {
+		const all = [...existing, ...formControllerHandler.value ?? []];
+		return all.filter(i => {
+			if(i.status == 'disconnect'){
+				return false;
+			}
+
+			if(i.status == 'saved'){
+				if(all.find(j => j.id == i.id && j.status == 'disconnect')){
+					return false;
+				}
+			}
+
+			return true;
+		});
+
+	}, [existing, formControllerHandler.value]);
+
+	const allPermissionsGrouped = useMemo((): Record<string, Operation[]> => {
+
+		const permissionByEntity = groupByMap(currentPermissions,  
+			item => item.entityName,
+			(item): Operation => ({
+				id: item.id,
+				operation: item.operation,
+				status: item.status
+			})
+		);
+
+		return permissionByEntity;
+
+	}, [currentPermissions]);
+	
 
 	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
-
-		const allPermissions = formControllerHandler.value ?? {};
-		const newPermissions = changePermission(allPermissions, entityName, operations);
+		const newPermissions = changePermission(existing, entityName, operations);
 
 		formControllerHandler.onChange({
 			target: {
 				name: props.name,
-				value: {
-					...allPermissions,
+				value: [
+					...formControllerHandler.value?.filter(i => i.entityName != entityName) ?? [],
 					...newPermissions
-				}
+				]
 			}
 		});
-	}, [props.name, formControllerHandler.value, formControllerHandler.onChange]);
+	}, [existing, formControllerHandler.value, formControllerHandler.onChange]);
 
 	const selectAll = useCallback(() => {
-
-		const allPermissions = formControllerHandler.value ?? {};
-
-		const newPermissions = entities.reduce((acc: any, entity) => {
-			return {
-				...acc,
-				...changePermission(allPermissions, entity.name, operationDefs.map(i => i.name))
-			}
-		}, {});
+		const newPermissions = entities.flatMap((entity) => {
+				return changePermission(existing, entity.name, operationDefs.map(i => i.name))
+		});
 
 		formControllerHandler.onChange({
 			target: {
 				name: props.name,
-				value: {
-					...allPermissions,
-					...newPermissions
-				}
+				value: newPermissions
 			}
 		});
 	}, [entities, onPermissionValuesChanged]);
 
-	const permissions = useMemo(() => {
-		return Object.values(formControllerHandler.value).reduce((sum, arr) => [...sum, ...arr], []);
-	}, [formControllerHandler.value]);
+	const clearAll = useCallback(() => {
+		const newPermissions = entities.flatMap((entity) => {
+				return changePermission(existing, entity.name, [])
+		});
+
+		formControllerHandler.onChange({
+			target: {
+				name: props.name,
+				value: newPermissions
+			}
+		});
+	}, [entities, onPermissionValuesChanged]);
+
+	const resetChanges = useCallback(() => {
+		formControllerHandler.onChange({
+			target: {
+				name: props.name,
+				value: []
+			}
+		});
+	}, [entities, onPermissionValuesChanged]);
 
 	const permissionsCount = useMemo(() => {
-		return permissions.filter(i => i.status != 'disconnect');
-	}, [permissions]);
+		return currentPermissions.filter(i => i.status != 'disconnect');
+	}, [currentPermissions]);
 
 	const tooltipLabel = useMemo(() => {
-		const added = permissions.filter(i => i.status == 'create').length;
-		const disconnect = permissions.filter(i => i.status == 'disconnect').length;
-		const saved = permissions.filter(i => i.status == 'saved').length;
+		const added = formControllerHandler.value?.filter(i => i.status == 'create').length ?? 0;
+		const disconnect = formControllerHandler.value?.filter(i => i.status == 'disconnect').length ?? 0;
+		const saved = existing.filter(i => formControllerHandler.value?.find(j => j.id == i.id && j.status == 'disconnect') == null).length ?? 0;
 
 		return `${saved} existing, ${added} added, ${disconnect} removed`;
-	}, [permissions]);
+	}, [existing, formControllerHandler.value]);
 
 	return (
 		<Stack gap={1.5}>
@@ -258,7 +301,18 @@ const PermissionSection = (props: PermissionSectionProps) => {
 							</ListItemIcon>
 							<ListItemText>Select All Permissions</ListItemText>
 						</MenuItem>
-
+						<MenuItem data-autoclose onClick={clearAll}>
+							<ListItemIcon>
+								<RadioButtonUncheckedIcon fontSize="small" />
+							</ListItemIcon>
+							<ListItemText>Clear All Permissions</ListItemText>
+						</MenuItem>
+						<MenuItem data-autoclose onClick={resetChanges}>
+							<ListItemIcon>
+								<HistoryIcon fontSize="small" />
+							</ListItemIcon>
+							<ListItemText>Reset Changes</ListItemText>
+						</MenuItem>
 
 					</MenuButton>
 				}>
@@ -274,7 +328,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 					<EntityPermissionView
 						entityCaption={entity.caption}
 						operationDefs={operationDefs}
-						operations={(formControllerHandler.value?.[entity.name] ?? []).filter(i => i.status !== 'disconnect')
+						operations={(allPermissionsGrouped[entity.name] ?? []).filter(i => i.status !== 'disconnect')
 							.map(i => i.operation) ?? []}
 						valuesChanged={(values) => {
 							onPermissionValuesChanged(entity.name, values);
@@ -291,31 +345,23 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 export const schema = z.object({
 	name: z.string().min(1, 'Caption is required'),
-	permissions: z.any().optional().nullish().transform((val: Record<string, Operation[]> | undefined) => {
+	permissions: z.any().optional().nullish().transform((val: PermissionItem[] | undefined) => {
 		if (!val) {
 			return val;
 		}
 
-		const allEntityPermissions = Object.keys(val)
-			.flatMap((entityName) => {
-				return val[entityName].map((operation) => ({
-					entityName,
-					...operation
-				}))
-			});
-
 		return {
-			connect: allEntityPermissions.filter(i => i.status == 'connect')
+			connect: val.filter(i => i.status == 'connect')
 				.map(i => ({
 					entity: i.entityName,
 					operation: i.operation
 				})),
-			create: allEntityPermissions.filter(i => i.status == 'create')
+			create: val.filter(i => i.status == 'create')
 				.map(i => ({
 					entity: i.entityName,
 					operation: i.operation
 				})),
-			disconnect: allEntityPermissions.filter(i => i.status == 'disconnect')
+			disconnect: val.filter(i => i.status == 'disconnect')
 				.filter(i => i.id)
 				.map(i => ({ id: i.id }))
 		}
@@ -326,44 +372,6 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 
 	const myDialogContext = useMyDialogContext();
 	const fullEntity = useFullEntity({ entityName: props.entityName });
-	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
-		variables: {
-			where: {
-				id: myDialogContext.editId
-			}
-		},
-		fetchPolicy: 'network-only',
-		skip: myDialogContext.openMode === FormOpenMode.New
-	});
-
-	const permissionValue = useMemo(() => {
-
-		if (!permissionRequest.data?.roles?.length) {
-			return [];
-		}
-
-		const savedValueItems = permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({
-			id: i.id,
-			entityName: i.entity,
-			operation: i.operation,
-			status: 'saved',
-		})) ?? [];
-
-		if (!savedValueItems.length) {
-			return null;
-		}
-
-		return groupByMap(savedValueItems,
-			item => item.entityName,
-			(item): Operation => ({
-				id: item.id,
-				operation: item.operation,
-				status: item.status
-			})
-		);
-
-	}, [permissionRequest.data]);
-
 
 	const id = useMemo(() => {
 		return props.defaultValue?.id;
@@ -381,26 +389,14 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 		return {
 			name: props.defaultValue?.name,
 			userRoles: usersRoles.convertFromRawValue(props.defaultValue?.userRoles),
-			permissions: permissionValue
 		}
-	}, [props.defaultValue, permissionValue]);
+	}, [props.defaultValue]);
 
 	const formMethods = useForm({
 		resolver: zodResolver(computedSchema),
 		mode: 'all',
 		defaultValues: computedDefaultValues
 	});
-
-	useEffect(() => {
-		if (!permissionValue) {
-			return;
-		}
-
-		formMethods.reset({
-			...formMethods.getValues(), // Keep other form values
-			permissions: permissionValue
-		});
-	}, [permissionValue]);
 
 	const onSave = useCallback((formData: any) => {
 		myDialogContext.closeWithResults(formData);
