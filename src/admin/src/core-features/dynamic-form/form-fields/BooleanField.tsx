@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Box, FormControlLabel, Switch } from '@mui/material';
+import { Box, FormControlLabel, Switch, SwitchProps } from '@mui/material';
 import { Control, FieldError, FieldErrorsImpl, Merge, UseFormRegister, get, useController, useFormContext } from 'react-hook-form';
 import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
@@ -18,17 +18,19 @@ interface BooleanFormComponentProps {
     value: any;
     onChange?: (event: any) => void;
     onBlur?: (event: any) => void;
+	color?: SwitchProps['color']
 }
 export function BooleanFormComponent(props: BooleanFormComponentProps) {
     const { name, label, placeholder, disabled, errors, value, onChange, onBlur } = props;
 
+	const color = props.color ?? 'primary';
 
     return (<>
         <Box
             border={0} padding={0}>
             <FormControlLabel
                 name={name}
-                control={<Switch checked={value ?? false} onChange={(_, checked: boolean) => {
+                control={<Switch color={color} checked={value ?? false} onChange={(_, checked: boolean) => {
                     onChange?.({ target: { name, value: checked } })
                 }
                 } />

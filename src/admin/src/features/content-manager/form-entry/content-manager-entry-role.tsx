@@ -9,7 +9,7 @@ import { useEntities, useFullEntity } from "@/hooks/use-entities";
 import { BasicAuditTrail } from "@/shared/components/basic-audit-trail";
 import { Id } from "@/shared/components/id";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogContent, Stack, Button, Typography, Checkbox, Box, Divider, Chip, Tooltip } from "@mui/material";
+import { DialogContent, Stack, Button, Typography, Checkbox, Box, Divider, Chip, Tooltip, MenuItem, ListItemIcon, ListItemText, IconButton } from "@mui/material";
 import { get, useForm, useFormContext } from "react-hook-form";
 import { useContentManagerFormSchema, useGenericEdgeFormSchema, useGenericFiedFormSchema } from "../use-content-manager-form-schema";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
@@ -27,7 +27,9 @@ import { useLiteController } from "@/core-features/dynamic-form/lite-controller"
 import { SavedSearch } from "@mui/icons-material";
 import { permission } from "node:process";
 import React from "react";
-
+import { MenuButton } from "@/shared/components/menu/menu-button";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
 	roles(where: $where)  {
@@ -57,6 +59,53 @@ type OperationDef = {
 	caption: string;
 }
 
+const changePermission = (allPermissions: Record<string, Operation[]>, entityName: string, operations: string[]) => {
+
+	const currentEntityPermissions = allPermissions[entityName] ?? [];
+
+	const save = [
+		...currentEntityPermissions.filter(i => operations.includes(i.operation))
+			.filter(i => i.status === 'saved'),
+
+		...currentEntityPermissions.filter(i => operations.includes(i.operation))
+			.filter(i => i.status === 'disconnect')
+			.map(i => ({
+				...i,
+				status: 'saved'
+			}))
+	]
+
+	const disconnect = [
+		...currentEntityPermissions.filter(i => i.status === 'saved')
+			.filter(i => operations.includes(i.operation) == false)
+			.map(i => ({
+				...i,
+				status: 'disconnect'
+			})),
+		...currentEntityPermissions.filter(i => i.status === 'disconnect')
+			.filter(i => operations.includes(i.operation) == false),
+	];
+
+	const savedAndDisconnect = [
+		...save.map(i => i.operation),
+		...disconnect.map(i => i.operation)
+	];
+
+	const create = operations.filter(i => savedAndDisconnect.includes(i) == false)
+		.map(i => ({
+			operation: i,
+			status: 'create'
+		}));
+
+	return {
+		[entityName]: [
+			...save,
+			...create,
+			...disconnect
+		]
+	}
+}
+
 // PERMISSION SECTION
 interface EntityPermissionViewProps {
 	entityCaption: string;
@@ -75,6 +124,17 @@ const EntityPermissionView = (props: EntityPermissionViewProps) => {
 		props.valuesChanged?.(props.operations.filter(i => i !== operationName));
 	}, [props.valuesChanged]);
 
+	const isAllChecked = useMemo(() => props.operations.length == props.operationDefs.length, [props.operations, props.operationDefs]);
+
+	const allChanged = useCallback((event: GenericEvent<boolean>) => {
+		if (event.target.value) {
+			props.valuesChanged?.(props.operationDefs.map(i => i.name));
+			return;
+		}
+
+		props.valuesChanged?.([]);
+	}, [props.valuesChanged]);
+
 	return (
 		<Stack gap={1.5} my={2} borderRadius={0}>
 			<Typography >
@@ -82,6 +142,15 @@ const EntityPermissionView = (props: EntityPermissionViewProps) => {
 			</Typography>
 
 			<Stack direction="row" gap={1} flexWrap="wrap" justifyContent="space-evenly" width={1}>
+
+				<BooleanFormComponent
+						name={`${props.entityCaption}-all`}
+						label="All"
+						color="success"
+						value={isAllChecked}
+						onChange={allChanged}
+					/>
+
 				{props.operationDefs.map((i: OperationDef) => {
 					return <BooleanFormComponent
 						key={i.name}
@@ -122,56 +191,40 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
 
 		const allPermissions = formControllerHandler.value ?? {};
-		const currentEntityPermissions = allPermissions[entityName] ?? [];
-
-		const save = [
-			...currentEntityPermissions.filter(i => operations.includes(i.operation))
-				.filter(i => i.status === 'saved'),
-
-			...currentEntityPermissions.filter(i => operations.includes(i.operation))
-				.filter(i => i.status === 'disconnect')
-				.map(i => ({
-					...i,
-					status: 'saved'
-				}))
-		]
-
-		const disconnect = [
-			...currentEntityPermissions.filter(i => i.status === 'saved')
-				.filter(i => operations.includes(i.operation) == false)
-				.map(i => ({
-					...i,
-					status: 'disconnect'
-				})),
-			...currentEntityPermissions.filter(i => i.status === 'disconnect')
-				.filter(i => operations.includes(i.operation) == false),
-		];
-
-		const savedAndDisconnect = [
-			...save.map(i => i.operation),
-			...disconnect.map(i => i.operation)
-		];
-
-		const create = operations.filter(i => savedAndDisconnect.includes(i) == false)
-			.map(i => ({
-				operation: i,
-				status: 'create'
-			}));
+		const newPermissions = changePermission(allPermissions, entityName, operations);
 
 		formControllerHandler.onChange({
 			target: {
 				name: props.name,
 				value: {
 					...allPermissions,
-					[entityName]: [
-						...save,
-						...create,
-						...disconnect
-					]
+					...newPermissions
 				}
 			}
 		});
 	}, [props.name, formControllerHandler.value, formControllerHandler.onChange]);
+
+	const selectAll = useCallback(() => {
+
+		const allPermissions = formControllerHandler.value ?? {};
+
+		const newPermissions = entities.reduce((acc: any, entity) => {
+			return {
+				...acc,
+				...changePermission(allPermissions, entity.name, operationDefs.map(i => i.name))
+			}
+		}, {});
+
+		formControllerHandler.onChange({
+			target: {
+				name: props.name,
+				value: {
+					...allPermissions,
+					...newPermissions
+				}
+			}
+		});
+	}, [entities, onPermissionValuesChanged]);
 
 	const permissions = useMemo(() => {
 		return Object.values(formControllerHandler.value).reduce((sum, arr) => [...sum, ...arr], []);
@@ -192,22 +245,40 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	return (
 		<Stack gap={1.5}>
 
-			<SectionTitle title="Permissions" >
+			<SectionTitle title="Permissions"
+				endAdornment={
+					<MenuButton
+						slots={{
+							button: (<IconButton><MoreVertIcon /></IconButton>)
+						}}
+					>
+						<MenuItem data-autoclose onClick={selectAll}>
+							<ListItemIcon>
+								<CheckCircleIcon fontSize="small" />
+							</ListItemIcon>
+							<ListItemText>Select All Permissions</ListItemText>
+						</MenuItem>
+
+
+					</MenuButton>
+				}>
 				<Tooltip title={tooltipLabel} placement='bottom' arrow>
 					<Chip component="span" label={permissionsCount.length} color="secondary" variant="outlined" size="small" />
 				</Tooltip>
+
+
 			</SectionTitle>
 
 			{entities.map((entity) => {
 				return <Fragment key={entity.name}>
-				<EntityPermissionView
-					entityCaption={entity.caption}
-					operationDefs={operationDefs}
-					operations={(formControllerHandler.value?.[entity.name] ?? []).filter(i => i.status !== 'disconnect')
-						.map(i => i.operation) ?? []}
-					valuesChanged={(values) => {
-						onPermissionValuesChanged(entity.name, values);
-					}} />
+					<EntityPermissionView
+						entityCaption={entity.caption}
+						operationDefs={operationDefs}
+						operations={(formControllerHandler.value?.[entity.name] ?? []).filter(i => i.status !== 'disconnect')
+							.map(i => i.operation) ?? []}
+						valuesChanged={(values) => {
+							onPermissionValuesChanged(entity.name, values);
+						}} />
 
 					<Divider />
 				</Fragment>
@@ -258,7 +329,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
 		variables: {
 			where: {
-				id: props.defaultValue?.id
+				id: myDialogContext.editId
 			}
 		},
 		fetchPolicy: 'network-only',
