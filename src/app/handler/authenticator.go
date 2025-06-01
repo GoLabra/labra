@@ -2,13 +2,13 @@ package handler
 
 import (
 	"app/config"
-	"app/domain/svc"
-	"app/ent"
 	"context"
 	"net/http"
 	"strings"
 
 	"github.com/GoLabra/labra/src/api/constants"
+	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
+	"github.com/GoLabra/labra/src/api/entgql/ent"
 	jwt_hs "github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
@@ -23,7 +23,7 @@ func Authenticator(next http.Handler) http.Handler {
 			return
 		}
 
-		service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service)
+		service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
 		if !ok {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -75,7 +75,6 @@ func Authenticator(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-
 		roleName := claims["role"].(string)
 		role, err := service.Role.GetOne(r.Context(), ent.RoleWhereUniqueInput{Name: &roleName})
 		if err != nil {

@@ -1,14 +1,14 @@
 package handler
 
 import (
-	"app/domain/svc"
-	"app/ent"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/GoLabra/labra/src/api/constants"
+	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
+	"github.com/GoLabra/labra/src/api/entgql/ent"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -42,7 +42,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service)
+	service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
 	if !ok {
 		fmt.Printf("error getting service: %v", err)
 		writeErrorResponse(w, "unable to get service", http.StatusInternalServerError)

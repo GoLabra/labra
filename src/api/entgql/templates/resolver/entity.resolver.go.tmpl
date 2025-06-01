@@ -9,6 +9,7 @@ import (
 	"context"
 )
 
+{{- if eq $.Owner "User" }}
 // Create{{$.Name}} is the resolver for the create{{$.Name}} field.
 func (r *mutationResolver) Create{{$.Name}}(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	return r.Service.{{$.Name}}.Create(ctx, data)
@@ -56,6 +57,7 @@ func (r *mutationResolver) Delete{{$.Name}}(ctx context.Context, where ent.{{$.N
 func (r *mutationResolver) DeleteMany{{$.Name | Plural}}(ctx context.Context, where ent.{{$.Name}}WhereInput) (int, error) {
 	return r.Service.{{$.Name}}.DeleteMany(ctx, where)
 }
+{{- end }}
 
 // {{$.Name | Plural}}Connection is the resolver for the {{ $.Name | Plural | LowerFirstLetter}}Connection field.
 func (r *queryResolver) {{$.Name | Plural}}Connection(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) (*ent.{{$.Name}}Connection, error) {

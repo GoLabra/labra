@@ -1,0 +1,48 @@
+extend type Query {
+    permissions(where: PermissionWhereInput, orderBy: PermissionOrder, skip: Int, first: Int, last: Int): [Permission!]
+    permissionsConnection(where: PermissionWhereInput, orderBy: PermissionOrder, skip: Int, first: Int, last: Int): PermissionConnection!
+}
+
+extend type Mutation {
+    createPermission(data: CreatePermissionInput!): Permission!
+    createManyPermissions(data: [CreatePermissionInput!]!): [Permission]!
+    updatePermission(where: PermissionWhereUniqueInput!, data: UpdatePermissionInput!): Permission!
+    updateManyPermissions(where: PermissionWhereInput!, data: UpdatePermissionInput!): Int!
+    upsertPermission(data: CreatePermissionInput!): Permission!
+    upsertManyPermissions(data: [CreatePermissionInput!]!): Int!
+    deletePermission(where: PermissionWhereUniqueInput!): Permission!
+    deleteManyPermissions(where: PermissionWhereInput!): Int!
+}
+extend input CreatePermissionInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+    role: CreateOneRoleInput
+}
+extend input UpdatePermissionInput {
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+    role: UpdateOneRoleInput
+}
+
+input CreateOnePermissionInput {
+    create: CreatePermissionInput
+    connect: PermissionWhereUniqueInput
+}
+
+input CreateManyPermissionInput {
+    create: [CreatePermissionInput!]
+    connect: [PermissionWhereUniqueInput!]
+}
+
+
+input UpdateOnePermissionInput {
+    create: CreatePermissionInput
+    connect: PermissionWhereUniqueInput
+    unset: Boolean
+}
+
+input UpdateManyPermissionInput {
+    create: [CreatePermissionInput!]
+    connect: [PermissionWhereUniqueInput!]
+    disconnect: [PermissionWhereUniqueInput!]
+}

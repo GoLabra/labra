@@ -12,6 +12,7 @@
 			data.Clear{{ Pascal $.Name }} = true
 		}
         {{- end }}
+        {{- if eq $.Type.Annotations.Entity.Owner "User" }}
         if data.{{ Pascal $.Name }}.Create != nil {
             var createInput ent.Create{{ $.Type.Name }}Input
             err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
@@ -30,6 +31,7 @@
 
             data.{{ Pascal $.Name }}ID = &toConnect.ID
         }
+        {{- end }}
     {{- else }}
         if data.{{ Pascal $.Name }}.Connect != nil {
             for _, connect := range data.{{ Pascal $.Name }}.Connect {
@@ -53,6 +55,7 @@
 				data.Remove{{ Singular (Pascal $.Name) }}IDs = append(data.Remove{{ Singular (Pascal $.Name) }}IDs, toDisconnect.ID)
 			}
 		}
+        {{- if eq $.Type.Annotations.Entity.Owner "User" }}
         if data.{{ Pascal $.Name }}.Create != nil {
             for _, create := range data.{{ Pascal $.Name }}.Create {
                 var createInput ent.Create{{ $.Type.Name }}Input
@@ -73,5 +76,6 @@
                 data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
             }
         }
+        {{- end }}
     {{- end }}
 {{- end }}

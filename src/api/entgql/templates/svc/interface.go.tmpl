@@ -11,6 +11,7 @@ type {{$.Name}} interface {
     GetOne(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
     GetTx(ctx context.Context, tx *ent.Tx, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error)
     GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
+    {{- if eq $.Owner "User" }}
     Create(ctx context.Context, u ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
     CreateTx(ctx context.Context, tx *ent.Tx, u ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
     CreateMany(ctx context.Context, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error)
@@ -27,4 +28,5 @@ type {{$.Name}} interface {
     DeleteTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
     DeleteMany(ctx context.Context, where ent.{{$.Name}}WhereInput) (int, error)
     DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput) (int, error)
+    {{- end }}
 }

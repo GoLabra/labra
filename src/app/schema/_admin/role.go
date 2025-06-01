@@ -20,6 +20,7 @@ type Role struct {
 
 func (Role) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 		entgql.MultiOrder(),
 		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),

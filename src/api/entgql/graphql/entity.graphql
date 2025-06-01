@@ -11,19 +11,19 @@ type Subscription {
     entities: [Entity!]
 }
 
-type Query {
+extend type Query {
     entities: [Entity!]
     entity(where: EntityWhereUniqueInput): Entity 
     fields: [Field!]
 }
 
-type Mutation {
+extend type Mutation {
     createEntity(data: CreateEntityInput!): Entity!
     updateEntity(where: EntityWhereUniqueInput!, data: UpdateEntityInput!): Entity!
     deleteEntity(where: EntityWhereUniqueInput!): Entity!
 }
 
-type Entity  {
+extend type Entity  {
     df: String!
     name: String!
     pluralName: String!

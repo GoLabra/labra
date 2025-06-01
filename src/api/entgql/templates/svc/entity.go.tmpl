@@ -35,6 +35,7 @@ func (s *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	return s.repository.{{$.Name}}.GetOneTx(ctx, tx, where)
 }
 
+{{- if eq $.Annotations.Entity.Owner "User" }}
 func (s *{{$.Name}}) CreateTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	createdInput, err := s.repository.{{$.Name}}.CreateTx(ctx, tx, data)
 	if err != nil {
@@ -106,3 +107,4 @@ func (s *{{$.Name}}) DeleteMany(ctx context.Context, where ent.{{$.Name}}WhereIn
 func (s *{{$.Name}}) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput) (int, error) {
 	return s.repository.{{$.Name}}.DeleteManyTx(ctx, tx, where)
 }
+{{- end }}

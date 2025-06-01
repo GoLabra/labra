@@ -37,7 +37,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service)
+	service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service) // TODO @David use admin service and move to api
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

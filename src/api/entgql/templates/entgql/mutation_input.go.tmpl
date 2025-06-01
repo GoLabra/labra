@@ -28,23 +28,31 @@ type {{ $inputName }} struct {
 
 {{- range $n := $.Nodes }}
     type CreateMany{{ $n.Name }}Input struct {
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
         Create  []*Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
         Connect []*{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
     }
 
     type CreateOne{{ $n.Name }}Input struct {
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
         Create  *Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
         Connect *{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
     }
     
     type UpdateMany{{ $n.Name }}Input struct {
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
         Create  []*Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
         Connect []*{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
         Disconnect []*{{ $n.Name }}WhereUniqueInput `json:"disconnect,omitempty"`
     }
 
     type UpdateOne{{ $n.Name }}Input struct {
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
         Create  *Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
         Connect *{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
         Unset *bool `json:"unset,omitempty"`
     }
