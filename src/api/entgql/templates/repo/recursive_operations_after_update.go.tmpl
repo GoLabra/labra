@@ -30,6 +30,14 @@
 
             data.{{ Pascal $.Name }}ID = &toConnect.ID
         }
+        if data.{{ Pascal $.Name }}.Delete != nil && *data.{{ Pascal $.Name }}.Delete {
+            _, err := repository.{{ $.Type.Name }}.DeleteTx(ctx, tx, {{ $.Name }}ToDelete)
+            itemToDelete, err := item.{{ Pascal $.Name }}(ctx)
+            if err != nil {
+                return nil, err
+            }
+            {{ $.Name }}ToDelete.ID = &itemToDelete.ID
+        }
     {{- else }}
         if data.{{ Pascal $.Name }}.Connect != nil {
             for _, connect := range data.{{ Pascal $.Name }}.Connect {

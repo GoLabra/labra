@@ -500,6 +500,7 @@ export type Role = Node & {
   createdBy?: Maybe<User>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  permissions?: Maybe<Array<Permission>>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<User>;
 };

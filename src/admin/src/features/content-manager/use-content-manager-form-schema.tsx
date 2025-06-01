@@ -21,7 +21,7 @@ import { MultipleChoiceFormField } from "@/core-features/dynamic-form/form-field
 import { isJsonOrNull, toJsonOrNull } from "@/lib/utils/is-json";
 
 type FieldDetails = {
-	schema: Record<string, z.ZodTypeAny>;
+	schema: z.ZodTypeAny;
 	input: ReactNode;
 	convertFromRawValue?: (value: any) => any;
 }
@@ -38,9 +38,7 @@ const getShortText = (field: Field): FieldDetails => {
 	})();
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		input: <TextShortFormField key={field.name} name={field.name} label={field.caption} required={field.required ?? false} />
 	}
 }
@@ -57,9 +55,7 @@ const getLongText = (field: Field): FieldDetails => {
 	})();
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		input: <TextLongFormField key={field.name} name={field.name} label={field.caption} required={field.required ?? false} />
 	}
 }
@@ -77,9 +73,7 @@ const getRichText = (field: Field): FieldDetails => {
 	})();
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		input: <RichTextFormField key={field.name} name={field.name} label={field.caption} required={field.required ?? false} />
 	}
 }
@@ -99,9 +93,7 @@ const getEmail = (field: Field): FieldDetails => {
 	})();
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		input: <TextShortFormField key={field.name} name={field.name} label={field.caption} required={field.required ?? false} />
 	}
 }
@@ -147,9 +139,7 @@ const getNumber = (field: Field): FieldDetails => {
 
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		input: <NumberFormField key={field.name} name={field.name} label={field.caption} required={field.required ?? false} min={field.min ?? undefined} max={field.max ?? undefined} />
 	}
 }
@@ -205,9 +195,7 @@ const getDateTime = (field: Field): FieldDetails => {
 	schema = schema.transform((val) => dateTimeToStringPrecision(val));
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		//defaultValue: field.defaultValue ? stringToDateTime(field.defaultValue) : undefined,
 		convertFromRawValue: (value) => {
 			return value ? stringToDateTime(value) : undefined;
@@ -266,9 +254,7 @@ const getDate = (field: Field): FieldDetails => {
 	schema = schema.transform((val) => dateToString(val));
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		//defaultValue: field.defaultValue ? stringToDate(field.defaultValue) : undefined,
 		convertFromRawValue: (value) => {
 			return value ? stringToDate(value) : undefined;
@@ -327,9 +313,7 @@ const getTime = (field: Field): FieldDetails => {
 	schema = schema.transform((val) => timeToStringPrecision(val));
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		//defaultValue: field.defaultValue ? stringToTime(field.defaultValue) : undefined,
 		convertFromRawValue: (value) => {
 			return value ? stringToTime(value) : undefined;
@@ -351,9 +335,7 @@ const getBoolean = (field: Field): FieldDetails => {
 		schema = baseSchema.optional();
 	}
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		//defaultValue: field.defaultValue ? !!field.defaultValue : undefined,
 		convertFromRawValue: (value) => {
 			return value ? !!value : undefined;
@@ -375,26 +357,24 @@ const getJson = (field: Field): FieldDetails => {
 	})();
 
 
-   // 2) If required, ban empty/null
-   if (field.required) {
-	 schema = schema.refine(
-	   (val) => val !== undefined && val !== null,
-	   { message: `${field.caption} is required` }
-	 );
-   }
- 
-   // 3) JSON‐validity only if there is a value
-   schema = schema.refine(
-	 (val) => val === undefined || val === null || isJsonOrNull(val),
-	 { message: `${field.caption} must be valid JSON` }
-   ).transform((val) => toJsonOrNull(val) ? JSON.parse(val) : undefined);
+	// 2) If required, ban empty/null
+	if (field.required) {
+		schema = schema.refine(
+			(val) => val !== undefined && val !== null,
+			{ message: `${field.caption} is required` }
+		);
+	}
+
+	// 3) JSON‐validity only if there is a value
+	schema = schema.refine(
+		(val) => val === undefined || val === null || isJsonOrNull(val),
+		{ message: `${field.caption} must be valid JSON` }
+	).transform((val) => toJsonOrNull(val) ? JSON.parse(val) : undefined);
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		convertFromRawValue: (value) => {
-			if(typeof value === 'string'){
+			if (typeof value === 'string') {
 				return value;
 			}
 			return value ? JSON.stringify(value) : undefined;
@@ -416,9 +396,7 @@ const getSingleChoice = (field: Field): FieldDetails => {
 		})) ?? [];
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		input: <SingleChoiceFormField key={field.name} name={field.name} label={field.caption} options={options} />
 	}
 }
@@ -447,9 +425,7 @@ const getMultiChoice = (field: Field): FieldDetails => {
 		})) ?? [];
 
 	return {
-		schema: {
-			[field.name]: schema
-		},
+		schema,
 		//defaultValue: field.defaultValue ? JSON.parse(field.defaultValue) : undefined,
 		convertFromRawValue: (value) => {
 			if (Array.isArray(value)) {
@@ -499,9 +475,7 @@ const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 	});
 
 	return {
-		schema: {
-			[edge.name]: schema
-		},
+		schema,
 		convertFromRawValue: (val) => undefined,
 		input: <LookupOneFIELDFormField key={edge.name} name={edge.name} label={edge.caption} entityName={entityName} edge={edge} />
 	}
@@ -535,9 +509,7 @@ const getRelationMany = (entityName: string, edge: Edge): FieldDetails => {
 	});
 
 	return {
-		schema: {
-			[edge.name]: schema
-		},
+		schema,
 		convertFromRawValue: (val) => undefined,
 		input: <LookupManyFIELDFormField key={edge.name} name={edge.name} label={edge.caption} entityName={entityName} edge={edge} />
 	}
@@ -578,9 +550,7 @@ const getFormEdge = (entityName: string, edge: Edge): FieldDetails => {
 
 		default:
 			return {
-				schema: {
-					[edge.name]: z.any().nullable()
-				},
+				schema: z.any().nullable(),
 				input: <>Unknown Relation</>
 			}
 	}
@@ -624,10 +594,10 @@ export const useContentManagerFormSchema = (entity: FullEntity | null) => {
 		const fieldsSchema = fieldsDescriptors.reduce((acc: any, field) => {
 			acc = {
 				...acc,
-				...field.schema
+				[field.name]: field.schema
 			}
 			return acc;
-		}, {});
+		}, {} as Record<string, z.ZodTypeAny>);
 
 		return z.object(fieldsSchema);
 	}, [fieldsDescriptors]);
@@ -675,3 +645,68 @@ export const useContentManagerFormSchema = (entity: FullEntity | null) => {
 }
 
 useContentManagerFormSchema.displayName = 'useContentManagerFormSchema';
+
+
+export const useGenericFiedFormSchema = () => {
+
+}
+
+export const useGenericEdgeFormSchema = (entity: FullEntity | null, edgeName: string) => {
+
+	const edge = useMemo(() => {
+		if (!entity) {
+			return null;
+		}
+		return entity.edges?.find(i => i.name === edgeName);
+	}, [entity, edgeName]);
+
+	const edgeDescriptor = useMemo(() => {
+		if (!entity) {
+			return null;
+		}
+
+		if (!edge) {
+			return null;
+		}
+
+		const result = {
+			...getFormEdge(entity.name, edge),
+			name: edge.name,
+			edge
+		};
+		return result;
+	}, [entity, edge]);
+
+	const convertFromRawValue = useCallback((defaultValue: any) => {
+
+		if (!edge) {
+			return null;
+		}
+
+		const value = edgeDescriptor?.convertFromRawValue ? edgeDescriptor?.convertFromRawValue?.(defaultValue) : defaultValue;
+		return value;
+	}, [edgeDescriptor, edge]);
+
+	const field = useMemo(():ReactNode => {
+		if (!edgeDescriptor) {
+			return <></>;
+		}
+
+		return edgeDescriptor.input;
+	}, [edgeDescriptor]);
+
+	const schema = useMemo(() => {
+		if (!edgeDescriptor) {
+			return z.any();
+		}
+
+		return edgeDescriptor.schema;
+	}, [edgeDescriptor]);
+
+	return useMemo(() => ({
+		edgeDescriptor,
+		convertFromRawValue,
+		field,
+		schema
+	}), [edgeDescriptor, convertFromRawValue, field, schema]);
+}

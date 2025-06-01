@@ -1,3 +1,4 @@
+import { GenericEvent } from "@/lib/utils/event";
 import { useCallback, useRef } from "react";
 import { Control, useWatch } from "react-hook-form";
 
@@ -7,7 +8,7 @@ interface useLiteControllerProps {
     control: Control;
     disabled?: boolean;
 }
-export const useLiteController = (props: useLiteControllerProps) => {
+export const useLiteController = <T = any>(props: useLiteControllerProps) => {
 
     const { name, control, disabled } = props;
 
@@ -22,7 +23,7 @@ export const useLiteController = (props: useLiteControllerProps) => {
 
     var registerProps = useRef(control.register(name,{value}));
 
-    const onChange = useCallback((event: any) => {
+    const onChange = useCallback((event: GenericEvent<T> | any) => {
         registerProps.current.onChange(event);
     }, []);
 
@@ -31,7 +32,7 @@ export const useLiteController = (props: useLiteControllerProps) => {
     }, []);
 
     return {
-        value: value ?? control._formValues[name],
+        value: value as T ?? control._formValues[name] as T,
         name: props.name,
         disabled,
         onChange,

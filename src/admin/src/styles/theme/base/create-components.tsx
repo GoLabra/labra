@@ -465,8 +465,6 @@ export const createComponents = (): Components => {
                     padding: 0,
                     width: 44,
 
-                    backroundColor: 'red',
-
                     [`.${switchClasses.switchBase}`]: {
                         padding: 4,
 

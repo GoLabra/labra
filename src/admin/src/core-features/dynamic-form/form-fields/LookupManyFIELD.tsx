@@ -14,13 +14,14 @@ import { useContentManagerStore } from '@/hooks/use-content-manager-store';
 import { getAdvancedFiltersFromGridFilter } from '@/lib/utils/get-advanced-filters-from-grid-filters';
 import { useCallback, useMemo } from 'react';
 import { getAdvancedFiltersFromQuery } from '@/lib/utils/get-filters-from-query';
-import { ContentManagerEntryDialogContent } from '@/features/content-manager/content-manager-new-item';
+import { ContentManagerEntryDialogContent } from '@/features/content-manager/content-manager-entry-form';
 import { FormOpenMode } from '../form-field';
 import { Options, Option } from '@/core-features/dynamic-form/form-field';
 import { AutocompleteBaseFieldFormComponent, AutocompleteFieldFormComponentProps } from './AutocompleteBaseField';
 import { ActionList } from '@/shared/components/action-list';
 import { ActionListItem } from '@/shared/components/action-list-item';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
+import { EdgeStatus } from '@/lib/utils/edge-status';
 
 interface RelationManyFIELDFormComponentProps {
     name: string;
@@ -357,4 +358,4 @@ const useGetEdgeValue = (entityName: string, entryId: string | null, edge: Edge)
 }
 
 
-export type OptionTag = 'saved' | 'connect' | 'create' | 'disconnect';
+export type OptionTag = EdgeStatus;
