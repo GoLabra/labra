@@ -11,7 +11,7 @@ import {
     NextSSRInMemoryCache,
     SSRMultipartLink
 } from "@apollo/experimental-nextjs-app-support/ssr";
-import { GRAPHQL_QUERY_API_URL, GRAPHQL_API_URL, GRAPHQL_ENTITY_API_URL, GRAPHQL_QUERY_SUBSCRIPTION_URL, GRAPHQL_ENTITY_SUBSCRIPTION_URL } from "@/config/CONST";
+import { GRAPHQL_QUERY_API_URL, GRAPHQL_API_URL, GRAPHQL_ADMIN_API_URL } from "@/config/CONST";
 import { onError } from "@apollo/client/link/error";
 import { addNotification } from "../notifications/store";
 import { RestLink } from "apollo-link-rest";
@@ -43,7 +43,7 @@ const queryLink = () => {
  
     // -- ws
     const wsQueryLink = typeof window !== "undefined" ? new GraphQLWsLink(createClient({
-        url: GRAPHQL_QUERY_SUBSCRIPTION_URL!,
+        url: GRAPHQL_QUERY_API_URL!,
         retryAttempts: 100,
         connectionParams: () => ({
             authorization: getBearerToken(),
@@ -71,13 +71,13 @@ const queryLink = () => {
     return queryLink;
 }
 
-const entityLink = () => {
+const adminLink = () => {
     // -- http
-    const httpEntityLink = new HttpLink({ uri: GRAPHQL_ENTITY_API_URL });
+    const httpEntityLink = new HttpLink({ uri: GRAPHQL_ADMIN_API_URL });
 
     // -- ws
     const wsEntityLink = typeof window !== "undefined" ? new GraphQLWsLink(createClient({
-        url: GRAPHQL_ENTITY_SUBSCRIPTION_URL!,
+        url: GRAPHQL_ADMIN_API_URL!,
         retryAttempts: 100,
         connectionParams: () => ({
             authorization: getBearerToken(),
@@ -114,9 +114,9 @@ function makeClient() {
         (operation) => {
             return operation.getContext().clientName === "entity"
         },
-        entityLink(),
+        adminLink(),
         queryLink()
-    ) : entityLink();
+    ) : adminLink();
 
 
     // Create error link
