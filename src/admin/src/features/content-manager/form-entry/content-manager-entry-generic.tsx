@@ -118,3 +118,5 @@ export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, Cont
 		</>
 	)
 });
+
+ContentManagerEntryGeneric.displayName = 'ContentManagerEntryGeneric';

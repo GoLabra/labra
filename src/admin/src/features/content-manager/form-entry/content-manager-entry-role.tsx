@@ -44,6 +44,12 @@ const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleW
   	}
 }`
 
+type PermissionItem = {
+	id?: string;
+	entityName: string;
+	operation: string;
+	status: EdgeStatus;
+}
 
 type Operation = {
 	id?: string;
@@ -451,9 +457,4 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 	)
 });
 
-type PermissionItem = {
-	id?: string;
-	entityName: string;
-	operation: string;
-	status: EdgeStatus;
-}
+ContentManagerEntryRole.displayName = 'ContentManagerEntryRole';
