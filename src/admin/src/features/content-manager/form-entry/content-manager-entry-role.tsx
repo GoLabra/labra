@@ -78,7 +78,7 @@ const changePermission = (savedPermissions: PermissionItem[], entityName: string
 	const disconnect = currentEntityPermissions.filter(i => operations.includes(i.operation) == false)
 												.map((i): PermissionItem => ({
 													...i,
-													status: 'disconnect'
+													status: 'delete'
 												}));
 	const create = operations.filter(i => !!savedPermissions.find(j => j.entityName == entityName && j.operation == i) == false)
 							.map((i): PermissionItem => ({
@@ -124,6 +124,7 @@ const EntityPermissionView = (props: EntityPermissionViewProps) => {
 
 	return (
 		<Stack gap={1.5} my={2} borderRadius={0}>
+			
 			<Typography >
 				{props.entityCaption}
 			</Typography>
@@ -193,12 +194,12 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	const currentPermissions = useMemo((): PermissionItem[] => {
 		const all = [...existing, ...formControllerHandler.value ?? []];
 		return all.filter(i => {
-			if(i.status == 'disconnect'){
+			if(i.status == 'delete'){
 				return false;
 			}
 
 			if(i.status == 'saved'){
-				if(all.find(j => j.id == i.id && j.status == 'disconnect')){
+				if(all.find(j => j.id == i.id && j.status == 'delete')){
 					return false;
 				}
 			}
@@ -274,13 +275,13 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	}, [entities, onPermissionValuesChanged]);
 
 	const permissionsCount = useMemo(() => {
-		return currentPermissions.filter(i => i.status != 'disconnect');
+		return currentPermissions.filter(i => i.status != 'delete');
 	}, [currentPermissions]);
 
 	const tooltipLabel = useMemo(() => {
 		const added = formControllerHandler.value?.filter(i => i.status == 'create').length ?? 0;
-		const disconnect = formControllerHandler.value?.filter(i => i.status == 'disconnect').length ?? 0;
-		const saved = existing.filter(i => formControllerHandler.value?.find(j => j.id == i.id && j.status == 'disconnect') == null).length ?? 0;
+		const disconnect = formControllerHandler.value?.filter(i => i.status == 'delete').length ?? 0;
+		const saved = existing.filter(i => formControllerHandler.value?.find(j => j.id == i.id && j.status == 'delete') == null).length ?? 0;
 
 		return `${saved} existing, ${added} added, ${disconnect} removed`;
 	}, [existing, formControllerHandler.value]);
@@ -307,12 +308,13 @@ const PermissionSection = (props: PermissionSectionProps) => {
 							</ListItemIcon>
 							<ListItemText>Clear All Permissions</ListItemText>
 						</MenuItem>
-						<MenuItem data-autoclose onClick={resetChanges}>
+
+						{myDialogContext.openMode === FormOpenMode.Edit && (<MenuItem data-autoclose onClick={resetChanges}>
 							<ListItemIcon>
 								<HistoryIcon fontSize="small" />
 							</ListItemIcon>
 							<ListItemText>Reset Changes</ListItemText>
-						</MenuItem>
+						</MenuItem>)}
 
 					</MenuButton>
 				}>
@@ -328,7 +330,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 					<EntityPermissionView
 						entityCaption={entity.caption}
 						operationDefs={operationDefs}
-						operations={(allPermissionsGrouped[entity.name] ?? []).filter(i => i.status !== 'disconnect')
+						operations={(allPermissionsGrouped[entity.name] ?? []).filter(i => i.status !== 'delete')
 							.map(i => i.operation) ?? []}
 						valuesChanged={(values) => {
 							onPermissionValuesChanged(entity.name, values);
@@ -361,7 +363,7 @@ export const schema = z.object({
 					entity: i.entityName,
 					operation: i.operation
 				})),
-			disconnect: val.filter(i => i.status == 'disconnect')
+			delete: val.filter(i => i.status == 'delete')
 				.filter(i => i.id)
 				.map(i => ({ id: i.id }))
 		}

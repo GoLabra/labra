@@ -7,7 +7,7 @@ import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useEntities } from "@/hooks/use-entities";
 import Avvvatars from 'avvvatars-react'
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog";
-import { DynamicDialog } from "@/core-features/dynamic-dialog/src/dynamic-dialog";
+import { DynamicDialog, FinishResult } from "@/core-features/dynamic-dialog/src/dynamic-dialog";
 import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import { ContentManagerProvider, useContentManagerContext } from "@/features/content-manager/use-content-manager-context";
 import { ContentManagerEntryDialogContent } from "@/features/content-manager/content-manager-entry-form";
@@ -83,7 +83,7 @@ const PageContent = (props: PageContentProps) => {
         dynamicDialog.addPopup(ContentManagerEntryDialogContent, { entityName: contentManager.entityName }, FormOpenMode.New);
     }, [dynamicDialog, contentManager.entityName]);
 
-    const finishDialog = useCallback(({ data, openMode, editId }: { data: any, openMode?: FormOpenMode, editId?: string }) => {
+    const finishDialog = useCallback(({ data, openMode }: FinishResult) => {
 
         if (openMode == FormOpenMode.Edit) {
             return;

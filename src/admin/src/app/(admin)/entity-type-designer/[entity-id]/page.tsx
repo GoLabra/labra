@@ -3,7 +3,7 @@
 import { Button, ButtonGroup, Container, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, SvgIcon, Typography } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { DynamicDialog } from "@/core-features/dynamic-dialog/src/dynamic-dialog";
+import { DynamicDialog, FinishResult } from "@/core-features/dynamic-dialog/src/dynamic-dialog";
 import { useDialog } from "@/hooks/use-dialog";
 import { VscSave } from "react-icons/vsc";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -89,11 +89,7 @@ const PageContent = (props: PageContentProps) => {
     const deleteEntityConfirmationDialog = useDialog();
     const revertAllChangesConfirmationDialog = useDialog();
 
-    const onEntityDynamicDialogFinish = useCallback(({ data, openMode, editId }: {
-        data: ChangedNameCaptionEntity,
-        openMode?: FormOpenMode,
-        editId?: string
-    }) => {
+    const onEntityDynamicDialogFinish = useCallback(({ data, openMode, editId }: FinishResult<ChangedNameCaptionEntity>) => {
         if (!editId) {
             return;
         }

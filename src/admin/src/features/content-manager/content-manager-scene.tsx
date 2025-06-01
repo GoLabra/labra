@@ -5,7 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { ContentManagerSearch } from "./content-manager-search"
 import { useSelection } from "@/hooks/use-selection";
-import { DynamicDialog } from "../../core-features/dynamic-dialog/src/dynamic-dialog"
+import { DynamicDialog, FinishResult } from "../../core-features/dynamic-dialog/src/dynamic-dialog"
 import { FormOpenMode } from "@/core-features/dynamic-form/form-field"
 import { useDialog } from "@/hooks/use-dialog"
 import { useContentManagerIds } from "./use-content-manger-ids"
@@ -93,18 +93,18 @@ export const ContentManagerScene = () => {
         },
     ];
 
-    const finishDialog = useCallback(({ data, openMode, editId }: { data: any, openMode?: FormOpenMode, editId?: string }) => {
+    const finishDialog = useCallback((result: FinishResult) => {
 
-        if (openMode == FormOpenMode.Edit) {
-            if (!editId) {
+        if (result.openMode == FormOpenMode.Edit) {
+            if (!result.editId) {
                 return;
             }
-            contentManager.contentManagerStore.updateItem(editId, data);
+            contentManager.contentManagerStore.updateItem(result.editId, result.data);
             return;
         }
 
-        if (openMode == FormOpenMode.New) {
-            contentManager.contentManagerStore.addItem(data);
+        if (result.openMode == FormOpenMode.New) {
+            contentManager.contentManagerStore.addItem(result.data);
             return;
         }
 
