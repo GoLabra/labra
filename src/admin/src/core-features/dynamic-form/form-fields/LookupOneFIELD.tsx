@@ -6,7 +6,7 @@ import { FormOpenMode } from '@/core-features/dynamic-form/form-field';
 import { AutocompleteChangeReason, SvgIcon } from '@mui/material';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
 import { useCallback, useContext, useMemo } from 'react';
-import { ContentManagerEntryDialogContent } from '@/features/content-manager/content-manager-new-item';
+import { ContentManagerEntryDialogContent } from '@/features/content-manager/content-manager-entry-form';
 import { ActionList } from '@/shared/components/action-list';
 import { ActionListItem } from '@/shared/components/action-list-item';
 import { useFullEntity } from '@/hooks/use-entities';

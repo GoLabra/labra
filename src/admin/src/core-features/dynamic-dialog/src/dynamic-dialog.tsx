@@ -5,6 +5,15 @@ import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import { ChainDialogContentRef, ChainDialogRef, DialogChainPopupStack } from "./dynamic-dialog-types";
 import { DynamicDialogContent } from "./dynamic-dialog-content";
 
+
+
+export type FinishResult<T = any> = {
+	data: T;
+	openMode?: FormOpenMode;
+	editId?: string;
+	preventClose: boolean;
+}
+
 export const ChainDialogContext = createContext<{
     components: DialogChainPopupStack[];
 
@@ -32,11 +41,7 @@ ChainDialogContext.displayName = 'ChainDialogContext';
 export const useDynamicDialogContext = () => useContext(ChainDialogContext); 
 
 interface DynamicDialogProps {
-    finish: (result: {
-        data: any,
-        openMode?: FormOpenMode,
-        editId?: string
-    }) => void;
+    finish: (result: FinishResult) => void;
 }
 export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((props: DynamicDialogProps, ref) => {
     const [components, setComponents] = useState<Array<DialogChainPopupStack>>([]);
@@ -89,12 +94,19 @@ export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((pro
 
         const index = components.indexOf(component);
         if (index == 0) {
-            setComponents([]);
-            props.finish({
-                data: result,
+			
+			let finishResult: FinishResult<any> = {
+				data: result,
                 openMode: component.openMode,
-                editId: component.editId
-            });
+                editId: component.editId,
+				preventClose: false
+			};
+            props.finish(finishResult);
+
+			if(finishResult.preventClose == false){
+				setComponents([]);
+			}
+			
             return;
         }
 

@@ -31,48 +31,65 @@
 
             data.{{ Pascal $.Name }}ID = &toConnect.ID
         }
+        if data.{{ Pascal $.Name }}.Delete != nil && *data.{{ Pascal $.Name }}.Delete {
+            itemToDelete, err := item.{{ Pascal $.Name }}(ctx)
+            if err != nil {
+                return nil, err
+            }
+            {{ $.Name }}ToDelete.ID = &itemToDelete.ID
+        }
         {{- end }}
     {{- else }}
-    if data.{{ Pascal $.Name }}.Connect != nil {
-        for _, connect := range data.{{ Pascal $.Name }}.Connect {
-            toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *connect)
+        if data.{{ Pascal $.Name }}.Connect != nil {
+            for _, connect := range data.{{ Pascal $.Name }}.Connect {
+                toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *connect)
 
-            if err != nil {
-                return nil, err
+                if err != nil {
+                    return nil, err
+                }
+
+                data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
             }
-
-            data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
         }
-    }
-    if data.{{ Pascal $.Name }}.Disconnect != nil {
-        for _, disconnect := range data.{{ Pascal $.Name }}.Disconnect {
-            toDisconnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *disconnect)
+        if data.{{ Pascal $.Name }}.Disconnect != nil {
+            for _, disconnect := range data.{{ Pascal $.Name }}.Disconnect {
+                toDisconnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *disconnect)
 
-            if err != nil {
-                return nil, err
+                if err != nil {
+                    return nil, err
+                }
+
+                data.Remove{{ Singular (Pascal $.Name) }}IDs = append(data.Remove{{ Singular (Pascal $.Name) }}IDs, toDisconnect.ID)
             }
-
-            data.Remove{{ Singular (Pascal $.Name) }}IDs = append(data.Remove{{ Singular (Pascal $.Name) }}IDs, toDisconnect.ID)
         }
-    }
     {{- if eq $.Type.Annotations.Entity.Owner "User" }}
-    if data.{{ Pascal $.Name }}.Create != nil {
-        for _, create := range data.{{ Pascal $.Name }}.Create {
-            var createInput ent.Create{{ $.Type.Name }}Input
-            err = mapstructure.Decode(create, &createInput)
-            if err != nil {
-                return nil, err
+        if data.{{ Pascal $.Name }}.Create != nil {
+            for _, create := range data.{{ Pascal $.Name }}.Create {
+                var createInput ent.Create{{ $.Type.Name }}Input
+                err = mapstructure.Decode(create, &createInput)
+                if err != nil {
+                    return nil, err
+                }
+
+                toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+
+                if err != nil {
+                    return nil, err
+                }
+
+                 data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
             }
-
-            toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
-
-            if err != nil {
-                return nil, err
-            }
-
-            data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
         }
-    }
+        if data.{{ Pascal $.Name }}.Delete != nil {
+            for _, delete := range data.{{ Pascal $.Name }}.Delete {
+                _, err := repository.{{ $.Type.Name }}.DeleteTx(ctx, tx, *delete)
+
+                if err != nil {
+                    return nil, err
+                }
+            }
+        }
+    {{- end }}
     {{- end }}
     {{- end }}
 {{- end }}

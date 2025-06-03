@@ -51,6 +51,7 @@ input UpdateOne{{$.Node.Name}}Input {
     create: Create{{$.Node.Name}}Input
     {{- end }}
     connect: {{$.Node.Name}}WhereUniqueInput
+    delete: Boolean
     unset: Boolean
 }
 
@@ -59,6 +60,7 @@ input UpdateMany{{$.Node.Name}}Input {
     create: [Create{{$.Node.Name}}Input!]
     {{- end }}
     connect: [{{$.Node.Name}}WhereUniqueInput!]
+    delete: [{{$.Node.Name}}WhereUniqueInput!]
     disconnect: [{{$.Node.Name}}WhereUniqueInput!]
 }
 

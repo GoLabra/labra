@@ -9,6 +9,7 @@ import { Avatar, Button, Chip, Stack, Typography } from '@mui/material';
 // import { stringAvatar } from '@/lib/utils/avatar';
 import { stringToDate, stringToDateTime, stringToTime } from '@/core-features/dynamic-form/value-convertor';
 import { InlineAvatar } from '@/shared/components/avatar';
+import { useViewRelationStore } from '@/core-features/view-item/use-view-relation-store';
 
 export type ColumnOptions = {
     hasSort?: boolean,
@@ -20,7 +21,7 @@ interface UseDynamicGridColumnsProps {
     fields?: Field[],
     edges?: Edge[],
     displayFieldName?: string,
-    expansionStore: ReturnType<typeof useRowExpansionStore>,
+	openRelation: (entityName: string, edge: Edge, entryId: string) => void,
     showId: boolean
 }
 export const useDynamicGridColumns = ({
@@ -28,14 +29,14 @@ export const useDynamicGridColumns = ({
     fields = [],
     edges = [],
     displayFieldName,
-    expansionStore,
+    openRelation,
     showId
 }: UseDynamicGridColumnsProps): ColumnDef[] => {
 
     const displayFieldPin = useResponsivePin({ pin: 'left', breakpoint: 'sm', direction: 'up' });
 
-    const expansionStoreRef = useRef(expansionStore);
-    expansionStoreRef.current = expansionStore;
+    const expansionStoreRef = useRef(openRelation);
+    expansionStoreRef.current = openRelation;
 
     return useMemo(() => (
         [
@@ -86,17 +87,17 @@ const fieldToColumn = (field: Field): ColumnDef<Field> => {
     }
 }
 
-const edgeToColumn = (entityName: string, edge: Edge, expansionStore: MutableRefObject<ReturnType<typeof useRowExpansionStore>>): ColumnDef<Edge> => {
+const edgeToColumn = (entityName: string, edge: Edge, openRelation: MutableRefObject<(entityName: string, edge: Edge, entryId: string) => void>): ColumnDef<Edge> => {
 
     switch (edge.relationType) {
         case RelationType.One:
         case RelationType.OneToOne:
         case RelationType.OneToMany:
-            return oneColumnDef(entityName, edge, expansionStore);
+            return oneColumnDef(entityName, edge, openRelation);
         case RelationType.Many:
         case RelationType.ManyToOne:
         case RelationType.ManyToMany:
-            return manyColumnDef(entityName, edge, expansionStore);
+            return manyColumnDef(entityName, edge, openRelation);
     }
 
     return {
@@ -248,7 +249,7 @@ const multiChoiceColumnDef = (name: string, caption: string, render: (row: any) 
     };
 }
 
-const oneColumnDef = (entityName: string, edge: Edge, expansionStore: MutableRefObject<ReturnType<typeof useRowExpansionStore>>, options?: ColumnOptions): ColumnDef<any> => {
+const oneColumnDef = (entityName: string, edge: Edge, openRelation: MutableRefObject<(entityName: string, edge: Edge, entryId: string) => void>, options?: ColumnOptions): ColumnDef<any> => {
 
     return {
         id: edge.name,
@@ -267,20 +268,7 @@ const oneColumnDef = (entityName: string, edge: Edge, expansionStore: MutableRef
                     padding: 0
                 }}
                 onClick={() => {
-
-                    const rowStatus = expansionStore.current.expansionState[row.id];
-                    const isExpanded = rowStatus?.isOpen ?? false;
-                    const shouldBeExpanded = isExpanded == false ? true : (rowStatus.params.entityName != entityName || rowStatus.params.edge.name != edge.name);
-
-                    expansionStore.current.setParams({
-                        rowId: row.id,
-                        params: {
-                            entityName: entityName,
-                            entryId: row.id,
-                            edge: edge
-                        },
-                        openImmediately: shouldBeExpanded
-                    })
+					openRelation.current(entityName, edge, row.id);
                 }}>
                 <Typography
                     color="text.primary"
@@ -292,7 +280,7 @@ const oneColumnDef = (entityName: string, edge: Edge, expansionStore: MutableRef
     };
 }
 
-const manyColumnDef = (entityName: string, edge: Edge, expansionStore: MutableRefObject<ReturnType<typeof useRowExpansionStore>>, options?: ColumnOptions): ColumnDef<any> => {
+const manyColumnDef = (entityName: string, edge: Edge, openRelation: MutableRefObject<(entityName: string, edge: Edge, entryId: string) => void>, options?: ColumnOptions): ColumnDef<any> => {
     return {
         id: edge.name,
         header: edge.caption,
@@ -305,19 +293,8 @@ const manyColumnDef = (entityName: string, edge: Edge, expansionStore: MutableRe
                 }}
                 onClick={() => {
 
-                    const rowStatus = expansionStore.current.expansionState[row.id];
-                    const isExpanded = rowStatus?.isOpen ?? false;
-                    const shouldBeExpanded = isExpanded == false ? true : (rowStatus.params.entityName != entityName || rowStatus.params.edge.name != edge.name);
+					openRelation.current(entityName, edge, row.id);
 
-                    expansionStore.current.setParams({
-                        rowId: row.id,
-                        params: {
-                            entityName: entityName,
-                            entryId: row.id,
-                            edge: edge
-                        },
-                        openImmediately: shouldBeExpanded
-                    })
                 }}>
                 <Typography
                     color="text.primary"

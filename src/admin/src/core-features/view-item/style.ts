@@ -1,7 +1,6 @@
-import { styled } from "@mui/material";
+import { Box, styled } from "@mui/material";
 
-export const ArrowRoot = styled('div')(({
-
+export const ArrowRoot = styled('div')({
     position: 'absolute',
     top: '-9px',
     left: '50%',
@@ -11,5 +10,12 @@ export const ArrowRoot = styled('div')(({
     borderLeft: '10px solid transparent',
     borderRight: '10px solid transparent',
     borderBottom: '10px solid var(--mui-palette-background-paper)',
-}
-));
+});
+
+
+export const RoundPanelPlaceholder = styled(Box)({
+	//backgroundColor: 'var(--mui-palette-background-paper)',
+	// backgroundColor: '#373e4b',
+	borderRadius: '8px',
+	overflow: 'hidden',
+});

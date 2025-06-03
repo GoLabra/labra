@@ -279,14 +279,21 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	}
 
 	{{- range $e := $.Edges}}
+	{{- if $e.Unique }}
+	{{ $e.Name }}ToDelete := ent.{{ $e.Type.Name }}WhereUniqueInput{}
+	{{- end}}
     {{- if or (not $e.Optional) (or (not $e.Ref) ($e.Ref.Optional)) }}
-    {{- if $e.Optional }}
     if data.{{ Pascal $e.Name }} != nil {
         {{ template "recursive_operations_before_update" $e }}
     }
-    {{- else }}
-    {{ template "recursive_operations_before_update" $e }}
-    {{- end }}
+	{{- else if $e.Unique }}
+        if data.{{ Pascal $e.Name }} != nil && data.{{ Pascal $e.Name }}.Delete != nil && *data.{{ Pascal $e.Name }}.Delete {
+            itemToDelete, err := item.{{ Pascal $e.Name }}(ctx)
+            if err != nil {
+                return nil, err
+            }
+            {{ $e.Name }}ToDelete.ID = &itemToDelete.ID
+        }
     {{- end }}
     {{- end }}
 
@@ -297,15 +304,16 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 
 	{{- range $e := $.Edges}}
     {{- if and ($e.Optional) (and $e.Ref (not $e.Ref.Optional)) }}
-    {{- if $e.Optional }}
-    if data.{{ Pascal $e.Name }} != nil {
-        {{ template "recursive_operations_after_update" $e }}
-    }   
-    {{- else }}
     if data.{{ Pascal $e.Name }} != nil {
         {{ template "recursive_operations_after_update" $e }}
     }
-    {{- end }}
+	{{- else if $e.Unique }}
+	if data.{{ Pascal $e.Name }} != nil && data.{{ Pascal $e.Name }}.Delete != nil && *data.{{ Pascal $e.Name }}.Delete {
+		_, err := repository.{{ $e.Type.Name }}.DeleteTx(ctx, tx, {{ $e.Name }}ToDelete)
+		if err != nil {
+			return nil, err
+		}
+	}
     {{- end }}
     {{- end }}
 

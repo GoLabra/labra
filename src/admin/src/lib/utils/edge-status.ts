@@ -1,0 +1,1 @@
+export type EdgeStatus = 'saved' | 'connect' | 'create' | 'disconnect' | 'delete';

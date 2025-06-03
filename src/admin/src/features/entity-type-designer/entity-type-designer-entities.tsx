@@ -7,7 +7,7 @@ import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
 import PencilIcon from "@heroicons/react/24/outline/PencilIcon";
 import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
 import { EntityTypeNewEntityDialog } from "./entity-type-new-entity-dialog";
-import { DynamicDialog } from "../../core-features/dynamic-dialog/src/dynamic-dialog";
+import { DynamicDialog, FinishResult } from "../../core-features/dynamic-dialog/src/dynamic-dialog";
 import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog";
 import { Theme, styled } from '@mui/material/styles';
@@ -58,10 +58,7 @@ export default function EntityTypeBuilderEntities() {
 
     const skipId = useSkipLink({ id: 'entity-manager-entities', title: 'Go To Entities' });
 
-    const finish = useCallback(({ data, openMode }: {
-        data: ChangedNameCaptionEntity,
-        openMode?: FormOpenMode
-    }) => {
+    const finish = useCallback(({ data }: FinishResult<ChangedNameCaptionEntity>) => {
         addEntity(data);
         router.push(`/entity-type-designer/${data.name}`);
 
