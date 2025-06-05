@@ -87,7 +87,7 @@
     "react-social-icons": "^6.22.0",
     "save-as": "^0.1.8",
     "simplebar": "^6.2.5",
-    "simplebar-react": "^3.2.4",
+    "simplebar-react": "3.3.0",
     "yup": "^1.4.0",
     "zod": "^3.24.2"
   },
