@@ -10,7 +10,7 @@ import { RemoveButton, DownloadButton } from './action-buttons';
 
 interface FileThumbnailProps {
   sx?: any;
-  file: any;
+  file: string | File;
   tooltip?: boolean;
   onRemove?: () => void;
   imageView?: boolean;

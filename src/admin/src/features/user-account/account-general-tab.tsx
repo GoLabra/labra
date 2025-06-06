@@ -2,6 +2,7 @@ import { AuthContextType } from "@/core-features/auth/jwt-context";
 import { useAuth } from "@/core-features/auth/use-auth";
 import { AvatarUploadField } from "@/core-features/dynamic-form/form-fields/AvatarUploadField";
 import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/TextShortField";
+import { UploadOneFileField } from "@/core-features/dynamic-form/form-fields/UploadOneFileField";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
 import { UploadAvatar } from "@/shared/components/upload/upload-avatar";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,7 +82,8 @@ export const AccountGeneralTab = () => {
                                     <TextShortFormField name="name" label="Name" required disabled/>
                                     <TextShortFormField name="email" label="Email" required disabled/>
                                     <TextShortFormField name="firstName" label="First Name" required disabled/>
-                                    <TextShortFormField name="lastName" label="Last Name" required disabled/>
+                                    <TextShortFormField name="lastName" label="Last Name" required />
+									<UploadOneFileField name="avatar" label="Avatar" required/>
 
                                     <Stack direction="row" justifyContent="end">
                                         <Button
