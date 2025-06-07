@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Box, FilledInput, FormControl, FormControlLabel, FormHelperText, InputLabel, Link, Switch, SwitchProps } from '@mui/material';
 import { Control, FieldError, FieldErrorsImpl, Merge, UseFormRegister, get, useController, useFormContext } from 'react-hook-form';
 import { useLiteController } from '../lite-controller';
@@ -9,9 +8,9 @@ import { ReactNode, useId, useState } from 'react';
 import { UploadOneFile } from '@/shared/components/upload/upload-one-file';
 import { saveFile } from '@/lib/utils/save-file';
 import { useDropzone } from 'react-dropzone';
+import { UploadManyFiles } from '@/shared/components/upload/upload-many-files';
 
-
-interface UploadFileFieldProps {
+interface UploadManyFilesFieldProps {
 	name: string;
 	label: string;
 	placeholder?: string;
@@ -24,7 +23,7 @@ interface UploadFileFieldProps {
 	onBlur?: (event: any) => void;
 	color?: SwitchProps['color']
 }
-export function UploadOneFileComponent(props: UploadFileFieldProps) {
+export function UploadManyFilesComponent(props: UploadManyFilesFieldProps) {
 
 	const { name, label, placeholder, disabled, errors, value, onChange, onBlur } = props;
 
@@ -57,7 +56,7 @@ export function UploadOneFileComponent(props: UploadFileFieldProps) {
 
 			<FilledInput
 				fullWidth
-				inputComponent={UploadOneFile}
+				inputComponent={UploadManyFiles}
 				inputProps={{
 					dropzone
 				}}
@@ -71,32 +70,17 @@ export function UploadOneFileComponent(props: UploadFileFieldProps) {
 				}}
 				sx={{
 					overflow: 'inherit',
-					padding: 0,
-					width: 'fit-content',
+					padding: 0
 				}} />
 
 			{errors && (<FormHelperText>{errors}</FormHelperText>)}
 
-			{value && (
-				<>
-					<Link href="#" underline="always" fontSize="small" onClick={() => {
-						saveFile(props.name, value as any);
-					}}>
-						Dowload
-					</Link>
-
-					<Link href="#" underline="always" fontSize="small" onClick={() => {
-						onChange?.({ target: { name: props.name, value: null } } as any);
-					}}>
-						Remove
-					</Link>
-				</>)}
 		</FormControl>
 	</>)
 }
 
 
-interface FormFieldProps {
+interface UploadManyFilesFieldProps {
 	name: string;
 	placeholder?: string;
 	label: string;
@@ -104,7 +88,7 @@ interface FormFieldProps {
 	hide?: boolean;
 	required?: boolean;
 }
-export function UploadOneFileField(props: FormFieldProps) {
+export function UploadManyFilesField(props: UploadManyFilesFieldProps) {
 
 	useFormDynamicContext(props.name, { disabled: props.disabled });
 	const formContext = useFormContext();
@@ -117,7 +101,7 @@ export function UploadOneFileField(props: FormFieldProps) {
 
 	const errors = get(formContext.formState.errors, props.name);
 
-	return (<UploadOneFileComponent
+	return (<UploadManyFilesComponent
 		label={props.label}
 		placeholder={props.placeholder}
 		required={props.required}

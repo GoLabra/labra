@@ -2,6 +2,7 @@ import { AuthContextType } from "@/core-features/auth/jwt-context";
 import { useAuth } from "@/core-features/auth/use-auth";
 import { AvatarUploadField } from "@/core-features/dynamic-form/form-fields/AvatarUploadField";
 import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/TextShortField";
+import { UploadManyFilesField } from "@/core-features/dynamic-form/form-fields/UploadManyFilesField";
 import { UploadOneFileField } from "@/core-features/dynamic-form/form-fields/UploadOneFileField";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
 import { UploadAvatar } from "@/shared/components/upload/upload-avatar";
@@ -84,6 +85,7 @@ export const AccountGeneralTab = () => {
                                     <TextShortFormField name="firstName" label="First Name" required disabled/>
                                     <TextShortFormField name="lastName" label="Last Name" required />
 									<UploadOneFileField name="avatar" label="Avatar" required/>
+									<UploadManyFilesField name="avatar2" label="Avatar" required/>
 
                                     <Stack direction="row" justifyContent="end">
                                         <Button
