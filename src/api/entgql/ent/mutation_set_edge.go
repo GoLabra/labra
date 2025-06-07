@@ -3,11 +3,28 @@
 package ent
 
 import (
-	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
+	"fmt"
+
+	
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
-	"fmt"
+	"github.com/GoLabra/labra/src/api/entgql/ent/file"
+	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 )
+
+// SetEdge sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
+func (m *FileMutation) SetEdge(name, value string) error {
+	switch name {
+	case file.EdgeCreatedBy:
+		m.SetCreatedByID(value)
+		return nil
+	case file.EdgeUpdatedBy:
+		m.SetUpdatedByID(value)
+		return nil
+	}
+	return fmt.Errorf("unknown File edge %s", name)
+}
 
 // SetEdge sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema

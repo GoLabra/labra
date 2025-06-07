@@ -6,6 +6,29 @@ import (
 	"time"
 )
 
+type CreateManyFileInput struct {
+	Create  []*CreateFileInput      `json:"create,omitempty"`
+	Connect []*FileWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type CreateOneFileInput struct {
+	Create  *CreateFileInput      `json:"create,omitempty"`
+	Connect *FileWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyFileInput struct {
+	Create     []*CreateFileInput      `json:"create,omitempty"`
+	Connect    []*FileWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*FileWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*FileWhereUniqueInput `json:"delete,omitempty"`
+}
+
+type UpdateOneFileInput struct {
+	Create  *CreateFileInput      `json:"create,omitempty"`
+	Connect *FileWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                 `json:"unset,omitempty"`
+	Delete  *bool                 `json:"delete,omitempty"`
+}
 type CreateManyPermissionInput struct {
 	Create  []*CreatePermissionInput      `json:"create,omitempty"`
 	Connect []*PermissionWhereUniqueInput `json:"connect,omitempty"`
@@ -20,12 +43,14 @@ type UpdateManyPermissionInput struct {
 	Create     []*CreatePermissionInput      `json:"create,omitempty"`
 	Connect    []*PermissionWhereUniqueInput `json:"connect,omitempty"`
 	Disconnect []*PermissionWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*PermissionWhereUniqueInput `json:"delete,omitempty"`
 }
 
 type UpdateOnePermissionInput struct {
 	Create  *CreatePermissionInput      `json:"create,omitempty"`
 	Connect *PermissionWhereUniqueInput `json:"connect,omitempty"`
 	Unset   *bool                       `json:"unset,omitempty"`
+	Delete  *bool                       `json:"delete,omitempty"`
 }
 type CreateManyRoleInput struct {
 	Create  []*CreateRoleInput      `json:"create,omitempty"`
@@ -41,12 +66,14 @@ type UpdateManyRoleInput struct {
 	Create     []*CreateRoleInput      `json:"create,omitempty"`
 	Connect    []*RoleWhereUniqueInput `json:"connect,omitempty"`
 	Disconnect []*RoleWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*RoleWhereUniqueInput `json:"delete,omitempty"`
 }
 
 type UpdateOneRoleInput struct {
 	Create  *CreateRoleInput      `json:"create,omitempty"`
 	Connect *RoleWhereUniqueInput `json:"connect,omitempty"`
 	Unset   *bool                 `json:"unset,omitempty"`
+	Delete  *bool                 `json:"delete,omitempty"`
 }
 type CreateManyUserInput struct {
 	Create  []*CreateUserInput      `json:"create,omitempty"`
@@ -62,12 +89,124 @@ type UpdateManyUserInput struct {
 	Create     []*CreateUserInput      `json:"create,omitempty"`
 	Connect    []*UserWhereUniqueInput `json:"connect,omitempty"`
 	Disconnect []*UserWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*UserWhereUniqueInput `json:"delete,omitempty"`
 }
 
 type UpdateOneUserInput struct {
 	Create  *CreateUserInput      `json:"create,omitempty"`
 	Connect *UserWhereUniqueInput `json:"connect,omitempty"`
 	Unset   *bool                 `json:"unset,omitempty"`
+	Delete  *bool                 `json:"delete,omitempty"`
+}
+
+// CreateFileInput represents a mutation input for creating files.
+type CreateFileInput struct {
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+	Name      string
+	Content   string
+	/*
+	   CreatedBy  *CreateOneUserWithoutFileInput
+	   CreatedByID *string
+	   UpdatedBy  *CreateOneUserWithoutFileInput
+	   UpdatedByID *string*/
+	CreatedBy   *CreateOneUserInput
+	CreatedByID *string
+	UpdatedBy   *CreateOneUserInput
+	UpdatedByID *string
+}
+
+// Mutate applies the CreateFileInput on the FileMutation builder.
+func (i *CreateFileInput) Mutate(m *FileMutation) {
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	m.SetName(i.Name)
+	m.SetContent(i.Content)
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateFileInput on the FileCreate builder.
+func (c *FileCreate) SetInput(i CreateFileInput) *FileCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateFileInput represents a mutation input for updating files.
+type UpdateFileInput struct {
+	ClearCreatedAt bool
+	CreatedAt      *time.Time
+	ClearUpdatedAt bool
+	UpdatedAt      *time.Time
+	Name           *string
+	Content        *string
+	/*
+	   ClearCreatedBy bool
+	   CreatedBy  *CreateOneUserWithoutFileInput
+	   CreatedByID *string
+	   ClearUpdatedBy bool
+	   UpdatedBy  *CreateOneUserWithoutFileInput
+	   UpdatedByID *string*/
+	ClearCreatedBy bool
+	CreatedBy      *UpdateOneUserInput
+	CreatedByID    *string
+	ClearUpdatedBy bool
+	UpdatedBy      *UpdateOneUserInput
+	UpdatedByID    *string
+}
+
+// Mutate applies the UpdateFileInput on the FileMutation builder.
+func (i *UpdateFileInput) Mutate(m *FileMutation) {
+	if i.ClearCreatedAt {
+		m.ClearCreatedAt()
+	}
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if i.ClearUpdatedAt {
+		m.ClearUpdatedAt()
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Content; v != nil {
+		m.SetContent(*v)
+	}
+	if i.ClearCreatedBy {
+		m.ClearCreatedBy()
+	}
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if i.ClearUpdatedBy {
+		m.ClearUpdatedBy()
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateFileInput on the FileUpdate builder.
+func (c *FileUpdate) SetInput(i UpdateFileInput) *FileUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateFileInput on the FileUpdateOne builder.
+func (c *FileUpdateOne) SetInput(i UpdateFileInput) *FileUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
 }
 
 // CreatePermissionInput represents a mutation input for creating permissions.

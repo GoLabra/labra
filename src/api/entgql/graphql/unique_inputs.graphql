@@ -5,15 +5,23 @@ scalar DateOnly
 scalar TimeOnly
 
 scalar DateTime
+
 input PermissionWhereUniqueInput {
   id: ID
 }
+
 input RoleWhereUniqueInput {
   id: ID
   name: String
 }
+
 input UserWhereUniqueInput {
   id: ID
   email: String
+}
+
+input FileWhereUniqueInput {
+  id: ID
+  name: String
 }
 

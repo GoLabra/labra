@@ -16,6 +16,7 @@ type Service struct {
 	Permission svc.Permission
 	Role       svc.Role
 	User       svc.User
+	File       svc.File
 }
 
 func New(repository *repo.Repository, schemaManager generator.SchemaManager) *Service {
@@ -25,5 +26,6 @@ func New(repository *repo.Repository, schemaManager generator.SchemaManager) *Se
 		Role:       NewRole(repository),
 		User:       NewUser(repository),
 		Entity:     NewEntity(schemaManager),
+		File:       NewFile(repository),
 	}
 }

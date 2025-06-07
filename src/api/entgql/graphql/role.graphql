@@ -40,11 +40,13 @@ input CreateManyRoleInput {
 input UpdateOneRoleInput {
     create: CreateRoleInput
     connect: RoleWhereUniqueInput
+    delete: Boolean
     unset: Boolean
 }
 
 input UpdateManyRoleInput {
     create: [CreateRoleInput!]
     connect: [RoleWhereUniqueInput!]
+    delete: [RoleWhereUniqueInput!]
     disconnect: [RoleWhereUniqueInput!]
 }

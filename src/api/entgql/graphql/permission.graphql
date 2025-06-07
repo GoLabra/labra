@@ -38,11 +38,13 @@ input CreateManyPermissionInput {
 input UpdateOnePermissionInput {
     create: CreatePermissionInput
     connect: PermissionWhereUniqueInput
+    delete: Boolean
     unset: Boolean
 }
 
 input UpdateManyPermissionInput {
     create: [CreatePermissionInput!]
     connect: [PermissionWhereUniqueInput!]
+    delete: [PermissionWhereUniqueInput!]
     disconnect: [PermissionWhereUniqueInput!]
 }

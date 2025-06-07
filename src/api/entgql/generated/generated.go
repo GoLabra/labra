@@ -89,8 +89,31 @@ type ComplexityRoot struct {
 		Unique         func(childComplexity int) int
 	}
 
+	File struct {
+		Content   func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		UpdatedBy func(childComplexity int) int
+	}
+
+	FileConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	FileEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateEntity          func(childComplexity int, data entity.CreateEntityInput) int
+		CreateFile            func(childComplexity int, data ent.CreateFileInput) int
+		CreateManyFiles       func(childComplexity int, data []*ent.CreateFileInput) int
 		CreateManyPermissions func(childComplexity int, data []*ent.CreatePermissionInput) int
 		CreateManyRoles       func(childComplexity int, data []*ent.CreateRoleInput) int
 		CreateManyUsers       func(childComplexity int, data []*ent.CreateUserInput) int
@@ -98,6 +121,8 @@ type ComplexityRoot struct {
 		CreateRole            func(childComplexity int, data ent.CreateRoleInput) int
 		CreateUser            func(childComplexity int, data ent.CreateUserInput) int
 		DeleteEntity          func(childComplexity int, where entity.EntityWhereUniqueInput) int
+		DeleteFile            func(childComplexity int, where ent.FileWhereUniqueInput) int
+		DeleteManyFiles       func(childComplexity int, where ent.FileWhereInput) int
 		DeleteManyPermissions func(childComplexity int, where ent.PermissionWhereInput) int
 		DeleteManyRoles       func(childComplexity int, where ent.RoleWhereInput) int
 		DeleteManyUsers       func(childComplexity int, where ent.UserWhereInput) int
@@ -105,12 +130,16 @@ type ComplexityRoot struct {
 		DeleteRole            func(childComplexity int, where ent.RoleWhereUniqueInput) int
 		DeleteUser            func(childComplexity int, where ent.UserWhereUniqueInput) int
 		UpdateEntity          func(childComplexity int, where entity.EntityWhereUniqueInput, data entity.UpdateEntityInput) int
+		UpdateFile            func(childComplexity int, where ent.FileWhereUniqueInput, data ent.UpdateFileInput) int
+		UpdateManyFiles       func(childComplexity int, where ent.FileWhereInput, data ent.UpdateFileInput) int
 		UpdateManyPermissions func(childComplexity int, where ent.PermissionWhereInput, data ent.UpdatePermissionInput) int
 		UpdateManyRoles       func(childComplexity int, where ent.RoleWhereInput, data ent.UpdateRoleInput) int
 		UpdateManyUsers       func(childComplexity int, where ent.UserWhereInput, data ent.UpdateUserInput) int
 		UpdatePermission      func(childComplexity int, where ent.PermissionWhereUniqueInput, data ent.UpdatePermissionInput) int
 		UpdateRole            func(childComplexity int, where ent.RoleWhereUniqueInput, data ent.UpdateRoleInput) int
 		UpdateUser            func(childComplexity int, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) int
+		UpsertFile            func(childComplexity int, data ent.CreateFileInput) int
+		UpsertManyFiles       func(childComplexity int, data []*ent.CreateFileInput) int
 		UpsertManyPermissions func(childComplexity int, data []*ent.CreatePermissionInput) int
 		UpsertManyRoles       func(childComplexity int, data []*ent.CreateRoleInput) int
 		UpsertManyUsers       func(childComplexity int, data []*ent.CreateUserInput) int
@@ -152,6 +181,8 @@ type ComplexityRoot struct {
 		Entities              func(childComplexity int) int
 		Entity                func(childComplexity int, where *entity.EntityWhereUniqueInput) int
 		Fields                func(childComplexity int) int
+		Files                 func(childComplexity int, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) int
+		FilesConnection       func(childComplexity int, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) int
 		Node                  func(childComplexity int, id string) int
 		Nodes                 func(childComplexity int, ids []string) int
 		Permissions           func(childComplexity int, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) int
@@ -232,6 +263,14 @@ type MutationResolver interface {
 	CreateEntity(ctx context.Context, data entity.CreateEntityInput) (*entity.Entity, error)
 	UpdateEntity(ctx context.Context, where entity.EntityWhereUniqueInput, data entity.UpdateEntityInput) (*entity.Entity, error)
 	DeleteEntity(ctx context.Context, where entity.EntityWhereUniqueInput) (*entity.Entity, error)
+	CreateFile(ctx context.Context, data ent.CreateFileInput) (*ent.File, error)
+	CreateManyFiles(ctx context.Context, data []*ent.CreateFileInput) ([]*ent.File, error)
+	UpdateFile(ctx context.Context, where ent.FileWhereUniqueInput, data ent.UpdateFileInput) (*ent.File, error)
+	UpdateManyFiles(ctx context.Context, where ent.FileWhereInput, data ent.UpdateFileInput) (int, error)
+	UpsertFile(ctx context.Context, data ent.CreateFileInput) (*ent.File, error)
+	UpsertManyFiles(ctx context.Context, data []*ent.CreateFileInput) (int, error)
+	DeleteFile(ctx context.Context, where ent.FileWhereUniqueInput) (*ent.File, error)
+	DeleteManyFiles(ctx context.Context, where ent.FileWhereInput) (int, error)
 	CreatePermission(ctx context.Context, data ent.CreatePermissionInput) (*ent.Permission, error)
 	CreateManyPermissions(ctx context.Context, data []*ent.CreatePermissionInput) ([]*ent.Permission, error)
 	UpdatePermission(ctx context.Context, where ent.PermissionWhereUniqueInput, data ent.UpdatePermissionInput) (*ent.Permission, error)
@@ -263,6 +302,8 @@ type QueryResolver interface {
 	Entities(ctx context.Context) ([]*entity.Entity, error)
 	Entity(ctx context.Context, where *entity.EntityWhereUniqueInput) (*entity.Entity, error)
 	Fields(ctx context.Context) ([]*entity.Field, error)
+	Files(ctx context.Context, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) ([]*ent.File, error)
+	FilesConnection(ctx context.Context, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) (*ent.FileConnection, error)
 	Permissions(ctx context.Context, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) ([]*ent.Permission, error)
 	PermissionsConnection(ctx context.Context, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) (*ent.PermissionConnection, error)
 	Roles(ctx context.Context, where *ent.RoleWhereInput, orderBy *ent.RoleOrder, skip *int, first *int, last *int) ([]*ent.Role, error)
@@ -469,6 +510,90 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Field.Unique(childComplexity), true
 
+	case "File.content":
+		if e.complexity.File.Content == nil {
+			break
+		}
+
+		return e.complexity.File.Content(childComplexity), true
+
+	case "File.createdAt":
+		if e.complexity.File.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.File.CreatedAt(childComplexity), true
+
+	case "File.createdBy":
+		if e.complexity.File.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.File.CreatedBy(childComplexity), true
+
+	case "File.id":
+		if e.complexity.File.ID == nil {
+			break
+		}
+
+		return e.complexity.File.ID(childComplexity), true
+
+	case "File.name":
+		if e.complexity.File.Name == nil {
+			break
+		}
+
+		return e.complexity.File.Name(childComplexity), true
+
+	case "File.updatedAt":
+		if e.complexity.File.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.File.UpdatedAt(childComplexity), true
+
+	case "File.updatedBy":
+		if e.complexity.File.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.File.UpdatedBy(childComplexity), true
+
+	case "FileConnection.edges":
+		if e.complexity.FileConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.FileConnection.Edges(childComplexity), true
+
+	case "FileConnection.pageInfo":
+		if e.complexity.FileConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.FileConnection.PageInfo(childComplexity), true
+
+	case "FileConnection.totalCount":
+		if e.complexity.FileConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.FileConnection.TotalCount(childComplexity), true
+
+	case "FileEdge.cursor":
+		if e.complexity.FileEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.FileEdge.Cursor(childComplexity), true
+
+	case "FileEdge.node":
+		if e.complexity.FileEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.FileEdge.Node(childComplexity), true
+
 	case "Mutation.createEntity":
 		if e.complexity.Mutation.CreateEntity == nil {
 			break
@@ -480,6 +605,30 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateEntity(childComplexity, args["data"].(entity.CreateEntityInput)), true
+
+	case "Mutation.createFile":
+		if e.complexity.Mutation.CreateFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createFile_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateFile(childComplexity, args["data"].(ent.CreateFileInput)), true
+
+	case "Mutation.createManyFiles":
+		if e.complexity.Mutation.CreateManyFiles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createManyFiles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateManyFiles(childComplexity, args["data"].([]*ent.CreateFileInput)), true
 
 	case "Mutation.createManyPermissions":
 		if e.complexity.Mutation.CreateManyPermissions == nil {
@@ -565,6 +714,30 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteEntity(childComplexity, args["where"].(entity.EntityWhereUniqueInput)), true
 
+	case "Mutation.deleteFile":
+		if e.complexity.Mutation.DeleteFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteFile_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteFile(childComplexity, args["where"].(ent.FileWhereUniqueInput)), true
+
+	case "Mutation.deleteManyFiles":
+		if e.complexity.Mutation.DeleteManyFiles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteManyFiles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteManyFiles(childComplexity, args["where"].(ent.FileWhereInput)), true
+
 	case "Mutation.deleteManyPermissions":
 		if e.complexity.Mutation.DeleteManyPermissions == nil {
 			break
@@ -649,6 +822,30 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.UpdateEntity(childComplexity, args["where"].(entity.EntityWhereUniqueInput), args["data"].(entity.UpdateEntityInput)), true
 
+	case "Mutation.updateFile":
+		if e.complexity.Mutation.UpdateFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateFile_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateFile(childComplexity, args["where"].(ent.FileWhereUniqueInput), args["data"].(ent.UpdateFileInput)), true
+
+	case "Mutation.updateManyFiles":
+		if e.complexity.Mutation.UpdateManyFiles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateManyFiles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateManyFiles(childComplexity, args["where"].(ent.FileWhereInput), args["data"].(ent.UpdateFileInput)), true
+
 	case "Mutation.updateManyPermissions":
 		if e.complexity.Mutation.UpdateManyPermissions == nil {
 			break
@@ -720,6 +917,30 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["where"].(ent.UserWhereUniqueInput), args["data"].(ent.UpdateUserInput)), true
+
+	case "Mutation.upsertFile":
+		if e.complexity.Mutation.UpsertFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertFile_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertFile(childComplexity, args["data"].(ent.CreateFileInput)), true
+
+	case "Mutation.upsertManyFiles":
+		if e.complexity.Mutation.UpsertManyFiles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertManyFiles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertManyFiles(childComplexity, args["data"].([]*ent.CreateFileInput)), true
 
 	case "Mutation.upsertManyPermissions":
 		if e.complexity.Mutation.UpsertManyPermissions == nil {
@@ -937,6 +1158,30 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Fields(childComplexity), true
+
+	case "Query.files":
+		if e.complexity.Query.Files == nil {
+			break
+		}
+
+		args, err := ec.field_Query_files_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Files(childComplexity, args["where"].(*ent.FileWhereInput), args["orderBy"].(*ent.FileOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+
+	case "Query.filesConnection":
+		if e.complexity.Query.FilesConnection == nil {
+			break
+		}
+
+		args, err := ec.field_Query_filesConnection_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FilesConnection(childComplexity, args["where"].(*ent.FileWhereInput), args["orderBy"].(*ent.FileOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
 
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
@@ -1269,11 +1514,14 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateEdgeInput,
 		ec.unmarshalInputCreateEntityInput,
 		ec.unmarshalInputCreateFieldInput,
+		ec.unmarshalInputCreateFileInput,
 		ec.unmarshalInputCreateManyEdgesInput,
 		ec.unmarshalInputCreateManyFieldsInput,
+		ec.unmarshalInputCreateManyFileInput,
 		ec.unmarshalInputCreateManyPermissionInput,
 		ec.unmarshalInputCreateManyRoleInput,
 		ec.unmarshalInputCreateManyUserInput,
+		ec.unmarshalInputCreateOneFileInput,
 		ec.unmarshalInputCreateOnePermissionInput,
 		ec.unmarshalInputCreateOneRoleInput,
 		ec.unmarshalInputCreateOneUserInput,
@@ -1284,6 +1532,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputEntityConnectInput,
 		ec.unmarshalInputEntityWhereUniqueInput,
 		ec.unmarshalInputFieldWhereUniqueInput,
+		ec.unmarshalInputFileOrder,
+		ec.unmarshalInputFileWhereInput,
+		ec.unmarshalInputFileWhereUniqueInput,
 		ec.unmarshalInputPermissionOrder,
 		ec.unmarshalInputPermissionWhereInput,
 		ec.unmarshalInputPermissionWhereUniqueInput,
@@ -1293,13 +1544,16 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateEdgeInput,
 		ec.unmarshalInputUpdateEntityInput,
 		ec.unmarshalInputUpdateFieldInput,
+		ec.unmarshalInputUpdateFileInput,
 		ec.unmarshalInputUpdateManyEdgesInput,
 		ec.unmarshalInputUpdateManyFieldsInput,
+		ec.unmarshalInputUpdateManyFileInput,
 		ec.unmarshalInputUpdateManyPermissionInput,
 		ec.unmarshalInputUpdateManyRoleInput,
 		ec.unmarshalInputUpdateManyUserInput,
 		ec.unmarshalInputUpdateOneEdgeInput,
 		ec.unmarshalInputUpdateOneFieldInput,
+		ec.unmarshalInputUpdateOneFileInput,
 		ec.unmarshalInputUpdateOnePermissionInput,
 		ec.unmarshalInputUpdateOneRoleInput,
 		ec.unmarshalInputUpdateOneUserInput,
@@ -1597,6 +1851,54 @@ input UpdateEdgeInput {
     private: Boolean
 }
 `, BuiltIn: false},
+	{Name: "../graphql/file.graphql", Input: `extend type Query {
+    files(where: FileWhereInput, orderBy: FileOrder, skip: Int, first: Int, last: Int): [File!]
+    filesConnection(where: FileWhereInput, orderBy: FileOrder, skip: Int, first: Int, last: Int): FileConnection!
+}
+extend type Mutation {
+    createFile(data: CreateFileInput!): File!
+    createManyFiles(data: [CreateFileInput!]!): [File]!
+    updateFile(where: FileWhereUniqueInput!, data: UpdateFileInput!): File!
+    updateManyFiles(where: FileWhereInput!, data: UpdateFileInput!): Int!
+    upsertFile(data: CreateFileInput!): File!
+    upsertManyFiles(data: [CreateFileInput!]!): Int!
+    deleteFile(where: FileWhereUniqueInput!): File!
+    deleteManyFiles(where: FileWhereInput!): Int!
+}
+extend input CreateFileInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+}
+extend input UpdateFileInput {
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+}
+
+input CreateOneFileInput {
+    create: CreateFileInput
+    connect: FileWhereUniqueInput
+}
+
+input CreateManyFileInput {
+    create: [CreateFileInput!]
+    connect: [FileWhereUniqueInput!]
+}
+
+
+input UpdateOneFileInput {
+    create: CreateFileInput
+    connect: FileWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyFileInput {
+    create: [CreateFileInput!]
+    connect: [FileWhereUniqueInput!]
+    delete: [FileWhereUniqueInput!]
+    disconnect: [FileWhereUniqueInput!]
+}
+`, BuiltIn: false},
 	{Name: "../graphql/permission.graphql", Input: `extend type Query {
     permissions(where: PermissionWhereInput, orderBy: PermissionOrder, skip: Int, first: Int, last: Int): [Permission!]
     permissionsConnection(where: PermissionWhereInput, orderBy: PermissionOrder, skip: Int, first: Int, last: Int): PermissionConnection!
@@ -1637,12 +1939,14 @@ input CreateManyPermissionInput {
 input UpdateOnePermissionInput {
     create: CreatePermissionInput
     connect: PermissionWhereUniqueInput
+    delete: Boolean
     unset: Boolean
 }
 
 input UpdateManyPermissionInput {
     create: [CreatePermissionInput!]
     connect: [PermissionWhereUniqueInput!]
+    delete: [PermissionWhereUniqueInput!]
     disconnect: [PermissionWhereUniqueInput!]
 }
 `, BuiltIn: false},
@@ -1688,17 +1992,31 @@ input CreateManyRoleInput {
 input UpdateOneRoleInput {
     create: CreateRoleInput
     connect: RoleWhereUniqueInput
+    delete: Boolean
     unset: Boolean
 }
 
 input UpdateManyRoleInput {
     create: [CreateRoleInput!]
     connect: [RoleWhereUniqueInput!]
+    delete: [RoleWhereUniqueInput!]
     disconnect: [RoleWhereUniqueInput!]
 }
 `, BuiltIn: false},
 	{Name: "../graphql/schema.graphql", Input: `directive @goField(forceResolver: Boolean, name: String, omittable: Boolean) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 directive @goModel(model: String, models: [String!], forceGenerate: Boolean) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+"""
+CreateFileInput is used for create File object.
+Input was generated by ent.
+"""
+input CreateFileInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String!
+  content: String!
+  createdByID: ID
+  updatedByID: ID
+}
 """
 CreatePermissionInput is used for create Permission object.
 Input was generated by ent.
@@ -1739,6 +2057,158 @@ Define a Relay Cursor type:
 https://relay.dev/graphql/connections.htm#sec-Cursor
 """
 scalar Cursor
+type File implements Node {
+  id: ID!
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String!
+  content: String!
+  createdBy: User
+  updatedBy: User
+}
+"""
+A connection to a list of items.
+"""
+type FileConnection {
+  """
+  A list of edges.
+  """
+  edges: [FileEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type FileEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: File
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
+Ordering options for File connections
+"""
+input FileOrder {
+  """
+  The ordering direction.
+  """
+  direction: OrderDirection! = ASC
+  """
+  The field by which to order Files.
+  """
+  field: FileOrderField!
+}
+"""
+Properties by which File connections can be ordered.
+"""
+enum FileOrderField {
+  id
+  createdAt
+  updatedAt
+  name
+  content
+}
+"""
+FileWhereInput is used for filtering File objects.
+Input was generated by ent.
+"""
+input FileWhereInput {
+  not: FileWhereInput
+  and: [FileWhereInput!]
+  or: [FileWhereInput!]
+  """
+  id field predicates
+  """
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  idEqualFold: ID
+  idContainsFold: ID
+  """
+  created_at field predicates
+  """
+  createdAt: DateTime
+  createdAtNEQ: DateTime
+  createdAtIn: [DateTime!]
+  createdAtNotIn: [DateTime!]
+  createdAtGT: DateTime
+  createdAtGTE: DateTime
+  createdAtLT: DateTime
+  createdAtLTE: DateTime
+  createdAtIsNil: Boolean
+  createdAtNotNil: Boolean
+  """
+  updated_at field predicates
+  """
+  updatedAt: DateTime
+  updatedAtNEQ: DateTime
+  updatedAtIn: [DateTime!]
+  updatedAtNotIn: [DateTime!]
+  updatedAtGT: DateTime
+  updatedAtGTE: DateTime
+  updatedAtLT: DateTime
+  updatedAtLTE: DateTime
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """
+  name field predicates
+  """
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
+  """
+  content field predicates
+  """
+  content: String
+  contentNEQ: String
+  contentIn: [String!]
+  contentNotIn: [String!]
+  contentGT: String
+  contentGTE: String
+  contentLT: String
+  contentLTE: String
+  contentContains: String
+  contentHasPrefix: String
+  contentHasSuffix: String
+  contentEqualFold: String
+  contentContainsFold: String
+  """
+  created_by edge predicates
+  """
+  hasCreatedBy: Boolean
+  hasCreatedByWith: [UserWhereInput!]
+  """
+  updated_by edge predicates
+  """
+  hasUpdatedBy: Boolean
+  hasUpdatedByWith: [UserWhereInput!]
+}
 """
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
@@ -2111,6 +2581,22 @@ The builtin Time type
 """
 scalar Time
 """
+UpdateFileInput is used for update File object.
+Input was generated by ent.
+"""
+input UpdateFileInput {
+  createdAt: DateTime
+  clearCreatedAt: Boolean
+  updatedAt: DateTime
+  clearUpdatedAt: Boolean
+  name: String
+  content: String
+  createdByID: ID
+  clearCreatedBy: Boolean
+  updatedByID: ID
+  clearUpdatedBy: Boolean
+}
+"""
 UpdatePermissionInput is used for update Permission object.
 Input was generated by ent.
 """
@@ -2390,16 +2876,24 @@ scalar DateOnly
 scalar TimeOnly
 
 scalar DateTime
+
 input PermissionWhereUniqueInput {
   id: ID
 }
+
 input RoleWhereUniqueInput {
   id: ID
   name: String
 }
+
 input UserWhereUniqueInput {
   id: ID
   email: String
+}
+
+input FileWhereUniqueInput {
+  id: ID
+  name: String
 }
 
 `, BuiltIn: false},
@@ -2449,12 +2943,14 @@ input CreateManyUserInput {
 input UpdateOneUserInput {
     create: CreateUserInput
     connect: UserWhereUniqueInput
+    delete: Boolean
     unset: Boolean
 }
 
 input UpdateManyUserInput {
     create: [CreateUserInput!]
     connect: [UserWhereUniqueInput!]
+    delete: [UserWhereUniqueInput!]
     disconnect: [UserWhereUniqueInput!]
 }
 `, BuiltIn: false},
@@ -2490,6 +2986,62 @@ func (ec *executionContext) field_Mutation_createEntity_argsData(
 	}
 
 	var zeroVal entity.CreateEntityInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createFile_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createFile_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createFile_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.CreateFileInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal ent.CreateFileInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNCreateFileInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx, tmp)
+	}
+
+	var zeroVal ent.CreateFileInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createManyFiles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createManyFiles_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createManyFiles_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) ([]*ent.CreateFileInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal []*ent.CreateFileInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNCreateFileInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInputᚄ(ctx, tmp)
+	}
+
+	var zeroVal []*ent.CreateFileInput
 	return zeroVal, nil
 }
 
@@ -2686,6 +3238,62 @@ func (ec *executionContext) field_Mutation_deleteEntity_argsWhere(
 	}
 
 	var zeroVal entity.EntityWhereUniqueInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteFile_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteFile_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteFile_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.FileWhereUniqueInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal ent.FileWhereUniqueInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalNFileWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx, tmp)
+	}
+
+	var zeroVal ent.FileWhereUniqueInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteManyFiles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteManyFiles_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteManyFiles_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.FileWhereInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal ent.FileWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalNFileWhereInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx, tmp)
+	}
+
+	var zeroVal ent.FileWhereInput
 	return zeroVal, nil
 }
 
@@ -2905,6 +3513,108 @@ func (ec *executionContext) field_Mutation_updateEntity_argsData(
 	}
 
 	var zeroVal entity.UpdateEntityInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateFile_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateFile_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := ec.field_Mutation_updateFile_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateFile_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.FileWhereUniqueInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal ent.FileWhereUniqueInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalNFileWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx, tmp)
+	}
+
+	var zeroVal ent.FileWhereUniqueInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateFile_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.UpdateFileInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal ent.UpdateFileInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNUpdateFileInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUpdateFileInput(ctx, tmp)
+	}
+
+	var zeroVal ent.UpdateFileInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateManyFiles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateManyFiles_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := ec.field_Mutation_updateManyFiles_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateManyFiles_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.FileWhereInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal ent.FileWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalNFileWhereInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx, tmp)
+	}
+
+	var zeroVal ent.FileWhereInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateManyFiles_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.UpdateFileInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal ent.UpdateFileInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNUpdateFileInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUpdateFileInput(ctx, tmp)
+	}
+
+	var zeroVal ent.UpdateFileInput
 	return zeroVal, nil
 }
 
@@ -3214,6 +3924,62 @@ func (ec *executionContext) field_Mutation_updateUser_argsData(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_upsertFile_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_upsertFile_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_upsertFile_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.CreateFileInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal ent.CreateFileInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNCreateFileInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx, tmp)
+	}
+
+	var zeroVal ent.CreateFileInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_upsertManyFiles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_upsertManyFiles_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_upsertManyFiles_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) ([]*ent.CreateFileInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal []*ent.CreateFileInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNCreateFileInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInputᚄ(ctx, tmp)
+	}
+
+	var zeroVal []*ent.CreateFileInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_upsertManyPermissions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3435,6 +4201,246 @@ func (ec *executionContext) field_Query_entity_argsWhere(
 	}
 
 	var zeroVal *entity.EntityWhereUniqueInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_filesConnection_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_filesConnection_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := ec.field_Query_filesConnection_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := ec.field_Query_filesConnection_argsSkip(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := ec.field_Query_filesConnection_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := ec.field_Query_filesConnection_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Query_filesConnection_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.FileWhereInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal *ent.FileWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOFileWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.FileWhereInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_filesConnection_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.FileOrder, error) {
+	if _, ok := rawArgs["orderBy"]; !ok {
+		var zeroVal *ent.FileOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOFileOrder2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.FileOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_filesConnection_argsSkip(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["skip"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+	if tmp, ok := rawArgs["skip"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_filesConnection_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["first"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_filesConnection_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["last"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_files_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_files_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := ec.field_Query_files_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := ec.field_Query_files_argsSkip(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := ec.field_Query_files_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := ec.field_Query_files_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Query_files_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.FileWhereInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal *ent.FileWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOFileWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.FileWhereInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_files_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.FileOrder, error) {
+	if _, ok := rawArgs["orderBy"]; !ok {
+		var zeroVal *ent.FileOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOFileOrder2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.FileOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_files_argsSkip(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["skip"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("skip"))
+	if tmp, ok := rawArgs["skip"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_files_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["first"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_files_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["last"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
 	return zeroVal, nil
 }
 
@@ -5473,6 +6479,600 @@ func (ec *executionContext) fieldContext_Field_acceptedValues(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _File_id(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_name(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_content(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_content(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_createdBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_User_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_User_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_updatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_updatedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedBy(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_updatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_User_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_User_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.FileConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.FileEdge)
+	fc.Result = res
+	return ec.marshalOFileEdge2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_FileEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_FileEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type FileEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.FileConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[string])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.FileConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.FileEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.File)
+	fc.Result = res
+	return ec.marshalOFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_File_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_File_updatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.FileEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[string])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createEntity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createEntity(ctx, field)
 	if err != nil {
@@ -5686,6 +7286,526 @@ func (ec *executionContext) fieldContext_Mutation_deleteEntity(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteEntity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createFile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateFile(rctx, fc.Args["data"].(ent.CreateFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_File_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_File_updatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createFile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createManyFiles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createManyFiles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateManyFiles(rctx, fc.Args["data"].([]*ent.CreateFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createManyFiles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_File_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_File_updatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createManyFiles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateFile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateFile(rctx, fc.Args["where"].(ent.FileWhereUniqueInput), fc.Args["data"].(ent.UpdateFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_File_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_File_updatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateFile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateManyFiles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateManyFiles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateManyFiles(rctx, fc.Args["where"].(ent.FileWhereInput), fc.Args["data"].(ent.UpdateFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateManyFiles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateManyFiles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_upsertFile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpsertFile(rctx, fc.Args["data"].(ent.CreateFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_File_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_File_updatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertFile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertManyFiles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_upsertManyFiles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpsertManyFiles(rctx, fc.Args["data"].([]*ent.CreateFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertManyFiles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertManyFiles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteFile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteFile(rctx, fc.Args["where"].(ent.FileWhereUniqueInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.File)
+	fc.Result = res
+	return ec.marshalNFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_File_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_File_updatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteFile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteManyFiles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteManyFiles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteManyFiles(rctx, fc.Args["where"].(ent.FileWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteManyFiles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteManyFiles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8442,6 +10562,137 @@ func (ec *executionContext) fieldContext_Query_fields(_ context.Context, field g
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Field", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_files(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_files(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Files(rctx, fc.Args["where"].(*ent.FileWhereInput), fc.Args["orderBy"].(*ent.FileOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.File)
+	fc.Result = res
+	return ec.marshalOFile2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_files(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_File_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_File_updatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_files_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_filesConnection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_filesConnection(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FilesConnection(rctx, fc.Args["where"].(*ent.FileWhereInput), fc.Args["orderBy"].(*ent.FileOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.FileConnection)
+	fc.Result = res
+	return ec.marshalNFileConnection2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_filesConnection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_FileConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_FileConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_FileConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type FileConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_filesConnection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12788,6 +15039,82 @@ func (ec *executionContext) unmarshalInputCreateFieldInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateFileInput(ctx context.Context, obj any) (ent.CreateFileInput, error) {
+	var it ent.CreateFileInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "name", "content", "createdByID", "updatedByID", "createdBy", "updatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "createdByID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByID"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByID = data
+		case "updatedByID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByID"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByID = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateManyEdgesInput(ctx context.Context, obj any) (entity.CreateManyEdgesInput, error) {
 	var it entity.CreateManyEdgesInput
 	asMap := map[string]any{}
@@ -12836,6 +15163,40 @@ func (ec *executionContext) unmarshalInputCreateManyFieldsInput(ctx context.Cont
 				return it, err
 			}
 			it.Create = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateManyFileInput(ctx context.Context, obj any) (ent.CreateManyFileInput, error) {
+	var it ent.CreateManyFileInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateFileInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOFileWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
 		}
 	}
 
@@ -12934,6 +15295,40 @@ func (ec *executionContext) unmarshalInputCreateManyUserInput(ctx context.Contex
 		case "connect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
 			data, err := ec.unmarshalOUserWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUserWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateOneFileInput(ctx context.Context, obj any) (ent.CreateOneFileInput, error) {
+	var it ent.CreateOneFileInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateFileInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOFileWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13439,6 +15834,539 @@ func (ec *executionContext) unmarshalInputFieldWhereUniqueInput(ctx context.Cont
 				return it, err
 			}
 			it.Caption = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputFileOrder(ctx context.Context, obj any) (ent.FileOrder, error) {
+	var it ent.FileOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNFileOrderField2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputFileWhereInput(ctx context.Context, obj any) (ent.FileWhereInput, error) {
+	var it ent.FileWhereInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "content", "contentNEQ", "contentIn", "contentNotIn", "contentGT", "contentGTE", "contentLT", "contentLTE", "contentContains", "contentHasPrefix", "contentHasSuffix", "contentEqualFold", "contentContainsFold", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOFileWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOFileWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOFileWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "idNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNEQ = data
+		case "idIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDIn = data
+		case "idNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNotIn = data
+		case "idGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGT = data
+		case "idGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGTE = data
+		case "idLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLT = data
+		case "idLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLTE = data
+		case "idEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idEqualFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDEqualFold = data
+		case "idContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idContainsFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDContainsFold = data
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "createdAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNEQ = data
+		case "createdAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIn = data
+		case "createdAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotIn = data
+		case "createdAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGT = data
+		case "createdAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGTE = data
+		case "createdAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLT = data
+		case "createdAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLTE = data
+		case "createdAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIsNil = data
+		case "createdAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotNil = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "updatedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNEQ = data
+		case "updatedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIn = data
+		case "updatedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotIn = data
+		case "updatedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGT = data
+		case "updatedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGTE = data
+		case "updatedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLT = data
+		case "updatedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLTE = data
+		case "updatedAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIsNil = data
+		case "updatedAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotNil = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "nameNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNEQ = data
+		case "nameIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIn = data
+		case "nameNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotIn = data
+		case "nameGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGT = data
+		case "nameGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGTE = data
+		case "nameLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLT = data
+		case "nameLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLTE = data
+		case "nameContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContains = data
+		case "nameHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasPrefix = data
+		case "nameHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasSuffix = data
+		case "nameEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameEqualFold = data
+		case "nameContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContainsFold = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "contentNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentNEQ = data
+		case "contentIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentIn = data
+		case "contentNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentNotIn = data
+		case "contentGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentGT = data
+		case "contentGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentGTE = data
+		case "contentLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentLT = data
+		case "contentLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentLTE = data
+		case "contentContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentContains = data
+		case "contentHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentHasPrefix = data
+		case "contentHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentHasSuffix = data
+		case "contentEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentEqualFold = data
+		case "contentContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentContainsFold = data
+		case "hasCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedBy = data
+		case "hasCreatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedByWith = data
+		case "hasUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedBy = data
+		case "hasUpdatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedByWith = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputFileWhereUniqueInput(ctx context.Context, obj any) (ent.FileWhereUniqueInput, error) {
+	var it ent.FileWhereUniqueInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		}
 	}
 
@@ -14620,6 +17548,110 @@ func (ec *executionContext) unmarshalInputUpdateFieldInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateFileInput(ctx context.Context, obj any) (ent.UpdateFileInput, error) {
+	var it ent.UpdateFileInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "name", "content", "createdByID", "clearCreatedBy", "updatedByID", "clearUpdatedBy", "createdBy", "updatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "clearCreatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCreatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "clearUpdatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUpdatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "createdByID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByID"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByID = data
+		case "clearCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCreatedBy"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCreatedBy = data
+		case "updatedByID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByID"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByID = data
+		case "clearUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUpdatedBy = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateManyEdgesInput(ctx context.Context, obj any) (entity.UpdateManyEdgesInput, error) {
 	var it entity.UpdateManyEdgesInput
 	asMap := map[string]any{}
@@ -14702,6 +17734,54 @@ func (ec *executionContext) unmarshalInputUpdateManyFieldsInput(ctx context.Cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateManyFileInput(ctx context.Context, obj any) (ent.UpdateManyFileInput, error) {
+	var it ent.UpdateManyFileInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "disconnect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateFileInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOFileWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOFileWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
+		case "disconnect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
+			data, err := ec.unmarshalOFileWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Disconnect = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateManyPermissionInput(ctx context.Context, obj any) (ent.UpdateManyPermissionInput, error) {
 	var it ent.UpdateManyPermissionInput
 	asMap := map[string]any{}
@@ -14709,7 +17789,7 @@ func (ec *executionContext) unmarshalInputUpdateManyPermissionInput(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"create", "connect", "disconnect"}
+	fieldsInOrder := [...]string{"create", "connect", "delete", "disconnect"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14730,6 +17810,13 @@ func (ec *executionContext) unmarshalInputUpdateManyPermissionInput(ctx context.
 				return it, err
 			}
 			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOPermissionWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐPermissionWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
 		case "disconnect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
 			data, err := ec.unmarshalOPermissionWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐPermissionWhereUniqueInputᚄ(ctx, v)
@@ -14750,7 +17837,7 @@ func (ec *executionContext) unmarshalInputUpdateManyRoleInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"create", "connect", "disconnect"}
+	fieldsInOrder := [...]string{"create", "connect", "delete", "disconnect"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14771,6 +17858,13 @@ func (ec *executionContext) unmarshalInputUpdateManyRoleInput(ctx context.Contex
 				return it, err
 			}
 			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalORoleWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐRoleWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
 		case "disconnect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
 			data, err := ec.unmarshalORoleWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐRoleWhereUniqueInputᚄ(ctx, v)
@@ -14791,7 +17885,7 @@ func (ec *executionContext) unmarshalInputUpdateManyUserInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"create", "connect", "disconnect"}
+	fieldsInOrder := [...]string{"create", "connect", "delete", "disconnect"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14812,6 +17906,13 @@ func (ec *executionContext) unmarshalInputUpdateManyUserInput(ctx context.Contex
 				return it, err
 			}
 			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOUserWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUserWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
 		case "disconnect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
 			data, err := ec.unmarshalOUserWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUserWhereUniqueInputᚄ(ctx, v)
@@ -14893,6 +17994,54 @@ func (ec *executionContext) unmarshalInputUpdateOneFieldInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateOneFileInput(ctx context.Context, obj any) (ent.UpdateOneFileInput, error) {
+	var it ent.UpdateOneFileInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "unset"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateFileInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOFileWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
+		case "unset":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Unset = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateOnePermissionInput(ctx context.Context, obj any) (ent.UpdateOnePermissionInput, error) {
 	var it ent.UpdateOnePermissionInput
 	asMap := map[string]any{}
@@ -14900,7 +18049,7 @@ func (ec *executionContext) unmarshalInputUpdateOnePermissionInput(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"create", "connect", "unset"}
+	fieldsInOrder := [...]string{"create", "connect", "delete", "unset"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14921,6 +18070,13 @@ func (ec *executionContext) unmarshalInputUpdateOnePermissionInput(ctx context.C
 				return it, err
 			}
 			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
 		case "unset":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -14941,7 +18097,7 @@ func (ec *executionContext) unmarshalInputUpdateOneRoleInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"create", "connect", "unset"}
+	fieldsInOrder := [...]string{"create", "connect", "delete", "unset"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14962,6 +18118,13 @@ func (ec *executionContext) unmarshalInputUpdateOneRoleInput(ctx context.Context
 				return it, err
 			}
 			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
 		case "unset":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -14982,7 +18145,7 @@ func (ec *executionContext) unmarshalInputUpdateOneUserInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"create", "connect", "unset"}
+	fieldsInOrder := [...]string{"create", "connect", "delete", "unset"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15003,6 +18166,13 @@ func (ec *executionContext) unmarshalInputUpdateOneUserInput(ctx context.Context
 				return it, err
 			}
 			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
 		case "unset":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -16248,6 +19418,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Permission(ctx, sel, obj)
+	case *ent.File:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._File(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -16631,6 +19806,212 @@ func (ec *executionContext) _Field(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var fileImplementors = []string{"File", "Node"}
+
+func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj *ent.File) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, fileImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("File")
+		case "id":
+			out.Values[i] = ec._File_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._File_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._File_updatedAt(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._File_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "content":
+			out.Values[i] = ec._File_content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._File_createdBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "updatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._File_updatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var fileConnectionImplementors = []string{"FileConnection"}
+
+func (ec *executionContext) _FileConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.FileConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, fileConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FileConnection")
+		case "edges":
+			out.Values[i] = ec._FileConnection_edges(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._FileConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._FileConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var fileEdgeImplementors = []string{"FileEdge"}
+
+func (ec *executionContext) _FileEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.FileEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, fileEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FileEdge")
+		case "node":
+			out.Values[i] = ec._FileEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._FileEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -16667,6 +20048,62 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteEntity":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteEntity(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createFile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createFile(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createManyFiles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createManyFiles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateFile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateFile(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateManyFiles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateManyFiles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertFile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertFile(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertManyFiles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertManyFiles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteFile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteFile(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteManyFiles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteManyFiles(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -17257,6 +20694,47 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_fields(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "files":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_files(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "filesConnection":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_filesConnection(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -18376,6 +21854,31 @@ func (ec *executionContext) unmarshalNCreateFieldInput2ᚖgithubᚗcomᚋGoLabra
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCreateFileInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx context.Context, v any) (ent.CreateFileInput, error) {
+	res, err := ec.unmarshalInputCreateFileInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateFileInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInputᚄ(ctx context.Context, v any) ([]*ent.CreateFileInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateFileInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateFileInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateFileInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx context.Context, v any) (*ent.CreateFileInput, error) {
+	res, err := ec.unmarshalInputCreateFileInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreatePermissionInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreatePermissionInput(ctx context.Context, v any) (ent.CreatePermissionInput, error) {
 	res, err := ec.unmarshalInputCreatePermissionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -18552,6 +22055,108 @@ func (ec *executionContext) unmarshalNFieldWhereUniqueInput2githubᚗcomᚋGoLab
 
 func (ec *executionContext) unmarshalNFieldWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentityᚐFieldWhereUniqueInput(ctx context.Context, v any) (*entity.FieldWhereUniqueInput, error) {
 	res, err := ec.unmarshalInputFieldWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFile2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx context.Context, sel ast.SelectionSet, v ent.File) graphql.Marshaler {
+	return ec._File(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFile2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx context.Context, sel ast.SelectionSet, v []*ent.File) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx context.Context, sel ast.SelectionSet, v *ent.File) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._File(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNFileConnection2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileConnection(ctx context.Context, sel ast.SelectionSet, v ent.FileConnection) graphql.Marshaler {
+	return ec._FileConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFileConnection2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileConnection(ctx context.Context, sel ast.SelectionSet, v *ent.FileConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._FileConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFileOrderField2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileOrderField(ctx context.Context, v any) (*ent.FileOrderField, error) {
+	var res = new(ent.FileOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFileOrderField2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.FileOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalNFileWhereInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx context.Context, v any) (ent.FileWhereInput, error) {
+	res, err := ec.unmarshalInputFileWhereInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNFileWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx context.Context, v any) (*ent.FileWhereInput, error) {
+	res, err := ec.unmarshalInputFileWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNFileWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx context.Context, v any) (ent.FileWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputFileWhereUniqueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNFileWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx context.Context, v any) (*ent.FileWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputFileWhereUniqueInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -18927,6 +22532,11 @@ func (ec *executionContext) unmarshalNUpdateEntityInput2githubᚗcomᚋGoLabra�
 
 func (ec *executionContext) unmarshalNUpdateFieldInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentityᚐUpdateFieldInput(ctx context.Context, v any) (entity.UpdateFieldInput, error) {
 	res, err := ec.unmarshalInputUpdateFieldInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateFileInput2githubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUpdateFileInput(ctx context.Context, v any) (ent.UpdateFileInput, error) {
+	res, err := ec.unmarshalInputUpdateFileInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -19376,6 +22986,32 @@ func (ec *executionContext) unmarshalOCreateFieldInput2ᚕᚖgithubᚗcomᚋGoLa
 	return res, nil
 }
 
+func (ec *executionContext) unmarshalOCreateFileInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInputᚄ(ctx context.Context, v any) ([]*ent.CreateFileInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateFileInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateFileInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCreateFileInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐCreateFileInput(ctx context.Context, v any) (*ent.CreateFileInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateFileInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOCreateManyEdgesInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentityᚐCreateManyEdgesInput(ctx context.Context, v any) (*entity.CreateManyEdgesInput, error) {
 	if v == nil {
 		return nil, nil
@@ -19777,6 +23413,168 @@ func (ec *executionContext) unmarshalOFieldWhereUniqueInput2ᚖgithubᚗcomᚋGo
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputFieldWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFile2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.File) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOFile2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFile(ctx context.Context, sel ast.SelectionSet, v *ent.File) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._File(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOFileEdge2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.FileEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOFileEdge2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOFileEdge2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileEdge(ctx context.Context, sel ast.SelectionSet, v *ent.FileEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._FileEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFileOrder2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileOrder(ctx context.Context, v any) (*ent.FileOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFileOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOFileWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInputᚄ(ctx context.Context, v any) ([]*ent.FileWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.FileWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNFileWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOFileWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereInput(ctx context.Context, v any) (*ent.FileWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFileWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOFileWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInputᚄ(ctx context.Context, v any) ([]*ent.FileWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.FileWhereUniqueInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNFileWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOFileWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐFileWhereUniqueInput(ctx context.Context, v any) (*ent.FileWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFileWhereUniqueInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

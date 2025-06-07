@@ -16,6 +16,7 @@ import (
 
 var (
 	ErrRepositoryNotSetInContext = "repository is not set in context"
+	RepositoryContextValue       = "repository"
 )
 
 type Txer interface {
@@ -29,6 +30,7 @@ type Repository struct {
 	Permission repo.Permission
 	Role       repo.Role
 	User       repo.User
+	File       repo.File
 }
 
 func New(client *ent.Client) *Repository {
@@ -38,6 +40,7 @@ func New(client *ent.Client) *Repository {
 		Permission: NewPermission(client),
 		Role:       NewRole(client),
 		User:       NewUser(client),
+		File:       NewFile(client),
 	}
 }
 

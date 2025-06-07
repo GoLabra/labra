@@ -3,7 +3,7 @@ extend type Query {
     {{$.Node.Name | Plural | LowerFirstLetter}}Connection(where: {{$.Node.Name}}WhereInput, orderBy: {{$.Node.Name}}Order, skip: Int, first: Int, last: Int): {{$.Node.Name}}Connection!
 }
 
-{{- if eq $.Node.Annotations.Owner "User" }}
+{{- if not (ShouldSkip $.Node "mutation_create_input") }}
 extend type Mutation {
     create{{$.Node.Name}}(data: Create{{$.Node.Name}}Input!): {{$.Node.Name}}!
     createMany{{$.Node.Name | Plural}}(data: [Create{{$.Node.Name}}Input!]!): [{{$.Node.Name}}]!
@@ -32,14 +32,14 @@ extend input Update{{$.Node.Name}}Input {
 {{- end }}
 
 input CreateOne{{$.Node.Name}}Input {
-    {{- if eq $.Node.Annotations.Owner "User" }}
+    {{- if not (ShouldSkip $.Node "mutation_create_input") }}
     create: Create{{$.Node.Name}}Input
     {{- end }}
     connect: {{$.Node.Name}}WhereUniqueInput
 }
 
 input CreateMany{{$.Node.Name}}Input {
-    {{- if eq $.Node.Annotations.Owner "User" }}
+    {{- if not (ShouldSkip $.Node "mutation_create_input") }}
     create: [Create{{$.Node.Name}}Input!]
     {{- end }}
     connect: [{{$.Node.Name}}WhereUniqueInput!]
@@ -47,7 +47,7 @@ input CreateMany{{$.Node.Name}}Input {
 
 
 input UpdateOne{{$.Node.Name}}Input {
-    {{- if eq $.Node.Annotations.Owner "User" }}
+    {{- if not (ShouldSkip $.Node "mutation_create_input") }}
     create: Create{{$.Node.Name}}Input
     {{- end }}
     connect: {{$.Node.Name}}WhereUniqueInput
@@ -56,7 +56,7 @@ input UpdateOne{{$.Node.Name}}Input {
 }
 
 input UpdateMany{{$.Node.Name}}Input {
-    {{- if eq $.Node.Annotations.Owner "User" }}
+    {{- if not (ShouldSkip $.Node "mutation_create_input") }}
     create: [Create{{$.Node.Name}}Input!]
     {{- end }}
     connect: [{{$.Node.Name}}WhereUniqueInput!]

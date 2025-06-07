@@ -11,7 +11,7 @@
         data.{{ Pascal $.Name }}ID =  {{ if $isPointer }}&{{ end }}toConnect.ID
     }
     
-    {{- if eq $.Type.Annotations.Entity.Owner "User" }}
+    {{- if not (ShouldSkip $.Type "mutation_create_input") }}
     if data.{{ Pascal $.Name }}.Create != nil {
         var createInput ent.Create{{ $.Type.Name }}Input
         err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
@@ -40,7 +40,7 @@
             data.{{ Singular (Pascal $.Name) }}IDs = append(data.{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
         }
     }
-    {{- if eq $.Type.Annotations.Entity.Owner "User" }}
+    {{- if not (ShouldSkip $.Type "mutation_create_input") }}
     if data.{{ Pascal $.Name }}.Create != nil {
         for _, create := range data.{{ Pascal $.Name }}.Create {
             var createInput ent.Create{{ $.Type.Name }}Input

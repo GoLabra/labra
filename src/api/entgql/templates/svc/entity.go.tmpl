@@ -35,7 +35,7 @@ func (s *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	return s.repository.{{$.Name}}.GetOneTx(ctx, tx, where)
 }
 
-{{- if eq $.Annotations.Entity.Owner "User" }}
+{{- if not (ShouldSkip $ "mutation_create_input") }}
 func (s *{{$.Name}}) CreateTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	createdInput, err := s.repository.{{$.Name}}.CreateTx(ctx, tx, data)
 	if err != nil {

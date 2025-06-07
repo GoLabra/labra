@@ -20,6 +20,7 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/GoLabra/labra/src/api/entgql/templates"
 	"github.com/GoLabra/labra/src/api/strcase"
+	"github.com/GoLabra/labra/src/api/utils"
 	pluralize "github.com/gertd/go-pluralize"
 	"github.com/mitchellh/mapstructure"
 )
@@ -32,38 +33,21 @@ func init() {
 	pluralizeClient := pluralize.NewClient()
 	templateFuncMap = entgql.TemplateFuncs
 	templateFuncMap["ToUpper"] = strings.Title
-	templateFuncMap["LowerFirstLetter"] = func(val string) string {
-		return strings.ToLower(val[:1]) + val[1:]
-	}
+	templateFuncMap["LowerFirstLetter"] = strcase.LowerFirstLetter
 	templateFuncMap["ToLower"] = strings.ToLower
 	templateFuncMap["Singular"] = pluralizeClient.Singular
 	templateFuncMap["Plural"] = pluralizeClient.Plural
 	templateFuncMap["Camel"] = strcase.ToLowerCamel
 	templateFuncMap["Pascal"] = strcase.ToPascal
-	templateFuncMap["ToTitle"] = func(val string) string {
-		return strings.ToTitle(val[:1]) + val[1:]
-	}
+	templateFuncMap["ToTitle"] = strcase.ToTitle
 	templateFuncMap["CreateInputs"] = CreateInputs
-	templateFuncMap["CustomFieldName"] = func(val string) string {
-		val = strings.TrimSuffix(val, "_id")
-		val = strings.TrimSuffix(val, "_ids")
-		return val
-	}
-
-	templateFuncMap["InputEdges"] = func(m *entgql.MutationDescriptor) []*gen.Edge {
-		inputEdges := make([]*gen.Edge, 0, len(m.Type.Edges))
-		for _, e := range m.Type.Edges {
-			if e.Type.IsEdgeSchema() || e.Immutable || e.Annotations["Skip"] == entgql.SkipMutationUpdateInput {
-				continue
-			}
-			inputEdges = append(inputEdges, e)
-		}
-		return inputEdges
-	}
+	templateFuncMap["CustomFieldName"] = utils.CustomFieldName
+	templateFuncMap["InputEdges"] = utils.InputEdges
 	templateFuncMap["GetExtendedTypes"] = getExtendedTypes
 	templateFuncMap["GraphqlInputName"] = GraphqlInputName
 	templateFuncMap["GoInputName"] = GoInputName
 	templateFuncMap["EntMutationFieldName"] = entMutationFieldName
+	templateFuncMap["ShouldSkip"] = utils.ShouldSkip
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
 	os.MkdirAll("./domain/resolvers", os.ModePerm)
@@ -515,17 +499,12 @@ func CreateServiceInterface() gen.Hook {
 					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
 				}
 
-				data := GraphqlSchemaTemplateData{
-					Name:  node.Name,
-					Owner: entityAnnotation.Owner,
-				}
-
 				f, err := os.Create("./interfaces/svc/" + fileName)
 				if err != nil {
 					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
 				}
 
-				err = tmpl.Execute(f, data)
+				err = tmpl.Execute(f, node)
 				if err != nil {
 					f.Close()
 					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
@@ -567,17 +546,12 @@ func CreateRepositoryInterface() gen.Hook {
 					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
 				}
 
-				data := GraphqlSchemaTemplateData{
-					Name:  node.Name,
-					Owner: entityAnnotation.Owner,
-				}
-
 				f, err := os.Create("./interfaces/repo/" + fileName)
 				if err != nil {
 					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
 				}
 
-				err = tmpl.Execute(f, data)
+				err = tmpl.Execute(f, node)
 				if err != nil {
 					f.Close()
 					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))

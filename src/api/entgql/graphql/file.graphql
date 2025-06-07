@@ -1,0 +1,47 @@
+extend type Query {
+    files(where: FileWhereInput, orderBy: FileOrder, skip: Int, first: Int, last: Int): [File!]
+    filesConnection(where: FileWhereInput, orderBy: FileOrder, skip: Int, first: Int, last: Int): FileConnection!
+}
+extend type Mutation {
+    createFile(data: CreateFileInput!): File!
+    createManyFiles(data: [CreateFileInput!]!): [File]!
+    updateFile(where: FileWhereUniqueInput!, data: UpdateFileInput!): File!
+    updateManyFiles(where: FileWhereInput!, data: UpdateFileInput!): Int!
+    upsertFile(data: CreateFileInput!): File!
+    upsertManyFiles(data: [CreateFileInput!]!): Int!
+    deleteFile(where: FileWhereUniqueInput!): File!
+    deleteManyFiles(where: FileWhereInput!): Int!
+}
+extend input CreateFileInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+}
+extend input UpdateFileInput {
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+}
+
+input CreateOneFileInput {
+    create: CreateFileInput
+    connect: FileWhereUniqueInput
+}
+
+input CreateManyFileInput {
+    create: [CreateFileInput!]
+    connect: [FileWhereUniqueInput!]
+}
+
+
+input UpdateOneFileInput {
+    create: CreateFileInput
+    connect: FileWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyFileInput {
+    create: [CreateFileInput!]
+    connect: [FileWhereUniqueInput!]
+    delete: [FileWhereUniqueInput!]
+    disconnect: [FileWhereUniqueInput!]
+}

@@ -12,7 +12,7 @@
 			data.Clear{{ Pascal $.Name }} = true
 		}
         {{- end }}
-        {{- if eq $.Type.Annotations.Entity.Owner "User" }}
+        {{- if not (ShouldSkip $.Type "mutation_create_input") }}
         if data.{{ Pascal $.Name }}.Create != nil {
             var createInput ent.Create{{ $.Type.Name }}Input
             err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
@@ -63,7 +63,7 @@
 				data.Remove{{ Singular (Pascal $.Name) }}IDs = append(data.Remove{{ Singular (Pascal $.Name) }}IDs, toDisconnect.ID)
 			}
 		}
-        {{- if eq $.Type.Annotations.Entity.Owner "User" }}
+        {{- if not (ShouldSkip $.Type "mutation_create_input") }}
         if data.{{ Pascal $.Name }}.Create != nil {
             for _, create := range data.{{ Pascal $.Name }}.Create {
                 var createInput ent.Create{{ $.Type.Name }}Input

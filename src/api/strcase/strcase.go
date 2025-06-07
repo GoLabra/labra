@@ -43,6 +43,14 @@ func ToPascal(s string) string {
 	return pascalWords(words)
 }
 
+func ToTitle(val string) string {
+	return strings.ToTitle(val[:1]) + val[1:]
+}
+
+func LowerFirstLetter(val string) string {
+	return strings.ToLower(val[:1]) + val[1:]
+}
+
 func pascalWords(words []string) string {
 	for i, w := range words {
 		upper := strings.ToUpper(w)

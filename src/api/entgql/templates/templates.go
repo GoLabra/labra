@@ -39,7 +39,7 @@ func Load(templateFuncMap template.FuncMap) (store, error) {
 		return templateStore, err
 	}
 
-	templateStore.MutationSetEdge, err = loadT("mutation_set_edge.go.tmpl", "entgql/mutation_set_edge.go.tmpl", templateFuncMap)
+	templateStore.MutationSetEdge, err = loadT("mutation_set_edge", "entgql/mutation_set_edge.go.tmpl", templateFuncMap)
 	if err != nil {
 		log.Fatalf("cannot parse mutation add edges template: %v", err)
 		return templateStore, err

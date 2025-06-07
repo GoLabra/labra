@@ -11,6 +11,14 @@ import (
 
 // AddEdges sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema
+func (m *FileMutation) AddEdges(name string, values []string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown File edge %s", name)
+}
+
+// AddEdges sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
 func (m *PermissionMutation) AddEdges(name string, values []string) error {
 	switch name {
 	}

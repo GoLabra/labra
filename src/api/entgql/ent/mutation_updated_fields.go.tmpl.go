@@ -3,6 +3,30 @@
 package ent
 
 // UpdatedFields returns all fields and edges that were changed during this mutation.
+func (m *FileMutation) UpdatedFields() map[string]Value {
+	var updatedFields = make(map[string]Value)
+	if m.created_at != nil {
+		updatedFields["created_at"] = m.created_at
+	}
+	if m.updated_at != nil {
+		updatedFields["updated_at"] = m.updated_at
+	}
+	if m.name != nil {
+		updatedFields["name"] = m.name
+	}
+	if m.content != nil {
+		updatedFields["content"] = m.content
+	}
+	if m.created_by != nil {
+		updatedFields["created_by"] = m.created_by
+	}
+	if m.updated_by != nil {
+		updatedFields["updated_by"] = m.updated_by
+	}
+	return updatedFields
+}
+
+// UpdatedFields returns all fields and edges that were changed during this mutation.
 func (m *PermissionMutation) UpdatedFields() map[string]Value {
 	var updatedFields = make(map[string]Value)
 	if m.created_at != nil {

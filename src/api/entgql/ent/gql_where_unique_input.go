@@ -3,11 +3,57 @@ package ent
 import (
 	"errors"
 
+	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
+
+var ErrEmptyFileWhereUniqueInput = errors.New("empty predicate FileWhereUniqueInput")
+
+// RoleWhereInput represents a where input for filtering Role queries.
+type FileWhereUniqueInput struct {
+	Predicates []predicate.File `json:"-"`
+
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
+func (i *FileWhereUniqueInput) AddPredicates(predicates ...predicate.File) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+func (i *FileWhereUniqueInput) Filter(q *FileQuery) (*FileQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+func (i *FileWhereUniqueInput) P() (predicate.File, error) {
+	var predicates []predicate.File
+
+	if i.ID != nil {
+		predicates = append(predicates, file.IDEQ(*i.ID))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, file.NameEQ(*i.Name))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyFileWhereUniqueInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return file.And(predicates...), nil
+	}
+}
 
 var ErrEmptyPermissionWhereUniqueInput = errors.New("empty predicate PermissionWhereUniqueInput")
 

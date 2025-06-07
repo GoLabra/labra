@@ -28,21 +28,21 @@ type {{ $inputName }} struct {
 
 {{- range $n := $.Nodes }}
     type CreateMany{{ $n.Name }}Input struct {
-        {{- if eq $n.Annotations.Entity.Owner "User" }}
-        Create  *Create{{ $n.Name }}Input        `json:"create,omitempty"`
+        {{- if not (ShouldSkip $n "mutation_create_input") }}
+        Create  []*Create{{ $n.Name }}Input        `json:"create,omitempty"`
         {{- end }}
         Connect []*{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
     }
 
     type CreateOne{{ $n.Name }}Input struct {
-        {{- if eq $n.Annotations.Entity.Owner "User" }}
+        {{- if not (ShouldSkip $n "mutation_create_input") }}
         Create  *Create{{ $n.Name }}Input `json:"create,omitempty"`
         {{- end }}
         Connect *{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
     }
     
     type UpdateMany{{ $n.Name }}Input struct {
-        {{- if eq $n.Annotations.Entity.Owner "User" }}
+        {{- if not (ShouldSkip $n "mutation_create_input") }}
         Create  []*Create{{ $n.Name }}Input         `json:"create,omitempty"`
         {{- end }}
         Connect []*{{ $n.Name }}WhereUniqueInput    `json:"connect,omitempty"`
@@ -51,7 +51,7 @@ type {{ $inputName }} struct {
     }
 
     type UpdateOne{{ $n.Name }}Input struct {
-        {{- if eq $n.Annotations.Entity.Owner "User" }}
+        {{- if not (ShouldSkip $n "mutation_create_input") }}
         Create  *Create{{ $n.Name }}Input `json:"create,omitempty"`
         {{- end }}
         Connect *{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`

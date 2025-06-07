@@ -136,7 +136,7 @@ func (r *Role) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 }
 
 func (r *Role) Create(ctx context.Context, data ent.CreateRoleInput) (*ent.Role, error) {
-	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
@@ -165,7 +165,7 @@ func (r *Role) Create(ctx context.Context, data ent.CreateRoleInput) (*ent.Role,
 
 func (r *Role) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateRoleInput) (*ent.Role, error) {
 	var err error
-	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -320,7 +320,7 @@ func (r *Role) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateRo
 }
 
 func (r *Role) Update(ctx context.Context, where ent.RoleWhereUniqueInput, data ent.UpdateRoleInput) (*ent.Role, error) {
-	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -348,7 +348,7 @@ func (r *Role) Update(ctx context.Context, where ent.RoleWhereUniqueInput, data 
 
 func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniqueInput, data ent.UpdateRoleInput) (*ent.Role, error) {
 
-	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -362,6 +362,7 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 	if err != nil {
 		return nil, fmt.Errorf("error getting item to update: %v", err)
 	}
+	created_byToDelete := ent.UserWhereUniqueInput{}
 	if data.CreatedBy != nil {
 
 		if data.CreatedBy.Connect != nil {
@@ -391,7 +392,15 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 
 			data.CreatedByID = &toConnect.ID
 		}
+		if data.CreatedBy.Delete != nil && *data.CreatedBy.Delete {
+			itemToDelete, err := item.CreatedBy(ctx)
+			if err != nil {
+				return nil, err
+			}
+			created_byToDelete.ID = &itemToDelete.ID
+		}
 	}
+	updated_byToDelete := ent.UserWhereUniqueInput{}
 	if data.UpdatedBy != nil {
 
 		if data.UpdatedBy.Connect != nil {
@@ -420,6 +429,13 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 			}
 
 			data.UpdatedByID = &toConnect.ID
+		}
+		if data.UpdatedBy.Delete != nil && *data.UpdatedBy.Delete {
+			itemToDelete, err := item.UpdatedBy(ctx)
+			if err != nil {
+				return nil, err
+			}
+			updated_byToDelete.ID = &itemToDelete.ID
 		}
 	}
 	if data.UserRoles != nil {
@@ -461,6 +477,15 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 				}
 
 				data.AddUserRoleIDs = append(data.AddUserRoleIDs, toConnect.ID)
+			}
+		}
+		if data.UserRoles.Delete != nil {
+			for _, delete := range data.UserRoles.Delete {
+				_, err := repository.User.DeleteTx(ctx, tx, *delete)
+
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 	}
@@ -505,11 +530,32 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 				data.AddPermissionIDs = append(data.AddPermissionIDs, toConnect.ID)
 			}
 		}
+		if data.Permissions.Delete != nil {
+			for _, delete := range data.Permissions.Delete {
+				_, err := repository.Permission.DeleteTx(ctx, tx, *delete)
+
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 	}
 
 	updatedInput, err := tx.Role.UpdateOne(item).SetInput(data).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error updating item: %v", err)
+	}
+	if data.CreatedBy != nil && data.CreatedBy.Delete != nil && *data.CreatedBy.Delete {
+		_, err := repository.User.DeleteTx(ctx, tx, created_byToDelete)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if data.UpdatedBy != nil && data.UpdatedBy.Delete != nil && *data.UpdatedBy.Delete {
+		_, err := repository.User.DeleteTx(ctx, tx, updated_byToDelete)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return updatedInput, nil

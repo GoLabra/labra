@@ -2,13 +2,13 @@ package repo
 
 import (
 	"context"
-	{{- if eq $.Annotations.Entity.Owner "User" }}
+	{{- if not (ShouldSkip $ "mutation_create_input") }}
 	"errors"
 	{{- end }}
 	"fmt"
 	"app/ent"
 	
-	{{- if eq $.Annotations.Entity.Owner "User" }}
+	{{- if not (ShouldSkip $ "mutation_create_input") }}
 	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/mitchellh/mapstructure"
 	{{- end }}
@@ -139,7 +139,7 @@ func (r *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	return query.First(ctx)
 }
 
-{{- if eq $.Annotations.Entity.Owner "User" }}
+{{- if not (ShouldSkip $ "mutation_create_input") }}
 func (r *{{$.Name}}) Create(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 
@@ -233,7 +233,9 @@ func (r *{{$.Name}}) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
 	}
 	return createdItems, nil
 }
+{{- end }}
 
+{{- if not (ShouldSkip $ "mutation_update_input") }}
 func (r *{{$.Name}}) Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 	if !ok {
@@ -279,7 +281,7 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	}
 
 	{{- range $e := $.Edges}}
-	{{- if $e.Unique }}
+	{{- if and $e.Unique (not (ShouldSkip $e.Type "mutation_create_input")) }} 
 	{{ $e.Name }}ToDelete := ent.{{ $e.Type.Name }}WhereUniqueInput{}
 	{{- end}}
     {{- if or (not $e.Optional) (or (not $e.Ref) ($e.Ref.Optional)) }}
@@ -307,7 +309,7 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
     if data.{{ Pascal $e.Name }} != nil {
         {{ template "recursive_operations_after_update" $e }}
     }
-	{{- else if $e.Unique }}
+	{{- else if and $e.Unique (not (ShouldSkip $e.Type "mutation_create_input")) }} 
 	if data.{{ Pascal $e.Name }} != nil && data.{{ Pascal $e.Name }}.Delete != nil && *data.{{ Pascal $e.Name }}.Delete {
 		_, err := repository.{{ $e.Type.Name }}.DeleteTx(ctx, tx, {{ $e.Name }}ToDelete)
 		if err != nil {
