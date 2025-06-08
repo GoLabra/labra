@@ -5,111 +5,112 @@ import Tooltip from '@mui/material/Tooltip';
 import { fileThumbnailClasses } from './classes';
 import { fileData, fileThumb, fileFormat } from './utils';
 import { RemoveButton, DownloadButton } from './action-buttons';
+import { SxProps, Theme } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 interface FileThumbnailProps {
-  sx?: any;
-  file: string | File;
-  tooltip?: boolean;
-  onRemove?: () => void;
-  imageView?: boolean;
-  slotProps?: {
-    img?: any;
-    icon?: any;
-    removeBtn?: any;
-    downloadBtn?: any;
-  };
-  onDownload?: () => void;
+	sx?: SxProps<Theme>;
+	file: string | File;
+	tooltip?: boolean;
+	onRemove?: () => void;
+	imageView?: boolean;
+	slotProps?: {
+		img?: any;
+		icon?: any;
+		removeBtn?: any;
+		downloadBtn?: any;
+	};
+	onDownload?: () => void;
 }
 export function FileThumbnail({
-  sx,
-  file,
-  tooltip,
-  onRemove,
-  imageView,
-  slotProps,
-  onDownload,
-  ...other
+	sx,
+	file,
+	tooltip,
+	onRemove,
+	imageView,
+	slotProps,
+	onDownload,
+	...other
 }: FileThumbnailProps) {
-  const previewUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
+	const previewUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
 
-  const { name, path } = fileData(file);
+	const { name, path } = fileData(file);
 
-  const format = fileFormat(path || previewUrl);
+	const format = fileFormat(path || previewUrl);
 
-  const renderImg = (
-    <Box
-      component="img"
-      src={previewUrl}
-      className={fileThumbnailClasses.img}
-      sx={{
-        width: 1,
-        height: 1,
-        objectFit: 'cover',
-        borderRadius: 'inherit',
-        ...slotProps?.img,
-      }}
-    />
-  );
+	const renderImg = (
+		<Box
+			component="img"
+			src={previewUrl}
+			className={fileThumbnailClasses.img}
+			sx={{
+				width: 1,
+				height: 1,
+				objectFit: 'cover',
+				borderRadius: 'inherit',
+				...slotProps?.img,
+			}}
+		/>
+	);
 
-  const renderIcon = (
-    <Box
-      component="img"
-      src={fileThumb(format)}
-      className={fileThumbnailClasses.icon}
-      sx={{ width: 1, height: 1, ...slotProps?.icon }}
-    />
-  );
+	const renderIcon = (
+		<Box
+			component="img"
+			src={fileThumb(format)}
+			className={fileThumbnailClasses.icon}
+			sx={{ width: 1, height: 1, ...slotProps?.icon }}
+		/>
+	);
 
-  const renderContent = (
-    <Stack
-      component="span"
-      className={fileThumbnailClasses.root}
-      sx={{
-        width: 36,
-        height: 36,
-        flexShrink: 0,
-        borderRadius: 1.25,
-        alignItems: 'center',
-        position: 'relative',
-        display: 'inline-flex',
-        justifyContent: 'center',
-        ...sx,
-      }}
-      {...other}
-    >
-      {format === 'image' && imageView ? renderImg : renderIcon}
+	const renderContent = (
+		<Stack
+			component="span"
+			className={fileThumbnailClasses.root}
+			sx={{
+				width: 36,
+				height: 36,
+				flexShrink: 0,
+				borderRadius: 1.25,
+				alignItems: 'center',
+				position: 'relative',
+				display: 'inline-flex',
+				justifyContent: 'center',
+				...sx,
+			}}
+			{...other}
+		>
+			{format === 'image' && imageView ? renderImg : renderIcon}
 
-      {onRemove && (
-        <RemoveButton
-          onClick={onRemove}
-          className={fileThumbnailClasses.removeBtn}
-          sx={slotProps?.removeBtn}
-        />
-      )}
+			{onRemove && (
+				<RemoveButton
+					onClick={onRemove}
+					className={fileThumbnailClasses.removeBtn}
+					sx={slotProps?.removeBtn}
+				/>
+			)}
 
-      {onDownload && (
-        <DownloadButton
-          onClick={onDownload}
-          className={fileThumbnailClasses.downloadBtn}
-          sx={slotProps?.downloadBtn}
-        />
-      )}
-    </Stack>
-  );
+			{onDownload && (
+				<DownloadButton
+					onClick={onDownload}
+					className={fileThumbnailClasses.downloadBtn}
+					sx={slotProps?.downloadBtn}
+				/>
+			)}
+		</Stack>
+	);
 
-  if (tooltip) {
-    return (
-      <Tooltip
-        arrow
-        title={name}
-        slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, -12] } }] } }}
-      >
-        {renderContent}
-      </Tooltip>
-    );
-  }
+	if (tooltip) {
+		return (
+			<Tooltip
+				arrow
+				title={name}
+				slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, -12] } }] } }}
+			>
+				{renderContent}
+			</Tooltip>
+		);
+	}
 
-  return renderContent;
+	return renderContent;
 }

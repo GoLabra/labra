@@ -12,17 +12,16 @@ export const FileDrop = (props: PropsWithChildren<FileDropProps>) => {
 	const { dropzone } = props;
 	const hasError = dropzone.isDragReject;
 
+	const { onClick, ...other} = dropzone.getRootProps();
+
 	return (
 		<Box
-			{...dropzone.getRootProps()}
+			{...other}
 			sx={{
 				outline: 'none !important',
-				padding: 0.5,
-				width: 'fit-content',
-				height: 124,
-
-				cursor: 'pointer',
-				...(dropzone.isDragActive && { opacity: 0.72 }),
+				// width: 'fit-content',
+				// cursor: 'pointer',
+				...(dropzone.isDragActive && { opacity: 0.60 }),
 				...(props.disabled && { opacity: 0.48, pointerEvents: 'none' }),
 				...(hasError && { borderColor: 'error.main' }),
 				// ...(hasFile && {

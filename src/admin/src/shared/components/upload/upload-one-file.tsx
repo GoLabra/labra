@@ -6,6 +6,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { FileDrop } from './components/file-drop';
 import { OneFilePreview } from './components/one-file-preview';
 
+
 export const UploadOneFile = memo((props: InputBaseComponentProps) => {
 
 	const { dropzone } = props;
@@ -53,7 +54,7 @@ export const UploadOneFile = memo((props: InputBaseComponentProps) => {
 				}}
 			>
 				<CameraAltIcon />
-				<Typography variant="caption">{hasFile ? 'Change file' : 'Drop or select file'}</Typography>
+				<Typography variant="caption">{hasFile ? 'Change file' : 'Upload file'}</Typography>
 			</Box>
 		</>
 	);

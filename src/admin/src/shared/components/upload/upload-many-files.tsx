@@ -39,10 +39,9 @@ export const UploadManyFiles = memo((props: InputBaseComponentProps) => {
 					// bgcolor: 'color-mix(in srgb, var(--mui-palette-grey-500), transparent 80%)',
 					transition: (theme) =>
 						theme.transitions.create(['opacity'], { duration: theme.transitions.duration.shorter }),
-					'&:hover': { opacity: 0.72 },
+					'&:hover': { opacity: 0.72 }
 				}}
 			>
-
 
 
 				<Stack spacing={1} sx={{ textAlign: 'center' }}>
@@ -58,8 +57,6 @@ export const UploadManyFiles = memo((props: InputBaseComponentProps) => {
 						through your machine.
 					</Box>
 				</Stack>
-
-
 
 			</Box>
 		</>

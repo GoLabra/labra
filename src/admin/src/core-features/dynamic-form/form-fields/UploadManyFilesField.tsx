@@ -1,16 +1,20 @@
 "use client";
 
-import { Box, FilledInput, FormControl, FormControlLabel, FormHelperText, InputLabel, Link, Switch, SwitchProps } from '@mui/material';
+import { Box, FilledInput, FormControl, FormControlLabel, FormHelperText, InputLabel, Link, Stack, Switch, SwitchProps, Typography } from '@mui/material';
 import { Control, FieldError, FieldErrorsImpl, Merge, UseFormRegister, get, useController, useFormContext } from 'react-hook-form';
 import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
-import { ReactNode, useId, useState } from 'react';
+import { ReactNode, useCallback, useId, useState } from 'react';
 import { UploadOneFile } from '@/shared/components/upload/upload-one-file';
 import { saveFile } from '@/lib/utils/save-file';
 import { useDropzone } from 'react-dropzone';
 import { UploadManyFiles } from '@/shared/components/upload/upload-many-files';
+import { ManyFilesPreview } from '@/shared/components/upload/components/many-files-preview';
+import { FileDrop } from '@/shared/components/upload/components/file-drop';
+import { BrowseButton } from '@/shared/components/upload/components/browse-button';
+import AttachFileIcon from '@mui/icons-material/AttachFile'; 
 
-interface UploadManyFilesFieldProps {
+interface UploadManyFilesComponentProps {
 	name: string;
 	label: string;
 	placeholder?: string;
@@ -18,33 +22,47 @@ interface UploadManyFilesFieldProps {
 	required?: boolean;
 	errors?: ReactNode;
 
-	value: any;
+	value: any[];
 	onChange?: (event: any) => void;
 	onBlur?: (event: any) => void;
-	color?: SwitchProps['color']
+	color?: SwitchProps['color'];
+	maxFiles?: number;
 }
-export function UploadManyFilesComponent(props: UploadManyFilesFieldProps) {
+export function UploadManyFilesComponent(props: UploadManyFilesComponentProps) {
 
 	const { name, label, placeholder, disabled, errors, value, onChange, onBlur } = props;
 
 	const dropzone = useDropzone({
-		multiple: false,
+		multiple: true,
+		maxFiles: props.maxFiles,
 		disabled: props.disabled,
 		accept: { '*/*': [] },
 		onDrop: (acceptedFiles, fileRejections, event) => {
 			if (!acceptedFiles.length) {
 				return;
 			}
-			props.onChange?.({ target: { name: props.name, value: acceptedFiles[0] } } as any);
+			props.onChange?.({ target: { name: props.name, value: [...value, ...acceptedFiles] } } as any); 
 		}
 	});
 
 	const [focused, setFocused] = useState(false);
 	const id = useId();
 
+	const onRemove = useCallback((file: File | string) => {
+
+		const oldFile = value.find(i => i === file);
+		if (oldFile < 0) {
+			return;
+		}
+
+		props.onChange?.({ target: { name: props.name, value: value.filter(i => i != file)  } } as any); 
+	}, [value, props.onChange]);
+
+	const isFull = props.maxFiles != undefined && value?.length >= props.maxFiles;
+
 	return (<>
 
-		<FormControl
+		{/* <FormControl
 			fullWidth
 			variant="filled"
 			focused={focused}
@@ -75,7 +93,33 @@ export function UploadManyFilesComponent(props: UploadManyFilesFieldProps) {
 
 			{errors && (<FormHelperText>{errors}</FormHelperText>)}
 
-		</FormControl>
+			
+		</FormControl> */}
+
+		<InputLabel htmlFor={id} id={`${id}-name`}>{label}</InputLabel>
+
+		<FileDrop dropzone={dropzone}>
+			<ManyFilesPreview
+				onRemove={onRemove} 
+				firstNode={ isFull == false ? <BrowseButton dropzone={dropzone}>  
+					<Box sx={{
+						display: 'flex',
+						borderRadius: 1,
+						alignItems: 'center',
+						color: 'text.disabled',
+						flexDirection: 'column',
+						justifyContent: 'center',
+						textAlign: 'center',
+					}}>
+						<AttachFileIcon />
+						<Typography variant="caption">Attach File</Typography>  
+					</Box>
+				</BrowseButton> : undefined }
+
+				files={value}
+				 />
+		</FileDrop>
+		
 	</>)
 }
 
@@ -87,6 +131,8 @@ interface UploadManyFilesFieldProps {
 	disabled?: boolean;
 	hide?: boolean;
 	required?: boolean;
+
+	maxFiles?: number;
 }
 export function UploadManyFilesField(props: UploadManyFilesFieldProps) {
 
@@ -106,6 +152,7 @@ export function UploadManyFilesField(props: UploadManyFilesFieldProps) {
 		placeholder={props.placeholder}
 		required={props.required}
 		errors={errors?.message as string}
+		maxFiles={props.maxFiles}
 		{...formControllerHandler}
 	/>)
 }

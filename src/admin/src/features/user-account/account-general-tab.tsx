@@ -85,7 +85,7 @@ export const AccountGeneralTab = () => {
                                     <TextShortFormField name="firstName" label="First Name" required disabled/>
                                     <TextShortFormField name="lastName" label="Last Name" required />
 									<UploadOneFileField name="avatar" label="Avatar" required/>
-									<UploadManyFilesField name="avatar2" label="Avatar" required/>
+									<UploadManyFilesField name="avatar2" label="Avatar" required />
 
                                     <Stack direction="row" justifyContent="end">
                                         <Button
