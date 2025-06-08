@@ -5,16 +5,11 @@ import { Control, FieldError, FieldErrorsImpl, Merge, UseFormRegister, get, useC
 import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { ReactNode, useCallback, useId, useState } from 'react';
-import { UploadOneFile } from '@/shared/components/upload/upload-one-file';
-import { saveFile } from '@/lib/utils/save-file';
 import { useDropzone } from 'react-dropzone';
-import { UploadManyFiles } from '@/shared/components/upload/upload-many-files';
-import { ManyFilesPreview } from '@/shared/components/upload/components/many-files-preview';
-import { FileDrop } from '@/shared/components/upload/components/file-drop';
-import { BrowseButton } from '@/shared/components/upload/components/browse-button';
-import AttachFileIcon from '@mui/icons-material/AttachFile'; 
+import { UploadFiles } from '@/shared/components/upload/upload';
 
-interface UploadManyFilesComponentProps {
+
+interface UploadFilesComponentProps {
 	name: string;
 	label: string;
 	placeholder?: string;
@@ -28,7 +23,7 @@ interface UploadManyFilesComponentProps {
 	color?: SwitchProps['color'];
 	maxFiles?: number;
 }
-export function UploadManyFilesComponent(props: UploadManyFilesComponentProps) {
+export function UploadFilesComponent(props: UploadFilesComponentProps) {
 
 	const { name, label, placeholder, disabled, errors, value, onChange, onBlur } = props;
 
@@ -41,7 +36,7 @@ export function UploadManyFilesComponent(props: UploadManyFilesComponentProps) {
 			if (!acceptedFiles.length) {
 				return;
 			}
-			props.onChange?.({ target: { name: props.name, value: [...value, ...acceptedFiles] } } as any); 
+			props.onChange?.({ target: { name: props.name, value: [...value ?? [], ...acceptedFiles] } } as any); 
 		}
 	});
 
@@ -58,7 +53,7 @@ export function UploadManyFilesComponent(props: UploadManyFilesComponentProps) {
 		props.onChange?.({ target: { name: props.name, value: value.filter(i => i != file)  } } as any); 
 	}, [value, props.onChange]);
 
-	const isFull = props.maxFiles != undefined && value?.length >= props.maxFiles;
+	// const isFull = props.maxFiles != undefined && value?.length >= props.maxFiles;
 
 	return (<>
 
@@ -74,7 +69,7 @@ export function UploadManyFilesComponent(props: UploadManyFilesComponentProps) {
 
 			<FilledInput
 				fullWidth
-				inputComponent={UploadManyFiles}
+				inputComponent={UploadFiles}
 				inputProps={{
 					dropzone
 				}}
@@ -98,33 +93,13 @@ export function UploadManyFilesComponent(props: UploadManyFilesComponentProps) {
 
 		<InputLabel htmlFor={id} id={`${id}-name`}>{label}</InputLabel>
 
-		<FileDrop dropzone={dropzone}>
-			<ManyFilesPreview
-				onRemove={onRemove} 
-				firstNode={ isFull == false ? <BrowseButton dropzone={dropzone}>  
-					<Box sx={{
-						display: 'flex',
-						borderRadius: 1,
-						alignItems: 'center',
-						color: 'text.disabled',
-						flexDirection: 'column',
-						justifyContent: 'center',
-						textAlign: 'center',
-					}}>
-						<AttachFileIcon />
-						<Typography variant="caption">Attach File</Typography>  
-					</Box>
-				</BrowseButton> : undefined }
-
-				files={value}
-				 />
-		</FileDrop>
+		<UploadFiles dropzone={dropzone} value={value} onRemove={onRemove} maxFiles={props.maxFiles} />
 		
 	</>)
 }
 
 
-interface UploadManyFilesFieldProps {
+interface UploadFilesFieldProps {
 	name: string;
 	placeholder?: string;
 	label: string;
@@ -134,7 +109,7 @@ interface UploadManyFilesFieldProps {
 
 	maxFiles?: number;
 }
-export function UploadManyFilesField(props: UploadManyFilesFieldProps) {
+export function UploadFilesField(props: UploadFilesFieldProps) {
 
 	useFormDynamicContext(props.name, { disabled: props.disabled });
 	const formContext = useFormContext();
@@ -147,7 +122,7 @@ export function UploadManyFilesField(props: UploadManyFilesFieldProps) {
 
 	const errors = get(formContext.formState.errors, props.name);
 
-	return (<UploadManyFilesComponent
+	return (<UploadFilesComponent
 		label={props.label}
 		placeholder={props.placeholder}
 		required={props.required}

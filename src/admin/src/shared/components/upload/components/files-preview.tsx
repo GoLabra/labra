@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
-interface MultiFilePreviewProps {
+interface FilePreviewProps {
 	sx?: SxProps<Theme>;
 	onRemove?: (file: File | string) => void;
 	lastNode?: React.ReactNode;
@@ -20,7 +20,7 @@ interface MultiFilePreviewProps {
 	firstNode?: React.ReactNode;
 	files?: any[];
 }
-export function ManyFilesPreview(props: MultiFilePreviewProps) {
+export function FilesPreview(props: FilePreviewProps) {
 
 	const viewMode = props.viewMode ?? 'grid';
 
@@ -91,11 +91,11 @@ export function ManyFilesPreview(props: MultiFilePreviewProps) {
 							padding: '1px'
 						}}>
 
-							<Box sx={{position: 'absolute', top: 0, right: 0, zIndex: 1, padding: '1px'}} onClick={() => props.onRemove?.(file)}>
+							{props.onRemove && (<Box sx={{position: 'absolute', top: 0, right: 0, zIndex: 1, padding: '1px'}} onClick={() => props.onRemove?.(file)}>
 								<IconButton aria-label="delete" size="small">
 									<HighlightOffIcon fontSize="inherit" />
 								</IconButton>
-							</Box>
+							</Box>)}
 
 							<FileThumbnail
 								tooltip
