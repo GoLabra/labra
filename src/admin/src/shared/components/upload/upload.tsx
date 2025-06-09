@@ -9,10 +9,11 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 interface UploadFilesProps {
 	dropzone: DropzoneState;
 	value: File[] | string[];
+	viewMode?: 'list' | 'grid';
 	maxFiles?: number;
 	onRemove?: (file: File | string) => void;
 }
-export const UploadFiles = memo((props: UploadFilesProps) => {
+export const UploadFiles = (props: UploadFilesProps) => {
 
 	const { dropzone } = props;
 
@@ -21,6 +22,7 @@ export const UploadFiles = memo((props: UploadFilesProps) => {
 	return (
 		<FileDrop dropzone={dropzone}>
 			<FilesPreview
+				viewMode={props.viewMode}
 				onRemove={props.onRemove}
 				firstNode={isFull == false ? <BrowseButton dropzone={dropzone}>
 					<Box sx={{
@@ -41,4 +43,4 @@ export const UploadFiles = memo((props: UploadFilesProps) => {
 			/>
 		</FileDrop>
 	);
-});
+};

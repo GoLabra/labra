@@ -28,6 +28,7 @@ export function FilesPreview(props: FilePreviewProps) {
 		<Box
 			component="li"
 			sx={{
+				listStyleType: 'none',
 				...(viewMode === 'grid' && {
 					width: 100,
 					height: 100,
@@ -43,6 +44,7 @@ export function FilesPreview(props: FilePreviewProps) {
 		<Box
 			component="li"
 			sx={{
+				listStyleType: 'none',
 				...(viewMode === 'grid' && {
 					width: 100,
 					height: 100,
@@ -148,7 +150,7 @@ export function FilesPreview(props: FilePreviewProps) {
 
 						{props.onRemove && (
 							<IconButton size="small" onClick={() => props.onRemove?.(file)}>
-								{/* <Iconify icon="mingcute:close-line" width={16} /> */}
+								<HighlightOffIcon fontSize="inherit" />
 							</IconButton>
 						)}
 					</Stack>

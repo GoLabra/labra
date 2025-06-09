@@ -1,13 +1,15 @@
 "use client";
 
-import { Box, FilledInput, FormControl, FormControlLabel, FormHelperText, InputLabel, Link, Stack, Switch, SwitchProps, Typography } from '@mui/material';
+import { Box, FilledInput, FormControl, FormControlLabel, FormHelperText, InputLabel, Link, Stack, Switch, SwitchProps, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { Control, FieldError, FieldErrorsImpl, Merge, UseFormRegister, get, useController, useFormContext } from 'react-hook-form';
 import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { ReactNode, useCallback, useId, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadFiles } from '@/shared/components/upload/upload';
-
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 
 interface UploadFilesComponentProps {
 	name: string;
@@ -36,11 +38,13 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 			if (!acceptedFiles.length) {
 				return;
 			}
-			props.onChange?.({ target: { name: props.name, value: [...value ?? [], ...acceptedFiles] } } as any); 
+			props.onChange?.({ target: { name: props.name, value: [...value ?? [], ...acceptedFiles] } } as any);
 		}
 	});
 
 	const [focused, setFocused] = useState(false);
+	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
 	const id = useId();
 
 	const onRemove = useCallback((file: File | string) => {
@@ -50,8 +54,12 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 			return;
 		}
 
-		props.onChange?.({ target: { name: props.name, value: value.filter(i => i != file)  } } as any); 
+		props.onChange?.({ target: { name: props.name, value: value.filter(i => i != file) } } as any);
 	}, [value, props.onChange]);
+
+	const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: 'grid' | 'list') => {
+		setViewMode(nextView);
+	};
 
 	// const isFull = props.maxFiles != undefined && value?.length >= props.maxFiles;
 
@@ -91,10 +99,27 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 			
 		</FormControl> */}
 
-		<InputLabel htmlFor={id} id={`${id}-name`}>{label}</InputLabel>
+		<InputLabel htmlFor={id} id={`${id}-name`}>
+			<Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+				{label}
+				
+				<ToggleButtonGroup
+					value={viewMode}
+					exclusive
+					onChange={handleChange}
+				>
+					<ToggleButton value="list" aria-label="list" size="small" sx={{ padding: 0.5 }}>
+						<ViewListIcon />
+					</ToggleButton>
+					<ToggleButton value="grid" aria-label="grid" size="small" sx={{ padding: 0.5 }}>
+						<ViewModuleIcon />
+					</ToggleButton>
+				</ToggleButtonGroup>
+			</Stack>
+		</InputLabel>
 
-		<UploadFiles dropzone={dropzone} value={value} onRemove={onRemove} maxFiles={props.maxFiles} />
-		
+		<UploadFiles dropzone={dropzone} value={value} onRemove={onRemove} maxFiles={props.maxFiles} viewMode={viewMode} />
+
 	</>)
 }
 
