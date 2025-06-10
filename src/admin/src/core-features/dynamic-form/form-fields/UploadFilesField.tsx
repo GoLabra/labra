@@ -65,7 +65,7 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 
 	return (<>
 
-		{/* <FormControl
+		<FormControl
 			fullWidth
 			variant="filled"
 			focused={focused}
@@ -73,52 +73,32 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 			onBlur={() => setFocused(false)}
 			error={!!errors}>
 
-			<InputLabel htmlFor={id} id={`${id}-label`}>{label}</InputLabel>
+			<InputLabel htmlFor={id} id={`${id}-name`} shrink={true}>
+				<Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+					{label}
 
-			<FilledInput
-				fullWidth
-				inputComponent={UploadFiles}
-				inputProps={{
-					dropzone
-				}}
-				placeholder={placeholder}
-				disabled={disabled}
-				id={id}
-				name={name}
-				value={value ?? ''}
-				onChange={(e) => {
-					onChange?.(e)
-				}}
-				sx={{
-					overflow: 'inherit',
-					padding: 0
-				}} />
+					<ToggleButtonGroup
+						value={viewMode}
+						exclusive
+						onChange={handleChange}
+					>
+						<ToggleButton value="list" aria-label="list" size="small" sx={{ padding: 0.5 }}>
+							<ViewListIcon />
+						</ToggleButton>
+						<ToggleButton value="grid" aria-label="grid" size="small" sx={{ padding: 0.5 }}>
+							<ViewModuleIcon />
+						</ToggleButton>
+					</ToggleButtonGroup>
+				</Stack>
+			</InputLabel>
+
+			<UploadFiles dropzone={dropzone} value={value} onRemove={onRemove} maxFiles={props.maxFiles} viewMode={viewMode} />
 
 			{errors && (<FormHelperText>{errors}</FormHelperText>)}
 
-			
-		</FormControl> */}
 
-		<InputLabel htmlFor={id} id={`${id}-name`}>
-			<Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-				{label}
-				
-				<ToggleButtonGroup
-					value={viewMode}
-					exclusive
-					onChange={handleChange}
-				>
-					<ToggleButton value="list" aria-label="list" size="small" sx={{ padding: 0.5 }}>
-						<ViewListIcon />
-					</ToggleButton>
-					<ToggleButton value="grid" aria-label="grid" size="small" sx={{ padding: 0.5 }}>
-						<ViewModuleIcon />
-					</ToggleButton>
-				</ToggleButtonGroup>
-			</Stack>
-		</InputLabel>
+		</FormControl>
 
-		<UploadFiles dropzone={dropzone} value={value} onRemove={onRemove} maxFiles={props.maxFiles} viewMode={viewMode} />
 
 	</>)
 }
