@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/GoLabra/labra/src/api/cache"
-	"github.com/GoLabra/labra/src/api/domain/svc"
+	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
 	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/GoLabra/labra/src/api/mocks"
 	. "github.com/GoLabra/labra/src/api/utils"

@@ -2,12 +2,16 @@ package repo
 
 import (
 	"context"
+	{{- if eq $.Annotations.Entity.Owner "User" }}
 	"errors"
+	{{- end }}
 	"fmt"
 	"app/ent"
-
+	
+	{{- if eq $.Annotations.Entity.Owner "User" }}
 	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/mitchellh/mapstructure"
+	{{- end }}
 )
 
 type {{$.Name}} struct {
@@ -135,7 +139,7 @@ func (r *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	return query.First(ctx)
 }
 
-
+{{- if eq $.Annotations.Entity.Owner "User" }}
 func (r *{{$.Name}}) Create(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 
@@ -481,3 +485,4 @@ func (r *{{$.Name}}) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$
 	}
 	return deletedRows, nil
 }
+{{- end }}

@@ -52,6 +52,8 @@ const (
 
 	RepositoryContextValue       ContextKey = "repository"
 	ServiceContextValue          ContextKey = "service"
+	AdminRepositoryContextValue  ContextKey = "adminRepository"
+	AdminServiceContextValue     ContextKey = "adminService"
 	CentrifugeClientContextValue ContextKey = "centrifugeClient"
 	UserContextValue             ContextKey = "user"
 	RoleContextValue             ContextKey = "role"

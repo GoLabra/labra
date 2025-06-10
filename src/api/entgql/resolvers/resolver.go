@@ -1,7 +1,7 @@
 package resolvers
 
 import (
-	"github.com/GoLabra/labra/src/api/domain/svc"
+	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
 	"github.com/GoLabra/labra/src/api/subscription"
 )
 

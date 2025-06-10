@@ -10,6 +10,8 @@
 
         data.{{ Pascal $.Name }}ID =  {{ if $isPointer }}&{{ end }}toConnect.ID
     }
+    
+    {{- if eq $.Type.Annotations.Entity.Owner "User" }}
     if data.{{ Pascal $.Name }}.Create != nil {
         var createInput ent.Create{{ $.Type.Name }}Input
         err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
@@ -25,6 +27,7 @@
 
         data.{{ Pascal $.Name }}ID = {{ if $isPointer }}&{{ end }}toConnect.ID
     }
+    {{- end }}
     {{- else }}
     if data.{{ Pascal $.Name }}.Connect != nil {
         for _, connect := range data.{{ Pascal $.Name }}.Connect {
@@ -37,6 +40,7 @@
             data.{{ Singular (Pascal $.Name) }}IDs = append(data.{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
         }
     }
+    {{- if eq $.Type.Annotations.Entity.Owner "User" }}
     if data.{{ Pascal $.Name }}.Create != nil {
         for _, create := range data.{{ Pascal $.Name }}.Create {
             var createInput ent.Create{{ $.Type.Name }}Input
@@ -54,5 +58,6 @@
             data.{{ Singular (Pascal $.Name) }}IDs = append(data.{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
         }
     }
+    {{- end }}
     {{- end }}
     {{- end }}

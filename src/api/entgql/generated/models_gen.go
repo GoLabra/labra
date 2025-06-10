@@ -2,8 +2,5 @@
 
 package gqlgen
 
-type Mutation struct {
-}
-
 type Subscription struct {
 }

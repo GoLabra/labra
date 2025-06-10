@@ -28,12 +28,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/GoLabra/labra/src/api/cache"
 	"github.com/GoLabra/labra/src/api/constants"
-	apiSvc "github.com/GoLabra/labra/src/api/domain/svc"
 	"github.com/GoLabra/labra/src/api/entgql/annotations"
 	"github.com/GoLabra/labra/src/api/entgql/entity"
-	entityGenerated "github.com/GoLabra/labra/src/api/entgql/generated"
 	"github.com/GoLabra/labra/src/api/entgql/generator"
-	entityResolvers "github.com/GoLabra/labra/src/api/entgql/resolvers"
 	"github.com/GoLabra/labra/src/api/strcase"
 	"github.com/GoLabra/labra/src/api/subscription"
 	"github.com/GoLabra/labra/src/api/utils"
@@ -44,6 +41,12 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/cors"
+
+	adminRepo "github.com/GoLabra/labra/src/api/entgql/domain/repo"
+	adminResolver "github.com/GoLabra/labra/src/api/entgql/domain/resolvers"
+	adminSvc "github.com/GoLabra/labra/src/api/entgql/domain/svc"
+	adminEnt "github.com/GoLabra/labra/src/api/entgql/ent"
+	adminGenerated "github.com/GoLabra/labra/src/api/entgql/generated"
 )
 
 func main() {
@@ -100,13 +103,9 @@ func main() {
 
 	repository := repo.New(client)
 
-	osFileSystem := utils.NewOSFileSystem()
-
 	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
 
-	schemaManager := generator.NewSchemaManager(osFileSystem, "./schema", ".", graphqlSubscriptionClient)
-
-	service := svc.New(repository, schemaManager)
+	service := svc.New(repository)
 
 	gocentClient := gocent.New(gocent.Config{
 		Addr: conf.CentrifugoApiAddress,
@@ -117,10 +116,7 @@ func main() {
 		Service: service,
 	}
 
-	entityResolvers := &entityResolvers.Resolver{
-		Service:            &struct{ Entity *apiSvc.Entity }{apiSvc.NewEntity(schemaManager)},
-		SubscriptionClient: graphqlSubscriptionClient,
-	}
+	adminRepository, adminService, adminResolver := InitAdmin(drv)
 
 	router := chi.NewRouter()
 	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
@@ -137,6 +133,8 @@ func main() {
 	router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var ctx = r.Context()
+			ctx = context.WithValue(ctx, constants.AdminServiceContextValue, adminService)
+			ctx = context.WithValue(ctx, constants.AdminRepositoryContextValue, adminRepository)
 			ctx = context.WithValue(ctx, constants.ServiceContextValue, service)
 			ctx = context.WithValue(ctx, constants.RepositoryContextValue, repository)
 			ctx = context.WithValue(ctx, constants.CentrifugeClientContextValue, gocentClient)
@@ -151,9 +149,9 @@ func main() {
 				Resolvers: resolver,
 			},
 		))
-		entitySrv := gqlHandler.New(entityGenerated.NewExecutableSchema(
-			entityGenerated.Config{
-				Resolvers: entityResolvers,
+		adminSrv := gqlHandler.New(adminGenerated.NewExecutableSchema(
+			adminGenerated.Config{
+				Resolvers: adminResolver,
 			},
 		))
 
@@ -168,26 +166,26 @@ func main() {
 		})
 		srv.Use(extension.Introspection{})
 
-		entitySrv.AddTransport(transport.POST{})
-		entitySrv.AddTransport(transport.GET{})
-		entitySrv.AddTransport(transport.Options{})
+		adminSrv.AddTransport(transport.POST{})
+		adminSrv.AddTransport(transport.GET{})
+		adminSrv.AddTransport(transport.Options{})
 		// AV: Please review this
-		entitySrv.AddTransport(&transport.Websocket{
+		adminSrv.AddTransport(&transport.Websocket{
 			Upgrader: websocket.Upgrader{
 				CheckOrigin: func(r *http.Request) bool { return true }, // Allow all origins
 			},
 		})
-		entitySrv.Use(extension.Introspection{})
+		adminSrv.Use(extension.Introspection{})
 
 		router.Use(jwtauth.Verifier(tokenAuth))
 		router.Use(handler.Authenticator)
 
 		router.Handle("/query", srv)
-		router.Handle("/entity", entitySrv)
+		router.Handle("/admin", adminSrv)
 	})
 
 	router.Handle("/playground", handler.Playground("GraphQL playground", "/query"))
-	router.Handle("/eplayground", handler.Playground("GraphQL playground", "/entity"))
+	router.Handle("/aplayground", handler.Playground("GraphQL playground", "/admin"))
 
 	router.Group(func(router chi.Router) {
 		router.Use(jwtauth.Verifier(tokenAuth))
@@ -215,6 +213,45 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func InitApp() {
+
+}
+
+func InitAdmin(drv *entsql.Driver) (*adminRepo.Repository, *adminSvc.Service, *adminResolver.Resolver) {
+	client := adminEnt.NewClient(adminEnt.Driver(drv))
+
+	client = client.Debug()
+
+	client.Use(
+		hooks.CreatedByUpdatedByHook,
+	)
+
+	if err := client.Schema.Create(
+		context.Background(),
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true),
+	); err != nil {
+		panic(err)
+	}
+
+	repository := adminRepo.New(client)
+
+	osFileSystem := utils.NewOSFileSystem()
+
+	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
+
+	schemaManager := generator.NewSchemaManager(osFileSystem, "./schema", ".", graphqlSubscriptionClient)
+
+	service := adminSvc.New(repository, schemaManager)
+
+	adminResolver := &adminResolver.Resolver{
+		Service:            service,
+		SubscriptionClient: graphqlSubscriptionClient,
+	}
+
+	return repository, service, adminResolver
 }
 
 func LoadSchema(graph *gen.Graph) {

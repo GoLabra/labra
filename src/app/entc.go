@@ -141,6 +141,7 @@ type TemplateData struct {
 
 type GraphqlSchemaTemplateData struct {
 	Name                 string
+	Owner                entity.EntityOwner
 	PluralName           string
 	GetManyOperationName string
 }
@@ -515,7 +516,8 @@ func CreateServiceInterface() gen.Hook {
 				}
 
 				data := GraphqlSchemaTemplateData{
-					Name: node.Name,
+					Name:  node.Name,
+					Owner: entityAnnotation.Owner,
 				}
 
 				f, err := os.Create("./interfaces/svc/" + fileName)
@@ -566,7 +568,8 @@ func CreateRepositoryInterface() gen.Hook {
 				}
 
 				data := GraphqlSchemaTemplateData{
-					Name: node.Name,
+					Name:  node.Name,
+					Owner: entityAnnotation.Owner,
 				}
 
 				f, err := os.Create("./interfaces/repo/" + fileName)
@@ -617,7 +620,8 @@ func CreateResolvers() gen.Hook {
 				}
 
 				data := GraphqlSchemaTemplateData{
-					Name: node.Name,
+					Name:  node.Name,
+					Owner: entityAnnotation.Owner,
 				}
 
 				f, err := os.Create("./domain/resolvers/" + fileName)

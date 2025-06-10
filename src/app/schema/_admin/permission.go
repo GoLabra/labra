@@ -24,6 +24,7 @@ type Permission struct {
 
 func (Permission) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 		entgql.MultiOrder(),
 		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
@@ -38,7 +39,6 @@ func (Permission) Annotations() []schema.Annotation {
 // Fields of the  Permission.
 func (Permission) Fields() []ent.Field {
 	return []ent.Field{
-
 		field.String("id").DefaultFunc(cuid.New).Annotations(
 			entgql.OrderField("id"),
 			annotations.Field{

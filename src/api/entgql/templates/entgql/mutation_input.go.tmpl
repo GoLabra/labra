@@ -28,27 +28,33 @@ type {{ $inputName }} struct {
 
 {{- range $n := $.Nodes }}
     type CreateMany{{ $n.Name }}Input struct {
-        Create  []*Create{{ $n.Name }}Input      `json:"create,omitempty"`
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
+        Create  []*Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
         Connect []*{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
     }
 
     type CreateOne{{ $n.Name }}Input struct {
-        Create  *Create{{ $n.Name }}Input      `json:"create,omitempty"`
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
+        Create  *Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
         Connect *{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
     }
     
     type UpdateMany{{ $n.Name }}Input struct {
-        Create     []*Create{{ $n.Name }}Input      `json:"create,omitempty"`
-        Connect    []*{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
+        Create  []*Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
+        Connect []*{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
         Disconnect []*{{ $n.Name }}WhereUniqueInput `json:"disconnect,omitempty"`
-        Delete     []*{{ $n.Name }}WhereUniqueInput `json:"delete,omitempty"`
     }
 
     type UpdateOne{{ $n.Name }}Input struct {
-        Create  *Create{{ $n.Name }}Input      `json:"create,omitempty"`
+        {{- if eq $n.Annotations.Entity.Owner "User" }}
+        Create  *Create{{ $n.Name }}Input `json:"create,omitempty"`
+        {{- end }}
         Connect *{{ $n.Name }}WhereUniqueInput `json:"connect,omitempty"`
-        Unset   *bool                          `json:"unset,omitempty"`
-        Delete  *bool                          `json:"delete,omitempty"`
+        Unset *bool `json:"unset,omitempty"`
     }
 {{- end }}
 
