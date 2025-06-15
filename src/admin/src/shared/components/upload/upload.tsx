@@ -7,8 +7,9 @@ import { BrowseButton } from './components/browse-button';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 interface UploadFilesProps {
+	name: string;
 	dropzone: DropzoneState;
-	value: File[] | string[];
+	value: (File | string)[];
 	viewMode?: 'list' | 'grid';
 	maxFiles?: number;
 	onRemove?: (file: File | string) => void;
@@ -20,7 +21,7 @@ export const UploadFiles = (props: UploadFilesProps) => {
 	const isFull = props.maxFiles != undefined && props.value?.length >= props.maxFiles;
 
 	return (
-		<FileDrop dropzone={dropzone}>
+		<FileDrop name={props.name} dropzone={dropzone}>
 			<FilesPreview
 				viewMode={props.viewMode}
 				onRemove={props.onRemove}

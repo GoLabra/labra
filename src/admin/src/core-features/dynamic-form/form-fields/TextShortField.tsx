@@ -59,7 +59,7 @@ export function TextShortFormField(props: FormFieldProps) {
   
     const formContext = useFormContext();
     const {ref, ...registerMethods} = formContext.register(props.name, { disabled: props.disabled, required: props.required, shouldUnregister: true, maxLength: 256 }); 
-    useFormDynamicContext(props.name, { disabled: registerMethods.disabled });
+    useFormDynamicContext(props.name, { disabled: registerMethods.disabled, hide: props.hide });
 
     if(props.hide){
         return null;

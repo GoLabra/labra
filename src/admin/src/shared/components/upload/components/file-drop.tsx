@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 import { Accept, DropzoneOptions, DropzoneState, useDropzone } from 'react-dropzone';
 
 interface FileDropProps {
+	name: string;
 	dropzone: DropzoneState
 	disabled?: boolean,
 	sx?: SxProps<Theme>
@@ -33,7 +34,7 @@ export const FileDrop = (props: PropsWithChildren<FileDropProps>) => {
 				...props.sx,
 			}}
 		>
-			<input {...dropzone.getInputProps()} />
+			<input name={props.name} {...dropzone.getInputProps()} />
 
 			{props.children}
 		</Box>

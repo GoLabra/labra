@@ -32,6 +32,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HistoryIcon from "@mui/icons-material/History";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import { useRelationDiff } from "../use-relation-diff";
 
 const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
 	roles(where: $where)  {
@@ -86,6 +87,7 @@ const changePermission = (savedPermissions: PermissionItem[], entityName: string
 			...i,
 			status: 'delete'
 		}));
+		
 	const create = operations.filter(i => !!savedPermissions.find(j => j.entityName == entityName && j.operation == i) == false)
 		.map((i): PermissionItem => ({
 			entityName: entityName,
@@ -169,7 +171,8 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	const formControllerHandler = useLiteController<PermissionItem[]>({ name: props.name, control: formContext.control });
 	const myDialogContext = useMyDialogContext();
 
-
+	
+	
 	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
 		variables: {
 			where: {
@@ -181,7 +184,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	});
 
 
-	const existing = useMemo(() => {
+	const saved = useMemo(() => {
 
 		if (!permissionRequest.data?.roles?.length) {
 			return [];
@@ -197,27 +200,29 @@ const PermissionSection = (props: PermissionSectionProps) => {
 		return savedValueItems ?? [];
 	}, [permissionRequest.data]);
 
-	const currentPermissions = useMemo((): PermissionItem[] => {
-		const all = [...existing, ...formControllerHandler.value ?? []];
-		return all.filter(i => {
-			if (i.status == 'delete') {
-				return false;
-			}
 
-			if (i.status == 'saved') {
-				if (all.find(j => j.id == i.id && j.status == 'delete')) {
-					return false;
-				}
-			}
+	const relationDiff = useRelationDiff<PermissionItem>({ saved, changedArray: formControllerHandler.value });
 
-			return true;
-		});
+	// const currentPermissions = useMemo((): PermissionItem[] => {
+	// 	const all = [...existing, ...formControllerHandler.value ?? []];
+	// 	return all.filter(i => {
+	// 		if (i.status == 'delete') {
+	// 			return false;
+	// 		}
 
-	}, [existing, formControllerHandler.value]);
+	// 		if (i.status == 'saved') {
+	// 			if (all.find(j => j.id == i.id && j.status == 'delete')) {
+	// 				return false;
+	// 			}
+	// 		}
+
+	// 		return true;
+	// 	});
+	// }, [existing, formControllerHandler.value]);
 
 	const allPermissionsGrouped = useMemo((): Record<string, Operation[]> => {
 
-		const permissionByEntity = groupByMap(currentPermissions,
+		const permissionByEntity = groupByMap(relationDiff.final,
 			item => item.entityName,
 			(item): Operation => ({
 				id: item.id,
@@ -228,11 +233,11 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 		return permissionByEntity;
 
-	}, [currentPermissions]);
+	}, [relationDiff.final]);
 
 
 	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
-		const newPermissions = changePermission(existing, entityName, operations);
+		const newPermissions = changePermission(saved, entityName, operations);
 
 		formControllerHandler.onChange({
 			target: {
@@ -243,11 +248,11 @@ const PermissionSection = (props: PermissionSectionProps) => {
 				]
 			}
 		});
-	}, [existing, formControllerHandler.value, formControllerHandler.onChange]);
+	}, [saved, formControllerHandler.value, formControllerHandler.onChange]);
 
 	const selectAll = useCallback(() => {
 		const newPermissions = entities.flatMap((entity) => {
-			return changePermission(existing, entity.name, operationDefs.map(i => i.name))
+			return changePermission(saved, entity.name, operationDefs.map(i => i.name))
 		});
 
 		formControllerHandler.onChange({
@@ -260,7 +265,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 	const clearAll = useCallback(() => {
 		const newPermissions = entities.flatMap((entity) => {
-			return changePermission(existing, entity.name, [])
+			return changePermission(saved, entity.name, [])
 		});
 
 		formControllerHandler.onChange({
@@ -281,16 +286,16 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	}, [entities, onPermissionValuesChanged]);
 
 	const permissionsCount = useMemo(() => {
-		return currentPermissions.filter(i => i.status != 'delete');
-	}, [currentPermissions]);
+		return relationDiff.final.filter(i => i.status != 'delete');
+	}, [relationDiff.final]);
 
 	const tooltipLabel = useMemo(() => {
-		const added = formControllerHandler.value?.filter(i => i.status == 'create').length ?? 0;
-		const disconnect = formControllerHandler.value?.filter(i => i.status == 'delete').length ?? 0;
-		const saved = existing.filter(i => formControllerHandler.value?.find(j => j.id == i.id && j.status == 'delete') == null).length ?? 0;
+		const itemsAdded = formControllerHandler.value?.filter(i => i.status == 'create').length ?? 0;
+		const itemsDisconnected = formControllerHandler.value?.filter(i => i.status == 'delete').length ?? 0;
+		const itemsSaved = saved.filter(i => formControllerHandler.value?.find(j => j.id == i.id && j.status == 'delete') == null).length ?? 0;
 
-		return `${saved} existing, ${added} added, ${disconnect} removed`;
-	}, [existing, formControllerHandler.value]);
+		return `${itemsSaved} existing, ${itemsAdded} added, ${itemsDisconnected} removed`;
+	}, [saved, formControllerHandler.value]);
 
 	return (
 		<Stack gap={1.5}>

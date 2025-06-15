@@ -7,7 +7,7 @@ import { DesignerFieldGroup, designerEdgesGroups, designerFieldsGroups } from ".
 import { EntityTypeDesignerNewFieldPropsDialog } from "./entity-type-designer-new-field-props-dialog";
 import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog";
-import { ChildTypeDescriptor, designerFieldsMap } from "./designer-field-map";
+import { ChildTypeDescriptor, designerFieldsMap, getDescriptorByEntityChild } from "./designer-field-map";
 import { ChainDialogContentRef } from "@/core-features/dynamic-dialog/src/dynamic-dialog-types";
 import { DesignerEdge, DesignerField } from "@/types/entity";
 import { useMyDialogContext } from "@/core-features/dynamic-dialog/src/use-my-dialog-context";
@@ -28,8 +28,10 @@ export const useEntityTypeDesignerEntryDialog = () => {
 
     const openEditChild = useCallback((field: DesignerField | DesignerEdge) => {
 
-        const childType:ApiFieldTypes = 'type' in field ? field.type as ApiFieldTypes : 'Relation';
-        const selectedChildTypeDescriptor = designerFieldsMap[childType];
+        // const childType:ApiFieldTypes = 'type' in field ? field.type as ApiFieldTypes : 'Relation';
+        // const selectedChildTypeDescriptor = designerFieldsMap[childType];
+
+		const selectedChildTypeDescriptor = getDescriptorByEntityChild(field);
 
 		const formOpenMode = field.designerStatus == 'new' ? FormOpenMode.New : FormOpenMode.Edit;
 

@@ -18,7 +18,7 @@ interface FilePreviewProps {
 		thumbnail?: any;
 	};
 	firstNode?: React.ReactNode;
-	files?: any[];
+	files: (File | string)[];
 }
 export function FilesPreview(props: FilePreviewProps) {
 
@@ -92,25 +92,21 @@ export function FilesPreview(props: FilePreviewProps) {
 							borderColor: 'color-mix(in srgb, var(--mui-palette-grey-500), transparent 80%)',
 							padding: '1px'
 						}}>
-
-							{props.onRemove && (<Box sx={{position: 'absolute', top: 0, right: 0, zIndex: 1, padding: '1px'}} onClick={() => props.onRemove?.(file)}>
-								<IconButton aria-label="delete" size="small">
-									<HighlightOffIcon fontSize="inherit" />
-								</IconButton>
-							</Box>)}
-
 							<FileThumbnail
 								tooltip
 								imageView={true}
 								file={file}
 								onRemove={() => props.onRemove?.(file)}
+								slotProps={{
+									icon: { width: 36, height: 36 }
+								}}
 								sx={{
 									width: 1,
 									height: 1,
 									//   border: (theme) =>
 									//     `solid 1px ${theme.palette.grey[500]}`,
 								}}
-								slotProps={{ icon: { width: 36, height: 36 } }}
+								// slotProps={{ icon: { width: 36, height: 36 } }}
 								{...props.slotProps?.thumbnail}
 							/>
 						</Box>
@@ -125,7 +121,15 @@ export function FilesPreview(props: FilePreviewProps) {
 						gap={1}
 						alignItems="center"
 					>
-						<FileThumbnail imageView file={file} {...props.slotProps?.thumbnail} />
+						<FileThumbnail 
+							file={file} 
+							imageView 
+							// onRemove={() => props.onRemove?.(file)}
+							// slotProps={{
+							// 	removeBtn: true,
+							// 	downloadBtn: true
+							// }}
+							{...props.slotProps?.thumbnail} />
 
 						<ListItemText
 							primary={name}

@@ -5,13 +5,12 @@ import { Control, FieldError, FieldErrorsImpl, Merge, UseFormRegister, get, useC
 import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { ReactNode, useCallback, useId, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { DropEvent, DropzoneOptions, FileRejection, useDropzone } from 'react-dropzone';
 import { UploadFiles } from '@/shared/components/upload/upload';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 
-interface UploadFilesComponentProps {
+interface UploadFilesBaseFieldProps {
 	name: string;
 	label: string;
 	placeholder?: string;
@@ -19,13 +18,16 @@ interface UploadFilesComponentProps {
 	required?: boolean;
 	errors?: ReactNode;
 
-	value: any[];
+	maxFiles?: number;
+
+	value: (File | string)[];
 	onChange?: (event: any) => void;
 	onBlur?: (event: any) => void;
-	color?: SwitchProps['color'];
-	maxFiles?: number;
+
+	onDrop?: DropzoneOptions['onDrop'];
+	onRemove?: (file: File | string) => void;
 }
-export function UploadFilesComponent(props: UploadFilesComponentProps) {
+export function   UploadFilesBaseField(props: UploadFilesBaseFieldProps) {
 
 	const { name, label, placeholder, disabled, errors, value, onChange, onBlur } = props;
 
@@ -35,9 +37,17 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 		disabled: props.disabled,
 		accept: { '*/*': [] },
 		onDrop: (acceptedFiles, fileRejections, event) => {
+			
+			props.onDrop?.(acceptedFiles, fileRejections, event);
+			
 			if (!acceptedFiles.length) {
 				return;
 			}
+			
+			if(!props.onChange){
+				return;
+			}
+
 			props.onChange?.({ target: { name: props.name, value: [...value ?? [], ...acceptedFiles] } } as any);
 		}
 	});
@@ -49,8 +59,14 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 
 	const onRemove = useCallback((file: File | string) => {
 
+		props.onRemove?.(file);
+		
+		if(!props.onChange){
+			return;
+		}
+
 		const oldFile = value.find(i => i === file);
-		if (oldFile < 0) {
+		if (!oldFile) {
 			return;
 		}
 
@@ -60,8 +76,6 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 	const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: 'grid' | 'list') => {
 		setViewMode(nextView);
 	};
-
-	// const isFull = props.maxFiles != undefined && value?.length >= props.maxFiles;
 
 	return (<>
 
@@ -92,13 +106,11 @@ export function UploadFilesComponent(props: UploadFilesComponentProps) {
 				</Stack>
 			</InputLabel>
 
-			<UploadFiles dropzone={dropzone} value={value} onRemove={onRemove} maxFiles={props.maxFiles} viewMode={viewMode} />
+			<UploadFiles name={name} dropzone={dropzone} value={value} onRemove={onRemove} maxFiles={props.maxFiles} viewMode={viewMode} />
 
 			{errors && (<FormHelperText>{errors}</FormHelperText>)}
 
-
 		</FormControl>
-
 
 	</>)
 }
@@ -127,7 +139,7 @@ export function UploadFilesField(props: UploadFilesFieldProps) {
 
 	const errors = get(formContext.formState.errors, props.name);
 
-	return (<UploadFilesComponent
+	return (<UploadFilesBaseField
 		label={props.label}
 		placeholder={props.placeholder}
 		required={props.required}

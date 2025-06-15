@@ -19,6 +19,11 @@ import { LookupOneFIELDFormField, OptionTag as OptionTagOne } from "@/core-featu
 import { Options, Option } from "@/core-features/dynamic-form/form-field";
 import { MultipleChoiceFormField } from "@/core-features/dynamic-form/form-fields/MultipleChoice";
 import { isJsonOrNull, toJsonOrNull } from "@/lib/utils/is-json";
+import { Upload } from "@mui/icons-material";
+import { UploadFilesBaseField } from "@/core-features/dynamic-form/form-fields/UploadFilesBaseField";
+import { FileDiffWrapper, FileFormField } from "@/core-features/dynamic-form/form-fields/FileField";
+import { fileToBase64 } from "@/lib/utils/file-to-base64";
+
 
 type FieldDetails = {
 	schema: z.ZodTypeAny;
@@ -437,6 +442,89 @@ const getMultiChoice = (field: Field): FieldDetails => {
 	}
 }
 
+const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
+
+	let schema: z.ZodTypeAny = edge.required
+		? z.any().refine((val): val is Record<string, unknown> => !val,
+			{ message: `${edge.caption} is required` }
+		)
+		: z.any().optional().nullable();
+
+	schema = schema.transform(async (val?: FileDiffWrapper[]) => {
+
+		if (!val) {
+			return undefined;
+		}
+
+		if (!val.length) {
+			return undefined;
+		}
+
+		const file = val[0];
+
+		if(!file){
+			return undefined;
+		}
+
+		switch (file.status) {
+			case 'create':
+				return {
+					create: {
+						name: (file.file as File).name,
+						content: await fileToBase64(file.file as File)
+					}
+				}
+			case 'delete':
+				return {
+					delete: true
+				}
+		}
+
+	});
+
+	return {
+		schema,
+		convertFromRawValue: (val) => undefined,
+		input: <FileFormField key={edge.name} name={edge.name} label={edge.caption} entityName={entityName} edge={edge} maxFiles={1} />
+	}
+}
+
+const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => { 
+
+	let schema: z.ZodTypeAny = edge.required
+		? z.any().refine((val): val is Record<string, unknown> => !val,
+			{ message: `${edge.caption} is required` }
+		)
+		: z.any().optional().nullable();
+
+	schema = schema.transform(async (val?: FileDiffWrapper[]) => {
+
+		if (!val) {
+			return undefined;
+		}
+
+		return {
+			create: val.filter(i => i.status == 'create')
+				.filter((i): i is FileDiffWrapper & { file: File } => i.file instanceof File)
+				.map(async (i: FileDiffWrapper) => ({
+					name: (i.file as File).name,
+					content: await fileToBase64(i.file as File)
+				})),
+			delete: val.filter(i => i.status == 'delete')
+				.map(i => ({
+					id: i.id
+				}))
+		}
+	});
+
+	return {
+		schema,
+		convertFromRawValue: (val) => undefined,
+		input: <FileFormField key={edge.name} name={edge.name} label={edge.caption} entityName={entityName} edge={edge} />
+	}
+}
+
+
 const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 
 	let schema: z.ZodTypeAny = edge.required
@@ -537,15 +625,28 @@ const getFormField = (field: Field): FieldDetails => {
 }
 
 const getFormEdge = (entityName: string, edge: Edge): FieldDetails => {
+
+	const isFile = edge.relatedEntity.caption == 'File';
+
 	switch (edge.relationType) {
 		case RelationType.One:
 		case RelationType.OneToOne:
 		case RelationType.OneToMany:
+
+			if (isFile) {
+				return getUploadOneFile(entityName, edge);
+			}
+
 			return getRelationOne(entityName, edge);
 
 		case RelationType.Many:
 		case RelationType.ManyToOne:
 		case RelationType.ManyToMany:
+
+			if (isFile) {
+				return getUploadManyFile(entityName, edge);
+			}
+
 			return getRelationMany(entityName, edge);
 
 		default:
@@ -687,7 +788,7 @@ export const useGenericEdgeFormSchema = (entity: FullEntity | null, edgeName: st
 		return value;
 	}, [edgeDescriptor, edge]);
 
-	const field = useMemo(():ReactNode => {
+	const field = useMemo((): ReactNode => {
 		if (!edgeDescriptor) {
 			return <></>;
 		}

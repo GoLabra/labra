@@ -5,21 +5,29 @@ import Tooltip from '@mui/material/Tooltip';
 import { fileThumbnailClasses } from './classes';
 import { fileData, fileThumb, fileFormat } from './utils';
 import { RemoveButton, DownloadButton } from './action-buttons';
-import { SxProps, Theme } from '@mui/material';
+import { IconButtonProps, SxProps, Theme } from '@mui/material';
+import { FileWithPath } from 'react-dropzone';
 
 // ----------------------------------------------------------------------
 
+export type FileWithContent = {
+	name: string; 
+	content: string;
+	size?: number; 
+	lastModified?: number;
+}
+
 interface FileThumbnailProps {
 	sx?: SxProps<Theme>;
-	file: string | File;
+	file: FileWithPath | string | FileWithContent;
 	tooltip?: boolean;
 	onRemove?: () => void;
 	imageView?: boolean;
 	slotProps?: {
 		img?: any;
 		icon?: any;
-		removeBtn?: any;
-		downloadBtn?: any;
+		removeBtn?: IconButtonProps;
+		downloadBtn?: IconButtonProps;
 	};
 	onDownload?: () => void;
 }
@@ -33,16 +41,16 @@ export function FileThumbnail({
 	onDownload,
 	...other
 }: FileThumbnailProps) {
-	const previewUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
+	//const previewUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
 
-	const { name, path } = fileData(file);
+	const { name, path, preview } = fileData(file);
 
-	const format = fileFormat(path || previewUrl);
+	const format = fileFormat(path || name || '')
 
 	const renderImg = (
 		<Box
 			component="img"
-			src={previewUrl}
+			src={preview}
 			className={fileThumbnailClasses.img}
 			sx={{
 				width: 1,

@@ -2,10 +2,9 @@ import { AuthContextType } from "@/core-features/auth/jwt-context";
 import { useAuth } from "@/core-features/auth/use-auth";
 import { AvatarUploadField } from "@/core-features/dynamic-form/form-fields/AvatarUploadField";
 import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/TextShortField";
-import { UploadFilesField } from "@/core-features/dynamic-form/form-fields/UploadFilesField"; 
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Avatar, Box, Button, Card, CardContent, Grid, Stack, Typography } from "@mui/material"
+import { Box, Button, Card, CardContent, Grid, Stack, Typography } from "@mui/material"
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -81,8 +80,6 @@ export const AccountGeneralTab = () => {
                                     <TextShortFormField name="email" label="Email" required disabled/>
                                     <TextShortFormField name="firstName" label="First Name" required disabled/>
                                     <TextShortFormField name="lastName" label="Last Name" required />
-									<UploadFilesField name="avatar" label="One" maxFiles={1} required />
-									<UploadFilesField name="avatar2" label="Many" required />
 
                                     <Stack direction="row" justifyContent="end">
                                         <Button
