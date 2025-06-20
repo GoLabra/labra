@@ -9,12 +9,12 @@ import { useCallback, useMemo } from "react";
 import { EdgeStatus } from "@/lib/utils/edge-status";
 import { useRelationDiff } from "@/features/content-manager/use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
-import { useGetEdgeValue } from "@/hooks/use-get-edge-value";
-import { FileWithContent } from "@/shared/components/file-thumbnail";
+import { useEntityFiles, useGetEdgeValue } from "@/hooks/use-get-edge-value";
+import { FileData } from "@/shared/components/file-thumbnail";
 
 export type FileDiffWrapper = {
 	id?: string;
-	file: FileWithPath | FileWithContent | string;
+	file: FileWithPath | FileData | string;
 	status: EdgeStatus;
 }
 
@@ -40,44 +40,35 @@ interface RelationManyFIELDFormComponentProps {
 export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProps) {
 	const { name, label, placeholder, disabled, errors, entityName, edge, value, onChange, onBlur, editId } = props;
 
-	const edgeValue = useGetEdgeValue<any[] | any>({
+	const edgeFiles = useEntityFiles({
 		entityName, 
 		entryId: props.editId, 
-		edge,
-		fields: 'allfields'
+		edge
 	});
 
 	const saved = useMemo((): FileDiffWrapper[] => {
-
-		if(!edgeValue.data){
-			return [];
-		}
-
-		const data = Array.isArray(edgeValue.data) ? edgeValue.data : [edgeValue.data];
-
-		return data?.map(i => ({
+		return edgeFiles?.map(i => ({
 			id: i.id,
 			file: {
 				name: i.name,
-				content: i.content, //'https://content.app-sources.com/s/34322885479675261/uploads/Images/Wales-0386838.JPG',//i.name,
+				mimeType: '',
+				preview: i.content,
 			},
 			status: 'saved'
 		})) ?? []
 
-	}, [edgeValue.data]);
+	}, [edgeFiles]);
 
 
 	const relationDiff = useRelationDiff<FileDiffWrapper>({ saved, changedArray: value });
 
-	const files = useMemo(() => relationDiff.final.map(i => i.file), [relationDiff.final]);
+	const files = useMemo(() => relationDiff.showingItems.map(i => i.file), [relationDiff.showingItems]);
 
 	const onRemove = useCallback((file: File | string) => {
 		onChange({
 			target: {
 				name: name,
-				value: relationDiff.remove(i => {
-					debugger;
-					return i.file === file})
+				value: relationDiff.remove(i => i.file === file)
 			}
 		});
 	}, [onChange, relationDiff.remove]);
@@ -87,12 +78,11 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 			return [];
 		}
 
-		debugger;
 		onChange({
 			target: {
 				name: name,
 				value: [
-					...relationDiff.final,
+					...value ?? [],
 					...acceptedFiles.map(i => ({
 						id: createId(),
 						file: i,
@@ -101,7 +91,7 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 				]
 			}
 		});
-	}, [value, relationDiff.final, onChange]);
+	}, [value, onChange]);
 
 	return (
 		<>

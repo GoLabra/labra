@@ -3,23 +3,26 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 
 import { fileThumbnailClasses } from './classes';
-import { fileData, fileThumb, fileFormat } from './utils';
+import { fileData, fileIcon } from './utils';
 import { RemoveButton, DownloadButton } from './action-buttons';
 import { IconButtonProps, SxProps, Theme } from '@mui/material';
 import { FileWithPath } from 'react-dropzone';
+import { useMemo } from 'react';
 
 // ----------------------------------------------------------------------
 
-export type FileWithContent = {
-	name: string; 
-	content: string;
+export type FileData = {
+	name?: string; 
+	mimeType: string;
+	preview?: string;
+	content?: string;
 	size?: number; 
 	lastModified?: number;
 }
 
 interface FileThumbnailProps {
 	sx?: SxProps<Theme>;
-	file: FileWithPath | string | FileWithContent;
+	file: FileWithPath | string | FileData;
 	tooltip?: boolean;
 	onRemove?: () => void;
 	imageView?: boolean;
@@ -43,9 +46,11 @@ export function FileThumbnail({
 }: FileThumbnailProps) {
 	//const previewUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
 
-	const { name, path, preview } = fileData(file);
+	const { name, preview, mimeType } = useMemo(() => fileData(file), [file]);
 
-	const format = fileFormat(path || name || '')
+	// const format = fileFormat(name || '')
+
+	const icon = useMemo(() => fileIcon(mimeType), [preview]);
 
 	const renderImg = (
 		<Box
@@ -65,7 +70,7 @@ export function FileThumbnail({
 	const renderIcon = (
 		<Box
 			component="img"
-			src={fileThumb(format)}
+			src={icon}
 			className={fileThumbnailClasses.icon}
 			sx={{ width: 1, height: 1, ...slotProps?.icon }}
 		/>
@@ -88,7 +93,7 @@ export function FileThumbnail({
 			}}
 			{...other}
 		>
-			{format === 'image' && imageView ? renderImg : renderIcon}
+			{imageView && preview ? renderImg : renderIcon}
 
 			{onRemove && (
 				<RemoveButton

@@ -12,7 +12,7 @@ interface RelationDiffProps<T extends RelationDiffItem> {
 }
 export const useRelationDiff = <T extends RelationDiffItem = any>(props: RelationDiffProps<T>) => {
 
-	const final = useMemo((): T[] => {
+	const showingItems = useMemo((): T[] => {
 		const all = [...props.saved, ...props.changedArray ?? []];
 		return all.filter(i => {
 			if (i.status == 'delete') {
@@ -70,7 +70,7 @@ export const useRelationDiff = <T extends RelationDiffItem = any>(props: Relatio
 	}, [props.saved, props.changedArray]);
 
 	return useMemo(() => ({
-		final,
+		showingItems,
 		remove
-	}), [final, remove]);
+	}), [showingItems, remove]);
 }

@@ -222,7 +222,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 	const allPermissionsGrouped = useMemo((): Record<string, Operation[]> => {
 
-		const permissionByEntity = groupByMap(relationDiff.final,
+		const permissionByEntity = groupByMap(relationDiff.showingItems,
 			item => item.entityName,
 			(item): Operation => ({
 				id: item.id,
@@ -233,7 +233,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 		return permissionByEntity;
 
-	}, [relationDiff.final]);
+	}, [relationDiff.showingItems]);
 
 
 	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
@@ -286,8 +286,8 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	}, [entities, onPermissionValuesChanged]);
 
 	const permissionsCount = useMemo(() => {
-		return relationDiff.final.filter(i => i.status != 'delete');
-	}, [relationDiff.final]);
+		return relationDiff.showingItems.filter(i => i.status != 'delete');
+	}, [relationDiff.showingItems]);
 
 	const tooltipLabel = useMemo(() => {
 		const itemsAdded = formControllerHandler.value?.filter(i => i.status == 'create').length ?? 0;
