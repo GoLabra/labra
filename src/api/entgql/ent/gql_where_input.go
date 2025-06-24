@@ -57,6 +57,23 @@ type FileWhereInput struct {
 	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
 	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
 
+	// "caption" field predicates.
+	Caption             *string  `json:"caption,omitempty"`
+	CaptionNEQ          *string  `json:"captionNEQ,omitempty"`
+	CaptionIn           []string `json:"captionIn,omitempty"`
+	CaptionNotIn        []string `json:"captionNotIn,omitempty"`
+	CaptionGT           *string  `json:"captionGT,omitempty"`
+	CaptionGTE          *string  `json:"captionGTE,omitempty"`
+	CaptionLT           *string  `json:"captionLT,omitempty"`
+	CaptionLTE          *string  `json:"captionLTE,omitempty"`
+	CaptionContains     *string  `json:"captionContains,omitempty"`
+	CaptionHasPrefix    *string  `json:"captionHasPrefix,omitempty"`
+	CaptionHasSuffix    *string  `json:"captionHasSuffix,omitempty"`
+	CaptionIsNil        bool     `json:"captionIsNil,omitempty"`
+	CaptionNotNil       bool     `json:"captionNotNil,omitempty"`
+	CaptionEqualFold    *string  `json:"captionEqualFold,omitempty"`
+	CaptionContainsFold *string  `json:"captionContainsFold,omitempty"`
+
 	// "name" field predicates.
 	Name             *string  `json:"name,omitempty"`
 	NameNEQ          *string  `json:"nameNEQ,omitempty"`
@@ -71,6 +88,31 @@ type FileWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "storage_file_name" field predicates.
+	StorageFileName             *string  `json:"storageFileName,omitempty"`
+	StorageFileNameNEQ          *string  `json:"storageFileNameNEQ,omitempty"`
+	StorageFileNameIn           []string `json:"storageFileNameIn,omitempty"`
+	StorageFileNameNotIn        []string `json:"storageFileNameNotIn,omitempty"`
+	StorageFileNameGT           *string  `json:"storageFileNameGT,omitempty"`
+	StorageFileNameGTE          *string  `json:"storageFileNameGTE,omitempty"`
+	StorageFileNameLT           *string  `json:"storageFileNameLT,omitempty"`
+	StorageFileNameLTE          *string  `json:"storageFileNameLTE,omitempty"`
+	StorageFileNameContains     *string  `json:"storageFileNameContains,omitempty"`
+	StorageFileNameHasPrefix    *string  `json:"storageFileNameHasPrefix,omitempty"`
+	StorageFileNameHasSuffix    *string  `json:"storageFileNameHasSuffix,omitempty"`
+	StorageFileNameEqualFold    *string  `json:"storageFileNameEqualFold,omitempty"`
+	StorageFileNameContainsFold *string  `json:"storageFileNameContainsFold,omitempty"`
+
+	// "size" field predicates.
+	Size      *int64  `json:"size,omitempty"`
+	SizeNEQ   *int64  `json:"sizeNEQ,omitempty"`
+	SizeIn    []int64 `json:"sizeIn,omitempty"`
+	SizeNotIn []int64 `json:"sizeNotIn,omitempty"`
+	SizeGT    *int64  `json:"sizeGT,omitempty"`
+	SizeGTE   *int64  `json:"sizeGTE,omitempty"`
+	SizeLT    *int64  `json:"sizeLT,omitempty"`
+	SizeLTE   *int64  `json:"sizeLTE,omitempty"`
 
 	// "content" field predicates.
 	Content             *string  `json:"content,omitempty"`
@@ -257,6 +299,51 @@ func (i *FileWhereInput) P() (predicate.File, error) {
 	if i.UpdatedAtNotNil {
 		predicates = append(predicates, file.UpdatedAtNotNil())
 	}
+	if i.Caption != nil {
+		predicates = append(predicates, file.CaptionEQ(*i.Caption))
+	}
+	if i.CaptionNEQ != nil {
+		predicates = append(predicates, file.CaptionNEQ(*i.CaptionNEQ))
+	}
+	if len(i.CaptionIn) > 0 {
+		predicates = append(predicates, file.CaptionIn(i.CaptionIn...))
+	}
+	if len(i.CaptionNotIn) > 0 {
+		predicates = append(predicates, file.CaptionNotIn(i.CaptionNotIn...))
+	}
+	if i.CaptionGT != nil {
+		predicates = append(predicates, file.CaptionGT(*i.CaptionGT))
+	}
+	if i.CaptionGTE != nil {
+		predicates = append(predicates, file.CaptionGTE(*i.CaptionGTE))
+	}
+	if i.CaptionLT != nil {
+		predicates = append(predicates, file.CaptionLT(*i.CaptionLT))
+	}
+	if i.CaptionLTE != nil {
+		predicates = append(predicates, file.CaptionLTE(*i.CaptionLTE))
+	}
+	if i.CaptionContains != nil {
+		predicates = append(predicates, file.CaptionContains(*i.CaptionContains))
+	}
+	if i.CaptionHasPrefix != nil {
+		predicates = append(predicates, file.CaptionHasPrefix(*i.CaptionHasPrefix))
+	}
+	if i.CaptionHasSuffix != nil {
+		predicates = append(predicates, file.CaptionHasSuffix(*i.CaptionHasSuffix))
+	}
+	if i.CaptionIsNil {
+		predicates = append(predicates, file.CaptionIsNil())
+	}
+	if i.CaptionNotNil {
+		predicates = append(predicates, file.CaptionNotNil())
+	}
+	if i.CaptionEqualFold != nil {
+		predicates = append(predicates, file.CaptionEqualFold(*i.CaptionEqualFold))
+	}
+	if i.CaptionContainsFold != nil {
+		predicates = append(predicates, file.CaptionContainsFold(*i.CaptionContainsFold))
+	}
 	if i.Name != nil {
 		predicates = append(predicates, file.NameEQ(*i.Name))
 	}
@@ -295,6 +382,69 @@ func (i *FileWhereInput) P() (predicate.File, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, file.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.StorageFileName != nil {
+		predicates = append(predicates, file.StorageFileNameEQ(*i.StorageFileName))
+	}
+	if i.StorageFileNameNEQ != nil {
+		predicates = append(predicates, file.StorageFileNameNEQ(*i.StorageFileNameNEQ))
+	}
+	if len(i.StorageFileNameIn) > 0 {
+		predicates = append(predicates, file.StorageFileNameIn(i.StorageFileNameIn...))
+	}
+	if len(i.StorageFileNameNotIn) > 0 {
+		predicates = append(predicates, file.StorageFileNameNotIn(i.StorageFileNameNotIn...))
+	}
+	if i.StorageFileNameGT != nil {
+		predicates = append(predicates, file.StorageFileNameGT(*i.StorageFileNameGT))
+	}
+	if i.StorageFileNameGTE != nil {
+		predicates = append(predicates, file.StorageFileNameGTE(*i.StorageFileNameGTE))
+	}
+	if i.StorageFileNameLT != nil {
+		predicates = append(predicates, file.StorageFileNameLT(*i.StorageFileNameLT))
+	}
+	if i.StorageFileNameLTE != nil {
+		predicates = append(predicates, file.StorageFileNameLTE(*i.StorageFileNameLTE))
+	}
+	if i.StorageFileNameContains != nil {
+		predicates = append(predicates, file.StorageFileNameContains(*i.StorageFileNameContains))
+	}
+	if i.StorageFileNameHasPrefix != nil {
+		predicates = append(predicates, file.StorageFileNameHasPrefix(*i.StorageFileNameHasPrefix))
+	}
+	if i.StorageFileNameHasSuffix != nil {
+		predicates = append(predicates, file.StorageFileNameHasSuffix(*i.StorageFileNameHasSuffix))
+	}
+	if i.StorageFileNameEqualFold != nil {
+		predicates = append(predicates, file.StorageFileNameEqualFold(*i.StorageFileNameEqualFold))
+	}
+	if i.StorageFileNameContainsFold != nil {
+		predicates = append(predicates, file.StorageFileNameContainsFold(*i.StorageFileNameContainsFold))
+	}
+	if i.Size != nil {
+		predicates = append(predicates, file.SizeEQ(*i.Size))
+	}
+	if i.SizeNEQ != nil {
+		predicates = append(predicates, file.SizeNEQ(*i.SizeNEQ))
+	}
+	if len(i.SizeIn) > 0 {
+		predicates = append(predicates, file.SizeIn(i.SizeIn...))
+	}
+	if len(i.SizeNotIn) > 0 {
+		predicates = append(predicates, file.SizeNotIn(i.SizeNotIn...))
+	}
+	if i.SizeGT != nil {
+		predicates = append(predicates, file.SizeGT(*i.SizeGT))
+	}
+	if i.SizeGTE != nil {
+		predicates = append(predicates, file.SizeGTE(*i.SizeGTE))
+	}
+	if i.SizeLT != nil {
+		predicates = append(predicates, file.SizeLT(*i.SizeLT))
+	}
+	if i.SizeLTE != nil {
+		predicates = append(predicates, file.SizeLTE(*i.SizeLTE))
 	}
 	if i.Content != nil {
 		predicates = append(predicates, file.ContentEQ(*i.Content))

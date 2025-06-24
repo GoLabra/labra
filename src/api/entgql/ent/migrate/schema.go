@@ -13,8 +13,10 @@ var (
 		{Name: "id", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
+		{Name: "caption", Type: field.TypeString, Unique: true, Nullable: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
 		{Name: "name", Type: field.TypeString, Unique: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
-		{Name: "content", Type: field.TypeString, SchemaType: map[string]string{"mysql": "MEDIUMTEXT", "postgres": "TEXT"}},
+		{Name: "storage_file_name", Type: field.TypeString, Unique: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
+		{Name: "size", Type: field.TypeInt64},
 		{Name: "file_created_by", Type: field.TypeString, Nullable: true},
 		{Name: "file_updated_by", Type: field.TypeString, Nullable: true},
 	}
@@ -26,13 +28,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "files_users_created_by",
-				Columns:    []*schema.Column{FilesColumns[5]},
+				Columns:    []*schema.Column{FilesColumns[7]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "files_users_updated_by",
-				Columns:    []*schema.Column{FilesColumns[6]},
+				Columns:    []*schema.Column{FilesColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

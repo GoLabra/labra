@@ -388,6 +388,20 @@ var (
 			}
 		},
 	}
+	// FileOrderFieldCaption orders File by caption.
+	FileOrderFieldCaption = &FileOrderField{
+		Value: func(f *File) (ent.Value, error) {
+			return f.Caption, nil
+		},
+		column: file.FieldCaption,
+		toTerm: file.ByCaption,
+		toCursor: func(f *File) Cursor {
+			return Cursor{
+				ID:    f.ID,
+				Value: f.Caption,
+			}
+		},
+	}
 	// FileOrderFieldName orders File by name.
 	FileOrderFieldName = &FileOrderField{
 		Value: func(f *File) (ent.Value, error) {
@@ -402,17 +416,31 @@ var (
 			}
 		},
 	}
-	// FileOrderFieldContent orders File by content.
-	FileOrderFieldContent = &FileOrderField{
+	// FileOrderFieldStorageFileName orders File by storage_file_name.
+	FileOrderFieldStorageFileName = &FileOrderField{
 		Value: func(f *File) (ent.Value, error) {
-			return f.Content, nil
+			return f.StorageFileName, nil
 		},
-		column: file.FieldContent,
-		toTerm: file.ByContent,
+		column: file.FieldStorageFileName,
+		toTerm: file.ByStorageFileName,
 		toCursor: func(f *File) Cursor {
 			return Cursor{
 				ID:    f.ID,
-				Value: f.Content,
+				Value: f.StorageFileName,
+			}
+		},
+	}
+	// FileOrderFieldSize orders File by size.
+	FileOrderFieldSize = &FileOrderField{
+		Value: func(f *File) (ent.Value, error) {
+			return f.Size, nil
+		},
+		column: file.FieldSize,
+		toTerm: file.BySize,
+		toCursor: func(f *File) Cursor {
+			return Cursor{
+				ID:    f.ID,
+				Value: f.Size,
 			}
 		},
 	}
@@ -428,10 +456,14 @@ func (f FileOrderField) String() string {
 		str = "createdAt"
 	case FileOrderFieldUpdatedAt.column:
 		str = "updatedAt"
+	case FileOrderFieldCaption.column:
+		str = "caption"
 	case FileOrderFieldName.column:
 		str = "name"
-	case FileOrderFieldContent.column:
-		str = "content"
+	case FileOrderFieldStorageFileName.column:
+		str = "storageFileName"
+	case FileOrderFieldSize.column:
+		str = "size"
 	}
 	return str
 }
@@ -454,10 +486,14 @@ func (f *FileOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *FileOrderFieldCreatedAt
 	case "updatedAt":
 		*f = *FileOrderFieldUpdatedAt
+	case "caption":
+		*f = *FileOrderFieldCaption
 	case "name":
 		*f = *FileOrderFieldName
-	case "content":
-		*f = *FileOrderFieldContent
+	case "storageFileName":
+		*f = *FileOrderFieldStorageFileName
+	case "size":
+		*f = *FileOrderFieldSize
 	default:
 		return fmt.Errorf("%s is not a valid FileOrderField", str)
 	}

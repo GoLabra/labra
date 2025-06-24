@@ -101,10 +101,13 @@ type UpdateOneUserInput struct {
 
 // CreateFileInput represents a mutation input for creating files.
 type CreateFileInput struct {
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
-	Name      string
-	Content   string
+	CreatedAt       *time.Time
+	UpdatedAt       *time.Time
+	Caption         *string
+	Name            string
+	StorageFileName string
+	Size            int64
+	Content         string
 	/*
 	   CreatedBy  *CreateOneUserWithoutFileInput
 	   CreatedByID *string
@@ -124,7 +127,12 @@ func (i *CreateFileInput) Mutate(m *FileMutation) {
 	if v := i.UpdatedAt; v != nil {
 		m.SetUpdatedAt(*v)
 	}
+	if v := i.Caption; v != nil {
+		m.SetCaption(*v)
+	}
 	m.SetName(i.Name)
+	m.SetStorageFileName(i.StorageFileName)
+	m.SetSize(i.Size)
 	m.SetContent(i.Content)
 	if v := i.CreatedByID; v != nil {
 		m.SetCreatedByID(*v)
@@ -142,12 +150,16 @@ func (c *FileCreate) SetInput(i CreateFileInput) *FileCreate {
 
 // UpdateFileInput represents a mutation input for updating files.
 type UpdateFileInput struct {
-	ClearCreatedAt bool
-	CreatedAt      *time.Time
-	ClearUpdatedAt bool
-	UpdatedAt      *time.Time
-	Name           *string
-	Content        *string
+	ClearCreatedAt  bool
+	CreatedAt       *time.Time
+	ClearUpdatedAt  bool
+	UpdatedAt       *time.Time
+	ClearCaption    bool
+	Caption         *string
+	Name            *string
+	StorageFileName *string
+	Size            *int64
+	Content         *string
 	/*
 	   ClearCreatedBy bool
 	   CreatedBy  *CreateOneUserWithoutFileInput
@@ -177,8 +189,20 @@ func (i *UpdateFileInput) Mutate(m *FileMutation) {
 	if v := i.UpdatedAt; v != nil {
 		m.SetUpdatedAt(*v)
 	}
+	if i.ClearCaption {
+		m.ClearCaption()
+	}
+	if v := i.Caption; v != nil {
+		m.SetCaption(*v)
+	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
+	}
+	if v := i.StorageFileName; v != nil {
+		m.SetStorageFileName(*v)
+	}
+	if v := i.Size; v != nil {
+		m.SetSize(*v)
 	}
 	if v := i.Content; v != nil {
 		m.SetContent(*v)

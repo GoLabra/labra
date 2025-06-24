@@ -18,8 +18,14 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldCaption holds the string denoting the caption field in the database.
+	FieldCaption = "caption"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldStorageFileName holds the string denoting the storage_file_name field in the database.
+	FieldStorageFileName = "storage_file_name"
+	// FieldSize holds the string denoting the size field in the database.
+	FieldSize = "size"
 	// FieldContent holds the string denoting the content field in the database.
 	FieldContent = "content"
 	// EdgeCreatedBy holds the string denoting the created_by edge name in mutations.
@@ -49,7 +55,10 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldCaption,
 	FieldName,
+	FieldStorageFileName,
+	FieldSize,
 	FieldContent,
 }
 
@@ -104,9 +113,24 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
+// ByCaption orders the results by the caption field.
+func ByCaption(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCaption, opts...).ToFunc()
+}
+
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByStorageFileName orders the results by the storage_file_name field.
+func ByStorageFileName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStorageFileName, opts...).ToFunc()
+}
+
+// BySize orders the results by the size field.
+func BySize(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSize, opts...).ToFunc()
 }
 
 // ByContent orders the results by the content field.

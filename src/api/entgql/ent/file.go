@@ -22,8 +22,14 @@ type File struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	// Caption holds the value of the "caption" field.
+	Caption string `json:"caption,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// StorageFileName holds the value of the "storage_file_name" field.
+	StorageFileName string `json:"storage_file_name,omitempty"`
+	// Size holds the value of the "size" field.
+	Size int64 `json:"size,omitempty"`
 	// Content holds the value of the "content" field.
 	Content string `json:"content,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -74,7 +80,9 @@ func (*File) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case file.FieldID, file.FieldName, file.FieldContent:
+		case file.FieldSize:
+			values[i] = new(sql.NullInt64)
+		case file.FieldID, file.FieldCaption, file.FieldName, file.FieldStorageFileName, file.FieldContent:
 			values[i] = new(sql.NullString)
 		case file.FieldCreatedAt, file.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -117,11 +125,29 @@ func (f *File) assignValues(columns []string, values []any) error {
 				f.UpdatedAt = new(time.Time)
 				*f.UpdatedAt = value.Time
 			}
+		case file.FieldCaption:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field caption", values[i])
+			} else if value.Valid {
+				f.Caption = value.String
+			}
 		case file.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				f.Name = value.String
+			}
+		case file.FieldStorageFileName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field storage_file_name", values[i])
+			} else if value.Valid {
+				f.StorageFileName = value.String
+			}
+		case file.FieldSize:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field size", values[i])
+			} else if value.Valid {
+				f.Size = value.Int64
 			}
 		case file.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -199,8 +225,17 @@ func (f *File) String() string {
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
+	builder.WriteString("caption=")
+	builder.WriteString(f.Caption)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(f.Name)
+	builder.WriteString(", ")
+	builder.WriteString("storage_file_name=")
+	builder.WriteString(f.StorageFileName)
+	builder.WriteString(", ")
+	builder.WriteString("size=")
+	builder.WriteString(fmt.Sprintf("%v", f.Size))
 	builder.WriteString(", ")
 	builder.WriteString("content=")
 	builder.WriteString(f.Content)

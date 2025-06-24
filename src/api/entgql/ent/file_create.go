@@ -52,9 +52,35 @@ func (fc *FileCreate) SetNillableUpdatedAt(t *time.Time) *FileCreate {
 	return fc
 }
 
+// SetCaption sets the "caption" field.
+func (fc *FileCreate) SetCaption(s string) *FileCreate {
+	fc.mutation.SetCaption(s)
+	return fc
+}
+
+// SetNillableCaption sets the "caption" field if the given value is not nil.
+func (fc *FileCreate) SetNillableCaption(s *string) *FileCreate {
+	if s != nil {
+		fc.SetCaption(*s)
+	}
+	return fc
+}
+
 // SetName sets the "name" field.
 func (fc *FileCreate) SetName(s string) *FileCreate {
 	fc.mutation.SetName(s)
+	return fc
+}
+
+// SetStorageFileName sets the "storage_file_name" field.
+func (fc *FileCreate) SetStorageFileName(s string) *FileCreate {
+	fc.mutation.SetStorageFileName(s)
+	return fc
+}
+
+// SetSize sets the "size" field.
+func (fc *FileCreate) SetSize(i int64) *FileCreate {
+	fc.mutation.SetSize(i)
 	return fc
 }
 
@@ -170,6 +196,12 @@ func (fc *FileCreate) check() error {
 	if _, ok := fc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "File.name"`)}
 	}
+	if _, ok := fc.mutation.StorageFileName(); !ok {
+		return &ValidationError{Name: "storage_file_name", err: errors.New(`ent: missing required field "File.storage_file_name"`)}
+	}
+	if _, ok := fc.mutation.Size(); !ok {
+		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "File.size"`)}
+	}
 	if _, ok := fc.mutation.Content(); !ok {
 		return &ValidationError{Name: "content", err: errors.New(`ent: missing required field "File.content"`)}
 	}
@@ -217,9 +249,21 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = &value
 	}
+	if value, ok := fc.mutation.Caption(); ok {
+		_spec.SetField(file.FieldCaption, field.TypeString, value)
+		_node.Caption = value
+	}
 	if value, ok := fc.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := fc.mutation.StorageFileName(); ok {
+		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
+		_node.StorageFileName = value
+	}
+	if value, ok := fc.mutation.Size(); ok {
+		_spec.SetField(file.FieldSize, field.TypeInt64, value)
+		_node.Size = value
 	}
 	if value, ok := fc.mutation.Content(); ok {
 		_spec.SetField(file.FieldContent, field.TypeString, value)
@@ -347,6 +391,24 @@ func (u *FileUpsert) ClearUpdatedAt() *FileUpsert {
 	return u
 }
 
+// SetCaption sets the "caption" field.
+func (u *FileUpsert) SetCaption(v string) *FileUpsert {
+	u.Set(file.FieldCaption, v)
+	return u
+}
+
+// UpdateCaption sets the "caption" field to the value that was provided on create.
+func (u *FileUpsert) UpdateCaption() *FileUpsert {
+	u.SetExcluded(file.FieldCaption)
+	return u
+}
+
+// ClearCaption clears the value of the "caption" field.
+func (u *FileUpsert) ClearCaption() *FileUpsert {
+	u.SetNull(file.FieldCaption)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *FileUpsert) SetName(v string) *FileUpsert {
 	u.Set(file.FieldName, v)
@@ -356,6 +418,36 @@ func (u *FileUpsert) SetName(v string) *FileUpsert {
 // UpdateName sets the "name" field to the value that was provided on create.
 func (u *FileUpsert) UpdateName() *FileUpsert {
 	u.SetExcluded(file.FieldName)
+	return u
+}
+
+// SetStorageFileName sets the "storage_file_name" field.
+func (u *FileUpsert) SetStorageFileName(v string) *FileUpsert {
+	u.Set(file.FieldStorageFileName, v)
+	return u
+}
+
+// UpdateStorageFileName sets the "storage_file_name" field to the value that was provided on create.
+func (u *FileUpsert) UpdateStorageFileName() *FileUpsert {
+	u.SetExcluded(file.FieldStorageFileName)
+	return u
+}
+
+// SetSize sets the "size" field.
+func (u *FileUpsert) SetSize(v int64) *FileUpsert {
+	u.Set(file.FieldSize, v)
+	return u
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *FileUpsert) UpdateSize() *FileUpsert {
+	u.SetExcluded(file.FieldSize)
+	return u
+}
+
+// AddSize adds v to the "size" field.
+func (u *FileUpsert) AddSize(v int64) *FileUpsert {
+	u.Add(file.FieldSize, v)
 	return u
 }
 
@@ -461,6 +553,27 @@ func (u *FileUpsertOne) ClearUpdatedAt() *FileUpsertOne {
 	})
 }
 
+// SetCaption sets the "caption" field.
+func (u *FileUpsertOne) SetCaption(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetCaption(v)
+	})
+}
+
+// UpdateCaption sets the "caption" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateCaption() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateCaption()
+	})
+}
+
+// ClearCaption clears the value of the "caption" field.
+func (u *FileUpsertOne) ClearCaption() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.ClearCaption()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *FileUpsertOne) SetName(v string) *FileUpsertOne {
 	return u.Update(func(s *FileUpsert) {
@@ -472,6 +585,41 @@ func (u *FileUpsertOne) SetName(v string) *FileUpsertOne {
 func (u *FileUpsertOne) UpdateName() *FileUpsertOne {
 	return u.Update(func(s *FileUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetStorageFileName sets the "storage_file_name" field.
+func (u *FileUpsertOne) SetStorageFileName(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetStorageFileName(v)
+	})
+}
+
+// UpdateStorageFileName sets the "storage_file_name" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateStorageFileName() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateStorageFileName()
+	})
+}
+
+// SetSize sets the "size" field.
+func (u *FileUpsertOne) SetSize(v int64) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetSize(v)
+	})
+}
+
+// AddSize adds v to the "size" field.
+func (u *FileUpsertOne) AddSize(v int64) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.AddSize(v)
+	})
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateSize() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateSize()
 	})
 }
 
@@ -746,6 +894,27 @@ func (u *FileUpsertBulk) ClearUpdatedAt() *FileUpsertBulk {
 	})
 }
 
+// SetCaption sets the "caption" field.
+func (u *FileUpsertBulk) SetCaption(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetCaption(v)
+	})
+}
+
+// UpdateCaption sets the "caption" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateCaption() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateCaption()
+	})
+}
+
+// ClearCaption clears the value of the "caption" field.
+func (u *FileUpsertBulk) ClearCaption() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.ClearCaption()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *FileUpsertBulk) SetName(v string) *FileUpsertBulk {
 	return u.Update(func(s *FileUpsert) {
@@ -757,6 +926,41 @@ func (u *FileUpsertBulk) SetName(v string) *FileUpsertBulk {
 func (u *FileUpsertBulk) UpdateName() *FileUpsertBulk {
 	return u.Update(func(s *FileUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetStorageFileName sets the "storage_file_name" field.
+func (u *FileUpsertBulk) SetStorageFileName(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetStorageFileName(v)
+	})
+}
+
+// UpdateStorageFileName sets the "storage_file_name" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateStorageFileName() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateStorageFileName()
+	})
+}
+
+// SetSize sets the "size" field.
+func (u *FileUpsertBulk) SetSize(v int64) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetSize(v)
+	})
+}
+
+// AddSize adds v to the "size" field.
+func (u *FileUpsertBulk) AddSize(v int64) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.AddSize(v)
+	})
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateSize() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateSize()
 	})
 }
 

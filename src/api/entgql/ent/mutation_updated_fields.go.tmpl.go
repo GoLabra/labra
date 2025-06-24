@@ -11,8 +11,17 @@ func (m *FileMutation) UpdatedFields() map[string]Value {
 	if m.updated_at != nil {
 		updatedFields["updated_at"] = m.updated_at
 	}
+	if m.caption != nil {
+		updatedFields["caption"] = m.caption
+	}
 	if m.name != nil {
 		updatedFields["name"] = m.name
+	}
+	if m.storage_file_name != nil {
+		updatedFields["storage_file_name"] = m.storage_file_name
+	}
+	if m.size != nil {
+		updatedFields["size"] = m.size
 	}
 	if m.content != nil {
 		updatedFields["content"] = m.content

@@ -16,8 +16,10 @@ var ErrEmptyFileWhereUniqueInput = errors.New("empty predicate FileWhereUniqueIn
 type FileWhereUniqueInput struct {
 	Predicates []predicate.File `json:"-"`
 
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	ID              *string `json:"id,omitempty"`
+	Caption         *string `json:"caption,omitempty"`
+	Name            *string `json:"name,omitempty"`
+	StorageFileName *string `json:"storageFileName,omitempty"`
 }
 
 func (i *FileWhereUniqueInput) AddPredicates(predicates ...predicate.File) {
@@ -41,8 +43,14 @@ func (i *FileWhereUniqueInput) P() (predicate.File, error) {
 	if i.ID != nil {
 		predicates = append(predicates, file.IDEQ(*i.ID))
 	}
+	if i.Caption != nil {
+		predicates = append(predicates, file.CaptionEQ(*i.Caption))
+	}
 	if i.Name != nil {
 		predicates = append(predicates, file.NameEQ(*i.Name))
+	}
+	if i.StorageFileName != nil {
+		predicates = append(predicates, file.StorageFileNameEQ(*i.StorageFileName))
 	}
 
 	switch len(predicates) {

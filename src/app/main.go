@@ -30,7 +30,7 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/GoLabra/labra/src/api/entgql/generator"
 	"github.com/GoLabra/labra/src/api/handler"
-	
+
 	"github.com/GoLabra/labra/src/api/hooks"
 	"github.com/GoLabra/labra/src/api/strcase"
 	"github.com/GoLabra/labra/src/api/subscription"

@@ -66,10 +66,25 @@ func (f *FileQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 				selectedFields = append(selectedFields, file.FieldUpdatedAt)
 				fieldSeen[file.FieldUpdatedAt] = struct{}{}
 			}
+		case "caption":
+			if _, ok := fieldSeen[file.FieldCaption]; !ok {
+				selectedFields = append(selectedFields, file.FieldCaption)
+				fieldSeen[file.FieldCaption] = struct{}{}
+			}
 		case "name":
 			if _, ok := fieldSeen[file.FieldName]; !ok {
 				selectedFields = append(selectedFields, file.FieldName)
 				fieldSeen[file.FieldName] = struct{}{}
+			}
+		case "storageFileName":
+			if _, ok := fieldSeen[file.FieldStorageFileName]; !ok {
+				selectedFields = append(selectedFields, file.FieldStorageFileName)
+				fieldSeen[file.FieldStorageFileName] = struct{}{}
+			}
+		case "size":
+			if _, ok := fieldSeen[file.FieldSize]; !ok {
+				selectedFields = append(selectedFields, file.FieldSize)
+				fieldSeen[file.FieldSize] = struct{}{}
 			}
 		case "content":
 			if _, ok := fieldSeen[file.FieldContent]; !ok {

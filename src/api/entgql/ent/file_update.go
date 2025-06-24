@@ -61,6 +61,26 @@ func (fu *FileUpdate) ClearUpdatedAt() *FileUpdate {
 	return fu
 }
 
+// SetCaption sets the "caption" field.
+func (fu *FileUpdate) SetCaption(s string) *FileUpdate {
+	fu.mutation.SetCaption(s)
+	return fu
+}
+
+// SetNillableCaption sets the "caption" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableCaption(s *string) *FileUpdate {
+	if s != nil {
+		fu.SetCaption(*s)
+	}
+	return fu
+}
+
+// ClearCaption clears the value of the "caption" field.
+func (fu *FileUpdate) ClearCaption() *FileUpdate {
+	fu.mutation.ClearCaption()
+	return fu
+}
+
 // SetName sets the "name" field.
 func (fu *FileUpdate) SetName(s string) *FileUpdate {
 	fu.mutation.SetName(s)
@@ -72,6 +92,41 @@ func (fu *FileUpdate) SetNillableName(s *string) *FileUpdate {
 	if s != nil {
 		fu.SetName(*s)
 	}
+	return fu
+}
+
+// SetStorageFileName sets the "storage_file_name" field.
+func (fu *FileUpdate) SetStorageFileName(s string) *FileUpdate {
+	fu.mutation.SetStorageFileName(s)
+	return fu
+}
+
+// SetNillableStorageFileName sets the "storage_file_name" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableStorageFileName(s *string) *FileUpdate {
+	if s != nil {
+		fu.SetStorageFileName(*s)
+	}
+	return fu
+}
+
+// SetSize sets the "size" field.
+func (fu *FileUpdate) SetSize(i int64) *FileUpdate {
+	fu.mutation.ResetSize()
+	fu.mutation.SetSize(i)
+	return fu
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableSize(i *int64) *FileUpdate {
+	if i != nil {
+		fu.SetSize(*i)
+	}
+	return fu
+}
+
+// AddSize adds i to the "size" field.
+func (fu *FileUpdate) AddSize(i int64) *FileUpdate {
+	fu.mutation.AddSize(i)
 	return fu
 }
 
@@ -201,8 +256,23 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if fu.mutation.UpdatedAtCleared() {
 		_spec.ClearField(file.FieldUpdatedAt, field.TypeTime)
 	}
+	if value, ok := fu.mutation.Caption(); ok {
+		_spec.SetField(file.FieldCaption, field.TypeString, value)
+	}
+	if fu.mutation.CaptionCleared() {
+		_spec.ClearField(file.FieldCaption, field.TypeString)
+	}
 	if value, ok := fu.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
+	}
+	if value, ok := fu.mutation.StorageFileName(); ok {
+		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
+	}
+	if value, ok := fu.mutation.Size(); ok {
+		_spec.SetField(file.FieldSize, field.TypeInt64, value)
+	}
+	if value, ok := fu.mutation.AddedSize(); ok {
+		_spec.AddField(file.FieldSize, field.TypeInt64, value)
 	}
 	if value, ok := fu.mutation.Content(); ok {
 		_spec.SetField(file.FieldContent, field.TypeString, value)
@@ -317,6 +387,26 @@ func (fuo *FileUpdateOne) ClearUpdatedAt() *FileUpdateOne {
 	return fuo
 }
 
+// SetCaption sets the "caption" field.
+func (fuo *FileUpdateOne) SetCaption(s string) *FileUpdateOne {
+	fuo.mutation.SetCaption(s)
+	return fuo
+}
+
+// SetNillableCaption sets the "caption" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableCaption(s *string) *FileUpdateOne {
+	if s != nil {
+		fuo.SetCaption(*s)
+	}
+	return fuo
+}
+
+// ClearCaption clears the value of the "caption" field.
+func (fuo *FileUpdateOne) ClearCaption() *FileUpdateOne {
+	fuo.mutation.ClearCaption()
+	return fuo
+}
+
 // SetName sets the "name" field.
 func (fuo *FileUpdateOne) SetName(s string) *FileUpdateOne {
 	fuo.mutation.SetName(s)
@@ -328,6 +418,41 @@ func (fuo *FileUpdateOne) SetNillableName(s *string) *FileUpdateOne {
 	if s != nil {
 		fuo.SetName(*s)
 	}
+	return fuo
+}
+
+// SetStorageFileName sets the "storage_file_name" field.
+func (fuo *FileUpdateOne) SetStorageFileName(s string) *FileUpdateOne {
+	fuo.mutation.SetStorageFileName(s)
+	return fuo
+}
+
+// SetNillableStorageFileName sets the "storage_file_name" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableStorageFileName(s *string) *FileUpdateOne {
+	if s != nil {
+		fuo.SetStorageFileName(*s)
+	}
+	return fuo
+}
+
+// SetSize sets the "size" field.
+func (fuo *FileUpdateOne) SetSize(i int64) *FileUpdateOne {
+	fuo.mutation.ResetSize()
+	fuo.mutation.SetSize(i)
+	return fuo
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableSize(i *int64) *FileUpdateOne {
+	if i != nil {
+		fuo.SetSize(*i)
+	}
+	return fuo
+}
+
+// AddSize adds i to the "size" field.
+func (fuo *FileUpdateOne) AddSize(i int64) *FileUpdateOne {
+	fuo.mutation.AddSize(i)
 	return fuo
 }
 
@@ -487,8 +612,23 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 	if fuo.mutation.UpdatedAtCleared() {
 		_spec.ClearField(file.FieldUpdatedAt, field.TypeTime)
 	}
+	if value, ok := fuo.mutation.Caption(); ok {
+		_spec.SetField(file.FieldCaption, field.TypeString, value)
+	}
+	if fuo.mutation.CaptionCleared() {
+		_spec.ClearField(file.FieldCaption, field.TypeString)
+	}
 	if value, ok := fuo.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
+	}
+	if value, ok := fuo.mutation.StorageFileName(); ok {
+		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
+	}
+	if value, ok := fuo.mutation.Size(); ok {
+		_spec.SetField(file.FieldSize, field.TypeInt64, value)
+	}
+	if value, ok := fuo.mutation.AddedSize(); ok {
+		_spec.AddField(file.FieldSize, field.TypeInt64, value)
 	}
 	if value, ok := fuo.mutation.Content(); ok {
 		_spec.SetField(file.FieldContent, field.TypeString, value)

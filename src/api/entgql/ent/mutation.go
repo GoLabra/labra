@@ -41,7 +41,11 @@ type FileMutation struct {
 	id                *string
 	created_at        *time.Time
 	updated_at        *time.Time
+	caption           *string
 	name              *string
+	storage_file_name *string
+	size              *int64
+	addsize           *int64
 	content           *string
 	clearedFields     map[string]struct{}
 	created_by        *string
@@ -255,6 +259,55 @@ func (m *FileMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, file.FieldUpdatedAt)
 }
 
+// SetCaption sets the "caption" field.
+func (m *FileMutation) SetCaption(s string) {
+	m.caption = &s
+}
+
+// Caption returns the value of the "caption" field in the mutation.
+func (m *FileMutation) Caption() (r string, exists bool) {
+	v := m.caption
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCaption returns the old "caption" field's value of the File entity.
+// If the File object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FileMutation) OldCaption(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCaption is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCaption requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCaption: %w", err)
+	}
+	return oldValue.Caption, nil
+}
+
+// ClearCaption clears the value of the "caption" field.
+func (m *FileMutation) ClearCaption() {
+	m.caption = nil
+	m.clearedFields[file.FieldCaption] = struct{}{}
+}
+
+// CaptionCleared returns if the "caption" field was cleared in this mutation.
+func (m *FileMutation) CaptionCleared() bool {
+	_, ok := m.clearedFields[file.FieldCaption]
+	return ok
+}
+
+// ResetCaption resets all changes to the "caption" field.
+func (m *FileMutation) ResetCaption() {
+	m.caption = nil
+	delete(m.clearedFields, file.FieldCaption)
+}
+
 // SetName sets the "name" field.
 func (m *FileMutation) SetName(s string) {
 	m.name = &s
@@ -289,6 +342,98 @@ func (m *FileMutation) OldName(ctx context.Context) (v string, err error) {
 // ResetName resets all changes to the "name" field.
 func (m *FileMutation) ResetName() {
 	m.name = nil
+}
+
+// SetStorageFileName sets the "storage_file_name" field.
+func (m *FileMutation) SetStorageFileName(s string) {
+	m.storage_file_name = &s
+}
+
+// StorageFileName returns the value of the "storage_file_name" field in the mutation.
+func (m *FileMutation) StorageFileName() (r string, exists bool) {
+	v := m.storage_file_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStorageFileName returns the old "storage_file_name" field's value of the File entity.
+// If the File object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FileMutation) OldStorageFileName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStorageFileName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStorageFileName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStorageFileName: %w", err)
+	}
+	return oldValue.StorageFileName, nil
+}
+
+// ResetStorageFileName resets all changes to the "storage_file_name" field.
+func (m *FileMutation) ResetStorageFileName() {
+	m.storage_file_name = nil
+}
+
+// SetSize sets the "size" field.
+func (m *FileMutation) SetSize(i int64) {
+	m.size = &i
+	m.addsize = nil
+}
+
+// Size returns the value of the "size" field in the mutation.
+func (m *FileMutation) Size() (r int64, exists bool) {
+	v := m.size
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSize returns the old "size" field's value of the File entity.
+// If the File object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FileMutation) OldSize(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSize is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSize requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSize: %w", err)
+	}
+	return oldValue.Size, nil
+}
+
+// AddSize adds i to the "size" field.
+func (m *FileMutation) AddSize(i int64) {
+	if m.addsize != nil {
+		*m.addsize += i
+	} else {
+		m.addsize = &i
+	}
+}
+
+// AddedSize returns the value that was added to the "size" field in this mutation.
+func (m *FileMutation) AddedSize() (r int64, exists bool) {
+	v := m.addsize
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSize resets all changes to the "size" field.
+func (m *FileMutation) ResetSize() {
+	m.size = nil
+	m.addsize = nil
 }
 
 // SetContent sets the "content" field.
@@ -439,15 +584,24 @@ func (m *FileMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FileMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, file.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, file.FieldUpdatedAt)
 	}
+	if m.caption != nil {
+		fields = append(fields, file.FieldCaption)
+	}
 	if m.name != nil {
 		fields = append(fields, file.FieldName)
+	}
+	if m.storage_file_name != nil {
+		fields = append(fields, file.FieldStorageFileName)
+	}
+	if m.size != nil {
+		fields = append(fields, file.FieldSize)
 	}
 	if m.content != nil {
 		fields = append(fields, file.FieldContent)
@@ -464,8 +618,14 @@ func (m *FileMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case file.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case file.FieldCaption:
+		return m.Caption()
 	case file.FieldName:
 		return m.Name()
+	case file.FieldStorageFileName:
+		return m.StorageFileName()
+	case file.FieldSize:
+		return m.Size()
 	case file.FieldContent:
 		return m.Content()
 	}
@@ -481,8 +641,14 @@ func (m *FileMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case file.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case file.FieldCaption:
+		return m.OldCaption(ctx)
 	case file.FieldName:
 		return m.OldName(ctx)
+	case file.FieldStorageFileName:
+		return m.OldStorageFileName(ctx)
+	case file.FieldSize:
+		return m.OldSize(ctx)
 	case file.FieldContent:
 		return m.OldContent(ctx)
 	}
@@ -508,12 +674,33 @@ func (m *FileMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case file.FieldCaption:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCaption(v)
+		return nil
 	case file.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case file.FieldStorageFileName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStorageFileName(v)
+		return nil
+	case file.FieldSize:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSize(v)
 		return nil
 	case file.FieldContent:
 		v, ok := value.(string)
@@ -529,13 +716,21 @@ func (m *FileMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *FileMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addsize != nil {
+		fields = append(fields, file.FieldSize)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *FileMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case file.FieldSize:
+		return m.AddedSize()
+	}
 	return nil, false
 }
 
@@ -544,6 +739,13 @@ func (m *FileMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *FileMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case file.FieldSize:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSize(v)
+		return nil
 	}
 	return fmt.Errorf("unknown File numeric field %s", name)
 }
@@ -557,6 +759,9 @@ func (m *FileMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(file.FieldUpdatedAt) {
 		fields = append(fields, file.FieldUpdatedAt)
+	}
+	if m.FieldCleared(file.FieldCaption) {
+		fields = append(fields, file.FieldCaption)
 	}
 	return fields
 }
@@ -578,6 +783,9 @@ func (m *FileMutation) ClearField(name string) error {
 	case file.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
+	case file.FieldCaption:
+		m.ClearCaption()
+		return nil
 	}
 	return fmt.Errorf("unknown File nullable field %s", name)
 }
@@ -592,8 +800,17 @@ func (m *FileMutation) ResetField(name string) error {
 	case file.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case file.FieldCaption:
+		m.ResetCaption()
+		return nil
 	case file.FieldName:
 		m.ResetName()
+		return nil
+	case file.FieldStorageFileName:
+		m.ResetStorageFileName()
+		return nil
+	case file.FieldSize:
+		m.ResetSize()
 		return nil
 	case file.FieldContent:
 		m.ResetContent()
