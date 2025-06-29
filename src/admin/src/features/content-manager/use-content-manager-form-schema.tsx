@@ -14,8 +14,8 @@ import { BooleanSelectFormField } from "@/core-features/dynamic-form/form-fields
 import { JSONFormField } from "@/core-features/dynamic-form/form-fields/JSONField";
 import { SingleChoiceFormField } from "@/core-features/dynamic-form/form-fields/SingleChoice";
 import dayjs, { Dayjs } from "dayjs";
-import { LookupManyFIELDFormField, OptionTag as OptionTagMany } from "@/core-features/dynamic-form/form-fields/LookupManyFIELD";
-import { LookupOneFIELDFormField, OptionTag as OptionTagOne } from "@/core-features/dynamic-form/form-fields/LookupOneFIELD";
+import { LookupManyFIELDFormField } from "@/core-features/dynamic-form/form-fields/LookupManyFIELD";
+import { LookupOneFIELDFormField, OptionDiffWrapper } from "@/core-features/dynamic-form/form-fields/LookupOneFIELD";
 import { Options, Option } from "@/core-features/dynamic-form/form-field";
 import { MultipleChoiceFormField } from "@/core-features/dynamic-form/form-fields/MultipleChoice";
 import { isJsonOrNull, toJsonOrNull } from "@/lib/utils/is-json";
@@ -23,6 +23,7 @@ import { Upload } from "@mui/icons-material";
 import { UploadFilesBaseField } from "@/core-features/dynamic-form/form-fields/UploadFilesBaseField";
 import { FileDiffWrapper, FileFormField } from "@/core-features/dynamic-form/form-fields/FileField";
 import { fileToBase64 } from "@/lib/utils/file-to-base64";
+import { createId } from "@paralleldrive/cuid2";
 
 
 type FieldDetails = {
@@ -471,7 +472,11 @@ const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 				return {
 					create: {
 						name: (file.file as File).name,
-						content: await fileToBase64(file.file as File)
+						content: await fileToBase64(file.file as File),
+
+						//!!!! remove these
+						storageFileName: createId(),
+						size: 1,
 					}
 				}
 			case 'delete':
@@ -503,18 +508,32 @@ const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => {
 			return undefined;
 		}
 
-		return {
-			create: val.filter(i => i.status == 'create')
-				.filter((i): i is FileDiffWrapper & { file: File } => i.file instanceof File)
-				.map(async (i: FileDiffWrapper) => ({
-					name: (i.file as File).name,
-					content: await fileToBase64(i.file as File)
-				})),
-			delete: val.filter(i => i.status == 'delete')
-				.map(i => ({
-					id: i.id
-				}))
+		const create = val.filter(i => i.status === 'create' && i.file instanceof File);
+		const remove = val.filter(i => i.status === 'delete');
+
+		const result = {
+			...(create.length && {
+				create: await Promise.all(val.filter(i => i.status === 'create')
+					.filter((i) => i.file instanceof File)
+					.map(async (i: FileDiffWrapper) => ({
+						name: (i.file as File).name,
+						content: await fileToBase64(i.file as File),
+
+						//!!!! remove these
+						storageFileName: createId(),
+						size: 1,
+
+					})))
+			}),
+			...(remove.length && {
+				delete: val.filter(i => i.status === 'delete')
+					.map(i => ({
+						id: i.id
+					}))
+			})
 		}
+		console.log(result);
+		return result;
 	});
 
 	return {
@@ -533,17 +552,17 @@ const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 		)
 		: z.any().optional().nullable();
 
-	schema = schema.transform((val?: Option<string, OptionTagOne>) => {
+	schema = schema.transform((val?: OptionDiffWrapper) => {
 
 		if (!val) {
 			return undefined;
 		}
 
-		if (!val.tag) {
+		if (!val.status) {
 			return undefined;
 		}
 
-		switch (val.tag) {
+		switch (val.status) {
 			case 'create':
 				return {
 					create: val.value
@@ -557,6 +576,10 @@ const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 			case 'unset':
 				return {
 					unset: true
+				}
+			case 'delete':
+				return {
+					delete: true
 				}
 		}
 
@@ -576,23 +599,36 @@ const getRelationMany = (entityName: string, edge: Edge): FieldDetails => {
 		)
 		: z.any().optional().nullable();
 
-	schema = schema.transform((val?: Options<string, OptionTagMany>) => {
+	schema = schema.transform((val?: OptionDiffWrapper[]) => {
 
-		if (!val) {
+		if (!val || !val.length) {
 			return undefined;
 		}
 
+		const connect = val.filter(i => i.status === 'connect'); 
+		const create = val.filter(i => i.status === 'create');
+		const disconnect = val.filter(i => i.status === 'disconnect');
+		const remove = val.filter(i => i.status === 'delete');
+
 		return {
-			connect: val.filter(i => i.tag == 'connect')
-				.map(i => ({
-					id: i.value
+			...(connect.length && {
+				connect: connect.map(i => ({
+					id: i.id
 				})),
-			create: val.filter(i => i.tag == 'create')
-				.map(i => i.value),
-			disconnect: val.filter(i => i.tag == 'disconnect')
-				.map(i => ({
-					id: i.value
+			}),
+			...(create.length && {
+				create: create.map(i => i.value),
+			}),
+			...(disconnect.length && {
+				disconnect: disconnect.map(i => ({
+					id: i.id
 				}))
+			}),
+			...(remove.length && {
+				delete: remove.map(i => ({
+					id: i.id
+				}))
+			})
 		}
 	});
 

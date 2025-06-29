@@ -5,14 +5,15 @@ import { FileDrop } from './components/file-drop';
 import { FilesPreview } from './components/files-preview';
 import { BrowseButton } from './components/browse-button';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import { FileData } from '../file-thumbnail';
 
 interface UploadFilesProps {
 	name: string;
 	dropzone: DropzoneState;
-	value: (File | string)[];
+	value: (File | FileData | string)[];
 	viewMode?: 'list' | 'grid';
 	maxFiles?: number;
-	onRemove?: (file: File | string) => void;
+	onRemove?: (file: File | FileData | string) => void;
 }
 export const UploadFiles = (props: UploadFilesProps) => {
 

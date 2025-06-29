@@ -36,6 +36,7 @@ export const ContentManagerProvider = ({ entityName, children }: PropsWithChildr
     const fullEntity = useFullEntity({ entityName });
     const contentManagerSearch = useContentManagerSearchFromQuery();
     const contentManagerStore = useContentManagerStore({
+		entityOwner: fullEntity?.owner,
         entityName: entityName,
 
         page: contentManagerSearch.state.page,

@@ -13,7 +13,7 @@ import { useEntityFiles, useGetEdgeValue } from "@/hooks/use-get-edge-value";
 import { FileData } from "@/shared/components/file-thumbnail";
 
 export type FileDiffWrapper = {
-	id?: string;
+	id: string;
 	file: FileWithPath | FileData | string;
 	status: EdgeStatus;
 }
@@ -46,29 +46,33 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 		edge
 	});
 
-	const saved = useMemo((): FileDiffWrapper[] => {
+	const savedValueItems = useMemo((): FileDiffWrapper[] => {
 		return edgeFiles?.map(i => ({
 			id: i.id,
 			file: {
 				name: i.name,
-				mimeType: '',
 				preview: i.content,
 			},
 			status: 'saved'
 		})) ?? []
-
 	}, [edgeFiles]);
 
 
-	const relationDiff = useRelationDiff<FileDiffWrapper>({ saved, changedArray: value });
+	const relationDiff = useRelationDiff<FileDiffWrapper>({ saved: savedValueItems, changedArray: value });
 
 	const files = useMemo(() => relationDiff.showingItems.map(i => i.file), [relationDiff.showingItems]);
 
-	const onRemove = useCallback((file: File | string) => {
+	const onRemove = useCallback((file: File | FileData | string) => {
+
+		const removeId = relationDiff.showingItems.find(i => i.file === file)?.id;
+		if(!removeId){
+			return;
+		}
+
 		onChange({
 			target: {
 				name: name,
-				value: relationDiff.remove(i => i.file === file)
+				value: relationDiff.remove(removeId)
 			}
 		});
 	}, [onChange, relationDiff.remove]);

@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
 import { gql, useQuery } from "@apollo/client";
 import { fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
+import { EdgeRequest } from "@/lib/apollo/builders/gqlQueryBuilder";
 
 const GET_FILES_CONTENT = gql`query files($or: [FileWhereInput!]) {
 	files(where: { or: $or }) {
@@ -60,7 +61,6 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 
 	});
 
-	// console.log('filesContent', filesContent);
 
 	return useMemo((): any[] => {
 		
@@ -86,7 +86,8 @@ interface UseGetEdgeValueParams {
 	entityName: string;
 	entryId: string | null | undefined;
 	edge: Edge;
-	fields: 'allfields' | 'iddisplay' | string[] 
+	fields: 'allfields' | 'iddisplay' | string[];
+	edges?: EdgeRequest[];
 }
 export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 
@@ -117,6 +118,10 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 		return props.fields;
 	}, [fullEntity?.displayField, fullEntity?.fields, props.fields]);
 
+	const edges = useMemo(() => {
+		return props.edges ?? [];
+	}, [props.edges]);
+
 	const contentManagerStore = useContentManagerStore({
 		entityName: props.entityName,
 
@@ -124,7 +129,7 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 		rowsPerPage: contentManagerSearch.state.rowsPerPage,
 		sortBy: contentManagerSearch.state.sortBy,
 		order: contentManagerSearch.state.order,
-		lazy: props.entryId == null,
+		lazy: props.entryId == null || (!props.fields.length && !edges.length),
 		edges: useMemo(() => {
 			if (!fields) {
 				return undefined;
@@ -137,6 +142,7 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 			return [{
 				name: props.edge.name,
 				fields: fields,
+				edges: edges
 			}]
 		}, [fullEntity?.displayField]),
 
@@ -144,7 +150,6 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 	});
 
 	const data: T = useMemo(() => {
-		console.log(contentManagerStore.state.data);
 		if (!contentManagerStore.state.data?.length) {
 			return null;
 		}
@@ -154,5 +159,5 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 
 	return useMemo(() => ({
 		data: data, 
-	}), [data]);
+	}), [contentManagerStore.state.data]);
 }

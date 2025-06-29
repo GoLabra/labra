@@ -9,6 +9,7 @@ import { DropEvent, DropzoneOptions, FileRejection, useDropzone } from 'react-dr
 import { UploadFiles } from '@/shared/components/upload/upload';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import { FileData } from '@/shared/components/file-thumbnail';
 
 interface UploadFilesBaseFieldProps {
 	name: string;
@@ -20,14 +21,14 @@ interface UploadFilesBaseFieldProps {
 
 	maxFiles?: number;
 
-	value: (File | string)[];
+	value: (File | FileData | string)[];
 	onChange?: (event: any) => void;
 	onBlur?: (event: any) => void;
 
 	onDrop?: DropzoneOptions['onDrop'];
-	onRemove?: (file: File | string) => void;
+	onRemove?: (file: File | FileData | string) => void;
 }
-export function   UploadFilesBaseField(props: UploadFilesBaseFieldProps) {
+export function UploadFilesBaseField(props: UploadFilesBaseFieldProps) {
 
 	const { name, label, placeholder, disabled, errors, value, onChange, onBlur } = props;
 
@@ -57,7 +58,7 @@ export function   UploadFilesBaseField(props: UploadFilesBaseFieldProps) {
 
 	const id = useId();
 
-	const onRemove = useCallback((file: File | string) => {
+	const onRemove = useCallback((file: File | FileData | string) => {
 
 		props.onRemove?.(file);
 		

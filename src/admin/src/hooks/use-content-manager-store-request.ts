@@ -1,22 +1,26 @@
 import { ContentManagerSearchState } from "@/types/content-manager-search-state";
 import { useCallback, useMemo } from "react";
 import { gql, useApolloClient } from "@apollo/client";
-import { Edge, Field } from "@/lib/apollo/graphql.entities";
+import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { EdgeRequest, GqlDataQueryBuilder } from "@/lib/apollo/builders/gqlQueryBuilder";
 import { GqlDataCREATEMutationBuilder, GqlDataDELETEBulkMutationBuilder, GqlDataDELETEMutationBuilder, GqlDataUPDATEMutationBuilder } from "@/lib/apollo/builders/gqlMutationBuilder";
 import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
 import { getAdvancedFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
 import { AdvancedFilter } from "@/core-features/dynamic-filter/filter";
 import { Order } from "mosaic-data-table";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 
 
 interface UseContentManagerStoreRequestParams {
+	entityOwner: EntityOwner;
     entityName: string
 }
 export const useContentManagerStoreRequest = (props: UseContentManagerStoreRequestParams) => {
 
     const { entityName } = props;
     const client = useApolloClient();
+
+	const apiContext = useMemo(() => props.entityOwner == EntityOwner.Admin ? ADMIN_CONTEXT : {}, [props.entityOwner]);
 
     const fetchData = useCallback(({ fields, edges, page, rowsPerPage, sortBy, order, filters, orFilters }: {
         page: number;
@@ -59,7 +63,7 @@ export const useContentManagerStoreRequest = (props: UseContentManagerStoreReque
                 return;
             }
 
-            client.query({ query: gql(query.query), variables: query.variables, fetchPolicy: "network-only" }).then((response) => {
+            client.query({ query: gql(query.query), variables: query.variables, fetchPolicy: "network-only", context: apiContext }).then((response) => {
                 resolve({
                     data: response.data[operationName],
                     connection: response.data[builder.getOperationConnectionName()]
@@ -70,7 +74,7 @@ export const useContentManagerStoreRequest = (props: UseContentManagerStoreReque
         });
 
         return promise;
-    }, [client, entityName]);
+    }, [client, entityName, apiContext]);
 
     const addItem = useCallback((entityName: string, data: any) => {
 
@@ -86,10 +90,12 @@ export const useContentManagerStoreRequest = (props: UseContentManagerStoreReque
         if (!operationName) {
             return Promise.reject("No operationName to add");
         }
-        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables });
-    }, [client]);
+        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables, context: apiContext });
+    }, [client, apiContext]);
 
     const updateItem = useCallback((entityName: string, id: string, data: any) => {
+
+		debugger;
 
         var builder = new GqlDataUPDATEMutationBuilder().addField('id');
         var mutation = builder.addEntityName(entityName)
@@ -103,8 +109,8 @@ export const useContentManagerStoreRequest = (props: UseContentManagerStoreReque
         if (!operationName) {
             return;
         }
-        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables });
-    }, [client]);
+        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables, context: apiContext });
+    }, [client, apiContext]);
 
     const deleteItem = useCallback((entityName: string, id: string) => {
         var builder = new GqlDataDELETEMutationBuilder().addField('id');
@@ -119,8 +125,8 @@ export const useContentManagerStoreRequest = (props: UseContentManagerStoreReque
         if (!operationName) {
             return;
         }
-        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables });
-    }, [client]);
+        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables, context: apiContext });
+    }, [client, apiContext]);
 
     const deleteBulk = useCallback((entityName: string, ids: Array<string>) => {
         var builder = new GqlDataDELETEBulkMutationBuilder();
@@ -135,8 +141,8 @@ export const useContentManagerStoreRequest = (props: UseContentManagerStoreReque
         if (!operationName) {
             return;
         }
-        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables });
-    }, [client]);
+        return client.mutate({ mutation: gql(mutation.query), variables: mutation.variables, context: apiContext });
+    }, [client, apiContext]);
 
     return useMemo(() => ({
         fetchData,

@@ -7,7 +7,7 @@ const FORMAT_TEXT = ['txt'];
 const FORMAT_PHOTOSHOP = ['psd'];
 const FORMAT_WORD = ['doc', 'docx'];
 const FORMAT_EXCEL = ['xls', 'xlsx'];
-const FORMAT_ZIP = ['zip', 'x-zip', 'zip-compressed', 'x-zip-compressed' ,'rar', 'iso'];
+const FORMAT_ZIP = ['zip', 'rar', 'iso'];
 const FORMAT_ILLUSTRATOR = ['ai', 'esp'];
 const FORMAT_POWERPOINT = ['ppt', 'pptx'];
 const FORMAT_AUDIO = ['wav', 'aif', 'mp3', 'aac'];
@@ -16,10 +16,8 @@ const FORMAT_VIDEO = ['m4v', 'avi', 'mpg', 'mp4', 'webm'];
 
 const iconUrl = (icon: string) => `/assets/icons/files/${icon}.svg`;
 
-export function fileIcon(mimeType?: string) {
+export function fileIcon(extension?: string | null) {
 	
-	const extension = fileTypeByMimeType(mimeType);
-
 	if(!extension){
 		return iconUrl('ic-file');
 	}
@@ -68,12 +66,17 @@ export function fileIcon(mimeType?: string) {
 
 // ----------------------------------------------------------------------
 
-export function fileIsImage(extension: string) {
-	debugger;
+export function fileIsImage(extension?: string | null) {
+	if(!extension){
+		return false;
+	}
 	return FORMAT_IMG.includes(extension);
 }
 
-export function fileTypeByUrl(fileUrl: string) {
+export function fileTypeByUrl(fileUrl?: string | null): string | null {
+	if(!fileUrl){
+		return null;
+	}
 	return (fileUrl && fileUrl.split('.').pop())?.toLowerCase() || '';
 }
 
@@ -83,19 +86,12 @@ export function fileNameByUrl(fileUrl: string) {
 	return fileUrl.split('/').pop();
 }
 
-export function fileTypeByMimeType(mimeType?: string) {
-	if(!mimeType){
-		return null;
-	}
-	return mimeType.split('/').pop();
-}
-
 // ----------------------------------------------------------------------
 
 export function fileData(file: FileWithPath | FileData | string): FileData {
 
 	// From content
-	if (file && typeof file === 'object' && 'mimeType' in file) { 
+	if (file && typeof file === 'object' && !('path' in file)) { 
 		return file;
 	}
 	
@@ -104,18 +100,17 @@ export function fileData(file: FileWithPath | FileData | string): FileData {
 		return {
 			preview: file,
 			name: fileNameByUrl(file),
-			mimeType: `unknown/${fileTypeByUrl(file)}`,
 			size: undefined,
 			lastModified: undefined,
 		};
 	}
+
 
 	const isImage = fileIsImage(fileTypeByUrl(file.name));
 	// From file
 	return {
 		name: file.name,
 		size: file.size,
-		mimeType: file.type,
 		preview: isImage ? URL.createObjectURL(file) : undefined,
 		lastModified: file.lastModified,
 	};

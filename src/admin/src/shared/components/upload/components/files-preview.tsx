@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 // import { varAlpha } from 'src/theme/styles'; 
-import { fileData, FileThumbnail } from '../../file-thumbnail';
+import { FileData, fileData, FileThumbnail } from '../../file-thumbnail';
 import { fData } from '@/lib/utils/format-number';
 import { Stack, SxProps, Theme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,14 +11,14 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 interface FilePreviewProps {
 	sx?: SxProps<Theme>;
-	onRemove?: (file: File | string) => void;
+	onRemove?: (file: File | FileData |string) => void;
 	lastNode?: React.ReactNode;
 	viewMode?: 'list' | 'grid';
 	slotProps?: {
 		thumbnail?: any;
 	};
 	firstNode?: React.ReactNode;
-	files: (File | string)[];
+	files: (File | FileData | string)[];
 }
 export function FilesPreview(props: FilePreviewProps) {
 

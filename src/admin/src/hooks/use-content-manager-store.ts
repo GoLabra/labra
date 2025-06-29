@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useContentManagerStoreRequest } from "./use-content-manager-store-request";
 import { FullEntity } from "@/types/entity";
 import { addNotification } from "@/lib/notifications/store";
-import { Edge, Field } from "@/lib/apollo/graphql.entities";
+import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
 import { getAdvancedFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
 import { EdgeRequest } from "@/lib/apollo/builders/gqlQueryBuilder";
@@ -12,6 +12,7 @@ import { Order } from "mosaic-data-table";
 import { AdvancedFilter } from "@/core-features/dynamic-filter/filter";
 
 interface UseContentManagerStoreParams {
+	entityOwner?: EntityOwner;
     entityName: string
     //fullEntity?: FullEntity | null,
 
@@ -33,7 +34,7 @@ export const useContentManagerStore = (params: UseContentManagerStoreParams): Us
 
     const { entityName, fields, edges, page, rowsPerPage, sortBy, order, filters, orFilters, lazy } = params;
 
-    const contentManagerStoreRequest = useContentManagerStoreRequest({entityName});
+    const contentManagerStoreRequest = useContentManagerStoreRequest({entityName, entityOwner: params.entityOwner ?? EntityOwner.User});
     const [dataLoading, setDataLoading] = useState<boolean>(false);
     const [data, setData] = useState<[]>([]);
     const [dataConnection, setDataConnection] = useState<{ totalCount: number } | null>(null);
@@ -74,7 +75,7 @@ export const useContentManagerStore = (params: UseContentManagerStoreParams): Us
     }, [fetch]);
     
     const addItem = useCallback((data: any) => {
-        contentManagerStoreRequest.addItem(entityName,data)
+        contentManagerStoreRequest.addItem(entityName, data)
             ?.then((response) => {
                 fetch();
             })

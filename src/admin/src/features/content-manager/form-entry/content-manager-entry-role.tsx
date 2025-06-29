@@ -33,6 +33,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HistoryIcon from "@mui/icons-material/History";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { useRelationDiff } from "../use-relation-diff";
+import { createId } from "@paralleldrive/cuid2";
 
 const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
 	roles(where: $where)  {
@@ -46,7 +47,7 @@ const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleW
 }`
 
 type PermissionItem = {
-	id?: string;
+	id: string;
 	entityName: string;
 	operation: string;
 	status: EdgeStatus;
@@ -90,6 +91,7 @@ const changePermission = (savedPermissions: PermissionItem[], entityName: string
 		
 	const create = operations.filter(i => !!savedPermissions.find(j => j.entityName == entityName && j.operation == i) == false)
 		.map((i): PermissionItem => ({
+			id: createId(),
 			entityName: entityName,
 			operation: i,
 			status: 'create'
@@ -171,8 +173,6 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	const formControllerHandler = useLiteController<PermissionItem[]>({ name: props.name, control: formContext.control });
 	const myDialogContext = useMyDialogContext();
 
-	
-	
 	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
 		variables: {
 			where: {
@@ -200,25 +200,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 		return savedValueItems ?? [];
 	}, [permissionRequest.data]);
 
-
 	const relationDiff = useRelationDiff<PermissionItem>({ saved, changedArray: formControllerHandler.value });
-
-	// const currentPermissions = useMemo((): PermissionItem[] => {
-	// 	const all = [...existing, ...formControllerHandler.value ?? []];
-	// 	return all.filter(i => {
-	// 		if (i.status == 'delete') {
-	// 			return false;
-	// 		}
-
-	// 		if (i.status == 'saved') {
-	// 			if (all.find(j => j.id == i.id && j.status == 'delete')) {
-	// 				return false;
-	// 			}
-	// 		}
-
-	// 		return true;
-	// 	});
-	// }, [existing, formControllerHandler.value]);
 
 	const allPermissionsGrouped = useMemo((): Record<string, Operation[]> => {
 

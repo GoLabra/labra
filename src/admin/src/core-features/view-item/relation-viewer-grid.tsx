@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NextLink from 'next/link';
 import { EmptyMessage } from "@/shared/components/empty-message";
+import { useGetEdgeValue } from "@/hooks/use-get-edge-value";
 
 interface RelationViewerGridRootProps {
 	showId: boolean
@@ -44,13 +45,8 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 		}}>
 
 			<Box sx={{
-				//backgroundColor: 'var(--mui-palette-background-paper)',
-				// borderRadius: 2,
 				position: 'relative',
-				// overflow: 'hidden',
 			}}>
-
-				{/* <ArrowRoot /> */}
 
 				<Stack gap={1}>
 
@@ -65,7 +61,7 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 								</IconButton>
 
 								{hasHistory && (<Typography variant="h6">
-									{'.'.repeat(oneViewRelationStore.edges.length)} / 
+									{'.'.repeat(oneViewRelationStore.edges.length)} /
 								</Typography>)}
 
 								<Stack direction="row" gap={1} alignItems="center">
@@ -133,68 +129,33 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 			└─ ☑ [EDGE_01_01.relatedEntity.displayField.name]
 	*/
 
-	const contentManagerSearch = useContentManagerSearch({
-		initialFilter: {
-			id: {
-				operator: eqStringFoldOperator.name,
-				value: props.entryId
-			}
-		}
-	});
-
 	const fullEntity = useFullEntity({ entityName: props.edge.relatedEntity.name });
-	const selectFields = useMemo(() => fullEntity?.fields.map(i => i.name) ?? [], [fullEntity?.fields]);
-	const selectEdges = useMemo(() => ([
-		...fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
-			.filter(i => i.relationType !== 'ManyToOne')
-			.filter(i => i.relationType !== 'Many')
-			.map(i => ({
-				name: i.name,
-				fields: ['id', i.relatedEntity.displayField.name],
-			})) ?? []
-	]), [fullEntity?.edges]);
-
-	const contentManagerStore = useContentManagerStore({
+	
+	const relationData = useGetEdgeValue({
 		entityName: props.entityName,
-
-		page: contentManagerSearch.state.page,
-		rowsPerPage: contentManagerSearch.state.rowsPerPage,
-		sortBy: contentManagerSearch.state.sortBy,
-		order: contentManagerSearch.state.order,
-		edges: useMemo(() => {
-			if (!selectFields.length && !selectEdges.length) {
-				return undefined;
-			}
-
-			return [{
-				name: props.edge.name,
-				fields: selectFields,
-				edges: selectEdges
-			}]
-		}, [selectFields, selectEdges]),
-
-		filters: useMemo(() => getAdvancedFiltersFromGridFilter(contentManagerSearch.state.filter), [contentManagerSearch.state.filter]),
-	});
-
+		entryId: props.entryId,
+		edge: props.edge,
+		fields: 'allfields',
+		edges: useMemo(() => ([
+			...fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
+				.filter(i => i.relationType !== 'ManyToOne')
+				.filter(i => i.relationType !== 'Many')
+				.map(i => ({
+					name: i.name,
+					fields: ['id', i.relatedEntity.displayField.name],
+				})) ?? []
+		]), [fullEntity?.edges])
+	})
 
 	const gridData = useMemo(() => {
-
-		if (!contentManagerStore.state.data?.length) {
-			return []
-		}
-
-		const data = contentManagerStore.state.data[0][props.edge.name];
-
-		if (!data) {
+		if(!relationData.data){
 			return [];
 		}
-
-		if (Array.isArray(data)) {
-			return data;
+		if(Array.isArray(relationData.data)){
+			return relationData.data;
 		}
-
-		return [data];
-	}, [contentManagerStore.state.data]);
+		return [relationData.data];
+	}, [relationData.data]);
 
 
 	const headCells = useDynamicGridColumns({
