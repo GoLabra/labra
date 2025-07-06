@@ -11,15 +11,16 @@ func TestToCamel(t *testing.T) {
 		in  string
 		out string
 	}{
-		{"a test", "aTest"},
-		{"aTest", "aTest"},
-		{"twoTest", "twoTest"},
+		{"a test", "ATest"},
+		{"aTest", "ATest"},
+		{"twoTest", "TwoTest"},
 		{"TwoTest", "TwoTest"},
-		{"two Test", "twoTest"},
-		{"two test", "twoTest"},
-		{"two_test", "twoTest"},
-		{"two_Test", "twoTest"},
-		{"two_TeSt", "twoTeSt"},
+		{"two Test", "TwoTest"},
+		{"two test", "TwoTest"},
+		{"two_test", "TwoTest"},
+		{"two_Test", "TwoTest"},
+		{"two_TeSt", "TwoTeSt"},
+		{"file", "File"},
 	}
 
 	for _, tt := range tts {
@@ -43,6 +44,7 @@ func TestToLowerCamel(t *testing.T) {
 		{"two_test", "twoTest"},
 		{"two_Test", "twoTest"},
 		{"two_TeSt", "twoTeSt"},
+		{"file", "file"},
 	}
 
 	for _, tt := range tts {

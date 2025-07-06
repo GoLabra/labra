@@ -136,7 +136,7 @@ func (r *User) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniq
 }
 
 func (r *User) Create(ctx context.Context, data ent.CreateUserInput) (*ent.User, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
@@ -165,7 +165,7 @@ func (r *User) Create(ctx context.Context, data ent.CreateUserInput) (*ent.User,
 
 func (r *User) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateUserInput) (*ent.User, error) {
 	var err error
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -378,7 +378,7 @@ func (r *User) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateUs
 }
 
 func (r *User) Update(ctx context.Context, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) (*ent.User, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -406,7 +406,7 @@ func (r *User) Update(ctx context.Context, where ent.UserWhereUniqueInput, data 
 
 func (r *User) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) (*ent.User, error) {
 
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}

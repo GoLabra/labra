@@ -32,12 +32,12 @@ const templatesFolderPath = "./templates/%s"
 func init() {
 	pluralizeClient := pluralize.NewClient()
 	templateFuncMap = entgql.TemplateFuncs
-	templateFuncMap["ToUpper"] = strings.Title
 	templateFuncMap["LowerFirstLetter"] = strcase.LowerFirstLetter
 	templateFuncMap["ToLower"] = strings.ToLower
 	templateFuncMap["Singular"] = pluralizeClient.Singular
 	templateFuncMap["Plural"] = pluralizeClient.Plural
-	templateFuncMap["Camel"] = strcase.ToLowerCamel
+	templateFuncMap["Camel"] = strcase.ToLowerCamel // TODO @David these camels can be improved
+	templateFuncMap["ToCamel"] = strcase.ToCamel
 	templateFuncMap["Pascal"] = strcase.ToPascal
 	templateFuncMap["ToTitle"] = strcase.ToTitle
 	templateFuncMap["CreateInputs"] = CreateInputs
@@ -229,6 +229,11 @@ func CreateGraphqlSchema() gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 			for _, n := range g.Nodes {
+
+				if n.Annotations["Entity"] == nil || n.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+					continue
+				}
+
 				var createInputs = map[string]map[string]string{}
 				var entityAnnotation = annotations.Entity{}
 
@@ -361,6 +366,10 @@ func CreateRepositories() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -436,6 +445,10 @@ func CreateServices() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -483,6 +496,10 @@ func CreateServiceInterface() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != "User" {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -527,6 +544,10 @@ func CreateRepositoryInterface() gen.Hook {
 
 				if err != nil {
 					panic(err) // TODO treat errir
+				}
+
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
 				}
 
 				fileName := strcase.ToSnake(node.Name) + ".go"
@@ -576,6 +597,10 @@ func CreateResolvers() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".resolvers.go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -593,17 +618,12 @@ func CreateResolvers() gen.Hook {
 					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
 				}
 
-				data := GraphqlSchemaTemplateData{
-					Name:  node.Name,
-					Owner: entityAnnotation.Owner,
-				}
-
 				f, err := os.Create("./domain/resolvers/" + fileName)
 				if err != nil {
 					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
 				}
 
-				err = tmpl.Execute(f, data)
+				err = tmpl.Execute(f, node)
 				if err != nil {
 					f.Close()
 					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
@@ -748,7 +768,13 @@ func mapScalar(f *gen.Field) string {
 func CreateInputs(nodes []*gen.Type) map[string]map[string]string {
 	var createInputs = map[string]map[string]string{}
 	for _, n := range nodes {
+		if n.Annotations["Entity"] != nil && n.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+			continue
+		}
 		for _, e := range n.Edges {
+			if e.Type.Annotations["Entity"] == nil || e.Type.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+				continue
+			}
 			var inputName = fmt.Sprintf("Create%sWithout%sInput", e.Type.Name, n.Name)
 			if e.Ref == nil || e.Ref.Optional {
 				continue
@@ -801,6 +827,9 @@ func CreateInputs(nodes []*gen.Type) map[string]map[string]string {
 
 func GoInputName(isCreate bool, node *gen.Type, edge *gen.Edge) string {
 	input := InputName(isCreate, node, edge)
+	if edge.Type.Annotations["Entity"] == nil || edge.Type.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+		input = "admin." + input
+	}
 	if !isCreate || edge.Optional {
 		input = "*" + input
 	}

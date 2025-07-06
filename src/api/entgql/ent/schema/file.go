@@ -119,7 +119,6 @@ func (File) Fields() []ent.Field {
 			),
 
 		field.String("name").
-			Unique().
 			SchemaType(map[string]string{
 				dialect.MySQL:    "VARCHAR(255)",
 				dialect.Postgres: "VARCHAR(255)",
@@ -133,7 +132,6 @@ func (File) Fields() []ent.Field {
 			),
 
 		field.String("storage_file_name").
-			Unique().
 			SchemaType(map[string]string{
 				dialect.MySQL:    "VARCHAR(255)",
 				dialect.Postgres: "VARCHAR(255)",
@@ -158,10 +156,6 @@ func (File) Fields() []ent.Field {
 			),
 
 		field.String("content").
-			SchemaType(map[string]string{
-				dialect.MySQL:    "MEDIUMTEXT",
-				dialect.Postgres: "TEXT",
-			}).
 			Annotations(
 				entsql.Skip(),
 				annotations.Field{

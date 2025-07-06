@@ -9,6 +9,8 @@
 
 {{ template "import" $ }}
 
+import admin "github.com/GoLabra/labra/src/api/entgql/ent"
+
 {{ $gqlNodes := filterNodes $.Nodes (skipMode "mutation_create_input" "mutation_update_input") }}
 import (
     {{- range $n := $gqlNodes }}
@@ -27,6 +29,7 @@ type {{ $inputName }} struct {
 {{- end }}
 
 {{- range $n := $.Nodes }}
+    {{- if eq $n.Annotations.Entity.Owner "User" }}
     type CreateMany{{ $n.Name }}Input struct {
         {{- if not (ShouldSkip $n "mutation_create_input") }}
         Create  []*Create{{ $n.Name }}Input        `json:"create,omitempty"`
@@ -58,6 +61,7 @@ type {{ $inputName }} struct {
         Unset   *bool                          `json:"unset,omitempty"`
         Delete  *bool                          `json:"delete,omitempty"`
     }
+    {{- end }}
 {{- end }}
 
 
@@ -81,25 +85,6 @@ type {{ $inputName }} struct {
                 {{ $f.MutationAppend }} {{ if $f.IsPointer }}*{{ end }}{{ $f.Type }}
             {{- end }}
         {{- end }}
-        /*{{- range $e := $edges }}
-            {{- if and (not $n.IsCreate) $e.Optional }}
-                {{ $e.MutationClear }} bool
-            {{- end }}
-            {{- if $e.Unique }}
-                {{ pascal $e.Name }}  {{ if or (not $n.IsCreate) $e.Optional }}*{{ end }}CreateOne{{$e.Type.Name}}Without{{$n.Name}}Input
-                {{- $structField := print (pascal $e.Name) "ID" }}
-                {{ $structField }} {{ if or (not $n.IsCreate) $e.Optional }}*{{ end }}{{ $e.Type.ID.Type }}
-            {{- else }}
-                {{ pascal $e.Name }}  {{ if or (not $n.IsCreate) $e.Optional }}*{{ end }}CreateMany{{$e.Type.Name}}Without{{$n.Name}}Input
-                {{- if $n.IsCreate }}
-                    {{- $structField := print (singular $e.Name | pascal) "IDs" }}
-                    {{ $structField }} []{{ $e.Type.ID.Type }}
-                {{- else }}
-                    {{ $e.MutationAdd }} []{{ $e.Type.ID.Type }}
-                    {{ $e.MutationRemove }} []{{ $e.Type.ID.Type }}
-                {{- end }}
-            {{- end }}
-        {{- end }}*/
         {{- range $e := $n.Edges }}
             {{- if and (not $n.IsCreate) $e.Optional }}
                 {{ $e.MutationClear }} bool

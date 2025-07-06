@@ -7,6 +7,7 @@ toolchain go1.23.7
 replace github.com/GoLabra/labra/src/api => /home/david/labra/src/api
 
 require (
+	ariga.io/atlas v0.33.1
 	entgo.io/contrib v0.6.0
 	entgo.io/ent v0.14.4
 	github.com/99designs/gqlgen v0.17.73
@@ -25,7 +26,6 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.33.1 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect

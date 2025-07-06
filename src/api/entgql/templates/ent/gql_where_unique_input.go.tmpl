@@ -6,15 +6,21 @@ import (
 	"app/ent/predicate"
 
     {{- range $n := $.Nodes}}
+	{{- if ne $n.Annotations.Entity.Owner "User" }}
+	{{- continue }}
+	{{- end }}
     "app/ent/{{$n.Name | ToLower}}"
     {{- end}}
 )
 
 {{- range $n := $.Nodes}}
+{{- if ne $n.Annotations.Entity.Owner "User" }}
+{{- continue }}
+{{- end }}
 
 var ErrEmpty{{$n.Name}}WhereUniqueInput = errors.New("empty predicate {{$n.Name}}WhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// {{$n.Name}}WhereUniqueInput represents a where input for filtering {{$n.Name}} queries.
 type {{$n.Name}}WhereUniqueInput struct {
 	Predicates []predicate.{{$n.Name}}  `json:"-"`
 

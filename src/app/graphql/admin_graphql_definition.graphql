@@ -1,0 +1,103 @@
+input CreateFileInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  caption: String
+  name: String!
+  storageFileName: String!
+  size: Int!
+  content: String!
+  createdByID: ID
+  updatedByID: ID
+}
+
+input CreateOneFileInput {
+    create: CreateFileInput
+    connect: FileWhereUniqueInput
+}
+
+input CreateManyFileInput {
+    create: [CreateFileInput!]
+    connect: [FileWhereUniqueInput!]
+}
+
+
+input UpdateOneFileInput {
+    create: CreateFileInput
+    connect: FileWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyFileInput {
+    create: [CreateFileInput!]
+    connect: [FileWhereUniqueInput!]
+    delete: [FileWhereUniqueInput!]
+    disconnect: [FileWhereUniqueInput!]
+}
+
+input CreateOneUserInput {
+    connect: UserWhereUniqueInput
+}
+
+input CreateManyUserInput {
+    connect: [UserWhereUniqueInput!]
+}
+
+
+input UpdateOneUserInput {
+    connect: UserWhereUniqueInput
+    unset: Boolean
+}
+
+input UpdateManyUserInput {
+    connect: [UserWhereUniqueInput!]
+    disconnect: [UserWhereUniqueInput!]
+}
+
+extend type User {
+  name: String
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
+  createdAt: Time
+  updatedAt: Time
+  createdBy: User
+  updatedBy: User
+  roles: [Role!]
+  defaultRole: Role
+}
+extend type File {
+  createdAt: DateTime
+  updatedAt: DateTime
+  caption: String
+  name: String!
+  storageFileName: String!
+  size: Int!
+  content: String!
+  createdBy: User
+  updatedBy: User
+}
+
+type Role implements Node {
+  id: ID!
+  name: String!
+  createdAt: Time
+  updatedAt: Time
+  createdBy: User
+  updatedBy: User
+  userRoles: [User!]
+  permissions: [Permission!]
+}
+
+type Permission implements Node {
+  id: ID!
+  createdAt: DateTime
+  updatedAt: DateTime
+  entity: String!
+  operation: String!
+  createdBy: User
+  updatedBy: User
+  role: Role
+}
+scalar Time

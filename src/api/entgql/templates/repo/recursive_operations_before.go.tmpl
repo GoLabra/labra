@@ -1,8 +1,12 @@
 {{- define "recursive_operations_before" }}
     {{- $isPointer := $.Optional }}
+    {{- $package := "ent"}}
+    {{- if ne $.Type.Annotations.Entity.Owner "User" }}
+    {{- $package = "admin"}}
+    {{- end }}
     {{- if $.Unique }}
     if data.{{ Pascal $.Name }}.Connect != nil {    
-        toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *data.{{ Pascal $.Name }}.Connect)
+        toConnect, err := repository.{{ $.Type.Name }}.GetOne(ctx, *data.{{ Pascal $.Name }}.Connect)
 
         if err != nil {
             return nil, err
@@ -13,13 +17,13 @@
     
     {{- if not (ShouldSkip $.Type "mutation_create_input") }}
     if data.{{ Pascal $.Name }}.Create != nil {
-        var createInput ent.Create{{ $.Type.Name }}Input
+        var createInput {{ $package }}.Create{{ $.Type.Name }}Input
         err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
         if err != nil {
             return nil, err
         }
         
-        toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+        toConnect, err := repository.{{ $.Type.Name }}.Create(ctx, createInput)
 
         if err != nil {
             return nil, err
@@ -31,7 +35,7 @@
     {{- else }}
     if data.{{ Pascal $.Name }}.Connect != nil {
         for _, connect := range data.{{ Pascal $.Name }}.Connect {
-            toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *connect)
+            toConnect, err := repository.{{ $.Type.Name }}.GetOne(ctx, *connect)
 
             if err != nil {
                 return nil, err
@@ -43,13 +47,13 @@
     {{- if not (ShouldSkip $.Type "mutation_create_input") }}
     if data.{{ Pascal $.Name }}.Create != nil {
         for _, create := range data.{{ Pascal $.Name }}.Create {
-            var createInput ent.Create{{ $.Type.Name }}Input
+            var createInput {{ $package }}.Create{{ $.Type.Name }}Input
             err = mapstructure.Decode(create, &createInput)
             if err != nil {
                 return nil, err
             }
 
-            toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+            toConnect, err := repository.{{ $.Type.Name }}.Create(ctx, createInput)
 
             if err != nil {
                 return nil, err

@@ -16,8 +16,10 @@ import (
 	"app/ent/migrate"
 	"app/generated"
 
+	atlas "ariga.io/atlas/sql/schema"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 	gqlHandler "github.com/99designs/gqlgen/graphql/handler"
@@ -30,7 +32,6 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/GoLabra/labra/src/api/entgql/generator"
 	"github.com/GoLabra/labra/src/api/handler"
-
 	"github.com/GoLabra/labra/src/api/hooks"
 	"github.com/GoLabra/labra/src/api/strcase"
 	"github.com/GoLabra/labra/src/api/subscription"
@@ -87,6 +88,7 @@ func main() {
 		context.Background(),
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
+		schema.WithDiffHook(skipDiffOnAdminEntities),
 	); err != nil {
 		panic(err)
 	}
@@ -102,11 +104,13 @@ func main() {
 
 	LoadSchema(graph)
 
-	repository := repo.New(client)
+	adminClient, adminRepository, adminService, adminResolver := InitAdmin(drv)
+
+	repository := repo.New(client, adminClient)
 
 	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
 
-	service := svc.New(repository)
+	service := svc.New(repository, adminRepository)
 
 	gocentClient := gocent.New(gocent.Config{
 		Addr: conf.CentrifugoApiAddress,
@@ -116,8 +120,6 @@ func main() {
 	resolver := &resolvers.Resolver{
 		Service: service,
 	}
-
-	adminRepository, adminService, adminResolver := InitAdmin(drv)
 
 	router := chi.NewRouter()
 	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
@@ -220,7 +222,40 @@ func InitApp() {
 
 }
 
-func InitAdmin(drv *entsql.Driver) (*adminRepo.Repository, *adminSvc.Service, *adminResolver.Resolver) {
+func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
+	return schema.DiffFunc(func(current, desired *atlas.Schema) ([]atlas.Change, error) {
+		changes, err := next.Diff(current, desired)
+		if err != nil {
+			return nil, err
+		}
+		for _, c := range changes {
+			m, ok := c.(*atlas.ModifyTable)
+
+			if !ok || m.T.Name != "users" && m.T.Name != "files" {
+				continue
+			}
+			return nil, nil
+			// changes := atlas.Changes(m.Changes)
+			// m.cha
+			// switch i, j := changes.IndexDropColumn("old_name"), changes.IndexAddColumn("new_name"); {
+			// case i != -1 && j != -1:
+			// 	// Append a new renaming change.
+			// 	changes = append(changes, &atlas.RenameColumn{
+			// 		From: changes[i].(*atlas.DropColumn).C,
+			// 		To:   changes[j].(*atlas.AddColumn).C,
+			// 	})
+			// 	// Remove the drop and add changes.
+			// 	changes.RemoveIndex(i, j)
+			// 	m.Changes = changes
+			// case i != -1 || j != -1:
+			// 	return nil, errors.New("old_name and new_name must be present or absent")
+			// }
+		}
+		return changes, nil
+	})
+}
+
+func InitAdmin(drv *entsql.Driver) (*adminEnt.Client, *adminRepo.Repository, *adminSvc.Service, *adminResolver.Resolver) {
 	client := adminEnt.NewClient(adminEnt.Driver(drv))
 
 	client = client.Debug()
@@ -252,7 +287,7 @@ func InitAdmin(drv *entsql.Driver) (*adminRepo.Repository, *adminSvc.Service, *a
 		SubscriptionClient: graphqlSubscriptionClient,
 	}
 
-	return repository, service, adminResolver
+	return client, repository, service, adminResolver
 }
 
 func LoadSchema(graph *gen.Graph) {

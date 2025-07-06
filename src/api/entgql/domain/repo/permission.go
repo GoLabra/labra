@@ -136,7 +136,7 @@ func (r *Permission) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 }
 
 func (r *Permission) Create(ctx context.Context, data ent.CreatePermissionInput) (*ent.Permission, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
@@ -165,7 +165,7 @@ func (r *Permission) Create(ctx context.Context, data ent.CreatePermissionInput)
 
 func (r *Permission) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreatePermissionInput) (*ent.Permission, error) {
 	var err error
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -285,7 +285,7 @@ func (r *Permission) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
 }
 
 func (r *Permission) Update(ctx context.Context, where ent.PermissionWhereUniqueInput, data ent.UpdatePermissionInput) (*ent.Permission, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -313,7 +313,7 @@ func (r *Permission) Update(ctx context.Context, where ent.PermissionWhereUnique
 
 func (r *Permission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.PermissionWhereUniqueInput, data ent.UpdatePermissionInput) (*ent.Permission, error) {
 
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}

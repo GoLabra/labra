@@ -2,12 +2,18 @@ package repo
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
+	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/GoLabra/labra/src/api/entgql/ent"
 	"github.com/mitchellh/mapstructure"
+	"github.com/samborkent/uuidv7"
 )
 
 type File struct {
@@ -135,7 +141,7 @@ func (r *File) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.FileWhereUniq
 	return query.First(ctx)
 }
 func (r *File) Create(ctx context.Context, data ent.CreateFileInput) (*ent.File, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
@@ -163,8 +169,37 @@ func (r *File) Create(ctx context.Context, data ent.CreateFileInput) (*ent.File,
 }
 
 func (r *File) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateFileInput) (*ent.File, error) {
-	var err error
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	config, ok := ctx.Value("config").(*config.Config)
+
+	if !ok {
+		return nil, fmt.Errorf("[File.CreateTx] config not set in context")
+	}
+
+	fileExtension := filepath.Ext(data.Name)
+
+	if data.Caption == nil {
+		caption := strings.TrimSuffix(data.Name, fileExtension)
+		data.Caption = &caption
+	}
+
+	data.StorageFileName = uuidv7.New().String() + "." + fileExtension
+
+	decoded, err := base64.StdEncoding.DecodeString(data.Content)
+	if err != nil {
+		return nil, fmt.Errorf("[File.CreateTx] failed to decode base64 string: %w", err)
+	}
+
+	data.Size = int64(len(decoded))
+
+	outputPath := filepath.Join(config.FileStoragePath, data.StorageFileName)
+
+	err = os.WriteFile(outputPath, decoded, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("[File.CreateTx] failed to write file: %w", err)
+	}
+
+	// var err error
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -226,7 +261,7 @@ func (r *File) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateFi
 	return createdItems, nil
 }
 func (r *File) Update(ctx context.Context, where ent.FileWhereUniqueInput, data ent.UpdateFileInput) (*ent.File, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -254,7 +289,7 @@ func (r *File) Update(ctx context.Context, where ent.FileWhereUniqueInput, data 
 
 func (r *File) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.FileWhereUniqueInput, data ent.UpdateFileInput) (*ent.File, error) {
 
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}

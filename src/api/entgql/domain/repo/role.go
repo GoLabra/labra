@@ -136,7 +136,7 @@ func (r *Role) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 }
 
 func (r *Role) Create(ctx context.Context, data ent.CreateRoleInput) (*ent.Role, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
@@ -165,7 +165,7 @@ func (r *Role) Create(ctx context.Context, data ent.CreateRoleInput) (*ent.Role,
 
 func (r *Role) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateRoleInput) (*ent.Role, error) {
 	var err error
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -320,7 +320,7 @@ func (r *Role) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateRo
 }
 
 func (r *Role) Update(ctx context.Context, where ent.RoleWhereUniqueInput, data ent.UpdateRoleInput) (*ent.Role, error) {
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
@@ -348,7 +348,7 @@ func (r *Role) Update(ctx context.Context, where ent.RoleWhereUniqueInput, data 
 
 func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniqueInput, data ent.UpdateRoleInput) (*ent.Role, error) {
 
-	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	repository, ok := ctx.Value(constants.AdminRepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}

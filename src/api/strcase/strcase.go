@@ -6,6 +6,8 @@ import (
 	"unicode"
 
 	"github.com/iancoleman/strcase"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
@@ -20,19 +22,25 @@ func NodeNameToGraphqlName(s string) string {
 }
 
 func ToLowerCamel(s string) string {
-	words := strings.FieldsFunc(s, isSeparator)
-	if len(words) == 1 {
-		return strings.ToLower(words[0])
+	camel := ToCamel(s)
+	if len(camel) <= 1 {
+		return strings.ToLower(camel)
 	}
-	return strings.ToLower(words[0]) + pascalWords(words[1:])
+	return strings.ToLower(camel[:1]) + camel[1:]
 }
 
 func ToCamel(s string) string {
+	var camel string
 	words := strings.FieldsFunc(s, isSeparator)
 	if len(words) == 1 {
-		return words[0]
+		camel = words[0]
+	} else {
+		camel = words[0] + pascalWords(words[1:])
 	}
-	return words[0] + pascalWords(words[1:])
+	if len(camel) <= 1 {
+		return strings.ToUpper(camel)
+	}
+	return strings.ToUpper(camel[:1]) + camel[1:]
 }
 
 func ToPascal(s string) string {
@@ -44,7 +52,7 @@ func ToPascal(s string) string {
 }
 
 func ToTitle(val string) string {
-	return strings.ToTitle(val[:1]) + val[1:]
+	return cases.Title(language.English).String(val)
 }
 
 func LowerFirstLetter(val string) string {
