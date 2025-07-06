@@ -84,12 +84,6 @@ func (fc *FileCreate) SetSize(i int64) *FileCreate {
 	return fc
 }
 
-// SetContent sets the "content" field.
-func (fc *FileCreate) SetContent(s string) *FileCreate {
-	fc.mutation.SetContent(s)
-	return fc
-}
-
 // SetID sets the "id" field.
 func (fc *FileCreate) SetID(s string) *FileCreate {
 	fc.mutation.SetID(s)
@@ -202,9 +196,6 @@ func (fc *FileCreate) check() error {
 	if _, ok := fc.mutation.Size(); !ok {
 		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "File.size"`)}
 	}
-	if _, ok := fc.mutation.Content(); !ok {
-		return &ValidationError{Name: "content", err: errors.New(`ent: missing required field "File.content"`)}
-	}
 	return nil
 }
 
@@ -264,10 +255,6 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 	if value, ok := fc.mutation.Size(); ok {
 		_spec.SetField(file.FieldSize, field.TypeInt64, value)
 		_node.Size = value
-	}
-	if value, ok := fc.mutation.Content(); ok {
-		_spec.SetField(file.FieldContent, field.TypeString, value)
-		_node.Content = value
 	}
 	if nodes := fc.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -451,18 +438,6 @@ func (u *FileUpsert) AddSize(v int64) *FileUpsert {
 	return u
 }
 
-// SetContent sets the "content" field.
-func (u *FileUpsert) SetContent(v string) *FileUpsert {
-	u.Set(file.FieldContent, v)
-	return u
-}
-
-// UpdateContent sets the "content" field to the value that was provided on create.
-func (u *FileUpsert) UpdateContent() *FileUpsert {
-	u.SetExcluded(file.FieldContent)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -620,20 +595,6 @@ func (u *FileUpsertOne) AddSize(v int64) *FileUpsertOne {
 func (u *FileUpsertOne) UpdateSize() *FileUpsertOne {
 	return u.Update(func(s *FileUpsert) {
 		s.UpdateSize()
-	})
-}
-
-// SetContent sets the "content" field.
-func (u *FileUpsertOne) SetContent(v string) *FileUpsertOne {
-	return u.Update(func(s *FileUpsert) {
-		s.SetContent(v)
-	})
-}
-
-// UpdateContent sets the "content" field to the value that was provided on create.
-func (u *FileUpsertOne) UpdateContent() *FileUpsertOne {
-	return u.Update(func(s *FileUpsert) {
-		s.UpdateContent()
 	})
 }
 
@@ -961,20 +922,6 @@ func (u *FileUpsertBulk) AddSize(v int64) *FileUpsertBulk {
 func (u *FileUpsertBulk) UpdateSize() *FileUpsertBulk {
 	return u.Update(func(s *FileUpsert) {
 		s.UpdateSize()
-	})
-}
-
-// SetContent sets the "content" field.
-func (u *FileUpsertBulk) SetContent(v string) *FileUpsertBulk {
-	return u.Update(func(s *FileUpsert) {
-		s.SetContent(v)
-	})
-}
-
-// UpdateContent sets the "content" field to the value that was provided on create.
-func (u *FileUpsertBulk) UpdateContent() *FileUpsertBulk {
-	return u.Update(func(s *FileUpsert) {
-		s.UpdateContent()
 	})
 }
 

@@ -6,15 +6,19 @@ import (
 	"app/ent/predicate"
 
     {{- range $n := $.Nodes}}
-	{{- if ne $n.Annotations.Entity.Owner "User" }}
+	{{- if Ignore $n }}
 	{{- continue }}
 	{{- end }}
+	{{- if ne $n.Annotations.Entity.Owner "User" }}
+	"github.com/GoLabra/labra/src/api/entgql/ent/{{$n.Name | ToLower}}"
+	{{- else }}
     "app/ent/{{$n.Name | ToLower}}"
+	{{- end}}
     {{- end}}
 )
 
 {{- range $n := $.Nodes}}
-{{- if ne $n.Annotations.Entity.Owner "User" }}
+{{- if Ignore $n }}
 {{- continue }}
 {{- end }}
 

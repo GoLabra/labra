@@ -6,15 +6,13 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/GoLabra/labra/src/api/entgql/date"
-	"github.com/GoLabra/labra/src/api/utils"
-
 	"github.com/GoLabra/labra/src/api/entgql/annotations"
+	"github.com/GoLabra/labra/src/api/entgql/date"
 	"github.com/GoLabra/labra/src/api/entgql/entity"
+	"github.com/GoLabra/labra/src/api/utils"
 )
 
 // File holds the schema definition for the  File entity.
@@ -148,19 +146,9 @@ func (File) Fields() []ent.Field {
 		field.Int64("size").
 			Annotations(
 				entgql.OrderField("size"),
-				// entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Field{
 					Caption: "Size",
 					Type:    entity.FieldTypeInteger,
-				},
-			),
-
-		field.String("content").
-			Annotations(
-				entsql.Skip(),
-				annotations.Field{
-					Caption: "Content",
-					Type:    entity.FieldTypeLongText,
 				},
 			),
 	}

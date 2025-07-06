@@ -133,7 +133,6 @@ func (i *CreateFileInput) Mutate(m *FileMutation) {
 	m.SetName(i.Name)
 	m.SetStorageFileName(i.StorageFileName)
 	m.SetSize(i.Size)
-	m.SetContent(i.Content)
 	if v := i.CreatedByID; v != nil {
 		m.SetCreatedByID(*v)
 	}
@@ -203,9 +202,6 @@ func (i *UpdateFileInput) Mutate(m *FileMutation) {
 	}
 	if v := i.Size; v != nil {
 		m.SetSize(*v)
-	}
-	if v := i.Content; v != nil {
-		m.SetContent(*v)
 	}
 	if i.ClearCreatedBy {
 		m.ClearCreatedBy()

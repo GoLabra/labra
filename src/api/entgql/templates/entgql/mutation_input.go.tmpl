@@ -148,6 +148,9 @@ type {{ $inputName }} struct {
         FieldsDelete []FieldModelWhereUniqueInput
         {{- end }}
         {{- end }}
+        {{- if eq $n.Name "File" }}
+        Content string `json:"content,omitempty"`
+        {{- end }}
     }
 
     {{- if and (eq $n.Name "Menu") (not $n.IsCreate) }}

@@ -130,20 +130,6 @@ func (fu *FileUpdate) AddSize(i int64) *FileUpdate {
 	return fu
 }
 
-// SetContent sets the "content" field.
-func (fu *FileUpdate) SetContent(s string) *FileUpdate {
-	fu.mutation.SetContent(s)
-	return fu
-}
-
-// SetNillableContent sets the "content" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableContent(s *string) *FileUpdate {
-	if s != nil {
-		fu.SetContent(*s)
-	}
-	return fu
-}
-
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
 func (fu *FileUpdate) SetCreatedByID(id string) *FileUpdate {
 	fu.mutation.SetCreatedByID(id)
@@ -273,9 +259,6 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := fu.mutation.AddedSize(); ok {
 		_spec.AddField(file.FieldSize, field.TypeInt64, value)
-	}
-	if value, ok := fu.mutation.Content(); ok {
-		_spec.SetField(file.FieldContent, field.TypeString, value)
 	}
 	if fu.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -456,20 +439,6 @@ func (fuo *FileUpdateOne) AddSize(i int64) *FileUpdateOne {
 	return fuo
 }
 
-// SetContent sets the "content" field.
-func (fuo *FileUpdateOne) SetContent(s string) *FileUpdateOne {
-	fuo.mutation.SetContent(s)
-	return fuo
-}
-
-// SetNillableContent sets the "content" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableContent(s *string) *FileUpdateOne {
-	if s != nil {
-		fuo.SetContent(*s)
-	}
-	return fuo
-}
-
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
 func (fuo *FileUpdateOne) SetCreatedByID(id string) *FileUpdateOne {
 	fuo.mutation.SetCreatedByID(id)
@@ -629,9 +598,6 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 	}
 	if value, ok := fuo.mutation.AddedSize(); ok {
 		_spec.AddField(file.FieldSize, field.TypeInt64, value)
-	}
-	if value, ok := fuo.mutation.Content(); ok {
-		_spec.SetField(file.FieldContent, field.TypeString, value)
 	}
 	if fuo.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{

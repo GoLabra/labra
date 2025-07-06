@@ -114,21 +114,6 @@ type FileWhereInput struct {
 	SizeLT    *int64  `json:"sizeLT,omitempty"`
 	SizeLTE   *int64  `json:"sizeLTE,omitempty"`
 
-	// "content" field predicates.
-	Content             *string  `json:"content,omitempty"`
-	ContentNEQ          *string  `json:"contentNEQ,omitempty"`
-	ContentIn           []string `json:"contentIn,omitempty"`
-	ContentNotIn        []string `json:"contentNotIn,omitempty"`
-	ContentGT           *string  `json:"contentGT,omitempty"`
-	ContentGTE          *string  `json:"contentGTE,omitempty"`
-	ContentLT           *string  `json:"contentLT,omitempty"`
-	ContentLTE          *string  `json:"contentLTE,omitempty"`
-	ContentContains     *string  `json:"contentContains,omitempty"`
-	ContentHasPrefix    *string  `json:"contentHasPrefix,omitempty"`
-	ContentHasSuffix    *string  `json:"contentHasSuffix,omitempty"`
-	ContentEqualFold    *string  `json:"contentEqualFold,omitempty"`
-	ContentContainsFold *string  `json:"contentContainsFold,omitempty"`
-
 	// "created_by" edge predicates.
 	HasCreatedBy     *bool             `json:"hasCreatedBy,omitempty"`
 	HasCreatedByWith []*UserWhereInput `json:"hasCreatedByWith,omitempty"`
@@ -445,45 +430,6 @@ func (i *FileWhereInput) P() (predicate.File, error) {
 	}
 	if i.SizeLTE != nil {
 		predicates = append(predicates, file.SizeLTE(*i.SizeLTE))
-	}
-	if i.Content != nil {
-		predicates = append(predicates, file.ContentEQ(*i.Content))
-	}
-	if i.ContentNEQ != nil {
-		predicates = append(predicates, file.ContentNEQ(*i.ContentNEQ))
-	}
-	if len(i.ContentIn) > 0 {
-		predicates = append(predicates, file.ContentIn(i.ContentIn...))
-	}
-	if len(i.ContentNotIn) > 0 {
-		predicates = append(predicates, file.ContentNotIn(i.ContentNotIn...))
-	}
-	if i.ContentGT != nil {
-		predicates = append(predicates, file.ContentGT(*i.ContentGT))
-	}
-	if i.ContentGTE != nil {
-		predicates = append(predicates, file.ContentGTE(*i.ContentGTE))
-	}
-	if i.ContentLT != nil {
-		predicates = append(predicates, file.ContentLT(*i.ContentLT))
-	}
-	if i.ContentLTE != nil {
-		predicates = append(predicates, file.ContentLTE(*i.ContentLTE))
-	}
-	if i.ContentContains != nil {
-		predicates = append(predicates, file.ContentContains(*i.ContentContains))
-	}
-	if i.ContentHasPrefix != nil {
-		predicates = append(predicates, file.ContentHasPrefix(*i.ContentHasPrefix))
-	}
-	if i.ContentHasSuffix != nil {
-		predicates = append(predicates, file.ContentHasSuffix(*i.ContentHasSuffix))
-	}
-	if i.ContentEqualFold != nil {
-		predicates = append(predicates, file.ContentEqualFold(*i.ContentEqualFold))
-	}
-	if i.ContentContainsFold != nil {
-		predicates = append(predicates, file.ContentContainsFold(*i.ContentContainsFold))
 	}
 
 	if i.HasCreatedBy != nil {

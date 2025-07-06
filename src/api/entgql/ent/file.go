@@ -30,14 +30,14 @@ type File struct {
 	StorageFileName string `json:"storage_file_name,omitempty"`
 	// Size holds the value of the "size" field.
 	Size int64 `json:"size,omitempty"`
-	// Content holds the value of the "content" field.
-	Content string `json:"content,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FileQuery when eager-loading is set.
 	Edges           FileEdges `json:"edges"`
 	file_created_by *string
 	file_updated_by *string
 	selectValues    sql.SelectValues
+
+	Content string `json:"content,omitempty"`
 }
 
 // FileEdges holds the relations/edges for other nodes in the graph.
@@ -82,7 +82,7 @@ func (*File) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case file.FieldSize:
 			values[i] = new(sql.NullInt64)
-		case file.FieldID, file.FieldCaption, file.FieldName, file.FieldStorageFileName, file.FieldContent:
+		case file.FieldID, file.FieldCaption, file.FieldName, file.FieldStorageFileName:
 			values[i] = new(sql.NullString)
 		case file.FieldCreatedAt, file.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -148,12 +148,6 @@ func (f *File) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
 				f.Size = value.Int64
-			}
-		case file.FieldContent:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field content", values[i])
-			} else if value.Valid {
-				f.Content = value.String
 			}
 		case file.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -236,9 +230,6 @@ func (f *File) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("size=")
 	builder.WriteString(fmt.Sprintf("%v", f.Size))
-	builder.WriteString(", ")
-	builder.WriteString("content=")
-	builder.WriteString(f.Content)
 	builder.WriteByte(')')
 	return builder.String()
 }

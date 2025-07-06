@@ -23,9 +23,6 @@ func (m *FileMutation) UpdatedFields() map[string]Value {
 	if m.size != nil {
 		updatedFields["size"] = m.size
 	}
-	if m.content != nil {
-		updatedFields["content"] = m.content
-	}
 	if m.created_by != nil {
 		updatedFields["created_by"] = m.created_by
 	}

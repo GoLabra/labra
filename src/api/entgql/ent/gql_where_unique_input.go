@@ -12,14 +12,12 @@ import (
 
 var ErrEmptyFileWhereUniqueInput = errors.New("empty predicate FileWhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// FileWhereUniqueInput represents a where input for filtering File queries.
 type FileWhereUniqueInput struct {
 	Predicates []predicate.File `json:"-"`
 
-	ID              *string `json:"id,omitempty"`
-	Caption         *string `json:"caption,omitempty"`
-	Name            *string `json:"name,omitempty"`
-	StorageFileName *string `json:"storageFileName,omitempty"`
+	ID      *string `json:"id,omitempty"`
+	Caption *string `json:"caption,omitempty"`
 }
 
 func (i *FileWhereUniqueInput) AddPredicates(predicates ...predicate.File) {
@@ -46,12 +44,6 @@ func (i *FileWhereUniqueInput) P() (predicate.File, error) {
 	if i.Caption != nil {
 		predicates = append(predicates, file.CaptionEQ(*i.Caption))
 	}
-	if i.Name != nil {
-		predicates = append(predicates, file.NameEQ(*i.Name))
-	}
-	if i.StorageFileName != nil {
-		predicates = append(predicates, file.StorageFileNameEQ(*i.StorageFileName))
-	}
 
 	switch len(predicates) {
 	case 0:
@@ -65,7 +57,7 @@ func (i *FileWhereUniqueInput) P() (predicate.File, error) {
 
 var ErrEmptyPermissionWhereUniqueInput = errors.New("empty predicate PermissionWhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// PermissionWhereUniqueInput represents a where input for filtering Permission queries.
 type PermissionWhereUniqueInput struct {
 	Predicates []predicate.Permission `json:"-"`
 
@@ -106,7 +98,7 @@ func (i *PermissionWhereUniqueInput) P() (predicate.Permission, error) {
 
 var ErrEmptyRoleWhereUniqueInput = errors.New("empty predicate RoleWhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// RoleWhereUniqueInput represents a where input for filtering Role queries.
 type RoleWhereUniqueInput struct {
 	Predicates []predicate.Role `json:"-"`
 
@@ -151,7 +143,7 @@ func (i *RoleWhereUniqueInput) P() (predicate.Role, error) {
 
 var ErrEmptyUserWhereUniqueInput = errors.New("empty predicate UserWhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// UserWhereUniqueInput represents a where input for filtering User queries.
 type UserWhereUniqueInput struct {
 	Predicates []predicate.User `json:"-"`
 

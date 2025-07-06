@@ -231,22 +231,6 @@ input FileWhereInput {
   sizeLT: Int
   sizeLTE: Int
   """
-  content field predicates
-  """
-  content: String
-  contentNEQ: String
-  contentIn: [String!]
-  contentNotIn: [String!]
-  contentGT: String
-  contentGTE: String
-  contentLT: String
-  contentLTE: String
-  contentContains: String
-  contentHasPrefix: String
-  contentHasSuffix: String
-  contentEqualFold: String
-  contentContainsFold: String
-  """
   created_by edge predicates
   """
   hasCreatedBy: Boolean

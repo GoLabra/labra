@@ -48,6 +48,9 @@ func init() {
 	templateFuncMap["GoInputName"] = GoInputName
 	templateFuncMap["EntMutationFieldName"] = entMutationFieldName
 	templateFuncMap["ShouldSkip"] = utils.ShouldSkip
+	templateFuncMap["Ignore"] = func(t *gen.Type) bool {
+		return t.Annotations["Entity"] != nil && t.Annotations["Entity"].(map[string]any)["Owner"] == "User"
+	}
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
 	os.MkdirAll("./domain/resolvers", os.ModePerm)
@@ -73,6 +76,7 @@ func main() {
 			templates.MutationSetEdge,
 			templates.MutationAddEdges,
 			templates.MutationUpdatedFields,
+			templates.AdditionalFields,
 		),
 		entgql.WithWhereInputs(true),
 		entgql.WithConfigPath("./gqlgen.yml"),
@@ -97,8 +101,8 @@ func main() {
 		},
 		Hooks: []gen.Hook{
 			// CleanupUserFiles(),
-			// CreateGraphqlUniqueInputs(),
-			CreateEntUniqueInputs(),
+			CreateGraphqlUniqueInputs(),
+			// CreateEntUniqueInputs(),
 			// CreateGraphqlSchema(),
 			// CreateServiceInterface(),
 			// CreateRepositoryInterface(),

@@ -2260,22 +2260,6 @@ input FileWhereInput {
   sizeLT: Int
   sizeLTE: Int
   """
-  content field predicates
-  """
-  content: String
-  contentNEQ: String
-  contentIn: [String!]
-  contentNotIn: [String!]
-  contentGT: String
-  contentGTE: String
-  contentLT: String
-  contentLTE: String
-  contentContains: String
-  contentHasPrefix: String
-  contentHasSuffix: String
-  contentEqualFold: String
-  contentContainsFold: String
-  """
   created_by edge predicates
   """
   hasCreatedBy: Boolean
@@ -2957,24 +2941,20 @@ scalar DateOnly
 scalar TimeOnly
 
 scalar DateTime
-
+input FileWhereUniqueInput {
+  id: ID
+  caption: String
+}
 input PermissionWhereUniqueInput {
   id: ID
 }
-
 input RoleWhereUniqueInput {
   id: ID
   name: String
 }
-
 input UserWhereUniqueInput {
   id: ID
   email: String
-}
-
-input FileWhereUniqueInput {
-  id: ID
-  name: String
 }
 
 `, BuiltIn: false},
@@ -16158,7 +16138,7 @@ func (ec *executionContext) unmarshalInputFileWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "caption", "captionNEQ", "captionIn", "captionNotIn", "captionGT", "captionGTE", "captionLT", "captionLTE", "captionContains", "captionHasPrefix", "captionHasSuffix", "captionIsNil", "captionNotNil", "captionEqualFold", "captionContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "storageFileName", "storageFileNameNEQ", "storageFileNameIn", "storageFileNameNotIn", "storageFileNameGT", "storageFileNameGTE", "storageFileNameLT", "storageFileNameLTE", "storageFileNameContains", "storageFileNameHasPrefix", "storageFileNameHasSuffix", "storageFileNameEqualFold", "storageFileNameContainsFold", "size", "sizeNEQ", "sizeIn", "sizeNotIn", "sizeGT", "sizeGTE", "sizeLT", "sizeLTE", "content", "contentNEQ", "contentIn", "contentNotIn", "contentGT", "contentGTE", "contentLT", "contentLTE", "contentContains", "contentHasPrefix", "contentHasSuffix", "contentEqualFold", "contentContainsFold", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "caption", "captionNEQ", "captionIn", "captionNotIn", "captionGT", "captionGTE", "captionLT", "captionLTE", "captionContains", "captionHasPrefix", "captionHasSuffix", "captionIsNil", "captionNotNil", "captionEqualFold", "captionContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "storageFileName", "storageFileNameNEQ", "storageFileNameIn", "storageFileNameNotIn", "storageFileNameGT", "storageFileNameGTE", "storageFileNameLT", "storageFileNameLTE", "storageFileNameContains", "storageFileNameHasPrefix", "storageFileNameHasSuffix", "storageFileNameEqualFold", "storageFileNameContainsFold", "size", "sizeNEQ", "sizeIn", "sizeNotIn", "sizeGT", "sizeGTE", "sizeLT", "sizeLTE", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -16739,97 +16719,6 @@ func (ec *executionContext) unmarshalInputFileWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.SizeLTE = data
-		case "content":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Content = data
-		case "contentNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentNEQ"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentNEQ = data
-		case "contentIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentIn = data
-		case "contentNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentNotIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentNotIn = data
-		case "contentGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentGT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentGT = data
-		case "contentGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentGTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentGTE = data
-		case "contentLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentLT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentLT = data
-		case "contentLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentLTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentLTE = data
-		case "contentContains":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentContains"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentContains = data
-		case "contentHasPrefix":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentHasPrefix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentHasPrefix = data
-		case "contentHasSuffix":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentHasSuffix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentHasSuffix = data
-		case "contentEqualFold":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentEqualFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentEqualFold = data
-		case "contentContainsFold":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentContainsFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ContentContainsFold = data
 		case "hasCreatedBy":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedBy"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -16871,7 +16760,7 @@ func (ec *executionContext) unmarshalInputFileWhereUniqueInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name"}
+	fieldsInOrder := [...]string{"id", "caption"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -16885,13 +16774,13 @@ func (ec *executionContext) unmarshalInputFileWhereUniqueInput(ctx context.Conte
 				return it, err
 			}
 			it.ID = data
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		case "caption":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("caption"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Name = data
+			it.Caption = data
 		}
 	}
 

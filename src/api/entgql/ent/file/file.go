@@ -26,8 +26,6 @@ const (
 	FieldStorageFileName = "storage_file_name"
 	// FieldSize holds the string denoting the size field in the database.
 	FieldSize = "size"
-	// FieldContent holds the string denoting the content field in the database.
-	FieldContent = "content"
 	// EdgeCreatedBy holds the string denoting the created_by edge name in mutations.
 	EdgeCreatedBy = "created_by"
 	// EdgeUpdatedBy holds the string denoting the updated_by edge name in mutations.
@@ -59,7 +57,6 @@ var Columns = []string{
 	FieldName,
 	FieldStorageFileName,
 	FieldSize,
-	FieldContent,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "files"
@@ -131,11 +128,6 @@ func ByStorageFileName(opts ...sql.OrderTermOption) OrderOption {
 // BySize orders the results by the size field.
 func BySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSize, opts...).ToFunc()
-}
-
-// ByContent orders the results by the content field.
-func ByContent(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldContent, opts...).ToFunc()
 }
 
 // ByCreatedByField orders the results by created_by field.
