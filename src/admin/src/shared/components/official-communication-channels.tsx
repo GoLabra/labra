@@ -32,7 +32,7 @@ export const OfficialCommunicationChannels = () => {
                             Read the
                             {' '}
                             <Link
-                                href="#"
+                                // href="javascript:void(0)"
                                 target="_blank"
                                 variant="inherit"
                                 color="action.disabled" 
@@ -51,7 +51,7 @@ export const OfficialCommunicationChannels = () => {
                             Check
                             {' '}
                             <Link
-                                href="#"
+                                // href="javascript:void(0)"
                                 target="_blank"
                                 variant="inherit"
                                 color="action.disabled"

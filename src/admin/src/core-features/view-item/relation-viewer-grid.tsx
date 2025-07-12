@@ -41,7 +41,8 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 	return (
 		<Box sx={{
 			padding: '10px',
-			backgroundImage: 'url(/rough-diagonal.png)',
+			// backgroundImage: 'url(/rough-diagonal.png)',
+			background: 'url(/assets/img/relation-background.svg)',
 		}}>
 
 			<Box sx={{
@@ -51,7 +52,7 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 				<Stack gap={1}>
 
 					<RoundPanelPlaceholder sx={{
-						backdropFilter: 'blur(100px)'
+						// backdropFilter: 'blur(100px)'
 					}}>
 						<Stack direction="row" gap={1} alignItems="center" justifyContent="space-between">
 							<Stack direction="row" gap={1} alignItems="center">

@@ -9,6 +9,7 @@ import { Issuer } from '@/lib/utils/auth';
 import { changeRoleQuery, signInQuery, superUserSignUpQuery } from '@/lib/apollo/queries/auth';
 import { useMutation, useQuery, useLazyQuery, gql } from '@apollo/client';
 import { isJwtValid, getJwtSub } from '@/lib/utils/jwt';
+import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
 
 
 export const getMeDocument = gql`query getMe($where:UserWhereInput!) {
@@ -128,7 +129,9 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     const [signUpRequest] = useMutation<any>(superUserSignUpQuery);
     const [signInRequest] = useMutation<any>(signInQuery);
     const [changeRoleRequest] = useMutation<any>(changeRoleQuery);
-    const [me] = useLazyQuery<any>(getMeDocument);
+    const [me] = useLazyQuery<any>(getMeDocument, {
+		context: ADMIN_CONTEXT
+	});
     
     const initialize = useCallback(
         async (): Promise<void> => {
