@@ -49,8 +49,7 @@ func init() {
 	templateFuncMap["EntMutationFieldName"] = entMutationFieldName
 	templateFuncMap["ShouldSkip"] = utils.ShouldSkip
 	templateFuncMap["Ignore"] = func(t *gen.Type) bool {
-		fmt.Println(t.Annotations["Entity"].(map[string]any)["Owner"])
-		return t.Annotations["Entity"] != nil && t.Annotations["Entity"].(map[string]any)["Owner"] != "User"
+		return t.Annotations["Entity"] == nil || t.Annotations["Entity"].(map[string]any)["Owner"] != "User"
 	}
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
