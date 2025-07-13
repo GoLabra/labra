@@ -37,7 +37,7 @@ func LoadSchema(config *config.Config) {
 
 	nodes = append(nodes, graph.Nodes...)
 
-	for _, node := range graph.Nodes {
+	for _, node := range nodes {
 		var entityAnnotations annotations.Entity
 		err := mapstructure.Decode(node.Annotations["Entity"], &entityAnnotations)
 		if err != nil {
