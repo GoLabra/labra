@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
 	"app/domain/repo"
@@ -217,14 +218,15 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 		if err != nil {
 			return nil, err
 		}
-		for _, c := range changes {
-			m, ok := c.(*atlas.ModifyTable)
 
-			if !ok || m.T.Name != "users" && m.T.Name != "files" {
-				continue
+		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
+			m, ok := c.(*atlas.ModifyTable)
+			if ok && (m.T.Name == "users" || m.T.Name == "files") {
+				return true
 			}
-			return nil, nil
-		}
+			return false
+		})
+		
 		return changes, nil
 	})
 }
