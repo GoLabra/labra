@@ -20,20 +20,15 @@ import (
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
-	"entgo.io/ent/entc"
-	"entgo.io/ent/entc/gen"
 	gqlHandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/GoLabra/labra/src/api/cache"
 	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
-	"github.com/GoLabra/labra/src/api/entgql/annotations"
-	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/GoLabra/labra/src/api/entgql/generator"
 	"github.com/GoLabra/labra/src/api/handler"
 	"github.com/GoLabra/labra/src/api/hooks"
-	"github.com/GoLabra/labra/src/api/strcase"
 	"github.com/GoLabra/labra/src/api/subscription"
 	"github.com/GoLabra/labra/src/api/utils"
 	"github.com/centrifugal/gocent/v3"
@@ -41,7 +36,6 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/gorilla/websocket"
 	_ "github.com/lib/pq"
-	"github.com/mitchellh/mapstructure"
 	"github.com/rs/cors"
 
 	adminRepo "github.com/GoLabra/labra/src/api/entgql/domain/repo"
@@ -93,16 +87,11 @@ func main() {
 		panic(err)
 	}
 
-	graph, err := entc.LoadGraph(conf.EntSchemaPath, &gen.Config{})
-	if err != nil {
-		panic(err)
-	}
-
 	cache.NewEntityCache(1 * time.Hour)
 	cache.NewEdgeCache(1 * time.Hour)
 	cache.NewFieldCache(1 * time.Hour)
 
-	LoadSchema(graph)
+	utils.LoadSchema(conf)
 
 	adminClient, adminRepository, adminService, adminResolver := InitAdmin(drv)
 
@@ -235,21 +224,6 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 				continue
 			}
 			return nil, nil
-			// changes := atlas.Changes(m.Changes)
-			// m.cha
-			// switch i, j := changes.IndexDropColumn("old_name"), changes.IndexAddColumn("new_name"); {
-			// case i != -1 && j != -1:
-			// 	// Append a new renaming change.
-			// 	changes = append(changes, &atlas.RenameColumn{
-			// 		From: changes[i].(*atlas.DropColumn).C,
-			// 		To:   changes[j].(*atlas.AddColumn).C,
-			// 	})
-			// 	// Remove the drop and add changes.
-			// 	changes.RemoveIndex(i, j)
-			// 	m.Changes = changes
-			// case i != -1 || j != -1:
-			// 	return nil, errors.New("old_name and new_name must be present or absent")
-			// }
 		}
 		return changes, nil
 	})
@@ -288,102 +262,4 @@ func InitAdmin(drv *entsql.Driver) (*adminEnt.Client, *adminRepo.Repository, *ad
 	}
 
 	return client, repository, service, adminResolver
-}
-
-func LoadSchema(graph *gen.Graph) {
-	for _, node := range graph.Nodes {
-		var entityAnnotations annotations.Entity
-		err := mapstructure.Decode(node.Annotations["Entity"], &entityAnnotations)
-		if err != nil {
-			panic(err)
-		}
-
-		entityName := strcase.NodeNameToGraphqlName(node.Name)
-		cache.Entity.Set(entityName, entity.Entity{
-			Name:             entityName,
-			EntName:          node.Name,
-			Caption:          entityAnnotations.Caption,
-			Owner:            entityAnnotations.Owner,
-			DisplayFieldName: entityAnnotations.DisplayField,
-		})
-
-		fields := []entity.Field{
-			{
-				Caption: "Id",
-				Name:    "id",
-				Type:    string(entity.FieldTypeID),
-			},
-		}
-		for _, nodeField := range node.Fields {
-			var fieldAnnotations annotations.Field
-			err := mapstructure.Decode(nodeField.Annotations["Field"], &fieldAnnotations)
-			if err != nil {
-				panic(err)
-			}
-
-			required := !nodeField.Optional
-			unique := nodeField.Unique
-
-			field := entity.Field{
-				Name:           strcase.ToLowerCamel(nodeField.Name),
-				EntName:        nodeField.Name,
-				Caption:        fieldAnnotations.Caption,
-				Type:           string(fieldAnnotations.Type),
-				Required:       &required,
-				Unique:         &unique,
-				Nillable:       nodeField.Nillable,
-				UpdateDefault:  nodeField.UpdateDefault,
-				AcceptedValues: fieldAnnotations.AcceptedValues,
-			}
-
-			if nodeField.Default {
-				defaultValue := fmt.Sprint(nodeField.DefaultValue())
-				if fieldAnnotations.DefaultValue != "" {
-					defaultValue = fieldAnnotations.DefaultValue
-				}
-				field.DefaultValue = &defaultValue
-			}
-
-			if fieldAnnotations.Min != "" {
-				field.Min = &fieldAnnotations.Min
-			}
-
-			if fieldAnnotations.Max != "" {
-				field.Max = &fieldAnnotations.Max
-			}
-
-			if fieldAnnotations.Private {
-				field.Private = &fieldAnnotations.Private
-			}
-
-			fields = append(fields, field)
-		}
-		cache.Field.Set(entityName, fields)
-
-		edges := []entity.Edge{}
-		for _, edge := range node.Edges {
-			var edgeAnnotations annotations.Edge
-			err := mapstructure.Decode(edge.Annotations["Edge"], &edgeAnnotations)
-			if err != nil {
-				panic(err)
-			}
-
-			required := !edge.Optional
-			ref := ""
-			if edge.Ref != nil && edge.IsInverse() {
-				ref = edge.Ref.Name
-			}
-
-			edges = append(edges, entity.Edge{
-				Name:         strcase.ToLowerCamel(edge.Name),
-				EntName:      edge.Name,
-				Caption:      edgeAnnotations.Caption,
-				Required:     &required,
-				Type:         edge.Type.Name,
-				Ref:          ref,
-				RelationType: edgeAnnotations.RelationType,
-			})
-		}
-		cache.Edge.Set(entityName, edges)
-	}
 }
