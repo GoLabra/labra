@@ -473,10 +473,6 @@ const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 					create: {
 						name: (file.file as File).name,
 						content: await fileToBase64(file.file as File),
-
-						//!!!! remove these
-						storageFileName: createId(),
-						size: 1,
 					}
 				}
 			case 'delete':
@@ -518,10 +514,6 @@ const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => {
 					.map(async (i: FileDiffWrapper) => ({
 						name: (i.file as File).name,
 						content: await fileToBase64(i.file as File),
-
-						//!!!! remove these
-						storageFileName: createId(),
-						size: 1,
 
 					})))
 			}),

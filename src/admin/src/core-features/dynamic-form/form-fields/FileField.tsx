@@ -9,8 +9,8 @@ import { useCallback, useMemo } from "react";
 import { EdgeStatus } from "@/lib/utils/edge-status";
 import { useRelationDiff } from "@/features/content-manager/use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
-import { useEntityFiles, useGetEdgeValue } from "@/hooks/use-get-edge-value";
-import { FileData } from "@/shared/components/file-thumbnail";
+import { LFile, useEntityFiles, useGetEdgeValue } from "@/hooks/use-get-edge-value";
+import { FileData, fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
 
 export type FileDiffWrapper = {
 	id: string;
@@ -43,15 +43,21 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 	const edgeFiles = useEntityFiles({
 		entityName, 
 		entryId: props.editId, 
-		edge
+		edge,
+		loadContent: useCallback((file: LFile) => {
+			return fileIsImage(fileTypeByUrl(file.name));
+		}, []),
 	});
 
 	const savedValueItems = useMemo((): FileDiffWrapper[] => {
 		return edgeFiles?.map(i => ({
 			id: i.id,
 			file: {
+				caption: i.caption,
 				name: i.name,
-				preview: i.content,
+				size: i.size,
+				mimeType: i.mimeType,
+				preview: `data:${i.mimeType};base64,${i.content}`,
 			},
 			status: 'saved'
 		})) ?? []

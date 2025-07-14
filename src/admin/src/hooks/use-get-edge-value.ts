@@ -8,6 +8,7 @@ import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filte
 import { gql, useQuery } from "@apollo/client";
 import { fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
 import { EdgeRequest } from "@/lib/apollo/builders/gqlQueryBuilder";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 
 const GET_FILES_CONTENT = gql`query files($or: [FileWhereInput!]) {
 	files(where: { or: $or }) {
@@ -16,11 +17,19 @@ const GET_FILES_CONTENT = gql`query files($or: [FileWhereInput!]) {
 	}
 }`
 
+export type LFile = {
+	id: string;
+	name: string;
+	caption: string;
+	mimeType: string;
+	size: number;
+}
 
 interface UseEntityFilesParams {
 	entityName: string;
 	entryId: string | null | undefined;
 	edge: Edge;
+	loadContent?: (file: LFile) => boolean;
 }
 export const useEntityFiles = (props: UseEntityFilesParams) => {
 
@@ -28,14 +37,14 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 		entityName: props.entityName, 
 		entryId: props.entryId, 
 		edge: props.edge,
-		fields: ['id', 'name']
+		fields: ['id', 'caption', 'name', 'mimeType', 'size'] 
 	});
 
 	const files = useMemo(() => {
-		if (!edgeValueData.data) {
+		if(!edgeValueData.data){
 			return [];
 		}
-
+		
 		if(!Array.isArray(edgeValueData.data)){
 			return [edgeValueData.data]
 		}
@@ -44,7 +53,7 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 	}, [edgeValueData.data]);
 
 	const previewIds = useMemo(() => {
-		return files.filter(i => fileIsImage(fileTypeByUrl(i.name)))
+		return files.filter(i => props.loadContent?.(i) ?? true)
 					.map(i => i.id);
 
 	}, [files]);
@@ -57,12 +66,12 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 			})) ?? []
 		}, 
 		fetchPolicy: 'network-only',
-		skip: previewIds.length == 0
-
+		skip: previewIds.length == 0,
+		context: ADMIN_CONTEXT
 	});
 
 
-	return useMemo((): any[] => {
+	const filesWithContent = useMemo((): any[] => {
 		
 		const filesContent = filesContentData.data?.files ?? [];
 
@@ -79,6 +88,7 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 		});
 	}, [files, filesContentData.data])
 
+	return filesWithContent;
 }
 
 
