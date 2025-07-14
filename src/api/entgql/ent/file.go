@@ -26,6 +26,8 @@ type File struct {
 	Caption string `json:"caption,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// MimeType holds the value of the "mime_type" field.
+	MimeType string `json:"mime_type,omitempty"`
 	// StorageFileName holds the value of the "storage_file_name" field.
 	StorageFileName string `json:"storage_file_name,omitempty"`
 	// Size holds the value of the "size" field.
@@ -82,7 +84,7 @@ func (*File) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case file.FieldSize:
 			values[i] = new(sql.NullInt64)
-		case file.FieldID, file.FieldCaption, file.FieldName, file.FieldStorageFileName:
+		case file.FieldID, file.FieldCaption, file.FieldName, file.FieldMimeType, file.FieldStorageFileName:
 			values[i] = new(sql.NullString)
 		case file.FieldCreatedAt, file.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -136,6 +138,12 @@ func (f *File) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				f.Name = value.String
+			}
+		case file.FieldMimeType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field mime_type", values[i])
+			} else if value.Valid {
+				f.MimeType = value.String
 			}
 		case file.FieldStorageFileName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -224,6 +232,9 @@ func (f *File) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(f.Name)
+	builder.WriteString(", ")
+	builder.WriteString("mime_type=")
+	builder.WriteString(f.MimeType)
 	builder.WriteString(", ")
 	builder.WriteString("storage_file_name=")
 	builder.WriteString(f.StorageFileName)

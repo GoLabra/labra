@@ -76,6 +76,11 @@ func (f *FileQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 				selectedFields = append(selectedFields, file.FieldName)
 				fieldSeen[file.FieldName] = struct{}{}
 			}
+		case "mimeType":
+			if _, ok := fieldSeen[file.FieldMimeType]; !ok {
+				selectedFields = append(selectedFields, file.FieldMimeType)
+				fieldSeen[file.FieldMimeType] = struct{}{}
+			}
 		case "storageFileName":
 			if _, ok := fieldSeen[file.FieldStorageFileName]; !ok {
 				selectedFields = append(selectedFields, file.FieldStorageFileName)

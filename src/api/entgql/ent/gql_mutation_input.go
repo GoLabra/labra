@@ -105,18 +105,14 @@ type CreateFileInput struct {
 	UpdatedAt       *time.Time
 	Caption         *string
 	Name            string
+	MimeType        string
 	StorageFileName string
 	Size            int64
-	Content         string
-	/*
-	   CreatedBy  *CreateOneUserWithoutFileInput
-	   CreatedByID *string
-	   UpdatedBy  *CreateOneUserWithoutFileInput
-	   UpdatedByID *string*/
-	CreatedBy   *CreateOneUserInput
-	CreatedByID *string
-	UpdatedBy   *CreateOneUserInput
-	UpdatedByID *string
+	CreatedBy       *CreateOneUserInput
+	CreatedByID     *string
+	UpdatedBy       *CreateOneUserInput
+	UpdatedByID     *string
+	Content         string `json:"content,omitempty"`
 }
 
 // Mutate applies the CreateFileInput on the FileMutation builder.
@@ -131,6 +127,7 @@ func (i *CreateFileInput) Mutate(m *FileMutation) {
 		m.SetCaption(*v)
 	}
 	m.SetName(i.Name)
+	m.SetMimeType(i.MimeType)
 	m.SetStorageFileName(i.StorageFileName)
 	m.SetSize(i.Size)
 	if v := i.CreatedByID; v != nil {
@@ -156,22 +153,16 @@ type UpdateFileInput struct {
 	ClearCaption    bool
 	Caption         *string
 	Name            *string
+	MimeType        *string
 	StorageFileName *string
 	Size            *int64
-	Content         *string
-	/*
-	   ClearCreatedBy bool
-	   CreatedBy  *CreateOneUserWithoutFileInput
-	   CreatedByID *string
-	   ClearUpdatedBy bool
-	   UpdatedBy  *CreateOneUserWithoutFileInput
-	   UpdatedByID *string*/
-	ClearCreatedBy bool
-	CreatedBy      *UpdateOneUserInput
-	CreatedByID    *string
-	ClearUpdatedBy bool
-	UpdatedBy      *UpdateOneUserInput
-	UpdatedByID    *string
+	ClearCreatedBy  bool
+	CreatedBy       *UpdateOneUserInput
+	CreatedByID     *string
+	ClearUpdatedBy  bool
+	UpdatedBy       *UpdateOneUserInput
+	UpdatedByID     *string
+	Content         string `json:"content,omitempty"`
 }
 
 // Mutate applies the UpdateFileInput on the FileMutation builder.
@@ -196,6 +187,9 @@ func (i *UpdateFileInput) Mutate(m *FileMutation) {
 	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
+	}
+	if v := i.MimeType; v != nil {
+		m.SetMimeType(*v)
 	}
 	if v := i.StorageFileName; v != nil {
 		m.SetStorageFileName(*v)
@@ -231,17 +225,10 @@ func (c *FileUpdateOne) SetInput(i UpdateFileInput) *FileUpdateOne {
 
 // CreatePermissionInput represents a mutation input for creating permissions.
 type CreatePermissionInput struct {
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
-	Entity    string
-	Operation *string
-	/*
-	   CreatedBy  *CreateOneUserWithoutPermissionInput
-	   CreatedByID *string
-	   UpdatedBy  *CreateOneUserWithoutPermissionInput
-	   UpdatedByID *string
-	   Role  *CreateOneRoleWithoutPermissionInput
-	   RoleID *string*/
+	CreatedAt   *time.Time
+	UpdatedAt   *time.Time
+	Entity      string
+	Operation   *string
 	CreatedBy   *CreateOneUserInput
 	CreatedByID *string
 	UpdatedBy   *CreateOneUserInput
@@ -287,16 +274,6 @@ type UpdatePermissionInput struct {
 	UpdatedAt      *time.Time
 	Entity         *string
 	Operation      *string
-	/*
-	   ClearCreatedBy bool
-	   CreatedBy  *CreateOneUserWithoutPermissionInput
-	   CreatedByID *string
-	   ClearUpdatedBy bool
-	   UpdatedBy  *CreateOneUserWithoutPermissionInput
-	   UpdatedByID *string
-	   ClearRole bool
-	   Role  *CreateOneRoleWithoutPermissionInput
-	   RoleID *string*/
 	ClearCreatedBy bool
 	CreatedBy      *UpdateOneUserInput
 	CreatedByID    *string
@@ -362,16 +339,7 @@ func (c *PermissionUpdateOne) SetInput(i UpdatePermissionInput) *PermissionUpdat
 
 // CreateRoleInput represents a mutation input for creating roles.
 type CreateRoleInput struct {
-	Name string
-	/*
-	   CreatedBy  *CreateOneUserWithoutRoleInput
-	   CreatedByID *string
-	   UpdatedBy  *CreateOneUserWithoutRoleInput
-	   UpdatedByID *string
-	   UserRoles  *CreateManyUserWithoutRoleInput
-	       UserRoleIDs []string
-	   Permissions  *CreateManyPermissionWithoutRoleInput
-	       PermissionIDs []string*/
+	Name          string
 	CreatedBy     *CreateOneUserInput
 	CreatedByID   *string
 	UpdatedBy     *CreateOneUserInput
@@ -407,22 +375,7 @@ func (c *RoleCreate) SetInput(i CreateRoleInput) *RoleCreate {
 
 // UpdateRoleInput represents a mutation input for updating roles.
 type UpdateRoleInput struct {
-	Name *string
-	/*
-	   ClearCreatedBy bool
-	   CreatedBy  *CreateOneUserWithoutRoleInput
-	   CreatedByID *string
-	   ClearUpdatedBy bool
-	   UpdatedBy  *CreateOneUserWithoutRoleInput
-	   UpdatedByID *string
-	   ClearUserRoles bool
-	   UserRoles  *CreateManyUserWithoutRoleInput
-	       AddUserRoleIDs []string
-	       RemoveUserRoleIDs []string
-	   ClearPermissions bool
-	   Permissions  *CreateManyPermissionWithoutRoleInput
-	       AddPermissionIDs []string
-	       RemovePermissionIDs []string*/
+	Name                *string
 	ClearCreatedBy      bool
 	CreatedBy           *UpdateOneUserInput
 	CreatedByID         *string
@@ -490,24 +443,11 @@ func (c *RoleUpdateOne) SetInput(i UpdateRoleInput) *RoleUpdateOne {
 
 // CreateUserInput represents a mutation input for creating users.
 type CreateUserInput struct {
-	Name      *string
-	Email     string
-	Password  string
-	FirstName string
-	LastName  string
-	/*
-	   RefCreatedBy  *CreateManyUserWithoutUserInput
-	       RefCreatedByIDs []string
-	   CreatedBy  *CreateOneUserWithoutUserInput
-	   CreatedByID *string
-	   RefUpdatedBy  *CreateManyUserWithoutUserInput
-	       RefUpdatedByIDs []string
-	   UpdatedBy  *CreateOneUserWithoutUserInput
-	   UpdatedByID *string
-	   Roles  *CreateManyRoleWithoutUserInput
-	       RoleIDs []string
-	   DefaultRole  *CreateOneRoleWithoutUserInput
-	   DefaultRoleID *string*/
+	Name            *string
+	Email           string
+	Password        string
+	FirstName       string
+	LastName        string
 	RefCreatedBy    *CreateManyUserInput
 	RefCreatedByIDs []string
 	CreatedBy       *CreateOneUserInput
@@ -559,34 +499,12 @@ func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
 
 // UpdateUserInput represents a mutation input for updating users.
 type UpdateUserInput struct {
-	ClearName bool
-	Name      *string
-	Email     *string
-	Password  *string
-	FirstName *string
-	LastName  *string
-	/*
-	   ClearRefCreatedBy bool
-	   RefCreatedBy  *CreateManyUserWithoutUserInput
-	       AddRefCreatedByIDs []string
-	       RemoveRefCreatedByIDs []string
-	   ClearCreatedBy bool
-	   CreatedBy  *CreateOneUserWithoutUserInput
-	   CreatedByID *string
-	   ClearRefUpdatedBy bool
-	   RefUpdatedBy  *CreateManyUserWithoutUserInput
-	       AddRefUpdatedByIDs []string
-	       RemoveRefUpdatedByIDs []string
-	   ClearUpdatedBy bool
-	   UpdatedBy  *CreateOneUserWithoutUserInput
-	   UpdatedByID *string
-	   ClearRoles bool
-	   Roles  *CreateManyRoleWithoutUserInput
-	       AddRoleIDs []string
-	       RemoveRoleIDs []string
-	   ClearDefaultRole bool
-	   DefaultRole  *CreateOneRoleWithoutUserInput
-	   DefaultRoleID *string*/
+	ClearName             bool
+	Name                  *string
+	Email                 *string
+	Password              *string
+	FirstName             *string
+	LastName              *string
 	ClearRefCreatedBy     bool
 	RefCreatedBy          *UpdateManyUserInput
 	AddRefCreatedByIDs    []string

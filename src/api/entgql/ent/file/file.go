@@ -22,6 +22,8 @@ const (
 	FieldCaption = "caption"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldMimeType holds the string denoting the mime_type field in the database.
+	FieldMimeType = "mime_type"
 	// FieldStorageFileName holds the string denoting the storage_file_name field in the database.
 	FieldStorageFileName = "storage_file_name"
 	// FieldSize holds the string denoting the size field in the database.
@@ -55,6 +57,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldCaption,
 	FieldName,
+	FieldMimeType,
 	FieldStorageFileName,
 	FieldSize,
 }
@@ -118,6 +121,11 @@ func ByCaption(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByMimeType orders the results by the mime_type field.
+func ByMimeType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMimeType, opts...).ToFunc()
 }
 
 // ByStorageFileName orders the results by the storage_file_name field.

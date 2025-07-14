@@ -184,7 +184,15 @@ func (r *File) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateFileInpu
 
 	data.StorageFileName = uuidv7.New().String() + "." + fileExtension
 
-	decoded, err := base64.StdEncoding.DecodeString(data.Content)
+	parts := strings.Split(data.Content, ";base64,")
+
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("[File.CreateTx] incorrect file content format, expecting data:<mimetype>;base64,<b64 encoded data>")
+	}
+
+	data.MimeType = strings.TrimPrefix(parts[0], "data:")
+
+	decoded, err := base64.StdEncoding.DecodeString(parts[1])
 	if err != nil {
 		return nil, fmt.Errorf("[File.CreateTx] failed to decode base64 string: %w", err)
 	}

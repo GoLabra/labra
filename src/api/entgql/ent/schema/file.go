@@ -129,6 +129,19 @@ func (File) Fields() []ent.Field {
 				},
 			),
 
+		field.String("mime_type").
+			SchemaType(map[string]string{
+				dialect.MySQL:    "VARCHAR(255)",
+				dialect.Postgres: "VARCHAR(255)",
+			}).
+			Annotations(
+				entgql.OrderField("mimeType"),
+				annotations.Field{
+					Caption: "MIME Type",
+					Type:    entity.FieldTypeShortText,
+				},
+			),
+
 		field.String("storage_file_name").
 			SchemaType(map[string]string{
 				dialect.MySQL:    "VARCHAR(255)",

@@ -43,6 +43,7 @@ type FileMutation struct {
 	updated_at        *time.Time
 	caption           *string
 	name              *string
+	mime_type         *string
 	storage_file_name *string
 	size              *int64
 	addsize           *int64
@@ -343,6 +344,42 @@ func (m *FileMutation) ResetName() {
 	m.name = nil
 }
 
+// SetMimeType sets the "mime_type" field.
+func (m *FileMutation) SetMimeType(s string) {
+	m.mime_type = &s
+}
+
+// MimeType returns the value of the "mime_type" field in the mutation.
+func (m *FileMutation) MimeType() (r string, exists bool) {
+	v := m.mime_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMimeType returns the old "mime_type" field's value of the File entity.
+// If the File object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FileMutation) OldMimeType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMimeType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMimeType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMimeType: %w", err)
+	}
+	return oldValue.MimeType, nil
+}
+
+// ResetMimeType resets all changes to the "mime_type" field.
+func (m *FileMutation) ResetMimeType() {
+	m.mime_type = nil
+}
+
 // SetStorageFileName sets the "storage_file_name" field.
 func (m *FileMutation) SetStorageFileName(s string) {
 	m.storage_file_name = &s
@@ -547,7 +584,7 @@ func (m *FileMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FileMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, file.FieldCreatedAt)
 	}
@@ -559,6 +596,9 @@ func (m *FileMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, file.FieldName)
+	}
+	if m.mime_type != nil {
+		fields = append(fields, file.FieldMimeType)
 	}
 	if m.storage_file_name != nil {
 		fields = append(fields, file.FieldStorageFileName)
@@ -582,6 +622,8 @@ func (m *FileMutation) Field(name string) (ent.Value, bool) {
 		return m.Caption()
 	case file.FieldName:
 		return m.Name()
+	case file.FieldMimeType:
+		return m.MimeType()
 	case file.FieldStorageFileName:
 		return m.StorageFileName()
 	case file.FieldSize:
@@ -603,6 +645,8 @@ func (m *FileMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCaption(ctx)
 	case file.FieldName:
 		return m.OldName(ctx)
+	case file.FieldMimeType:
+		return m.OldMimeType(ctx)
 	case file.FieldStorageFileName:
 		return m.OldStorageFileName(ctx)
 	case file.FieldSize:
@@ -643,6 +687,13 @@ func (m *FileMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case file.FieldMimeType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMimeType(v)
 		return nil
 	case file.FieldStorageFileName:
 		v, ok := value.(string)
@@ -754,6 +805,9 @@ func (m *FileMutation) ResetField(name string) error {
 		return nil
 	case file.FieldName:
 		m.ResetName()
+		return nil
+	case file.FieldMimeType:
+		m.ResetMimeType()
 		return nil
 	case file.FieldStorageFileName:
 		m.ResetStorageFileName()

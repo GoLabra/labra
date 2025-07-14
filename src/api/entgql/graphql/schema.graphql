@@ -9,9 +9,6 @@ input CreateFileInput {
   updatedAt: DateTime
   caption: String
   name: String!
-  storageFileName: String!
-  size: Int!
-  content: String!
   createdByID: ID
   updatedByID: ID
 }
@@ -61,9 +58,9 @@ type File implements Node {
   updatedAt: DateTime
   caption: String
   name: String!
+  mimeType: String!
   storageFileName: String!
   size: Int!
-  content: String!
   createdBy: User
   updatedBy: User
 }
@@ -119,6 +116,7 @@ enum FileOrderField {
   updatedAt
   caption
   name
+  mimeType
   storageFileName
   size
 }
@@ -203,6 +201,22 @@ input FileWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """
+  mime_type field predicates
+  """
+  mimeType: String
+  mimeTypeNEQ: String
+  mimeTypeIn: [String!]
+  mimeTypeNotIn: [String!]
+  mimeTypeGT: String
+  mimeTypeGTE: String
+  mimeTypeLT: String
+  mimeTypeLTE: String
+  mimeTypeContains: String
+  mimeTypeHasPrefix: String
+  mimeTypeHasSuffix: String
+  mimeTypeEqualFold: String
+  mimeTypeContainsFold: String
   """
   storage_file_name field predicates
   """
@@ -624,9 +638,6 @@ input UpdateFileInput {
   caption: String
   clearCaption: Boolean
   name: String
-  storageFileName: String
-  size: Int
-  content: String
   createdByID: ID
   clearCreatedBy: Boolean
   updatedByID: ID

@@ -17,6 +17,9 @@ func (m *FileMutation) UpdatedFields() map[string]Value {
 	if m.name != nil {
 		updatedFields["name"] = m.name
 	}
+	if m.mime_type != nil {
+		updatedFields["mime_type"] = m.mime_type
+	}
 	if m.storage_file_name != nil {
 		updatedFields["storage_file_name"] = m.storage_file_name
 	}

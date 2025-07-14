@@ -3,8 +3,6 @@ input CreateFileInput {
   updatedAt: DateTime
   caption: String
   name: String!
-  storageFileName: String!
-  size: Int!
   content: String!
   createdByID: ID
   updatedByID: ID
@@ -72,6 +70,7 @@ extend type File {
   updatedAt: DateTime
   caption: String
   name: String!
+  mimeType: String!
   storageFileName: String!
   size: Int!
   content: String!

@@ -72,6 +72,12 @@ func (fc *FileCreate) SetName(s string) *FileCreate {
 	return fc
 }
 
+// SetMimeType sets the "mime_type" field.
+func (fc *FileCreate) SetMimeType(s string) *FileCreate {
+	fc.mutation.SetMimeType(s)
+	return fc
+}
+
 // SetStorageFileName sets the "storage_file_name" field.
 func (fc *FileCreate) SetStorageFileName(s string) *FileCreate {
 	fc.mutation.SetStorageFileName(s)
@@ -190,6 +196,9 @@ func (fc *FileCreate) check() error {
 	if _, ok := fc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "File.name"`)}
 	}
+	if _, ok := fc.mutation.MimeType(); !ok {
+		return &ValidationError{Name: "mime_type", err: errors.New(`ent: missing required field "File.mime_type"`)}
+	}
 	if _, ok := fc.mutation.StorageFileName(); !ok {
 		return &ValidationError{Name: "storage_file_name", err: errors.New(`ent: missing required field "File.storage_file_name"`)}
 	}
@@ -247,6 +256,10 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 	if value, ok := fc.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := fc.mutation.MimeType(); ok {
+		_spec.SetField(file.FieldMimeType, field.TypeString, value)
+		_node.MimeType = value
 	}
 	if value, ok := fc.mutation.StorageFileName(); ok {
 		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
@@ -408,6 +421,18 @@ func (u *FileUpsert) UpdateName() *FileUpsert {
 	return u
 }
 
+// SetMimeType sets the "mime_type" field.
+func (u *FileUpsert) SetMimeType(v string) *FileUpsert {
+	u.Set(file.FieldMimeType, v)
+	return u
+}
+
+// UpdateMimeType sets the "mime_type" field to the value that was provided on create.
+func (u *FileUpsert) UpdateMimeType() *FileUpsert {
+	u.SetExcluded(file.FieldMimeType)
+	return u
+}
+
 // SetStorageFileName sets the "storage_file_name" field.
 func (u *FileUpsert) SetStorageFileName(v string) *FileUpsert {
 	u.Set(file.FieldStorageFileName, v)
@@ -560,6 +585,20 @@ func (u *FileUpsertOne) SetName(v string) *FileUpsertOne {
 func (u *FileUpsertOne) UpdateName() *FileUpsertOne {
 	return u.Update(func(s *FileUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetMimeType sets the "mime_type" field.
+func (u *FileUpsertOne) SetMimeType(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetMimeType(v)
+	})
+}
+
+// UpdateMimeType sets the "mime_type" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateMimeType() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateMimeType()
 	})
 }
 
@@ -887,6 +926,20 @@ func (u *FileUpsertBulk) SetName(v string) *FileUpsertBulk {
 func (u *FileUpsertBulk) UpdateName() *FileUpsertBulk {
 	return u.Update(func(s *FileUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetMimeType sets the "mime_type" field.
+func (u *FileUpsertBulk) SetMimeType(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetMimeType(v)
+	})
+}
+
+// UpdateMimeType sets the "mime_type" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateMimeType() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateMimeType()
 	})
 }
 

@@ -416,6 +416,20 @@ var (
 			}
 		},
 	}
+	// FileOrderFieldMimeType orders File by mime_type.
+	FileOrderFieldMimeType = &FileOrderField{
+		Value: func(f *File) (ent.Value, error) {
+			return f.MimeType, nil
+		},
+		column: file.FieldMimeType,
+		toTerm: file.ByMimeType,
+		toCursor: func(f *File) Cursor {
+			return Cursor{
+				ID:    f.ID,
+				Value: f.MimeType,
+			}
+		},
+	}
 	// FileOrderFieldStorageFileName orders File by storage_file_name.
 	FileOrderFieldStorageFileName = &FileOrderField{
 		Value: func(f *File) (ent.Value, error) {
@@ -460,6 +474,8 @@ func (f FileOrderField) String() string {
 		str = "caption"
 	case FileOrderFieldName.column:
 		str = "name"
+	case FileOrderFieldMimeType.column:
+		str = "mimeType"
 	case FileOrderFieldStorageFileName.column:
 		str = "storageFileName"
 	case FileOrderFieldSize.column:
@@ -490,6 +506,8 @@ func (f *FileOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *FileOrderFieldCaption
 	case "name":
 		*f = *FileOrderFieldName
+	case "mimeType":
+		*f = *FileOrderFieldMimeType
 	case "storageFileName":
 		*f = *FileOrderFieldStorageFileName
 	case "size":

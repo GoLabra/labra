@@ -85,6 +85,11 @@ func Name(v string) predicate.File {
 	return predicate.File(sql.FieldEQ(FieldName, v))
 }
 
+// MimeType applies equality check predicate on the "mime_type" field. It's identical to MimeTypeEQ.
+func MimeType(v string) predicate.File {
+	return predicate.File(sql.FieldEQ(FieldMimeType, v))
+}
+
 // StorageFileName applies equality check predicate on the "storage_file_name" field. It's identical to StorageFileNameEQ.
 func StorageFileName(v string) predicate.File {
 	return predicate.File(sql.FieldEQ(FieldStorageFileName, v))
@@ -333,6 +338,71 @@ func NameEqualFold(v string) predicate.File {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.File {
 	return predicate.File(sql.FieldContainsFold(FieldName, v))
+}
+
+// MimeTypeEQ applies the EQ predicate on the "mime_type" field.
+func MimeTypeEQ(v string) predicate.File {
+	return predicate.File(sql.FieldEQ(FieldMimeType, v))
+}
+
+// MimeTypeNEQ applies the NEQ predicate on the "mime_type" field.
+func MimeTypeNEQ(v string) predicate.File {
+	return predicate.File(sql.FieldNEQ(FieldMimeType, v))
+}
+
+// MimeTypeIn applies the In predicate on the "mime_type" field.
+func MimeTypeIn(vs ...string) predicate.File {
+	return predicate.File(sql.FieldIn(FieldMimeType, vs...))
+}
+
+// MimeTypeNotIn applies the NotIn predicate on the "mime_type" field.
+func MimeTypeNotIn(vs ...string) predicate.File {
+	return predicate.File(sql.FieldNotIn(FieldMimeType, vs...))
+}
+
+// MimeTypeGT applies the GT predicate on the "mime_type" field.
+func MimeTypeGT(v string) predicate.File {
+	return predicate.File(sql.FieldGT(FieldMimeType, v))
+}
+
+// MimeTypeGTE applies the GTE predicate on the "mime_type" field.
+func MimeTypeGTE(v string) predicate.File {
+	return predicate.File(sql.FieldGTE(FieldMimeType, v))
+}
+
+// MimeTypeLT applies the LT predicate on the "mime_type" field.
+func MimeTypeLT(v string) predicate.File {
+	return predicate.File(sql.FieldLT(FieldMimeType, v))
+}
+
+// MimeTypeLTE applies the LTE predicate on the "mime_type" field.
+func MimeTypeLTE(v string) predicate.File {
+	return predicate.File(sql.FieldLTE(FieldMimeType, v))
+}
+
+// MimeTypeContains applies the Contains predicate on the "mime_type" field.
+func MimeTypeContains(v string) predicate.File {
+	return predicate.File(sql.FieldContains(FieldMimeType, v))
+}
+
+// MimeTypeHasPrefix applies the HasPrefix predicate on the "mime_type" field.
+func MimeTypeHasPrefix(v string) predicate.File {
+	return predicate.File(sql.FieldHasPrefix(FieldMimeType, v))
+}
+
+// MimeTypeHasSuffix applies the HasSuffix predicate on the "mime_type" field.
+func MimeTypeHasSuffix(v string) predicate.File {
+	return predicate.File(sql.FieldHasSuffix(FieldMimeType, v))
+}
+
+// MimeTypeEqualFold applies the EqualFold predicate on the "mime_type" field.
+func MimeTypeEqualFold(v string) predicate.File {
+	return predicate.File(sql.FieldEqualFold(FieldMimeType, v))
+}
+
+// MimeTypeContainsFold applies the ContainsFold predicate on the "mime_type" field.
+func MimeTypeContainsFold(v string) predicate.File {
+	return predicate.File(sql.FieldContainsFold(FieldMimeType, v))
 }
 
 // StorageFileNameEQ applies the EQ predicate on the "storage_file_name" field.

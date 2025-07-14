@@ -46,7 +46,7 @@ func (s *File) Get(ctx context.Context, where *ent.FileWhereInput, orderBy *ent.
 		}
 
 		files[idx].Content = base64.StdEncoding.EncodeToString(fileContent)
-	}
+	} // TODO @David move to repo
 
 	return files, err
 }
@@ -73,7 +73,7 @@ func (s *File) GetOne(ctx context.Context, where ent.FileWhereUniqueInput) (*ent
 		return file, err
 	}
 
-	file.Content = base64.StdEncoding.EncodeToString(fileContent)
+	file.Content = base64.StdEncoding.EncodeToString(fileContent) // TODO @David move to repo
 
 	return file, err
 }

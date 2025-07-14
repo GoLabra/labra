@@ -89,6 +89,21 @@ type FileWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
+	// "mime_type" field predicates.
+	MimeType             *string  `json:"mimeType,omitempty"`
+	MimeTypeNEQ          *string  `json:"mimeTypeNEQ,omitempty"`
+	MimeTypeIn           []string `json:"mimeTypeIn,omitempty"`
+	MimeTypeNotIn        []string `json:"mimeTypeNotIn,omitempty"`
+	MimeTypeGT           *string  `json:"mimeTypeGT,omitempty"`
+	MimeTypeGTE          *string  `json:"mimeTypeGTE,omitempty"`
+	MimeTypeLT           *string  `json:"mimeTypeLT,omitempty"`
+	MimeTypeLTE          *string  `json:"mimeTypeLTE,omitempty"`
+	MimeTypeContains     *string  `json:"mimeTypeContains,omitempty"`
+	MimeTypeHasPrefix    *string  `json:"mimeTypeHasPrefix,omitempty"`
+	MimeTypeHasSuffix    *string  `json:"mimeTypeHasSuffix,omitempty"`
+	MimeTypeEqualFold    *string  `json:"mimeTypeEqualFold,omitempty"`
+	MimeTypeContainsFold *string  `json:"mimeTypeContainsFold,omitempty"`
+
 	// "storage_file_name" field predicates.
 	StorageFileName             *string  `json:"storageFileName,omitempty"`
 	StorageFileNameNEQ          *string  `json:"storageFileNameNEQ,omitempty"`
@@ -367,6 +382,45 @@ func (i *FileWhereInput) P() (predicate.File, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, file.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.MimeType != nil {
+		predicates = append(predicates, file.MimeTypeEQ(*i.MimeType))
+	}
+	if i.MimeTypeNEQ != nil {
+		predicates = append(predicates, file.MimeTypeNEQ(*i.MimeTypeNEQ))
+	}
+	if len(i.MimeTypeIn) > 0 {
+		predicates = append(predicates, file.MimeTypeIn(i.MimeTypeIn...))
+	}
+	if len(i.MimeTypeNotIn) > 0 {
+		predicates = append(predicates, file.MimeTypeNotIn(i.MimeTypeNotIn...))
+	}
+	if i.MimeTypeGT != nil {
+		predicates = append(predicates, file.MimeTypeGT(*i.MimeTypeGT))
+	}
+	if i.MimeTypeGTE != nil {
+		predicates = append(predicates, file.MimeTypeGTE(*i.MimeTypeGTE))
+	}
+	if i.MimeTypeLT != nil {
+		predicates = append(predicates, file.MimeTypeLT(*i.MimeTypeLT))
+	}
+	if i.MimeTypeLTE != nil {
+		predicates = append(predicates, file.MimeTypeLTE(*i.MimeTypeLTE))
+	}
+	if i.MimeTypeContains != nil {
+		predicates = append(predicates, file.MimeTypeContains(*i.MimeTypeContains))
+	}
+	if i.MimeTypeHasPrefix != nil {
+		predicates = append(predicates, file.MimeTypeHasPrefix(*i.MimeTypeHasPrefix))
+	}
+	if i.MimeTypeHasSuffix != nil {
+		predicates = append(predicates, file.MimeTypeHasSuffix(*i.MimeTypeHasSuffix))
+	}
+	if i.MimeTypeEqualFold != nil {
+		predicates = append(predicates, file.MimeTypeEqualFold(*i.MimeTypeEqualFold))
+	}
+	if i.MimeTypeContainsFold != nil {
+		predicates = append(predicates, file.MimeTypeContainsFold(*i.MimeTypeContainsFold))
 	}
 	if i.StorageFileName != nil {
 		predicates = append(predicates, file.StorageFileNameEQ(*i.StorageFileName))

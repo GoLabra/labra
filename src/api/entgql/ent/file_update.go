@@ -95,6 +95,20 @@ func (fu *FileUpdate) SetNillableName(s *string) *FileUpdate {
 	return fu
 }
 
+// SetMimeType sets the "mime_type" field.
+func (fu *FileUpdate) SetMimeType(s string) *FileUpdate {
+	fu.mutation.SetMimeType(s)
+	return fu
+}
+
+// SetNillableMimeType sets the "mime_type" field if the given value is not nil.
+func (fu *FileUpdate) SetNillableMimeType(s *string) *FileUpdate {
+	if s != nil {
+		fu.SetMimeType(*s)
+	}
+	return fu
+}
+
 // SetStorageFileName sets the "storage_file_name" field.
 func (fu *FileUpdate) SetStorageFileName(s string) *FileUpdate {
 	fu.mutation.SetStorageFileName(s)
@@ -251,6 +265,9 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := fu.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 	}
+	if value, ok := fu.mutation.MimeType(); ok {
+		_spec.SetField(file.FieldMimeType, field.TypeString, value)
+	}
 	if value, ok := fu.mutation.StorageFileName(); ok {
 		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
 	}
@@ -400,6 +417,20 @@ func (fuo *FileUpdateOne) SetName(s string) *FileUpdateOne {
 func (fuo *FileUpdateOne) SetNillableName(s *string) *FileUpdateOne {
 	if s != nil {
 		fuo.SetName(*s)
+	}
+	return fuo
+}
+
+// SetMimeType sets the "mime_type" field.
+func (fuo *FileUpdateOne) SetMimeType(s string) *FileUpdateOne {
+	fuo.mutation.SetMimeType(s)
+	return fuo
+}
+
+// SetNillableMimeType sets the "mime_type" field if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableMimeType(s *string) *FileUpdateOne {
+	if s != nil {
+		fuo.SetMimeType(*s)
 	}
 	return fuo
 }
@@ -589,6 +620,9 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 	}
 	if value, ok := fuo.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
+	}
+	if value, ok := fuo.mutation.MimeType(); ok {
+		_spec.SetField(file.FieldMimeType, field.TypeString, value)
 	}
 	if value, ok := fuo.mutation.StorageFileName(); ok {
 		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
