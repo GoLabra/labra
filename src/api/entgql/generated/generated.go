@@ -91,6 +91,7 @@ type ComplexityRoot struct {
 
 	File struct {
 		Caption         func(childComplexity int) int
+		Content         func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
 		CreatedBy       func(childComplexity int) int
 		ID              func(childComplexity int) int
@@ -519,6 +520,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.File.Caption(childComplexity), true
+
+	case "File.content":
+		if e.complexity.File.Content == nil {
+			break
+		}
+
+		return e.complexity.File.Content(childComplexity), true
 
 	case "File.createdAt":
 		if e.complexity.File.CreatedAt == nil {
@@ -2038,6 +2046,7 @@ input CreateFileInput {
   updatedAt: DateTime
   caption: String
   name: String!
+  content: String!
   createdByID: ID
   updatedByID: ID
 }
@@ -2087,6 +2096,7 @@ type File implements Node {
   updatedAt: DateTime
   caption: String
   name: String!
+  content: String!
   mimeType: String!
   storageFileName: String!
   size: Int!
@@ -2671,6 +2681,7 @@ input UpdateFileInput {
   clearCreatedBy: Boolean
   updatedByID: ID
   clearUpdatedBy: Boolean
+  content: String
 }
 """
 UpdatePermissionInput is used for update Permission object.
@@ -6762,6 +6773,50 @@ func (ec *executionContext) fieldContext_File_name(_ context.Context, field grap
 	return fc, nil
 }
 
+func (ec *executionContext) _File_content(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_content(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _File_mimeType(ctx context.Context, field graphql.CollectedField, obj *ent.File) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_File_mimeType(ctx, field)
 	if err != nil {
@@ -7219,6 +7274,8 @@ func (ec *executionContext) fieldContext_FileEdge_node(_ context.Context, field 
 				return ec.fieldContext_File_caption(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
 			case "storageFileName":
@@ -7548,6 +7605,8 @@ func (ec *executionContext) fieldContext_Mutation_createFile(ctx context.Context
 				return ec.fieldContext_File_caption(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
 			case "storageFileName":
@@ -7625,6 +7684,8 @@ func (ec *executionContext) fieldContext_Mutation_createManyFiles(ctx context.Co
 				return ec.fieldContext_File_caption(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
 			case "storageFileName":
@@ -7702,6 +7763,8 @@ func (ec *executionContext) fieldContext_Mutation_updateFile(ctx context.Context
 				return ec.fieldContext_File_caption(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
 			case "storageFileName":
@@ -7834,6 +7897,8 @@ func (ec *executionContext) fieldContext_Mutation_upsertFile(ctx context.Context
 				return ec.fieldContext_File_caption(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
 			case "storageFileName":
@@ -7966,6 +8031,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteFile(ctx context.Context
 				return ec.fieldContext_File_caption(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
 			case "storageFileName":
@@ -10849,6 +10916,8 @@ func (ec *executionContext) fieldContext_Query_files(ctx context.Context, field 
 				return ec.fieldContext_File_caption(ctx, field)
 			case "name":
 				return ec.fieldContext_File_name(ctx, field)
+			case "content":
+				return ec.fieldContext_File_content(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
 			case "storageFileName":
@@ -15289,7 +15358,7 @@ func (ec *executionContext) unmarshalInputCreateFileInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "updatedAt", "caption", "name", "createdByID", "updatedByID", "createdBy", "updatedBy"}
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "caption", "name", "content", "createdByID", "updatedByID", "createdBy", "updatedBy"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15324,6 +15393,13 @@ func (ec *executionContext) unmarshalInputCreateFileInput(ctx context.Context, o
 				return it, err
 			}
 			it.Name = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
 		case "createdByID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByID"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
@@ -18050,7 +18126,7 @@ func (ec *executionContext) unmarshalInputUpdateFileInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "caption", "clearCaption", "name", "createdByID", "clearCreatedBy", "updatedByID", "clearUpdatedBy", "createdBy", "updatedBy"}
+	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "caption", "clearCaption", "name", "createdByID", "clearCreatedBy", "updatedByID", "clearUpdatedBy", "content", "createdBy", "updatedBy"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18134,6 +18210,13 @@ func (ec *executionContext) unmarshalInputUpdateFileInput(ctx context.Context, o
 				return it, err
 			}
 			it.ClearUpdatedBy = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
 		case "createdBy":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			data, err := ec.unmarshalOUpdateOneUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋsrcᚋapiᚋentgqlᚋentᚐUpdateOneUserInput(ctx, v)
@@ -20332,6 +20415,11 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._File_caption(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._File_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "content":
+			out.Values[i] = ec._File_content(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

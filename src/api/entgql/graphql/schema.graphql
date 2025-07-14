@@ -9,6 +9,7 @@ input CreateFileInput {
   updatedAt: DateTime
   caption: String
   name: String!
+  content: String!
   createdByID: ID
   updatedByID: ID
 }
@@ -58,6 +59,7 @@ type File implements Node {
   updatedAt: DateTime
   caption: String
   name: String!
+  content: String!
   mimeType: String!
   storageFileName: String!
   size: Int!
@@ -642,6 +644,7 @@ input UpdateFileInput {
   clearCreatedBy: Boolean
   updatedByID: ID
   clearUpdatedBy: Boolean
+  content: String
 }
 """
 UpdatePermissionInput is used for update Permission object.
