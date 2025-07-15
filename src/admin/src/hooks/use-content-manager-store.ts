@@ -28,11 +28,11 @@ interface UseContentManagerStoreParams {
     filters?: AdvancedFilter[];
     orFilters?: AdvancedFilter[];
 
-    lazy?: boolean;
+    skip?: boolean;
 }
 export const useContentManagerStore = (params: UseContentManagerStoreParams): UsersStore => {
 
-    const { entityName, fields, edges, page, rowsPerPage, sortBy, order, filters, orFilters, lazy } = params;
+    const { entityName, fields, edges, page, rowsPerPage, sortBy, order, filters, orFilters, skip } = params;
 
     const contentManagerStoreRequest = useContentManagerStoreRequest({entityName, entityOwner: params.entityOwner ?? EntityOwner.User});
     const [dataLoading, setDataLoading] = useState<boolean>(false);
@@ -42,7 +42,6 @@ export const useContentManagerStore = (params: UseContentManagerStoreParams): Us
     const fetch = useCallback(() => {
         setDataLoading(true);
         contentManagerStoreRequest.fetchData({
-
             page: page ?? 1,
             rowsPerPage: rowsPerPage ?? 10,
             sortBy: sortBy ?? null,
@@ -130,7 +129,7 @@ export const useContentManagerStore = (params: UseContentManagerStoreParams): Us
     }, [entityName, fetch]);
 
     useEffect(() => {
-        if(lazy){
+        if(skip){
             return;
         }
 
@@ -151,7 +150,7 @@ export const useContentManagerStore = (params: UseContentManagerStoreParams): Us
         // }
         
         fetch();
-    }, [fields, edges, fetch]);
+    }, [skip, fields, edges, fetch]);
 
     const numberOfPages = useMemo(() => {
         if (!dataConnection) {

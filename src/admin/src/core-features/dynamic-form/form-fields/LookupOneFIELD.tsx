@@ -56,6 +56,7 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 	const contentManagerSearch = useContentManagerSearch();
 	const contentManagerStore = useContentManagerStore({
 		entityName: edge.relatedEntity.name,
+		entityOwner: fullEntity?.owner,
 		page: contentManagerSearch.state.page,
 		rowsPerPage: contentManagerSearch.state.rowsPerPage,
 		sortBy: contentManagerSearch.state.sortBy,
@@ -69,7 +70,8 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 
 		}, [fullEntity?.displayField]),
 
-		orFilters: useMemo(() => getAdvancedFiltersFromQuery(contentManagerSearch.state.query, fullEntity?.fields ?? []), [contentManagerSearch.state.query, fullEntity?.fields])
+		orFilters: useMemo(() => getAdvancedFiltersFromQuery(contentManagerSearch.state.query, fullEntity?.fields ?? []), [contentManagerSearch.state.query, fullEntity?.fields]),
+		skip: fullEntity?.loading ?? true
 	});
 
 	const search = useCallback((searchValue: string) => {

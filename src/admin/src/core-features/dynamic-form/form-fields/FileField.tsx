@@ -57,7 +57,9 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 				name: i.name,
 				size: i.size,
 				mimeType: i.mimeType,
-				preview: `data:${i.mimeType};base64,${i.content}`,
+				...(i.content && {
+					preview: `data:${i.mimeType};base64,${i.content}`,
+				})
 			},
 			status: 'saved'
 		})) ?? []

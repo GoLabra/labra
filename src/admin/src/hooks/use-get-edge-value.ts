@@ -133,13 +133,14 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 	}, [props.edges]);
 
 	const contentManagerStore = useContentManagerStore({
+		entityOwner: fullEntity?.owner,
 		entityName: props.entityName,
 
 		page: contentManagerSearch.state.page,
 		rowsPerPage: contentManagerSearch.state.rowsPerPage,
 		sortBy: contentManagerSearch.state.sortBy,
 		order: contentManagerSearch.state.order,
-		lazy: props.entryId == null || (!props.fields.length && !edges.length),
+		skip: props.entryId == null || (!props.fields.length && !edges.length),
 		edges: useMemo(() => {
 			if (!fields) {
 				return undefined;
