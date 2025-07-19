@@ -55,10 +55,6 @@ func (File) Fields() []ent.Field {
 	}
 }
 
-// func (User) Fields() []ent.Field {
-// 	return adminEnt.User{}.Fields()
-// }
-
-// func (User) Edges() []ent.Edge {
-// 	return adminEnt.User{}.Edges()
-// }
+func (File) Edges() []ent.Edge {
+	return additionalFileEdges
+}

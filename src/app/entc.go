@@ -92,6 +92,11 @@ func main() {
 		entc.Extensions(ex),
 		entc.FeatureNames("sql/execquery", "sql/upsert"),
 	}
+	graph, err := entc.LoadGraph("./ent/schema", &gen.Config{})
+	if err != nil {
+		panic(err)
+	}
+	CreateSystemEntitiesReverseRelations(graph)
 
 	if err := entc.Generate("./ent/schema", &gen.Config{
 		Features: []gen.Feature{
@@ -682,6 +687,45 @@ func CreateTxRepo() gen.Hook {
 			return next.Generate(g)
 		})
 	}
+}
+
+func CreateSystemEntitiesReverseRelations(g *gen.Graph) error {
+	errFormat := "[CreateSystemEntitiesReverseRelations] %w"
+	f, _ := os.Create("./ent/schema/additional_edges.go")
+
+	tmpl, err := templates.LoadTemplate("additional_edges.go.tmpl", "entschema/additional_edges.go.tmpl", templateFuncMap)
+	if err != nil {
+		return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
+	}
+	additionalEdges := []*gen.Edge{}
+
+	for _, node := range g.Nodes {
+		if node.Annotations["Entity"] == nil || node.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+			continue
+		}
+
+		for _, edge := range node.Edges {
+			if edge.Unique {
+				continue
+			}
+			edge.Owner.ClientName()
+
+			if owner, ok := node.Annotations["Entity"].(map[string]any)["Owner"].(string); !ok || owner != "User" {
+				continue
+			}
+
+			additionalEdges = append(additionalEdges, edge)
+		}
+	}
+
+	err = tmpl.Execute(f, additionalEdges)
+	if err != nil {
+		f.Close()
+		return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
+	}
+
+	f.Close()
+	return nil
 }
 
 func getExtendedTypes(fields []*gen.Field) []*gen.Field {
