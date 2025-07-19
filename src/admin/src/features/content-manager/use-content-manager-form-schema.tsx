@@ -446,7 +446,7 @@ const getMultiChoice = (field: Field): FieldDetails => {
 const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 
 	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => !val,
+		? z.any().refine((val): val is Record<string, unknown> => val,
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
@@ -492,8 +492,8 @@ const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 
 const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => { 
 
-	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => !val,
+	let schema: z.ZodTypeAny = true
+		? z.any().refine((val): val is Record<string, unknown> => val && Array.isArray(val) && val.length > 0,
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
@@ -539,7 +539,7 @@ const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => {
 const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 
 	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => !val,
+		? z.any().refine((val): val is Record<string, unknown> => val && Array.isArray(val) && val.length > 0,
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
@@ -586,7 +586,7 @@ const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 
 const getRelationMany = (entityName: string, edge: Edge): FieldDetails => {
 	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => !val,
+		? z.any().refine((val): val is Record<string, unknown> => val,
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
