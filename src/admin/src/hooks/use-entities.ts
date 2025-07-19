@@ -51,6 +51,7 @@ export const GetEntitiesNameCaption = gql`query GetEntitiesNameCaption {
     entities{
       name
       caption
+	  owner
   }
 }`
 

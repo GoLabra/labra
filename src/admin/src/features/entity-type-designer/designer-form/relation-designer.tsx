@@ -12,6 +12,7 @@ import { stringToTime, timeToString } from "@/core-features/dynamic-form/value-c
 import { SelectFormField } from "@/core-features/dynamic-form/form-fields/SelectField";
 import { useEntitiesDesigner } from "../use-designer-entities";
 import { FormOpenMode, Options } from "@/core-features/dynamic-form/form-field";
+import { EntityOwner } from "@/lib/apollo/graphql.entities";
 
 export const schema = z.object({
     caption: z.string().nonempty('Caption is required')
@@ -74,13 +75,16 @@ export const toDefaultValue = (value: any): any => {
 }
 
 
-const relationTypeOptions: Options = [{
+const relationTypeOptionsRoot: Options = [{
     label: "One",
     value: "One"
 }, {
     label: "Many",
     value: "Many"
-}, {
+}]
+
+
+const relationTypeOptionsExtended = [{
     label: "One To One",
     value: "OneToOne"
 }, {
@@ -107,14 +111,32 @@ export const DesignerForm = (props: DesignerFormProps) => {
         }));
     }, [allEntities]);
 
+	const relatedEntity = props.formMethods.watch('relatedEntity.caption');
+	const relatedEntityOwner = useMemo(() => {
+		if(!relatedEntity){
+			return undefined;
+		}
+		console.log(allEntities);
+		const owner = allEntities.find(i => i.caption == relatedEntity)?.owner
+		console.log(owner);
+		return owner;
+	}, [allEntities, relatedEntity]);
+
+	const relationTypeOptions = useMemo(() => {
+		if (relatedEntityOwner == EntityOwner.User ) {
+			return [...relationTypeOptionsRoot, ...relationTypeOptionsExtended];
+		}
+		return relationTypeOptionsRoot;
+	}, [relatedEntityOwner]);
+ 
     const relationType = props.formMethods.watch('relationType');
     const belongsToCaptionHide = useMemo(() => !belongsToCaptionVisible.includes(relationType), [relationType]);
 
     return (<Stack gap={1.5}>
         <TextShortFormField name="caption" label="Caption" required />
-        <SelectFormField name="relationType" label="Relation Type" disabled={props.openMode == FormOpenMode.Edit} options={relationTypeOptions} required />
+        <SelectFormField name="relatedEntity.caption" label="Related Entity" disabled={props.openMode == FormOpenMode.Edit} options={options} required />
         <Stack direction="row" gap={1.5}>
-            <SelectFormField name="relatedEntity.caption" label="Related Entity" disabled={props.openMode == FormOpenMode.Edit} options={options} required />
+        	<SelectFormField name="relationType" label="Relation Type" disabled={props.openMode == FormOpenMode.Edit} options={relationTypeOptions} required />
             <TextShortFormField name="belongsToCaption" label="Belongs To Caption" disabled={props.openMode == FormOpenMode.Edit} hide={belongsToCaptionHide} required />
         </Stack>
         <BooleanFormField name="required" label="Required" />

@@ -4,6 +4,7 @@ import { gql, useApolloClient } from "@apollo/client";
 import { useEntitiesDesignerChanges } from "./use-designer-entities-changes";
 import { useEntities, useFullEntity } from "@/hooks/use-entities";
 import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
+import { EntityOwner } from "@/lib/apollo/graphql.entities";
 
 export const useEntitiesDesigner = () => {
 
@@ -16,6 +17,7 @@ export const useEntitiesDesigner = () => {
         let allEntities: ChangedNameCaptionEntity[] = graphEntities.entities.map((i) => ({
                 name: i.name,
                 caption: i.caption,
+				owner: i.owner,
                 designerStatus: 'unchanged'
             }));
 
@@ -71,6 +73,7 @@ export const useEntitiesDesigner = () => {
             const result: ChangedFullEntity = {
                 name: entity.name,
                 caption: designerChanges.changedFullEntitiesMap[entity.name]?.caption ?? entity.caption,
+				owner: entity.owner,
                 displayFieldCaption: children.filter(i => i.designerStatus != 'deleted')
                                             .find(i => i.caption == displayFieldCaption)?.caption
                                             ?? 'Id',

@@ -101,7 +101,8 @@ interface UseGetEdgeValueParams {
 }
 export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 
-	const fullEntity = useFullEntity({ entityName: props.edge.relatedEntity.name });
+	const rootEntity = useFullEntity({ entityName: props.entityName });
+	const edgeEntity = useFullEntity({ entityName: props.edge.relatedEntity.name });
 	const contentManagerSearch = useContentManagerSearch({
 		initialFilter: {
 			id: {
@@ -113,27 +114,27 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 
 	const fields = useMemo(() => {
 		if (props.fields === 'allfields') {
-			return fullEntity?.fields?.map(i => i.name) ?? undefined;
+			return edgeEntity?.fields?.map(i => i.name) ?? undefined;
 		}
 
 		if (props.fields === 'iddisplay') {
 
-			if (!fullEntity?.displayField) {
+			if (!edgeEntity?.displayField) {
 				return undefined;
 			}
 			
-			return ['id', fullEntity?.displayField?.name];
+			return ['id', edgeEntity?.displayField?.name];
 		}
 
 		return props.fields;
-	}, [fullEntity?.displayField, fullEntity?.fields, props.fields]);
+	}, [edgeEntity?.displayField, edgeEntity?.fields, props.fields]);
 
 	const edges = useMemo(() => {
 		return props.edges ?? [];
 	}, [props.edges]);
 
 	const contentManagerStore = useContentManagerStore({
-		entityOwner: fullEntity?.owner,
+		entityOwner: rootEntity?.owner,
 		entityName: props.entityName,
 
 		page: contentManagerSearch.state.page,
@@ -155,7 +156,7 @@ export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
 				fields: fields,
 				edges: edges
 			}]
-		}, [fullEntity?.displayField]),
+		}, [edgeEntity?.displayField]),
 
 		filters: useMemo(() => getAdvancedFiltersFromGridFilter(contentManagerSearch.state.filter), [contentManagerSearch.state.filter]),
 	});
