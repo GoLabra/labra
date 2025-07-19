@@ -116,10 +116,7 @@ export const DesignerForm = (props: DesignerFormProps) => {
 		if(!relatedEntity){
 			return undefined;
 		}
-		console.log(allEntities);
-		const owner = allEntities.find(i => i.caption == relatedEntity)?.owner
-		console.log(owner);
-		return owner;
+		return allEntities.find(i => i.caption == relatedEntity)?.owner
 	}, [allEntities, relatedEntity]);
 
 	const relationTypeOptions = useMemo(() => {
