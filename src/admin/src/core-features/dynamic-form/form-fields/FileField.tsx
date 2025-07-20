@@ -147,7 +147,7 @@ export function FileFormField(props: FileFormFieldProps) {
 	useFormDynamicContext(props.name, { disabled: props.disabled });
 	const myDialogContext = useMyDialogContext();
 	const formContext = useFormContext();
-	const formControllerHandler = useRelationManyLiteController({ name: props.name, control: formContext.control, disabled: props.disabled });
+	const formControllerHandler = useRelationManyLiteController({ name: props.name, disabled: props.disabled });
 
 	if (props.hide) {
 		return null;

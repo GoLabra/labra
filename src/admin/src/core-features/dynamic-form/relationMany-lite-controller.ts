@@ -1,6 +1,6 @@
 import { GenericEvent } from "@/lib/utils/event";
 import { useCallback, useMemo, useRef } from "react";
-import { Control, useWatch } from "react-hook-form";
+import { Control, useFormContext, useWatch } from "react-hook-form";
 import { useLiteController } from "./lite-controller";
 
 export const RelationInfoType = '_RELATION_INFO_';
@@ -11,12 +11,12 @@ export type RelationInfo = {
 
 interface useLiteControllerProps {
     name: string;
-    control: Control;
     disabled?: boolean;
 }
 export const useRelationManyLiteController = <T = any>(props: useLiteControllerProps) => {
 
-    const liteController = useLiteController<any[]>({ name: props.name, control: props.control, disabled: props.disabled });
+	const formContext = useFormContext();
+    const liteController = useLiteController<any[]>({ name: props.name, disabled: props.disabled });
 	const relationInfoRef = useRef<RelationInfo>();
 
 	const addRelationInfo = useCallback((relationInfo: RelationInfo) => {
@@ -25,15 +25,15 @@ export const useRelationManyLiteController = <T = any>(props: useLiteControllerP
 			type: RelationInfoType
 		};
 
-		liteController.onChange({
-			target: {
-				name: props.name,
-				value: [
+		formContext.setValue(props.name, [
 					...(liteController.value ?? []).filter((i: RelationInfo) => i.type !== RelationInfoType),
 					relationInfoRef.current
-				]
-			}
-		});
+				],{
+					shouldValidate: false,
+					shouldDirty: false,
+					shouldTouch: false,
+				}
+		);
 	}, [liteController.onChange]);
 
 	const value = useMemo(() => {
