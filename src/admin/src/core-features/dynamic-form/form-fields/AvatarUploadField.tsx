@@ -18,7 +18,7 @@ export function AvatarUploadField(props: FormFieldProps) {
 
     useFormDynamicContext(props.name, { disabled: props.disabled });
     const formContext = useFormContext();
-    const formControllerHandler = useLiteController({ name: props.name, control: formContext.control, disabled: props.disabled });
+    const formControllerHandler = useLiteController({ name: props.name, disabled: props.disabled });
     useFormDynamicContext(props.name, { disabled: formControllerHandler.disabled });
 
     if (props.hide) {

@@ -169,8 +169,7 @@ interface PermissionSectionProps {
 const PermissionSection = (props: PermissionSectionProps) => {
 
 	const { entities } = useEntities();
-	const formContext = useFormContext();
-	const formControllerHandler = useLiteController<PermissionItem[]>({ name: props.name, control: formContext.control });
+	const formControllerHandler = useLiteController<PermissionItem[]>({ name: props.name });
 	const myDialogContext = useMyDialogContext();
 
 	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {

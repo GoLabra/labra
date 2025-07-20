@@ -228,7 +228,7 @@ export function LookupManyFIELDFormField(props: FormFieldProps) {
     useFormDynamicContext(props.name, { disabled: props.disabled });
     const myDialogContext = useMyDialogContext();
     const formContext = useFormContext();
-    const formControllerHandler = useLiteController({ name: props.name, control: formContext.control, disabled: props.disabled });
+    const formControllerHandler = useLiteController({ name: props.name, disabled: props.disabled });
 
     if (props.hide) {
         return null;

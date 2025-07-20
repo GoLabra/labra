@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef } from "react";
-import { Edge, Entity, Field } from "@/lib/apollo/graphql.entities";
+import { Edge, Entity, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { useReactiveVar } from "@apollo/client";
 import { ChangedFullEntity, ChangedNameCaptionEntity, DesignerEdge, DesignerField } from "@/types/entity";
 import { createId } from '@paralleldrive/cuid2';
@@ -31,6 +31,7 @@ export const useEntitiesDesignerChanges = () => {
             return {
                 name: i,
                 designerStatus: 'edited',
+				owner: EntityOwner.User,
             }   
         });
     }, [ changedEntityJustNames, entityChanges]);
