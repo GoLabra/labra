@@ -5,12 +5,13 @@ import { useLiteController } from "../lite-controller";
 import { Edge } from "@/lib/apollo/graphql.entities";
 import { UploadFilesBaseField } from "./UploadFilesBaseField";
 import { DropEvent, FileRejection, FileWithPath } from "react-dropzone";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { EdgeStatus } from "@/lib/utils/edge-status";
 import { useRelationDiff } from "@/features/content-manager/use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
 import { LFile, useEntityFiles, useGetEdgeValue } from "@/hooks/use-get-edge-value";
 import { FileData, fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
+import { RelationInfo, useRelationManyLiteController } from "../relationMany-lite-controller";
 
 export type FileDiffWrapper = {
 	id: string;
@@ -35,6 +36,7 @@ interface RelationManyFIELDFormComponentProps {
 	edge: Edge;
 
 	maxFiles?: number;
+	addRelationInfo?: (relationInfo: RelationInfo) => void;
 }
 
 export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProps) {
@@ -48,6 +50,12 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 			return fileIsImage(fileTypeByUrl(file.name));
 		}, []),
 	});
+
+	useEffect(() => {
+		props.addRelationInfo?.({
+			savedCount: edgeFiles.length
+		});
+	}, [edgeFiles.length, props.addRelationInfo]);
 
 	const savedValueItems = useMemo((): FileDiffWrapper[] => {
 		return edgeFiles?.map(i => ({
@@ -139,7 +147,7 @@ export function FileFormField(props: FileFormFieldProps) {
 	useFormDynamicContext(props.name, { disabled: props.disabled });
 	const myDialogContext = useMyDialogContext();
 	const formContext = useFormContext();
-	const formControllerHandler = useLiteController({ name: props.name, control: formContext.control, disabled: props.disabled });
+	const formControllerHandler = useRelationManyLiteController({ name: props.name, control: formContext.control, disabled: props.disabled });
 
 	if (props.hide) {
 		return null;

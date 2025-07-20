@@ -24,6 +24,7 @@ import { UploadFilesBaseField } from "@/core-features/dynamic-form/form-fields/U
 import { FileDiffWrapper, FileFormField } from "@/core-features/dynamic-form/form-fields/FileField";
 import { fileToBase64 } from "@/lib/utils/file-to-base64";
 import { createId } from "@paralleldrive/cuid2";
+import { RelationInfo, RelationInfoType } from "@/core-features/dynamic-form/relationMany-lite-controller";
 
 
 type FieldDetails = {
@@ -445,8 +446,19 @@ const getMultiChoice = (field: Field): FieldDetails => {
 
 const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 
-	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => val,
+	let schema: z.ZodTypeAny = true
+		? z.any().refine((val: any[]) => {
+				const dataValue = val?.filter((i: RelationInfo) => i.type !== RelationInfoType) ?? [];
+
+				const savedCount = val?.find((i: RelationInfo) => i.type === RelationInfoType)?.savedCount ?? 0;
+				const removedCount = dataValue?.filter((i: FileDiffWrapper) => {
+										return i.status === 'delete' || i.status === 'disconnect' || i.status === 'unset';
+									  }).length ?? 0;
+				const addedCount = dataValue.length - removedCount;
+				const resultCount = savedCount + addedCount - removedCount;
+
+				return resultCount > 0
+			},
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
@@ -493,7 +505,18 @@ const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => { 
 
 	let schema: z.ZodTypeAny = true
-		? z.any().refine((val): val is Record<string, unknown> => val && Array.isArray(val) && val.length > 0,
+		? z.any().refine((val: any[]) => {
+				const dataValue = val?.filter((i: RelationInfo) => i.type !== RelationInfoType) ?? [];
+
+				const savedCount = val?.find((i: RelationInfo) => i.type === RelationInfoType)?.savedCount ?? 0;
+				const removedCount = dataValue?.filter((i: FileDiffWrapper) => {
+										return i.status === 'delete' || i.status === 'disconnect' || i.status === 'unset';
+									  }).length ?? 0;
+				const addedCount = dataValue.length - removedCount;
+				const resultCount = savedCount + addedCount - removedCount;
+
+				return resultCount > 0
+			},
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
@@ -539,7 +562,7 @@ const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => {
 const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 
 	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => val && Array.isArray(val) && val.length > 0,
+		? z.any().refine((val): val is Record<string, unknown> => val || Array.isArray(val) && val.length > 0,
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
