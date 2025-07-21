@@ -1,3 +1,4 @@
+// Binary main starts the Labra server. Located at src/app/main.go.
 package main
 
 import (
@@ -226,7 +227,7 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 			}
 			return false
 		})
-		
+
 		return changes, nil
 	})
 }

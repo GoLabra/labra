@@ -1,3 +1,5 @@
+// Package schema defines ent schemas for admin entities. File path:
+// src/app/schema/_admin/external.go.
 package schema
 
 import (
@@ -7,6 +9,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
+// User defines the minimal fields required for external user references.
 type User struct {
 	ent.Schema
 }
@@ -31,6 +34,7 @@ func (User) Fields() []ent.Field {
 	}
 }
 
+// File defines the minimal fields required for external file references.
 type File struct {
 	ent.Schema
 }
@@ -55,6 +59,7 @@ func (File) Fields() []ent.Field {
 	}
 }
 
+// Edges exposes additional edges injected by admin code generation.
 func (File) Edges() []ent.Edge {
 	return additionalFileEdges
 }

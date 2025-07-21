@@ -1,3 +1,5 @@
+// Binary generate is used by go:generate directives to regenerate ent and GraphQL code.
+// File path: src/app/generate.go.
 package main
 
 //go:generate rm -rf ./ent/schema

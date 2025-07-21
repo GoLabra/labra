@@ -1,3 +1,5 @@
+// Package strcase provides string case conversion helpers used during code
+// generation. Located in src/api/strcase.
 package strcase
 
 import (
@@ -13,14 +15,17 @@ import (
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
 var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
 
+// ToSnake converts a string into snake_case.
 func ToSnake(str string) string {
 	return strcase.ToSnake(str)
 }
 
+// NodeNameToGraphqlName lowers the first letter to create a GraphQL type name.
 func NodeNameToGraphqlName(s string) string {
 	return strings.ToLower(string(s[0])) + s[1:]
 }
 
+// ToLowerCamel converts a string to lowerCamel case.
 func ToLowerCamel(s string) string {
 	camel := ToCamel(s)
 	if len(camel) <= 1 {
@@ -29,6 +34,7 @@ func ToLowerCamel(s string) string {
 	return strings.ToLower(camel[:1]) + camel[1:]
 }
 
+// ToCamel converts a string to Camel case without altering acronyms.
 func ToCamel(s string) string {
 	var camel string
 	words := strings.FieldsFunc(s, isSeparator)
@@ -43,6 +49,7 @@ func ToCamel(s string) string {
 	return strings.ToUpper(camel[:1]) + camel[1:]
 }
 
+// ToPascal converts a string to PascalCase.
 func ToPascal(s string) string {
 	words := strings.FieldsFunc(s, isSeparator)
 	if len(words) == 1 {
@@ -51,10 +58,12 @@ func ToPascal(s string) string {
 	return pascalWords(words)
 }
 
+// ToTitle converts a string to title case.
 func ToTitle(val string) string {
 	return cases.Title(language.English).String(val)
 }
 
+// LowerFirstLetter makes the first letter of the string lower case.
 func LowerFirstLetter(val string) string {
 	return strings.ToLower(val[:1]) + val[1:]
 }

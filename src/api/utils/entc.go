@@ -1,3 +1,5 @@
+// Package utils contains helper functions for ent code generation. This file is
+// in src/api/utils.
 package utils
 
 import (
@@ -7,6 +9,7 @@ import (
 	"entgo.io/ent/entc/gen"
 )
 
+// ShouldSkip determines if a mutation input should skip a field based on entgql annotations.
 func ShouldSkip(n *gen.Type, skipOp string) bool {
 	ant := &entgql.Annotation{}
 	if err := ant.Decode(n.Annotations[ant.Name()]); err != nil {
@@ -21,6 +24,7 @@ func ShouldSkip(n *gen.Type, skipOp string) bool {
 	return false
 }
 
+// InputEdges filters edges that should be included in mutation input types.
 func InputEdges(m *entgql.MutationDescriptor) []*gen.Edge {
 	inputEdges := make([]*gen.Edge, 0, len(m.Type.Edges))
 	for _, e := range m.Type.Edges {
@@ -32,6 +36,7 @@ func InputEdges(m *entgql.MutationDescriptor) []*gen.Edge {
 	return inputEdges
 }
 
+// CustomFieldName trims _id or _ids suffixes from field names.
 func CustomFieldName(val string) string {
 	val = strings.TrimSuffix(val, "_id")
 	val = strings.TrimSuffix(val, "_ids")

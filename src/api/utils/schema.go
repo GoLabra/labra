@@ -1,3 +1,5 @@
+// Package utils contains helpers for schema management and generation. The
+// file is located at src/api/utils.
 package utils
 
 import (
@@ -15,10 +17,13 @@ import (
 	"github.com/samborkent/uuidv7"
 )
 
+// NewUUIDV7 generates a new UUID version 7 string.
 func NewUUIDV7() string {
 	return uuidv7.New().String()
 }
 
+// LoadSchema reads ent schemas from disk and populates the cache.
+// See app/entc.go for schema generation details.
 func LoadSchema(config *config.Config) {
 
 	graph, err := entc.LoadGraph(config.EntSchemaPath, &gen.Config{})

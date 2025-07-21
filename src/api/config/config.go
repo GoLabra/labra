@@ -1,3 +1,6 @@
+// Package config loads application configuration from environment variables.
+// Located in src/api/config, it centralizes configuration needed by the API
+// services.
 package config
 
 import (
@@ -7,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config holds environment driven configuration for the API server.
 type Config struct {
 	DSN                  string `env:"DSN,required"`
 	DBDialect            string `env:"DB_DIALECT,required"`
@@ -19,6 +23,7 @@ type Config struct {
 	FileStoragePath      string `env:"FILE_STORAGE_PATH,required"`
 }
 
+// New parses environment variables and returns a populated Config instance.
 func New() (*Config, error) {
 	godotenv.Load()
 

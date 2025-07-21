@@ -1,3 +1,5 @@
+// Package svc exposes service interfaces used by external layers. File path:
+// src/api/interfaces/svc.
 package svc
 
 import (
@@ -6,6 +8,7 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/entity"
 )
 
+// Entity defines business operations on entities for dependency injection.
 type Entity interface {
 	UpdateEntity(ctx context.Context, where entity.EntityWhereUniqueInput, data entity.UpdateEntityInput) (*entity.Entity, error)
 	CreateEntity(ctx context.Context, data entity.CreateEntityInput) (*entity.Entity, error)

@@ -1,3 +1,6 @@
+// Package handler provides HTTP handlers for authentication and GraphQL
+// operations. This file implements the middleware authenticator and resides in
+// src/api/handler.
 package handler
 
 import (
@@ -13,6 +16,7 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
+// Authenticator validates JWT tokens and injects user and role into the request context.
 func Authenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

@@ -1,3 +1,6 @@
+// Package handler exposes HTTP endpoints for authentication and GraphQL.
+// This file contains logic for changing a user's active role and is located in
+// src/api/handler.
 package handler
 
 import (
@@ -11,10 +14,13 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// ChangeSessionRoleRequest is the expected body for role change requests.
 type ChangeSessionRoleRequest struct {
 	Role string
 }
 
+// ChangeSessionRole signs a new JWT for the currently authenticated user with the
+// requested role.
 func ChangeSessionRole(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, ok := ctx.Value(constants.UserContextValue).(*ent.User)

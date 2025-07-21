@@ -1,3 +1,5 @@
+// Package constants defines shared constants and enumerations for the Labra
+// backend. It lives in src/api/constants.
 package constants
 
 import (
@@ -6,11 +8,19 @@ import (
 	"github.com/MakeNowJust/heredoc"
 )
 
+// Status represents an application or resource status.
 type Status string
+
+// Role defines a user role name used for authorization.
 type Role string
+
+// Environment indicates the deployment environment such as dev or prod.
 type Environment string
+
+// ContextKey identifies values stored in context.Context.
 type ContextKey string
 
+// Commonly used boolean and string constants.
 var (
 	FalseVal                = false
 	TrueVal                 = true
@@ -29,6 +39,7 @@ var (
 	`)
 )
 
+// Enumerations and configuration constants used throughout the API.
 const (
 	Active     Status = "Active"
 	Inactive   Status = "Inactive"
@@ -63,6 +74,7 @@ const (
 	Prod  Environment = "prod"
 )
 
+// String returns the textual representation of the Status value.
 func (s Status) String() string {
 	switch s {
 	case Active:
@@ -90,6 +102,7 @@ func (s Status) String() string {
 	}
 }
 
+// String returns the role name.
 func (r Role) String() string {
 	switch r {
 	case SuperAdmin:
@@ -99,6 +112,7 @@ func (r Role) String() string {
 	}
 }
 
+// String converts the Environment value to its string form.
 func (env Environment) String() string {
 	switch env {
 	case Local:

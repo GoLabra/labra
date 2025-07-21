@@ -1,3 +1,5 @@
+// Package handler exposes HTTP endpoints for authentication and GraphQL.
+// This file contains the login handler and is located in src/api/handler.
 package handler
 
 import (
@@ -14,12 +16,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// LoginFormData represents the JSON body expected by the Login handler.
 type LoginFormData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 // TODO: 1. sanitize error messages; 2. move to api; 3. add logs;
+// Login authenticates a user and issues a JWT on success.
 func Login(w http.ResponseWriter, r *http.Request) {
 	var (
 		loginFormData LoginFormData

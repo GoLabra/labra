@@ -1,3 +1,5 @@
+// Package handler includes HTTP handlers for the API. This file exposes helper
+// functions for serving a GraphQL playground. Located in src/api/handler.
 package handler
 
 import (
@@ -90,6 +92,7 @@ var page = template.Must(template.New("graphiql").Parse(`<!DOCTYPE html>
 `))
 
 // Handler responsible for setting up the playground
+// Playground returns a handler that serves the GraphQL playground at the given endpoint.
 func Playground(title, endpoint string) http.HandlerFunc {
 	return HandlerWithHeaders(title, endpoint, nil, nil)
 }
@@ -97,6 +100,7 @@ func Playground(title, endpoint string) http.HandlerFunc {
 // HandlerWithHeaders sets up the playground.
 // fetcherHeaders are used by the playground's fetcher instance and will not be visible in the UI.
 // uiHeaders are default headers that will show up in the UI headers editor.
+// HandlerWithHeaders sets up a GraphQL playground with optional default headers.
 func HandlerWithHeaders(
 	title, endpoint string,
 	fetcherHeaders, uiHeaders map[string]string,
@@ -123,6 +127,7 @@ func HandlerWithHeaders(
 }
 
 // endpointHasScheme checks if the endpoint has a scheme.
+// endpointHasScheme checks whether the endpoint includes a URL scheme.
 func endpointHasScheme(endpoint string) bool {
 	u, err := url.Parse(endpoint)
 	return err == nil && u.Scheme != ""
@@ -130,6 +135,7 @@ func endpointHasScheme(endpoint string) bool {
 
 // getSubscriptionEndpoint returns the subscription endpoint for the given
 // endpoint if it is parsable as a URL, or an empty string.
+// getSubscriptionEndpoint derives the WebSocket endpoint for subscriptions.
 func getSubscriptionEndpoint(endpoint string) string {
 	u, err := url.Parse(endpoint)
 	if err != nil {

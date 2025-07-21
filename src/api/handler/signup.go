@@ -1,3 +1,5 @@
+// Package handler exposes HTTP endpoints for authentication and GraphQL.
+// This file implements the signup endpoint and is located in src/api/handler.
 package handler
 
 import (
@@ -11,6 +13,7 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/ent"
 )
 
+// SignupFormData is the expected JSON body for user signup requests.
 type SignupFormData struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`
@@ -21,6 +24,7 @@ type SignupFormData struct {
 var superAdmin = "SuperAdmin"
 
 // TODO: 1. sanitize error messages; 2. move to api; 3. add logs;
+// Signup registers a new super admin user if none exists and returns status.
 func Signup(w http.ResponseWriter, r *http.Request) {
 	var (
 		signupFormData SignupFormData

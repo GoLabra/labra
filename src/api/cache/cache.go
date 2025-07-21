@@ -1,3 +1,6 @@
+// Package cache provides generic in-memory caching utilities for the Labra API.
+// Located at src/api/cache, it stores frequently accessed entities to reduce
+// database lookups.
 package cache
 
 import (
@@ -5,17 +8,21 @@ import (
 	"time"
 )
 
+// Cache stores key-value pairs with an optional TTL. It is thread safe and used
+// by various services to hold frequently accessed objects.
 type Cache[K comparable, V any] struct {
 	ttl    time.Duration
 	mu     sync.RWMutex
 	Values map[K]Item[V]
 }
 
+// Item represents a cached value with its expiration time.
 type Item[V any] struct {
 	expirationTime time.Time
 	Value          V
 }
 
+// NewCache initializes a Cache with the provided TTL.
 func NewCache[K comparable, V any](ttl time.Duration) Cache[K, V] {
 	return Cache[K, V]{
 		ttl:    ttl,
@@ -24,6 +31,7 @@ func NewCache[K comparable, V any](ttl time.Duration) Cache[K, V] {
 	}
 }
 
+// Get returns a cached value and a flag indicating whether it exists.
 func (c *Cache[K, V]) Get(key K) (V, bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -33,6 +41,7 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 	return value.Value, ok
 }
 
+// GetAll retrieves all values in the cache in no particular order.
 func (c *Cache[K, V]) GetAll() []V {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -45,6 +54,7 @@ func (c *Cache[K, V]) GetAll() []V {
 	return values
 }
 
+// Set adds or replaces a value for the given key and sets its expiration time.
 func (c *Cache[K, V]) Set(key K, val V) {
 	var expirationTime time.Time
 
@@ -61,6 +71,7 @@ func (c *Cache[K, V]) Set(key K, val V) {
 	}
 }
 
+// Delete removes the cached value for the provided key.
 func (c *Cache[K, V]) Delete(key K) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

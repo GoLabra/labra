@@ -1,5 +1,7 @@
 //go:build ignore
 
+// Binary entc runs ent code generation. It is invoked via go generate in
+// src/app/entc.go.
 package main
 
 import (

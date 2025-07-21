@@ -1,3 +1,5 @@
+// Package hooks provides ent mutation hooks used across the application. This
+// file defines auditing hooks and lives in src/api/hooks.
 package hooks
 
 import (
@@ -7,6 +9,8 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/ent"
 )
 
+// CreatedByUpdatedByHook automatically sets createdBy and updatedBy fields on
+// ent mutations when a user is present in the request context.
 func CreatedByUpdatedByHook(next ent.Mutator) ent.Mutator {
 	var currentUserId string
 	return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
