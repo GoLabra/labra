@@ -200,6 +200,8 @@ func Imports(fields []entity.Field) map[string]bool {
 			imports["entgo.io/ent/dialect"] = true
 		case entity.FieldTypeRichText:
 			imports["entgo.io/ent/dialect"] = true
+		case entity.FieldTypeMarkdown:
+			imports["entgo.io/ent/dialect"] = true
 		case entity.FieldTypeEmail:
 		case entity.FieldTypeInteger:
 		case entity.FieldTypeDecimal:

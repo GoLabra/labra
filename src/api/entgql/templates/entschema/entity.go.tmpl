@@ -49,6 +49,8 @@ func ({{$.Entity.EntName}}) Fields() []ent.Field {
             {{template "LongText" $f}}
         {{- else if eq $f.Type "RichText" }}
             {{template "RichText" $f}}
+        {{- else if eq $f.Type "Markdown" }}
+            {{template "Markdown" $f}}
         {{- else if eq $f.Type "Email" }}
             {{template "Email" $f}}
         {{- else if eq $f.Type "Integer" }}

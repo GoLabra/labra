@@ -98,6 +98,7 @@ const (
 	FieldTypeShortText      FieldType = "ShortText"
 	FieldTypeLongText       FieldType = "LongText"
 	FieldTypeRichText       FieldType = "RichText"
+	FieldTypeMarkdown       FieldType = "Markdown"
 	FieldTypeEmail          FieldType = "Email"
 	FieldTypeInteger        FieldType = "Integer"
 	FieldTypeDecimal        FieldType = "Decimal"

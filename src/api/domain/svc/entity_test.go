@@ -164,6 +164,69 @@ var _ = Describe("Create Entity", func() {
 				_, err := e.CreateEntity(ctx, createInput)
 				Expect(err).To(BeNil())
 			})
+			Context("Entity with markdown field", func() {
+				var createFieldInput entity.CreateFieldInput
+				BeforeEach(func() {
+					createInput = entity.CreateEntityInput{
+						Caption: "Test Entity",
+						DisplayField: entity.FieldWhereUniqueInput{
+							Name: P("id"),
+						},
+						Fields: &entity.CreateManyFieldsInput{
+							Create: []*entity.CreateFieldInput{},
+						},
+					}
+					createFieldInput = entity.CreateFieldInput{
+						Caption: "Md",
+						Type:    string(entity.FieldTypeMarkdown),
+					}
+				})
+
+				It("Will create markdown field", func() {
+					mockSchemaManager.EXPECT().BackupSchema().Return(nil)
+					mockSchemaManager.EXPECT().Generate(gomock.Any(), gomock.Any()).Return(nil)
+					mockSchemaManager.EXPECT().WriteEntityToSchema(Matches(
+						MatchFields(IgnoreExtras, Fields{
+							"Entity": MatchAllFields(Fields{
+								"Name":             Equal("testEntity"),
+								"EntName":          Equal("TestEntity"),
+								"Caption":          Equal("Test Entity"),
+								"Owner":            Equal(entity.EntityOwnerUser),
+								"DisplayFieldName": Equal("id"),
+							}),
+							"Fields": MatchAllElementsWithIndex(IndexIdentity, Elements{
+								"0": idFieldMatcher,
+								"1": createdAtMatcher,
+								"2": updatedAtMatcher,
+								"3": MatchAllFields(Fields{
+									"Name":           Equal("md"),
+									"EntName":        Equal("md"),
+									"Caption":        Equal("Md"),
+									"Type":           Equal(string(entity.FieldTypeMarkdown)),
+									"Required":       BeNil(),
+									"Unique":         BeNil(),
+									"DefaultValue":   BeNil(),
+									"Min":            BeNil(),
+									"Max":            BeNil(),
+									"Private":        BeNil(),
+									"Nillable":       Equal(false),
+									"UpdateDefault":  Equal(false),
+									"AcceptedValues": BeNil(),
+								}),
+							}),
+							"Edges": MatchAllElementsWithIndex(IndexIdentity, Elements{
+								"0": createdByMatcher,
+								"1": updatedByMatcher,
+							}),
+							"RelatedEntities": BeEmpty(),
+						}),
+					)).Return(nil)
+
+					createInput.Fields.Create = append(createInput.Fields.Create, &createFieldInput)
+					_, err := e.CreateEntity(ctx, createInput)
+					Expect(err).To(BeNil())
+				})
+			})
 		})
 		Context("Entity with short text field", func() {
 			var createFieldInput entity.CreateFieldInput
