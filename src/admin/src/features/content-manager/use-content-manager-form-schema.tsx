@@ -446,7 +446,7 @@ const getMultiChoice = (field: Field): FieldDetails => {
 
 const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 
-	let schema: z.ZodTypeAny = true
+	let schema: z.ZodTypeAny = edge.required
 		? z.any().refine((val: any[]) => {
 				const dataValue = val?.filter((i: RelationInfo) => i.type !== RelationInfoType) ?? [];
 
@@ -504,7 +504,7 @@ const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 
 const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => { 
 
-	let schema: z.ZodTypeAny = true
+	let schema: z.ZodTypeAny = edge.required
 		? z.any().refine((val: any[]) => {
 				const dataValue = val?.filter((i: RelationInfo) => i.type !== RelationInfoType) ?? [];
 
