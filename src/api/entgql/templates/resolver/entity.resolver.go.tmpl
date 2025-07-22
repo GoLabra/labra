@@ -81,7 +81,7 @@ func (r *{{$.Name | LowerFirstLetter}}Resolver) {{ ToCamel $e.Name }}(ctx contex
 	if err != nil {
 		return nil, fmt.Errorf("[{{$.Name | LowerFirstLetter}}Resolver.{{ $e.Name }}]: %w", err)
 	}
-	if relObj == nil {
+	if len(relObj) == 0 {
 		return nil, nil
 	}
 	{{- if $e.Unique }}

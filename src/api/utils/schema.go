@@ -20,7 +20,6 @@ func NewUUIDV7() string {
 }
 
 func LoadSchema(config *config.Config) {
-
 	graph, err := entc.LoadGraph(config.EntSchemaPath, &gen.Config{})
 	if err != nil {
 		panic(err)

@@ -92,6 +92,7 @@ func main() {
 		entc.Extensions(ex),
 		entc.FeatureNames("sql/execquery", "sql/upsert"),
 	}
+	
 	graph, err := entc.LoadGraph("./ent/schema", &gen.Config{})
 	if err != nil {
 		panic(err)
