@@ -6,6 +6,7 @@ import { DateTimeFormField } from "@/core-features/dynamic-form/form-fields/Date
 import { TimeFormField } from "@/core-features/dynamic-form/form-fields/TimeField";
 import { TextLongFormField } from "@/core-features/dynamic-form/form-fields/TextLongField";
 import { RichTextFormField } from "@/core-features/dynamic-form/form-fields/RichTextField";
+import { MarkdownFormField } from "@/core-features/dynamic-form/form-fields/MarkdownField";
 import { DateFormField } from "@/core-features/dynamic-form/form-fields/DateField";
 import { JSONFormField } from "@/core-features/dynamic-form/form-fields/JSONField";
 import { SelectFormField } from "@/core-features/dynamic-form/form-fields/SelectField";
@@ -18,29 +19,29 @@ import { MultipleChoiceFormField } from "@/core-features/dynamic-form/form-field
 import { TagsSelectFormField } from "@/core-features/dynamic-form/form-fields/TagsSelectField";
 import { PasswordFormField } from "./form-fields/PasswordField";
 
-export const FormElementsMap = { 
-    ShortText: TextShortFormField,
-    LongText: TextLongFormField,
-    RichText: RichTextFormField,
-    Password: PasswordFormField,
-    
-    Number: NumberFormField,
+export const FormElementsMap = {
+  ShortText: TextShortFormField,
+  LongText: TextLongFormField,
+  RichText: RichTextFormField,
+  Markdown: MarkdownFormField,
+  Password: PasswordFormField,
 
-    Boolean: BooleanFormField,
-    BooleanSelect: BooleanSelectFormField,
+  Number: NumberFormField,
 
-    DateTime: DateTimeFormField,
-    Date: DateFormField,
-    Time: TimeFormField,
+  Boolean: BooleanFormField,
+  BooleanSelect: BooleanSelectFormField,
 
-    Json: JSONFormField,
+  DateTime: DateTimeFormField,
+  Date: DateFormField,
+  Time: TimeFormField,
 
-    Select: SelectFormField,
-    TagsSelect: TagsSelectFormField,
+  Json: JSONFormField,
 
-    SingleChoice: SingleChoiceFormField,
-    MultipleChoice: MultipleChoiceFormField,
-    RelationOne: LookupOneFIELDFormField,
-    RelationMany: LookupManyFIELDFormField, 
+  Select: SelectFormField,
+  TagsSelect: TagsSelectFormField,
 
-} as {[key in FormFieldTypes]: React.FC<any>};
+  SingleChoice: SingleChoiceFormField,
+  MultipleChoice: MultipleChoiceFormField,
+  RelationOne: LookupOneFIELDFormField,
+  RelationMany: LookupManyFIELDFormField,
+} as { [key in FormFieldTypes]: React.FC<any> };
