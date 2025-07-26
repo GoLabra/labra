@@ -9,6 +9,9 @@ import (
 
 var additionalFileEdges = []ent.Edge{
 {{- range $edge := $ }}
+{{- if ne $edge.Type.Name "File" }}
+{{- continue }}
+{{- end }}
     edge.From("{{ToLower $edge.Owner.Name}}_{{$edge.Name}}", {{$edge.Owner.Name}}.Type).
         Ref("{{$edge.Name}}"),
 {{- end }}

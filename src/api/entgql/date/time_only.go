@@ -8,7 +8,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-const TimeOnlyFormat = "15:04:05.000"
+const TimeOnlyFormat = "15:04:05"
 
 func MarshalTimeOnly(t time.Time) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {

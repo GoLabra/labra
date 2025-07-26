@@ -325,7 +325,7 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	{{- else if and $e.Unique (not (ShouldSkip $e.Type "mutation_create_input")) }} 
 	if data.{{ Pascal $e.Name }} != nil && data.{{ Pascal $e.Name }}.Delete != nil && *data.{{ Pascal $e.Name }}.Delete {
 		{{- if ne $e.Type.Annotations.Entity.Owner "User" }}
-		toDelete := admin.{{ $e.Type.Name }}WhereUniqueInput{} // TODO @David test this shit
+		toDelete := admin.{{ $e.Type.Name }}WhereUniqueInput{} // TODO @David test this
 		err := mapstructure.Decode({{ $e.Name }}ToDelete, &toDelete)
 		if err != nil {
 			return nil, err

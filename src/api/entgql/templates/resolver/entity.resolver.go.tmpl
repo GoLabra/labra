@@ -81,16 +81,21 @@ func (r *{{$.Name | LowerFirstLetter}}Resolver) {{ ToCamel $e.Name }}(ctx contex
 	if err != nil {
 		return nil, fmt.Errorf("[{{$.Name | LowerFirstLetter}}Resolver.{{ $e.Name }}]: %w", err)
 	}
+	{{- if $e.Unique }}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.{{$e.Type.Name}}.GetOne(ctx, ent1.{{$e.Type.Name}}WhereUniqueInput{ID: &relObj.ID})
+	{{- else }}
 	if len(relObj) == 0 {
 		return nil, nil
 	}
-	{{- if $e.Unique }}
-	adminObj, err := r.Service.{{$e.Type.Name}}.GetOne(ctx, ent1.{{$e.Type.Name}}WhereUniqueInput{ID: &relObj.ID})
-	{{- else }}
+
 	var ids = make([]string, len(relObj))
 
-	for _, o := range relObj {
-		ids = append(ids, o.ID)
+	for idx, o := range relObj {
+		ids[idx] = o.ID
 	}
 
 	adminObj, err := r.Service.{{$e.Type.Name}}.Get(ctx, &ent1.{{$e.Type.Name}}WhereInput{IDIn: ids}, nil, nil, nil, nil)
