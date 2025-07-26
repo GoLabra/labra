@@ -21,7 +21,11 @@ export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, Cont
 	const formSchema = useContentManagerFormSchema(fullEntity);
 
 	const id = useMemo(() => {
-		return props.defaultValue?.id;
+
+		if(myDialogContext.openMode === FormOpenMode.New){
+			return null
+		}
+		return myDialogContext.editId;
 	}, [props.defaultValue]);
 
 	const displayValue = useMemo(() => {

@@ -82,21 +82,21 @@ const changePermission = (savedPermissions: PermissionItem[], entityName: string
 	const currentEntityPermissions = savedPermissions.filter(i => i.entityName == entityName);
 
 	const disconnect = currentEntityPermissions.filter(i => operations.includes(i.operation) == false)
-												.map((i): PermissionItem => ({
-													...i,
-													status: 'delete'
-												}));
+		.map((i): PermissionItem => ({
+			...i,
+			status: 'delete'
+		}));
 	const create = operations.filter(i => !!savedPermissions.find(j => j.entityName == entityName && j.operation == i) == false)
-							.map((i): PermissionItem => ({
-								entityName: entityName,
-								operation: i,
-								status: 'create'
-							}));
+		.map((i): PermissionItem => ({
+			entityName: entityName,
+			operation: i,
+			status: 'create'
+		}));
 
 	return [
 		...create,
 		...disconnect
-	]					
+	]
 }
 
 // PERMISSION SECTION
@@ -130,7 +130,7 @@ const EntityPermissionView = (props: EntityPermissionViewProps) => {
 
 	return (
 		<Stack gap={1.5} my={2} borderRadius={0}>
-			
+
 			<Typography >
 				{props.entityCaption}
 			</Typography>
@@ -194,18 +194,18 @@ const PermissionSection = (props: PermissionSectionProps) => {
 			status: 'saved',
 		}));
 
-		return savedValueItems ?? []; 
+		return savedValueItems ?? [];
 	}, [permissionRequest.data]);
 
 	const currentPermissions = useMemo((): PermissionItem[] => {
 		const all = [...existing, ...formControllerHandler.value ?? []];
 		return all.filter(i => {
-			if(i.status == 'delete'){
+			if (i.status == 'delete') {
 				return false;
 			}
 
-			if(i.status == 'saved'){
-				if(all.find(j => j.id == i.id && j.status == 'delete')){
+			if (i.status == 'saved') {
+				if (all.find(j => j.id == i.id && j.status == 'delete')) {
 					return false;
 				}
 			}
@@ -217,7 +217,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 	const allPermissionsGrouped = useMemo((): Record<string, Operation[]> => {
 
-		const permissionByEntity = groupByMap(currentPermissions,  
+		const permissionByEntity = groupByMap(currentPermissions,
 			item => item.entityName,
 			(item): Operation => ({
 				id: item.id,
@@ -229,7 +229,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 		return permissionByEntity;
 
 	}, [currentPermissions]);
-	
+
 
 	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
 		const newPermissions = changePermission(existing, entityName, operations);
@@ -247,7 +247,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 	const selectAll = useCallback(() => {
 		const newPermissions = entities.flatMap((entity) => {
-				return changePermission(existing, entity.name, operationDefs.map(i => i.name))
+			return changePermission(existing, entity.name, operationDefs.map(i => i.name))
 		});
 
 		formControllerHandler.onChange({
@@ -260,7 +260,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 
 	const clearAll = useCallback(() => {
 		const newPermissions = entities.flatMap((entity) => {
-				return changePermission(existing, entity.name, [])
+			return changePermission(existing, entity.name, [])
 		});
 
 		formControllerHandler.onChange({
@@ -382,7 +382,11 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 	const fullEntity = useFullEntity({ entityName: props.entityName });
 
 	const id = useMemo(() => {
-		return props.defaultValue?.id;
+
+		if (myDialogContext.openMode === FormOpenMode.New) {
+			return null
+		}
+		return myDialogContext.editId;
 	}, [props.defaultValue]);
 
 	const usersRoles = useGenericEdgeFormSchema(fullEntity, 'userRoles');

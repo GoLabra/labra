@@ -23,6 +23,7 @@ export const Id = (props: IdProps) => {
 
     return (<RootBox
         {...props.rootProps}
+		id={value}
         sx={{
     
             ...props.rootProps?.sx

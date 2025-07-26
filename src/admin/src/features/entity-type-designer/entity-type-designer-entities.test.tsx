@@ -16,6 +16,10 @@ jest.mock('@paralleldrive/cuid2', () => ({
     createId: jest.fn(() => 'mocked-id')
 }));
 
+jest.mock("@/config/CONST", () => ({
+    COLOR: 'blue',
+	ENTITY_SYSTEM_KEYWORDS: []
+}));
 
 // Mock useRouter:
 jest.mock("next/navigation", () => ({
