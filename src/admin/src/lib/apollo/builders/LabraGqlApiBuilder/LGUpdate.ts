@@ -1,11 +1,11 @@
 import { pascalCase } from "change-case";
-import { FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
 import * as gqlBuilder from 'gql-query-builder'
 
-export class LGUpdate<T> implements ILGQuery {
+export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 
 	public readonly isMutation = true;
 
@@ -87,7 +87,7 @@ export class LGUpdate<T> implements ILGQuery {
 		return response[fieldName];
 	}
 
-	public static from = <T = any>(entityName: string, data: T) => {
+	public static from = <T extends EntityBaseType = any>(entityName: string, data: T) => {
 		return new LGUpdate<T>(data, entityName, [], undefined);
 	};
 }

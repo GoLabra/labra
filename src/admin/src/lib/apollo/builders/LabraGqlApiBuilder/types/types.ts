@@ -16,11 +16,13 @@ export type FilterOperators =
 	| 'EqualFold'
 	| 'ContainsFold';
 
-export type Filters<T> = {
+export type EntityBaseType = { id: string }
+
+export type Filters<T extends EntityBaseType> = {
 	[K in keyof T as `${Extract<K, string>}${FilterOperators}`]?: T[K] | T[K][];
 };
 
-export type WhereInput<T = any> = Filters<T> & {
+export type WhereInput<T extends EntityBaseType= any> = Filters<T> & {
 	not?: WhereInput<T>;
 	and?: WhereInput<T>[];
 	or?: WhereInput<T>[];
@@ -36,10 +38,10 @@ export type FieldRequest<T = any, K extends ObjectKeys<T> = ObjectKeys<T>> =
 
 // Query Filter class
 
-export class GplFilter<T> {
+export class GplFilter<T extends EntityBaseType> {
 	private constructor(public readonly expression: WhereInput<T>) { }
 
-	static and<T>(...filters: Array<GplFilter<T> | WhereInput<T> | null | undefined>): GplFilter<T> {
+	static and<T extends EntityBaseType>(...filters: Array<GplFilter<T> | WhereInput<T> | null | undefined>): GplFilter<T> {
 		return new GplFilter<T>({ and: filters.filter(i => !!i).map(f => {
 			if(f instanceof GplFilter){
 				f.expression
@@ -48,7 +50,7 @@ export class GplFilter<T> {
 		}) } as WhereInput<T>);
 	}
 
-	static or<T>(...filters: Array<GplFilter<T> | null | undefined>): GplFilter<T> {
+	static or<T extends EntityBaseType>(...filters: Array<GplFilter<T> | null | undefined>): GplFilter<T> {
 		return new GplFilter<T>({ or: filters.filter(i => !!i).map(f => {
 			if(f instanceof GplFilter){
 				f.expression
@@ -57,11 +59,11 @@ export class GplFilter<T> {
 		}) } as WhereInput<T>);
 	}
 
-	static not<T>(filter: GplFilter<T>): GplFilter<T> {
+	static not<T extends EntityBaseType>(filter: GplFilter<T>): GplFilter<T> {
 		return new GplFilter<T>({ not: filter.expression } as WhereInput<T>);
 	}
 
-	static field<T, K extends Extract<keyof T, string>, Op extends FilterOperators, V = T[K]>(
+	static field<T extends EntityBaseType, K extends Extract<keyof T, string>, Op extends FilterOperators, V = T[K]>(
 		key: K,
 		operator: Op,
 		value: Op extends 'In' | 'NotIn' ? V[] : V

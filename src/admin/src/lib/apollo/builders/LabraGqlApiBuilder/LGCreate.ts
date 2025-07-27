@@ -1,24 +1,28 @@
 import { pascalCase } from "change-case";
-import { FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
 import * as gqlBuilder from 'gql-query-builder'
+import pluralize from "pluralize";
 
-export class LGCreate<T> implements ILGQuery {
+export class LGCreate<T extends EntityBaseType> implements ILGQuery {
 
 	public readonly isMutation = true;
 	private readonly _field: string;
 	private readonly _select: FieldRequest<T>[] = [];
-	private readonly _data: T;
+	private readonly _data: T | T[];
 
-	private constructor(data: T, operation: string, fields: FieldRequest<T>[]) {
+	private constructor(data: T | T[], operation: string, fields: FieldRequest<T>[]) {
 		this._data = data;
 		this._field = operation;
 		this._select = fields;
 	}
 
 	public getOperationName = (): string => {
+		if(Array.isArray(this._data)){
+			return `createMany${pascalCase(pluralize(this._field))}`;
+		}
 		return `create${pascalCase(this._field)}`;
 	}
 
@@ -53,6 +57,7 @@ export class LGCreate<T> implements ILGQuery {
 			return acc;
 		}, [] as Fields);
 
+		
 		const queryOptions = {
 			operation,
 			fields,
@@ -60,7 +65,8 @@ export class LGCreate<T> implements ILGQuery {
 				data: {
 					type: `Create${pascalCase(this._field)}Input`,
 					required: true,
-					value: this._data
+					value: this._data,
+					list: Array.isArray(this._data) ? [true] : undefined
 				}
 			}
 		};
@@ -78,7 +84,7 @@ export class LGCreate<T> implements ILGQuery {
 		return response[fieldName];
 	}
 
-	public static from = <T = any>(entityName: string, data: T) => {
+	public static from = <T extends EntityBaseType = any>(entityName: string, data: T | T[]) => {
 		return new LGCreate<T>(data, entityName, []);
 	};
 }

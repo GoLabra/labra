@@ -1,11 +1,12 @@
 import { pascalCase } from "change-case";
-import { FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
 import * as gqlBuilder from 'gql-query-builder'
+import pluralize from "pluralize";
 
-export class LGDelete<T> implements ILGQuery {
+export class LGDelete<T extends EntityBaseType> implements ILGQuery {
 
 	public readonly isMutation = true;
 
@@ -19,7 +20,14 @@ export class LGDelete<T> implements ILGQuery {
 		this._filter = filter;
 	}
 
+	private isMany = () => {
+		return this._filter?.id == null;
+	}
+
 	public getOperationName = (): string => {
+		if(this.isMany()){
+			return `deleteMany${pascalCase(pluralize(this._field))}`;
+		}
 		return `delete${pascalCase(this._field)}`;
 	}
 
@@ -55,12 +63,19 @@ export class LGDelete<T> implements ILGQuery {
 			return acc;
 		}, [] as Fields);
 
+		let whereType = (() => {
+			if(this.isMany()){
+				return `${pascalCase(this._field!)}WhereInput`;
+			}
+			return `${pascalCase(this._field!)}WhereUniqueInput`;
+		})();
+
 		const queryOptions = {
 			operation,
 			fields,
 			variables: {
 				where: {
-					type: `${pascalCase(this._field!)}WhereUniqueInput`,
+					type: whereType,
 					required: true,
 					value: this._filter
 				}
@@ -80,7 +95,7 @@ export class LGDelete<T> implements ILGQuery {
 		return response[fieldName];
 	}
 
-	public static from = <T = any>(entityName: string) => {
+	public static from = <T extends EntityBaseType = any>(entityName: string) => {
 		return new LGDelete<T>(entityName, [], undefined);
 	};
 }

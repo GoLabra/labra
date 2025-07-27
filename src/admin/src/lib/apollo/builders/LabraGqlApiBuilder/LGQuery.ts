@@ -2,7 +2,7 @@ import * as gqlBuilder from 'gql-query-builder'
 import Fields from 'gql-query-builder/build/Fields';
 import IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions';
 import pluralize from "pluralize";
-import { FieldRequest, GplFilter, GplOrder, ILGQuery, ObjectKeys, Unarray, WhereInput } from './types/types';
+import { EntityBaseType, FieldRequest, GplFilter, GplOrder, ILGQuery, ObjectKeys, Unarray, WhereInput } from './types/types';
 import { LGSelectInclude } from './LGSelectInclude';
 import { LGConnectionQuery } from './LGConnectionQuery';
 import { LGDelete } from './LGDelete';
@@ -10,7 +10,7 @@ import { LGUpdate } from './LGUpdate';
 import { LGCreate } from './LGCreate';
 import { pascalCase } from 'change-case';
 
-export class LGQuery<T>  implements ILGQuery {
+export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	public readonly isMutation = false;
 
 	private readonly _field: string;
@@ -114,24 +114,24 @@ export class LGQuery<T>  implements ILGQuery {
 		return response[fieldName];
 	}
 
-	public static from = <T = any>(entityName: string) => {
+	public static from = <T extends EntityBaseType = any>(entityName: string) => {
 		return new LGQuery<T>(entityName, [], undefined, undefined, undefined, undefined, undefined);
 	};
 
-	public static fromConnection = <T = any>(entityName: string) => {
+	public static fromConnection = <T extends EntityBaseType = any>(entityName: string) => {
 		return LGConnectionQuery.from<T>(entityName);
 	};
 
-	public static deleteFrom = <T = any>(entityName: string) => {
-		return LGDelete.from<T>(entityName);
-	};
-
-	public static update = <T = any>(entityName: string, data: T) => {
+	public static update = <T extends EntityBaseType = any>(entityName: string, data: T) => {
 		return LGUpdate.from<T>(entityName, data);
 	};
-
-	public static create = <T = any>(entityName: string, data: T) => {
+	
+	public static create = <T extends EntityBaseType = any>(entityName: string, data: T | T[]) => {
 		return LGCreate.from<T>(entityName, data);
+	};
+	
+	public static deleteFrom = <T extends EntityBaseType = any>(entityName: string) => {
+		return LGDelete.from<T>(entityName);
 	};
 
 	public static merge = <T = any>(...queries: ILGQuery[]) => {

@@ -136,8 +136,23 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreParams)
 
 
     const addItems = useCallback((data: any[]) => {
-	
-    }, []);
+		if(!params.fullEntity){
+			return;
+		}
+
+		const query = LGQuery.create(params.fullEntity.name, data)
+							.select('id');
+
+		setDataLoading(true);
+
+		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+       	RunQuery(client, apiType, query)
+		.then((response) => {
+			refresh();
+		}).catch(() => {
+			setDataLoading(false);
+		});
+    }, [client, params.fullEntity, refresh, setDataLoading]);
 
     const updateItem = useCallback((id: string, data: any) => {
 
@@ -183,8 +198,24 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreParams)
     }, [client, params.fullEntity, refresh, setDataLoading]);
 
     const deleteBulk = useCallback((ids: Array<string>) => {
-        
-    }, []);
+        if(!params.fullEntity){
+			return;
+		}
+
+		const query = LGQuery.deleteFrom(params.fullEntity.name)
+							.where(GplFilter.field('id', 'In', ids));
+
+		setDataLoading(true);
+
+		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+       	RunQuery(client, apiType, query)
+		.then((response) => {
+			refresh();
+		}).catch(() => {
+			setDataLoading(false);
+		});
+
+    }, [client, params.fullEntity, refresh, setDataLoading]);
 
     useEffect(() => {
         if(params.fullEntity?.loading ?? true){

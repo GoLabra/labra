@@ -2,10 +2,10 @@ import * as gqlBuilder from 'gql-query-builder'
 import Fields from 'gql-query-builder/build/Fields';
 import IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions';
 import pluralize from "pluralize";
-import { FieldRequest, GplFilter, GplOrder, ILGQuery, ObjectKeys, Unarray, WhereInput } from './types/types';
+import { EntityBaseType, FieldRequest, GplFilter, GplOrder, ILGQuery, ObjectKeys, Unarray, WhereInput } from './types/types';
 import { LGSelectInclude } from './LGSelectInclude';
 
-export class LGConnectionQuery<T> implements ILGQuery {
+export class LGConnectionQuery<T extends EntityBaseType> implements ILGQuery {
 
 	public readonly isMutation = false;
 
@@ -100,7 +100,7 @@ export class LGConnectionQuery<T> implements ILGQuery {
 		return response[fieldName];
 	}
 
-	public static from = <T = any>(entityName: string) => {
-		return new LGConnectionQuery<T>(entityName, [], {}, undefined, undefined, undefined, undefined);
+	public static from = <T extends EntityBaseType = any>(entityName: string) => {
+		return new LGConnectionQuery<T>(entityName, [], undefined, undefined, undefined, undefined, undefined);
 	};
 }
