@@ -1,5 +1,6 @@
 # schema tells gqlgen when the GraphQL schema is located.
 schema:
+  - github.com/GoLabra/labra/src/api/entgql/graphql/*.graphql
   - ./graphql/*.graphql
 
 
@@ -24,6 +25,7 @@ model:
 # provided package. If they match it will use them, otherwise it will generate new.
 autobind:
   - github.com/99designs/gqlgen/graphql/introspection
+  - github.com/GoLabra/labra/src/api/entgql/ent
   - app/ent
   - github.com/GoLabra/labra/src/api/entgql/entity
 

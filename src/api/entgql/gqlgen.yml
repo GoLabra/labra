@@ -9,7 +9,7 @@ exec:
 
 resolver:
   layout: follow-schema
-  dir: ./resolvers
+  dir: ./domain/resolvers
   package: resolvers
 
 model:
@@ -25,6 +25,7 @@ model:
 autobind:
   - github.com/99designs/gqlgen/graphql/introspection
   - github.com/GoLabra/labra/src/api/entgql/entity
+  - github.com/GoLabra/labra/src/api/entgql/ent
 
 # This section declares type mapping between the GraphQL and Go type systems.
 models:

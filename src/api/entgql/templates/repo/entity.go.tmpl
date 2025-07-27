@@ -2,12 +2,25 @@ package repo
 
 import (
 	"context"
+	{{- if not (ShouldSkip $ "mutation_create_input") }}
 	"errors"
+	{{- end }}
 	"fmt"
 	"app/ent"
-
+	
+	{{- if not (ShouldSkip $ "mutation_create_input") }}
 	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/mitchellh/mapstructure"
+	{{- end }}
+	
+    {{- range $e := $.Edges}}
+	{{- if ne $e.Type.Annotations.Entity.Owner "User" }}
+	{{- if not (ShouldSkip $e.Type "mutation_create_input") }}
+	admin "github.com/GoLabra/labra/src/api/entgql/ent"
+	{{- break }}
+	{{- end }}
+	{{- end }}
+	{{- end }}
 )
 
 type {{$.Name}} struct {
@@ -135,7 +148,7 @@ func (r *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	return query.First(ctx)
 }
 
-
+{{- if not (ShouldSkip $ "mutation_create_input") }}
 func (r *{{$.Name}}) Create(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 
@@ -229,7 +242,9 @@ func (r *{{$.Name}}) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
 	}
 	return createdItems, nil
 }
+{{- end }}
 
+{{- if not (ShouldSkip $ "mutation_update_input") }}
 func (r *{{$.Name}}) Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 	if !ok {
@@ -275,8 +290,12 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	}
 
 	{{- range $e := $.Edges}}
-	{{- if $e.Unique }}
-	{{ $e.Name }}ToDelete := ent.{{ $e.Type.Name }}WhereUniqueInput{}
+	{{- if and $e.Unique (not (ShouldSkip $e.Type "mutation_create_input")) }} 
+	{{- $package := "ent" }}
+	{{- if ne $e.Type.Annotations.Entity.Owner "User" }}
+	{{- $package = "admin" }}
+	{{- end }}
+	{{ $e.Name }}ToDelete := {{ $package }}.{{ $e.Type.Name }}WhereUniqueInput{}
 	{{- end}}
     {{- if or (not $e.Optional) (or (not $e.Ref) ($e.Ref.Optional)) }}
     if data.{{ Pascal $e.Name }} != nil {
@@ -303,12 +322,25 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
     if data.{{ Pascal $e.Name }} != nil {
         {{ template "recursive_operations_after_update" $e }}
     }
-	{{- else if $e.Unique }}
+	{{- else if and $e.Unique (not (ShouldSkip $e.Type "mutation_create_input")) }} 
 	if data.{{ Pascal $e.Name }} != nil && data.{{ Pascal $e.Name }}.Delete != nil && *data.{{ Pascal $e.Name }}.Delete {
-		_, err := repository.{{ $e.Type.Name }}.DeleteTx(ctx, tx, {{ $e.Name }}ToDelete)
+		{{- if ne $e.Type.Annotations.Entity.Owner "User" }}
+		toDelete := admin.{{ $e.Type.Name }}WhereUniqueInput{} // TODO @David test this
+		err := mapstructure.Decode({{ $e.Name }}ToDelete, &toDelete)
 		if err != nil {
 			return nil, err
 		}
+		
+		_, err = repository.{{ $e.Type.Name }}.Delete(ctx, toDelete)
+		if err != nil {
+			return nil, err
+		}
+		{{- else }}
+		_, err := repository.{{ $e.Type.Name }}.Delete(ctx, {{ $e.Name }}ToDelete)
+		if err != nil {
+			return nil, err
+		}
+		{{- end }}
 	}
     {{- end }}
     {{- end }}
@@ -481,3 +513,4 @@ func (r *{{$.Name}}) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$
 	}
 	return deletedRows, nil
 }
+{{- end }}

@@ -1,2 +1,5 @@
 {{ define "model/fields/additional" }}
+    {{- if eq $.Name "File" }}
+        Content string `json:"content,omitempty"`
+    {{- end }}
 {{ end }}

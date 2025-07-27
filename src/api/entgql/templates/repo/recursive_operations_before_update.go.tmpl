@@ -1,7 +1,11 @@
 {{- define "recursive_operations_before_update" }}
+    {{- $package := "ent"}}
+    {{- if ne $.Type.Annotations.Entity.Owner "User" }}
+    {{- $package = "admin"}}
+    {{- end }}
     {{- if $.Unique }}
         if data.{{ Pascal $.Name }}.Connect != nil {    
-            toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *data.{{ Pascal $.Name }}.Connect)
+            toConnect, err := repository.{{ $.Type.Name }}.GetOne(ctx, *data.{{ Pascal $.Name }}.Connect)
 
             if err != nil {
                 return nil, err
@@ -14,14 +18,16 @@
 			data.Clear{{ Pascal $.Name }} = true
 		}
         {{- end }}
+        
+        {{- if not (ShouldSkip $.Type "mutation_create_input") }}
         if data.{{ Pascal $.Name }}.Create != nil {
-            var createInput ent.Create{{ $.Type.Name }}Input
+            var createInput {{ $package }}.Create{{ $.Type.Name }}Input
             err = mapstructure.Decode(data.{{ Pascal $.Name }}.Create, &createInput)
             if err != nil {
                 return nil, err
             }
             
-            toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+            toConnect, err := repository.{{ $.Type.Name }}.Create(ctx, createInput)
 
             if err != nil {
                 return nil, err
@@ -36,10 +42,11 @@
             }
             {{ $.Name }}ToDelete.ID = &itemToDelete.ID
         }
+        {{- end }}
     {{- else }}
         if data.{{ Pascal $.Name }}.Connect != nil {
             for _, connect := range data.{{ Pascal $.Name }}.Connect {
-                toConnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *connect)
+                toConnect, err := repository.{{ $.Type.Name }}.GetOne(ctx, *connect)
 
                 if err != nil {
                     return nil, err
@@ -50,7 +57,7 @@
         }
         if data.{{ Pascal $.Name }}.Disconnect != nil {
             for _, disconnect := range data.{{ Pascal $.Name }}.Disconnect {
-                toDisconnect, err := repository.{{ $.Type.Name }}.GetOneTx(ctx, tx, *disconnect)
+                toDisconnect, err := repository.{{ $.Type.Name }}.GetOne(ctx, *disconnect)
 
                 if err != nil {
                     return nil, err
@@ -59,31 +66,33 @@
                 data.Remove{{ Singular (Pascal $.Name) }}IDs = append(data.Remove{{ Singular (Pascal $.Name) }}IDs, toDisconnect.ID)
             }
         }
+        {{- if not (ShouldSkip $.Type "mutation_create_input") }}
         if data.{{ Pascal $.Name }}.Create != nil {
             for _, create := range data.{{ Pascal $.Name }}.Create {
-                var createInput ent.Create{{ $.Type.Name }}Input
+                var createInput {{ $package }}.Create{{ $.Type.Name }}Input
                 err = mapstructure.Decode(create, &createInput)
                 if err != nil {
                     return nil, err
                 }
 
-                toConnect, err := repository.{{ $.Type.Name }}.CreateTx(ctx, tx, createInput)
+                toConnect, err := repository.{{ $.Type.Name }}.Create(ctx, createInput)
 
                 if err != nil {
                     return nil, err
                 }
 
-                data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
+                 data.Add{{ Singular (Pascal $.Name) }}IDs = append(data.Add{{ Singular (Pascal $.Name) }}IDs , toConnect.ID)
             }
         }
         if data.{{ Pascal $.Name }}.Delete != nil {
             for _, delete := range data.{{ Pascal $.Name }}.Delete {
-                _, err := repository.{{ $.Type.Name }}.DeleteTx(ctx, tx, *delete)
+                _, err := repository.{{ $.Type.Name }}.Delete(ctx, *delete)
 
                 if err != nil {
                     return nil, err
                 }
             }
         }
+    {{- end }}
     {{- end }}
 {{- end }}

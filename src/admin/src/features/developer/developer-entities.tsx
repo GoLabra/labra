@@ -11,7 +11,7 @@ import Defaults from "@/config/Defaults.json";
 import { useAppStatus } from "@/store/app-state/use-app-state";
 import { MenuItem } from "@/shared/layouts/header/Topnav/top-nav";
 import ArrowRight from "@/assets/icons/iconly/bulk/arrow-right";
-import { GRAPHQL_ENTITY_PLAYGROUND_URL, GRAPHQL_QUERY_PLAYGROUND_URL } from "@/config/CONST";
+import { GRAPHQL_ADMIN_PLAYGROUND_URL, GRAPHQL_QUERY_PLAYGROUND_URL } from "@/config/CONST";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import { HiExternalLink } from "react-icons/hi";
 
@@ -46,7 +46,7 @@ export default function DeveloperEntities() {
 
                     <TreeListItemNavigation
                         active={false}
-                        path={GRAPHQL_ENTITY_PLAYGROUND_URL!}
+                        path={GRAPHQL_ADMIN_PLAYGROUND_URL!}
                         label="Entity Playground"
                         externalLink={true}
                         icon={<HiExternalLink size="14px"/>} />

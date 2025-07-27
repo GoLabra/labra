@@ -3,3 +3,22 @@
 .env.test.local
 .env.production.local
 .env.local
+
+
+# development tools
+.vscode
+__debug*
+launch.json
+
+# generated code
+src/app/generated
+src/app/ent
+src/app/schema/_user
+src/app/schema/_user_backup
+src/app/schema/_admin_backup
+
+src/app/interfaces
+
+src/app/domain
+
+src/app/graphql

@@ -5,7 +5,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useCallback, useMemo, useState } from 'react';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { gql, useApolloClient } from '@apollo/client';
-import { GRAPHQL_ENTITY_PLAYGROUND_URL, GRAPHQL_QUERY_PLAYGROUND_URL } from '@/config/CONST';
+import { GRAPHQL_ADMIN_PLAYGROUND_URL, GRAPHQL_QUERY_PLAYGROUND_URL } from '@/config/CONST';
 import { ENTITY_CONTEXT } from '@/lib/apollo/apolloWrapper';
 
 const Chip = styled(MuiChip)(({ theme }) => ({
@@ -36,7 +36,7 @@ export const ShowGraphQlQuery: React.FC<ShowGraphQlQueryProps> = (props: ShowGra
     }, [client, query, variables, props.context]);
 
     const runQueryInPlayground = useCallback(() => {
-        const playgroundUrl = props.context ? GRAPHQL_ENTITY_PLAYGROUND_URL : GRAPHQL_QUERY_PLAYGROUND_URL;
+        const playgroundUrl = props.context ? GRAPHQL_ADMIN_PLAYGROUND_URL : GRAPHQL_QUERY_PLAYGROUND_URL;
         window.open(`${playgroundUrl!}?q=${encodeURIComponent(query)}&v=${encodeURIComponent(variables ?? '{}')}`, '_blank');
     }, [query, variables, props.context]);
 
