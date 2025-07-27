@@ -4,6 +4,7 @@ import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
 import * as gqlBuilder from 'gql-query-builder'
+import pluralize from "pluralize";
 
 export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 
@@ -21,7 +22,14 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 		this._filter = filter;
 	}
 
+	private isMany = () => {
+		return this._filter?.id == null;
+	}
+
 	public getOperationName = (): string => {
+		if(this.isMany()){
+			return `updateMany${pascalCase(pluralize(this._field))}`;
+		}
 		return `update${pascalCase(this._field)}`;
 	}
 
@@ -57,12 +65,19 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 			return acc;
 		}, [] as Fields);
 
+		let whereType = (() => {
+			if(this.isMany()){
+				return `${pascalCase(this._field!)}WhereInput`;
+			}
+			return `${pascalCase(this._field!)}WhereUniqueInput`;
+		})();
+
 		const queryOptions = {
 			operation,
 			fields,
 			variables: {
 				where: {
-					type: `${pascalCase(this._field)}WhereUniqueInput`,
+					type: whereType,
 					required: true,
 					value: this._filter
 				},
