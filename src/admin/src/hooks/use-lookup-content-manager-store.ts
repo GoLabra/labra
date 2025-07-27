@@ -1,14 +1,7 @@
 import { ContentManagerSearchState } from "@/types/content-manager-search-state";
-import { UsersStore } from "@/types/content-manager-store-state";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FullEntity } from "@/types/entity";
-import { addNotification } from "@/lib/notifications/store";
 import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
-import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
-import { getAdvancedFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
-import { EdgeRequest } from "@/lib/apollo/builders/gqlQueryBuilder";
-import { Order } from "mosaic-data-table";
-import { AdvancedFilter } from "@/core-features/dynamic-filter/filter";
 import { useApolloClient } from "@apollo/client";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
@@ -110,8 +103,6 @@ export const useLookupContentManagerStore = (props: UseLookupGridContentManagerS
     const refresh = useCallback(() => {
         fetch();
     }, [fetch]);
-    
-   
 
     useEffect(() => {
         if(props.fullEntity?.loading ?? true){

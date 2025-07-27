@@ -330,17 +330,17 @@ const getTime = (field: Field): FieldDetails => {
 }
 
 const getBoolean = (field: Field): FieldDetails => {
-	const baseSchema = z.boolean();
 
-	let schema;
-	if (field.required) {
-		schema = baseSchema.refine(
-			(data) => data !== undefined,
-			{ message: `${field.caption} is required` }
-		);
-	} else {
-		schema = baseSchema.optional();
-	}
+	const schema = (() => {
+		if (field.required) {
+			return z.boolean().nullish().refine(
+				(data) => data != null,
+				{ message: `${field.caption} is required` }
+			);
+		}
+		return z.boolean().optional().nullish();
+	})();
+	
 	return {
 		schema,
 		//defaultValue: field.defaultValue ? !!field.defaultValue : undefined,
