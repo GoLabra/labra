@@ -18,9 +18,10 @@ import { useLiteController } from '../lite-controller';
 import { Edge } from '@/lib/apollo/graphql.entities';
 import { getAdvancedFiltersFromQuery } from '@/lib/utils/get-filters-from-query';
 import { Options, Option } from '@/core-features/dynamic-form/form-field';
-import { useGetEdgeValue } from '@/hooks/use-get-edge-value';
 import { EdgeStatus } from '@/lib/utils/edge-status';
 import { nullable } from 'zod';
+import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
+import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
 
 export type OptionDiffWrapper = {
 	id: string;
@@ -50,28 +51,12 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 	const { name, label, placeholder, disabled, errors, entityName, edge, value, onChange, onBlur, editId } = props;
 
 
-
 	// SEARCH LOOKUP
 	const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
 	const contentManagerSearch = useContentManagerSearch();
-	const contentManagerStore = useContentManagerStore({
-		entityName: edge.relatedEntity.name,
-		entityOwner: fullEntity?.owner,
-		page: contentManagerSearch.state.page,
-		rowsPerPage: contentManagerSearch.state.rowsPerPage,
-		sortBy: contentManagerSearch.state.sortBy,
-		order: contentManagerSearch.state.order,
-		fields: useMemo(() => {
-			if (!fullEntity?.displayField) {
-				return [];
-			}
-
-			return ['id', fullEntity.displayField.name];
-
-		}, [fullEntity?.displayField]),
-
-		orFilters: useMemo(() => getAdvancedFiltersFromQuery(contentManagerSearch.state.query, fullEntity?.fields ?? []), [contentManagerSearch.state.query, fullEntity?.fields]),
-		skip: fullEntity?.loading ?? true
+	const contentManagerStore = useLookupContentManagerStore({
+		fullEntity: fullEntity,
+		searchState: contentManagerSearch.state,
 	});
 
 	const search = useCallback((searchValue: string) => {
@@ -82,7 +67,7 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 
 	const myDialogContext = useMyDialogContext();
 	const displayPropertyName = useMemo(() => fullEntity?.displayField?.name ?? 'name', [fullEntity?.displayField?.name]);
-	const edgeValue = useGetEdgeValue({
+	const edgeValue = useRelationContentManagerStore({
 		entityName: entityName,
 		entryId: editId,
 		edge: edge,

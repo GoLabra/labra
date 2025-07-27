@@ -16,7 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NextLink from 'next/link';
 import { EmptyMessage } from "@/shared/components/empty-message";
-import { useGetEdgeValue } from "@/hooks/use-get-edge-value";
+import { useRelationContentManagerStore } from "@/hooks/use-relation-content-manager-store";
 
 interface RelationViewerGridRootProps {
 	showId: boolean
@@ -131,22 +131,28 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 	*/
 
 	const fullEntity = useFullEntity({ entityName: props.edge.relatedEntity.name });
-	
-	const relationData = useGetEdgeValue({
+
+	const relationData = useRelationContentManagerStore({
 		entityName: props.entityName,
 		entryId: props.entryId,
 		edge: props.edge,
-		fields: 'allfields',
-		edges: useMemo(() => ([
-			...fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
-				.filter(i => i.relationType !== 'ManyToOne')
-				.filter(i => i.relationType !== 'Many')
-				.map(i => ({
-					name: i.name,
-					fields: ['id', i.relatedEntity.displayField.name],
-				})) ?? []
-		]), [fullEntity?.edges])
-	})
+		fields: 'grid'
+	});
+	// const relationData = useGetEdgeValue({
+	// 	entityName: props.entityName,
+	// 	entryId: props.entryId,
+	// 	edge: props.edge,
+	// 	fields: 'allfields',
+	// 	edges: useMemo(() => ([
+	// 		...fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
+	// 			.filter(i => i.relationType !== 'ManyToOne')
+	// 			.filter(i => i.relationType !== 'Many')
+	// 			.map(i => ({
+	// 				name: i.name,
+	// 				fields: ['id', i.relatedEntity.displayField.name],
+	// 			})) ?? []
+	// 	]), [fullEntity?.edges])
+	//})
 
 	const gridData = useMemo(() => {
 		if(!relationData.data){

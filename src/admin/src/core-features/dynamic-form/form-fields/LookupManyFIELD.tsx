@@ -24,7 +24,8 @@ import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
 import { EdgeStatus } from '@/lib/utils/edge-status';
 import { useRelationDiff } from '@/features/content-manager/use-relation-diff';
 import { OptionDiffWrapper } from './LookupOneFIELD';
-import { useGetEdgeValue } from '@/hooks/use-get-edge-value';
+import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
+import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
 
 interface RelationManyFIELDFormComponentProps {
     name: string;
@@ -46,30 +47,12 @@ interface RelationManyFIELDFormComponentProps {
 export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormComponentProps) {
     const { name, label, placeholder, disabled, errors, entityName, edge, value, onChange, onBlur, editId } = props;
 
-    
-    
-    // SEARCH LOOKUP
-    const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
-    const contentManagerSearch = useContentManagerSearch();
-    const contentManagerStore = useContentManagerStore({
-        entityName: edge.relatedEntity.name,
-		entityOwner: fullEntity?.owner,
-        page: contentManagerSearch.state.page,
-        rowsPerPage: contentManagerSearch.state.rowsPerPage,
-        sortBy: contentManagerSearch.state.sortBy,
-        order: contentManagerSearch.state.order,
-        fields: useMemo(() => {
-            if (!fullEntity?.displayField) {
-                return [];
-            }
-
-            return ['id', fullEntity.displayField.name];
-
-        }, [fullEntity?.displayField]),
-
-        orFilters: useMemo(() => getAdvancedFiltersFromQuery(contentManagerSearch.state.query, fullEntity?.fields ?? []), [contentManagerSearch.state.query, fullEntity?.fields]),
-		skip: fullEntity?.loading ?? true
-    });
+	const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
+	const contentManagerSearch = useContentManagerSearch();
+	const contentManagerStore = useLookupContentManagerStore({
+		fullEntity: fullEntity,
+		searchState: contentManagerSearch.state,
+	});
 
     const search = useCallback((searchValue: string) => {
         contentManagerSearch.handleQueryChange(searchValue);
@@ -77,7 +60,7 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
     // END SEARCH LOOKUP
 
 	const myDialogContext = useMyDialogContext();
-	const savedValue = useGetEdgeValue({
+	const savedValue = useRelationContentManagerStore({
 		entityName: entityName, 
 		entryId: editId, 
 		edge: props.edge,

@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { EdgeStatus } from "@/lib/utils/edge-status";
 import { useRelationDiff } from "@/features/content-manager/use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
-import { LFile, useEntityFiles, useGetEdgeValue } from "@/hooks/use-get-edge-value";
+import { LFile, useEntityFiles } from "@/hooks/use-relation-content-manager-store";
 import { FileData, fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
 import { RelationInfo, useRelationManyLiteController } from "../relationMany-lite-controller";
 

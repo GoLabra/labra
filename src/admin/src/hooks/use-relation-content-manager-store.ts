@@ -1,4 +1,4 @@
-import { Edge } from "@/lib/apollo/graphql.entities";
+import { Edge, EntityOwner } from "@/lib/apollo/graphql.entities";
 import { useFullEntity } from "./use-entities";
 import { useContentManagerSearch } from "./use-content-manager-search";
 import { eqStringFoldOperator } from "@/core-features/dynamic-filter/filter-operators";
@@ -9,6 +9,10 @@ import { gql, useQuery } from "@apollo/client";
 import { fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
 import { EdgeRequest } from "@/lib/apollo/builders/gqlQueryBuilder";
 import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
+import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
+import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
+import { useLgQuery } from "./use-lg-query";
+import { LGSelectInclude } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGSelectInclude";
 
 const GET_FILES_CONTENT = gql`query files($or: [FileWhereInput!]) {
 	files(where: { or: $or }) {
@@ -33,7 +37,7 @@ interface UseEntityFilesParams {
 }
 export const useEntityFiles = (props: UseEntityFilesParams) => {
 
-	const edgeValueData = useGetEdgeValue<any[] | any>({
+	const edgeValueData = useRelationContentManagerStore<any[] | any>({
 		entityName: props.entityName, 
 		entryId: props.entryId, 
 		edge: props.edge,
@@ -92,84 +96,79 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 }
 
 
-interface UseGetEdgeValueParams {
+interface UseRelationContentManagerStoreParams {
 	entityName: string;
 	entryId: string | null | undefined;
 	edge: Edge;
-	fields: 'allfields' | 'iddisplay' | string[];
-	edges?: EdgeRequest[];
+	fields: 'iddisplay' | 'grid' | string[];
 }
-export const useGetEdgeValue = <T = any>(props: UseGetEdgeValueParams) => {
+export const useRelationContentManagerStore = <T = any>(props: UseRelationContentManagerStoreParams) => {
 
 	const rootEntity = useFullEntity({ entityName: props.entityName });
 	const edgeEntity = useFullEntity({ entityName: props.edge.relatedEntity.name });
-	const contentManagerSearch = useContentManagerSearch({
-		initialFilter: {
-			id: {
-				operator: eqStringFoldOperator.name,
-				value: props.entryId
-			}
-		}
-	});
 
-	const fields = useMemo(() => {
-		if (props.fields === 'allfields') {
-			return edgeEntity?.fields?.map(i => i.name) ?? undefined;
-		}
 
-		if (props.fields === 'iddisplay') {
-
-			if (!edgeEntity?.displayField) {
-				return undefined;
-			}
-			
-			return ['id', edgeEntity?.displayField?.name];
-		}
-
-		return props.fields;
-	}, [edgeEntity?.displayField, edgeEntity?.fields, props.fields]);
-
-	const edges = useMemo(() => {
-		return props.edges ?? [];
-	}, [props.edges]);
-
-	const contentManagerStore = useContentManagerStore({
-		entityOwner: rootEntity?.owner,
-		entityName: props.entityName,
-
-		page: contentManagerSearch.state.page,
-		rowsPerPage: contentManagerSearch.state.rowsPerPage,
-		sortBy: contentManagerSearch.state.sortBy,
-		order: contentManagerSearch.state.order,
-		skip: props.entryId == null || (!props.fields.length && !edges.length),
-		edges: useMemo(() => {
-			if (!fields) {
-				return undefined;
-			}
-
-			if (!fields.length) {
-				return undefined;
-			}
-
-			return [{
-				name: props.edge.name,
-				fields: fields,
-				edges: edges
-			}]
-		}, [edgeEntity?.displayField]),
-
-		filters: useMemo(() => getAdvancedFiltersFromGridFilter(contentManagerSearch.state.filter), [contentManagerSearch.state.filter]),
-	});
-
-	const data: T = useMemo(() => {
-		if (!contentManagerStore.state.data?.length) {
+	const dataQuery = useMemo(() => {
+		if(rootEntity?.loading ?? true){
 			return null;
 		}
 
-		return contentManagerStore.state.data[0][props.edge.name];
-	}, [contentManagerStore.state.data]);
+		if(edgeEntity?.loading ?? true){
+			return null;
+		}
+
+		if(!props.entryId){
+			return null;
+		}
+		
+		let query = LGQuery.from<any>(rootEntity!.name)
+							.where(GplFilter.field('id', '', props.entryId));
+							
+		if(props.fields === 'iddisplay'){
+			query = query.include(edgeEntity!.name, q => q.select('id', edgeEntity!.displayField!.name));
+		} else if (Array.isArray(props.fields) && props.fields.every(item => typeof item === 'string')) {
+			query = query.include(edgeEntity!.name, q => q.select(...props.fields));
+		} else if(props.fields === 'grid'){
+			
+			query = query.include(props.edge.name, q => {
+				// add fields
+				let include = q.select(...edgeEntity!.fields.map(i => i.name));
+
+				// add edges	
+				include = edgeEntity!.edges.reduce((query: LGSelectInclude<any>, edge) => {
+					return include.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
+				}, include);
+
+				return include;
+			});			
+		} 
+		return query;	
+	}, [rootEntity, edgeEntity, props.entryId, props.fields]);
+
+	const apiType = rootEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
+	const data = useLgQuery({
+		apiType,
+		query: [dataQuery],
+		skip: dataQuery == null
+	});
+
+	const onlyData = useMemo(() => {
+
+		if(!data?.data){
+			return null;
+		}
+
+		const result = dataQuery?.getResultData(data.data);
+
+		if (!result?.length) {
+			return null;
+		}
+
+		return result[0][props.edge.name];
+	}, [data.data]);
 
 	return useMemo(() => ({
-		data: data, 
-	}), [contentManagerStore.state.data]);
+		data: onlyData, 
+		loading: data.loading
+	}), [onlyData]);
 }
