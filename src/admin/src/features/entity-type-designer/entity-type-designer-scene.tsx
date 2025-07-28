@@ -48,15 +48,12 @@ export default function EntityTypeDesignerScene(
         openMode?: FormOpenMode;
         editId?: string;
     }) => {
-        if (openMode == FormOpenMode.New) {
+        if (!editId) {
             entityDesigner.addChild(data.field);
             return;
         }
 
-        if (openMode == FormOpenMode.Edit) {
-            if (!editId) {
-                return;
-            }
+        if (editId) {
             entityDesigner.updateChild(editId, data.field);
             return;
         }

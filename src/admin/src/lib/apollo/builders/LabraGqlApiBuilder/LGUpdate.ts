@@ -23,7 +23,7 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 	}
 
 	private isMany = () => {
-		return this._filter?.key == null || this._filter?.key == 'id';
+		return this._filter?.key != 'id' || this._filter?.operator == '';
 	}
 
 	public getOperationName = (): string => {
@@ -79,7 +79,7 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 				where: {
 					type: whereType,
 					required: true,
-					value: this._filter
+					value: this._filter?.getExpression(),
 				},
 				 data: {
 					type: `Update${pascalCase(this._field!)}Input`,

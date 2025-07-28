@@ -21,7 +21,8 @@ export class LGDelete<T extends EntityBaseType> implements ILGQuery {
 	}
 
 	private isMany = () => {
-		return this._filter?.key == null || this._filter?.key == 'id';
+		const isSingle = this._filter?.key == 'id' && this._filter?.operator == ''; 
+		return isSingle == false;
 	}
 
 	public getOperationName = (): string => {
@@ -77,7 +78,7 @@ export class LGDelete<T extends EntityBaseType> implements ILGQuery {
 				where: {
 					type: whereType,
 					required: true,
-					value: this._filter
+					value: this._filter?.getExpression(),
 				}
 			}
 		};

@@ -27,10 +27,6 @@ export const useEntityTypeDesignerEntryDialog = () => {
     }, [entityChildrenDynamicDialog.ref]);
 
     const openEditChild = useCallback((field: DesignerField | DesignerEdge) => {
-
-        // const childType:ApiFieldTypes = 'type' in field ? field.type as ApiFieldTypes : 'Relation';
-        // const selectedChildTypeDescriptor = designerFieldsMap[childType];
-
 		const selectedChildTypeDescriptor = getDescriptorByEntityChild(field);
 
 		const formOpenMode = field.designerStatus == 'new' ? FormOpenMode.New : FormOpenMode.Edit;
