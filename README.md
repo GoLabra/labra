@@ -2,6 +2,8 @@
 
 Labra is a modern web application built with Go backend and Next.js frontend, featuring GraphQL API, PostgreSQL database, and a comprehensive admin interface.
 
+<img height="96" src="labra.jpeg" title="Labra Logo" width="96"/>
+
 ## 🚀 Quick Start
 
 ### Prerequisites
