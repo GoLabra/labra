@@ -9,6 +9,7 @@ import { LGDelete } from './LGDelete';
 import { LGUpdate } from './LGUpdate';
 import { LGCreate } from './LGCreate';
 import { pascalCase } from 'change-case';
+import { LGUpsert } from './LGUpsert';
 
 export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	public readonly isMutation = false;
@@ -152,6 +153,10 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	
 	public static create = <T extends EntityBaseType = any>(entityName: string, data: T | T[]) => {
 		return LGCreate.from<T>(entityName, data);
+	};
+
+	public static upsert = <T extends EntityBaseType = any>(entityName: string, data: T | T[]) => {
+		return LGUpsert.from<T>(entityName, data);
 	};
 	
 	public static deleteFrom = <T extends EntityBaseType = any>(entityName: string) => {
