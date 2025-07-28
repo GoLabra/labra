@@ -3,7 +3,6 @@
 import { ComponentType, FC } from "react";
 import { ShowGraphQlQueryProps } from "./show-graph-ql-query";
 import { useFullEntity } from "@/hooks/use-entities";
-import { GqlDataQueryBuilder } from "@/lib/apollo/builders/gqlQueryBuilder";
 import { Box, Card, CardContent, Chip, Divider, Stack } from "@mui/material";
 
 interface EntityInfoProps {

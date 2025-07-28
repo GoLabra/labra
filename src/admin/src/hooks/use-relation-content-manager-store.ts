@@ -1,13 +1,7 @@
 import { Edge, EntityOwner } from "@/lib/apollo/graphql.entities";
 import { useFullEntity } from "./use-entities";
-import { useContentManagerSearch } from "./use-content-manager-search";
-import { eqStringFoldOperator } from "@/core-features/dynamic-filter/filter-operators";
-import { useContentManagerStore } from "./use-content-manager-store";
 import { useMemo } from "react";
-import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
 import { gql, useQuery } from "@apollo/client";
-import { fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
-import { EdgeRequest } from "@/lib/apollo/builders/gqlQueryBuilder";
 import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";

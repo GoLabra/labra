@@ -1,7 +1,6 @@
 "use client";
 
-import { Control, FieldError, FieldErrorsImpl, Merge, useFormContext, UseFormRegister } from 'react-hook-form';
-import { gql } from "@apollo/client";
+import { useFormContext } from 'react-hook-form';
 import { AutocompleteChangeReason, Box, Chip, IconButton, List, ListItemButton, ListItemText, Stack, SvgIcon, TextField } from '@mui/material';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { useLiteController } from '../lite-controller';
@@ -9,11 +8,7 @@ import { useMyDialogContext } from '@/core-features/dynamic-dialog/src/use-my-di
 import { Edge } from '@/lib/apollo/graphql.entities';
 import { useFullEntity } from '@/hooks/use-entities';
 import { useContentManagerSearch } from '@/hooks/use-content-manager-search';
-import { eqStringFoldOperator } from '@/core-features/dynamic-filter/filter-operators';
-import { useContentManagerStore } from '@/hooks/use-content-manager-store';
-import { getAdvancedFiltersFromGridFilter } from '@/lib/utils/get-advanced-filters-from-grid-filters';
 import { useCallback, useMemo } from 'react';
-import { getAdvancedFiltersFromQuery } from '@/lib/utils/get-filters-from-query';
 import { ContentManagerEntryDialogContent } from '@/features/content-manager/content-manager-entry-form';
 import { FormOpenMode } from '../form-field';
 import { Options, Option } from '@/core-features/dynamic-form/form-field';

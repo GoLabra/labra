@@ -1,5 +1,6 @@
 import { useFullEntity } from "@/hooks/use-entities";
-import {  GqlDataUPDATEMutationBuilder } from "@/lib/apollo/builders/gqlMutationBuilder";
+import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
+import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { useMemo } from "react";
 
 export const useEntityDataUpdateMutation = (entityName: string) => {
@@ -18,11 +19,9 @@ export const useEntityDataUpdateMutation = (entityName: string) => {
 }
 
 export const getEntityDataUpdateMutationQuery = (entityName: string) => {
-    return new GqlDataUPDATEMutationBuilder()
-        .addEntityName(entityName)
-        .addField('id')
-        .build({
-            id: '[id]',
-            data: {}
-        });
+
+	return LGQuery.update(entityName, {})
+		.where(GplFilter.field('id', '', '123'))
+		.select('id')
+		.build();
 }

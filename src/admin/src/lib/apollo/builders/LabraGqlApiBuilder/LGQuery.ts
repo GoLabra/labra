@@ -147,15 +147,15 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 		return LGConnectionQuery.from<T>(entityName);
 	};
 
-	public static update = <T extends EntityBaseType = any>(entityName: string, data: T) => {
+	public static update = <T extends EntityBaseType = any>(entityName: string, data: any) => {
 		return LGUpdate.from<T>(entityName, data);
 	};
 	
-	public static create = <T extends EntityBaseType = any>(entityName: string, data: T | T[]) => {
+	public static create = <T extends EntityBaseType = any>(entityName: string, data: any | any[]) => {
 		return LGCreate.from<T>(entityName, data);
 	};
 
-	public static upsert = <T extends EntityBaseType = any>(entityName: string, data: T | T[]) => {
+	public static upsert = <T extends EntityBaseType = any>(entityName: string, data: any | any[]) => {
 		return LGUpsert.from<T>(entityName, data);
 	};
 	

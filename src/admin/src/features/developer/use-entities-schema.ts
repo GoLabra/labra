@@ -1,6 +1,4 @@
-import { useFullEntity } from "@/hooks/use-entities";
 import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
-import { GqlDataDELETEMutationBuilder } from "@/lib/apollo/builders/gqlMutationBuilder";
 import { useMemo } from "react";
 
 

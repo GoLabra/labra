@@ -11,9 +11,9 @@ export class LGUpsert<T extends EntityBaseType> implements ILGQuery {
 	public readonly isMutation = true;
 	private readonly _field: string;
 	private readonly _select: FieldRequest<T>[] = [];
-	private readonly _data: T | T[];
+	private readonly _data: any | any[];
 
-	private constructor(data: T | T[], operation: string, fields: FieldRequest<T>[]) {
+	private constructor(data: any | any[], operation: string, fields: FieldRequest<T>[]) {
 		this._data = data;
 		this._field = operation;
 		this._select = fields;
@@ -88,7 +88,7 @@ export class LGUpsert<T extends EntityBaseType> implements ILGQuery {
 		return response[fieldName];
 	}
 
-	public static from = <T extends EntityBaseType = any>(entityName: string, data: T | T[]) => {
+	public static from = <T extends EntityBaseType = any>(entityName: string, data: any | any[]) => {
 		return new LGUpsert<T>(data, entityName, []);
 	};
 }

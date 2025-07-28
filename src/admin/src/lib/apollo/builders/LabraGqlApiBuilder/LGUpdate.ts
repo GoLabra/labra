@@ -1,5 +1,5 @@
 import { pascalCase } from "change-case";
-import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
@@ -12,10 +12,10 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 
 	private readonly _field: string;
 	private readonly _select: FieldRequest<T>[] = [];
-	private readonly _filter?: WhereInput<T>;
-	private readonly _data: T;
+	private readonly _filter?: GplFilter<T>;
+	private readonly _data: any;
 
-	private constructor(data: T, operation: string, fields: FieldRequest<T>[] , filter?: WhereInput<T>) {
+	private constructor(data: any, operation: string, fields: FieldRequest<T>[] , filter?: GplFilter<T>) {
 		this._data = data;
 		this._field = operation;
 		this._select = fields;
@@ -23,7 +23,7 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 	}
 
 	private isMany = () => {
-		return this._filter?.id == null;
+		return this._filter?.key == null || this._filter?.key == 'id';
 	}
 
 	public getOperationName = (): string => {
@@ -46,7 +46,7 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 	}
 
 	public where = (filter: GplFilter<T>) => {
-		const whereInput = !!this._filter ? GplFilter.and(this._filter, filter.expression).expression : filter.expression
+		const whereInput = !!this._filter ? GplFilter.and(this._filter, filter) : filter
 		return new LGUpdate<T>(this._data, this._field, this._select, whereInput);
 	};
 		
@@ -106,7 +106,7 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 		return response[fieldName];
 	}
 
-	public static from = <T extends EntityBaseType = any>(entityName: string, data: T) => {
+	public static from = <T extends EntityBaseType = any>(entityName: string, data: any) => {
 		return new LGUpdate<T>(data, entityName, [], undefined);
 	};
 }

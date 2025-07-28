@@ -1,5 +1,5 @@
 import { pascalCase } from "change-case";
-import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
@@ -12,16 +12,16 @@ export class LGDelete<T extends EntityBaseType> implements ILGQuery {
 
 	private readonly _field: string;
 	private readonly _select: FieldRequest<T>[] = [];
-	private readonly _filter?: WhereInput<T>;
+	private readonly _filter?: GplFilter<T>;
 
-	private constructor(operation: string, fields: FieldRequest<T>[] , filter?: WhereInput<T>) {
+	private constructor(operation: string, fields: FieldRequest<T>[] , filter?: GplFilter<T>) {
 		this._field = operation;
 		this._select = fields;
 		this._filter = filter;
 	}
 
 	private isMany = () => {
-		return this._filter?.id == null;
+		return this._filter?.key == null || this._filter?.key == 'id';
 	}
 
 	public getOperationName = (): string => {
@@ -44,7 +44,7 @@ export class LGDelete<T extends EntityBaseType> implements ILGQuery {
 	}
 
 	public where = (filter: GplFilter<T>) => {
-		const whereInput = !!this._filter ? GplFilter.and(this._filter, filter.expression).expression : filter.expression
+		const whereInput = !!this._filter ? GplFilter.and(this._filter, filter) : filter
 		return new LGDelete<T>(this._field, this._select, whereInput);
 	};
 		

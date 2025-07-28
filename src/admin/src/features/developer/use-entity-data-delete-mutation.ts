@@ -1,5 +1,6 @@
 import { useFullEntity } from "@/hooks/use-entities";
-import { GqlDataDELETEMutationBuilder } from "@/lib/apollo/builders/gqlMutationBuilder";
+import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
+import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { useMemo } from "react";
 
 
@@ -13,8 +14,9 @@ export const useEntityDataDeleteMutation = (entityName: string) => {
 }
 
 export const getEntityDataDeleteMutationQuery = (entityName: string) => {
-    return new GqlDataDELETEMutationBuilder()
-        .addEntityName(entityName)
-        .addField('id')
-        .build('[id]')
+
+	return LGQuery.deleteFrom(entityName)
+		.where(GplFilter.field('id', '', '123'))
+		.select('id')
+		.build();
 }
