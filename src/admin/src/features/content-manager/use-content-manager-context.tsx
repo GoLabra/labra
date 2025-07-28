@@ -25,7 +25,6 @@ export const useContentManagerContext = () => {
     return useContext(ContentManagerContext);
 };
 
-
 interface ContextManagerProviderProps {
     entityName: string
 }

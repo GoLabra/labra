@@ -49,11 +49,11 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	};
 
 	public orderByAscending = (field: keyof T) => {		
-		return new LGQuery<T>(this._field, this._select, this._filter, new GplOrder<T>(field, true));
+		return new LGQuery<T>(this._field, this._select, this._filter, new GplOrder<T>(field, true), this._skip, this._first, this._last);
 	};
 
 	public orderByDescending = (field: keyof T) => {		
-		return new LGQuery<T>(this._field, this._select, this._filter, new GplOrder<T>(field, false));
+		return new LGQuery<T>(this._field, this._select, this._filter, new GplOrder<T>(field, false), this._skip, this._first, this._last);
 	};
 
 	public skip = (skip: number) => {		
@@ -88,16 +88,36 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 		}, [] as Fields);
 
 		// compute filter
-		
-
 		const queryOptions = {
 			operation,
 			fields,
 			variables: {
 				where: {
 					type: `${pascalCase(this._field)}WhereInput`,
-					value: this._filter
-				}
+					value: this._filter,
+				},
+
+				...(this._skip != null &&  {
+					skip: this._skip
+				}),
+
+				...(this._first != null &&  {
+					first: this._first
+				}),
+
+				...(this._last != null &&  {
+					skip: this._last
+				}),
+
+				... (this._order != null && {
+					orderBy: {
+						type: `${pascalCase(this._field)}Order`,
+						value: {
+							field: this._order.field,
+							direction: this._order.ascending ? 'ASC' : 'DESC'
+						}
+					}
+				})
 			}
 		};
 
@@ -110,6 +130,10 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	}
 
 	public getResultData = (response: any) => {
+		if(!response){
+			return null;
+		}
+		
 		const fieldName = this.getOperationName();
 		return response[fieldName];
 	}

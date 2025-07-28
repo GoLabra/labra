@@ -31,6 +31,7 @@ export const useLgQuery = (props: UseLgQueryParams) => {
 	const data = useQuery( 
 		gql(gplQuery?.query ?? `query { __typename }`), 
 		{
+			notifyOnNetworkStatusChange: true,
 			variables: gplQuery?.variables,
 			fetchPolicy: "network-only",
 			skip: gplQuery == null,

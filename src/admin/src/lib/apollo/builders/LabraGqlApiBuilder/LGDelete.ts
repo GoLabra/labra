@@ -91,6 +91,10 @@ export class LGDelete<T extends EntityBaseType> implements ILGQuery {
 	}
 
 	public getResultData = (response: any) => {
+		if(!response){
+			return null;
+		}
+		
 		const fieldName = this.getOperationName();
 		return response[fieldName];
 	}
