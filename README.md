@@ -1,185 +1,166 @@
-# What is LabraGo?
+# Labra - Go Backend with Next.js Frontend
 
-## It’s a headless CMS… but not *that* kind.
+Labra is a modern web application built with Go backend and Next.js frontend, featuring GraphQL API, PostgreSQL database, and a comprehensive admin interface.
 
-We’re not here to help you build a blog or a basic website. LabraGo was born to handle **real apps**—the complex, data-heavy, API-driven kind.
+## 🚀 Quick Start
 
-Built with Go for performance and React for a clean, modern admin UI, it’s fast, flexible, and actually enjoyable to work with.
+### Prerequisites
 
-Think of it as your backend brain—powerful enough to manage complex data models, events, and permissions, without drowning you in endless configurations.
+- **Go** (1.21 or higher)
+- **Node.js** (18 or higher)
+- **PostgreSQL** (14 or higher)
+- **Git**
 
-<img height="96" src="https://github.com/GoLabra/labra/blob/develop/labra.jpeg" title="Labra Logo" width="96"/>
+### Installation
 
-# Why does LabraGo exist?
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd labra
+   ```
 
-## Because we exist 🙂
+2. **Set up the database**
+   ```bash
+   # Start PostgreSQL (if not already running)
+   brew services start postgresql
+   
+   # Create database
+   createdb labra_db
+   ```
 
-And because we’ve run into enough problems building data-heavy apps, we decided to do something about it.
+3. **Configure environment variables**
+   ```bash
+   # Backend environment
+   cp src/app/.env.example src/app/.env
+   # Edit src/app/.env with your database credentials
+   
+   # Frontend environment
+   cp src/admin/.env.example src/admin/.env
+   # Edit src/admin/.env with your API URLs
+   ```
 
-This project is our way of making things simpler, cleaner, and more fun for anyone facing the same challenges.
+4. **Start the backend**
+   ```bash
+   cd src/app
+   go mod tidy
+   go run main.go start
+   ```
 
----
+5. **Start the frontend**
+   ```bash
+   cd src/admin
+   yarn install
+   yarn dev
+   ```
 
-# 📦 How to Install LabraGo
+## 🌐 Available Endpoints
 
-You can install and run LabraGo in two ways:
+- **Frontend Application**: http://localhost:3000
+- **Backend API**: http://localhost:4001/query
+- **GraphQL Playground**: http://localhost:4001/playground
+- **Admin Playground**: http://localhost:4001/aplayground
 
----
+## 📁 Project Structure
 
-## ✅ The Easy Way — Using `labractl` CLI
-
-```bash
-go install github.com/GoLabra/labractl@v.1.0.0
+```
+labra/
+├── src/
+│   ├── app/           # Go backend application
+│   ├── admin/         # Next.js frontend application
+│   └── api/           # Core API package
+├── docs/              # Documentation
+└── README.md
 ```
 
-Then run:
+## 🔧 Configuration
 
-```bash
-labractl create myproject
-cd myproject
-labractl start
-```
+### Backend Environment Variables
 
-This will:
-
-- Clone the repo
-- Patch `go.mod`
-- Set up `.env` files for frontend and backend
-- Run `go mod tidy` and `go generate`
-- Ensure PostgreSQL user and database
-- Install frontend dependencies
-- Start frontend and backend concurrently
-
-🔥 Done in seconds.
-
----
-
-## 🛠 The Manual Way (Advanced)
-
-See below:
-
----
-
-# Running LabraGo Admin Panel
-
-## Prerequisites
-To run this project, ensure you have the following installed on your system:
-
-- [Node.js](https://nodejs.org/) (version 18 or later is recommended)
-- [Yarn](https://yarnpkg.com/) (version 1.22 or later)
-
-## Installation
-Follow these steps to set up the project on your local machine:
-
-```bash
-git clone https://github.com/GoLabra/labra.git
-cd labra/src/admin
-yarn install
-```
-
-## Running in Development Mode
-
-```bash
-yarn dev
-```
-
-Go to `http://localhost:3000` to view the app.
-
-## Building the Project
-
-```bash
-yarn build
-```
-
-## Starting the Production Server
-
-```bash
-yarn start
-```
-
-## Set Environment Variables
-
-```bash
-cp .env.example .env
-```
-
+Create `src/app/.env`:
 ```env
-NEXT_PUBLIC_BRAND_PRODUCT_NAME="Labra·GO"
-NEXT_PUBLIC_BRAND_COLOR="blue"
-NEXT_PUBLIC_GRAPHQL_API_URL="http://localhost:4000"
-NEXT_PUBLIC_GRAPHQL_QUERY_API_URL="http://localhost:4000/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_SUBSCRIPTION_URL="ws://localhost:4000/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL="http://localhost:4000/playground"
-NEXT_PUBLIC_GRAPHQL_ENTITY_API_URL="http://localhost:4000/entity"
-NEXT_PUBLIC_GRAPHQL_ENTITY_SUBSCRIPTION_URL="ws://localhost:4000/entity"
-NEXT_PUBLIC_GRAPHQL_ENTITY_PLAYGROUND_URL="http://localhost:4000/eplayground"
-NEXT_PUBLIC_CENTRIFUGO_URL="ws://localhost:8000/connection/websocket"
-```
-
----
-
-# Running LabraGO – Backend/API
-
-## Prerequisites
-
-- Go 1.18 or later
-- PostgreSQL with an empty database
-
-## Setup
-
-```bash
-cd labra/src/app
-cp .env.example .env
-```
-
-Sample `.env`:
-
-```bash
-DSN=postgres://postgres:postgres@localhost:5432/labrago?sslmode=disable
+DSN=postgres://username:password@localhost:5432/labra_db?sslmode=disable
 DB_DIALECT=postgres
-SERVER_PORT=4000
+SERVER_PORT=4001
 ENT_SCHEMA_PATH=./ent/schema
-SECRET_KEY=XyZ7WpPqY2VW3m1O9QkH1fLj8zT6sJgKAsDfGhJ7K0I=
-SUPER_ADMIN_EMAIL=admin@labrago.eu
-CENTRIFUGO_API_ADDRESS=http://localhost:8000/api
-CENTRIFUGO_API_KEY=m4Q9KvJNpY8Gh2LxU7sR0cVf3eZUw1PnKaYtXjBmOq0=
+SECRET_KEY=your-secret-key
+CENTRIFUGO_API_ADDRESS=http://localhost:8000
+CENTRIFUGO_API_KEY=your-centrifugo-key
+FILE_STORAGE_PROVIDER=local
+FILE_STORAGE_PATH=./uploads
 ```
 
-Generate a key:
+### Frontend Environment Variables
 
-```bash
-head -c 32 /dev/urandom | base64
+Create `src/admin/.env`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4001
+NEXT_PUBLIC_GRAPHQL_URL=http://localhost:4001/query
+NEXT_PUBLIC_ADMIN_GRAPHQL_URL=http://localhost:4001/admin
 ```
 
-## Development
+## 🛠️ Development
+
+### Code Generation
+
+The project uses code generation for GraphQL schemas and database models:
 
 ```bash
-go mod tidy
+cd src/app
 go generate ./...
 ```
 
-## Run the API
+### Database Migrations
+
+Database migrations are handled automatically by Ent:
 
 ```bash
-cd ../cli
+cd src/app
 go run main.go start
 ```
 
-## Local API Dev Shortcut
+## 🐛 Troubleshooting
 
-In `/app/go.mod`:
+### Common Issues
 
-```go
-replace github.com/GoLabra/labra/src/api => ../api
-```
+1. **Database connection errors**
+   - Ensure PostgreSQL is running
+   - Check database credentials in `.env` file
+   - Verify database exists
 
-or run:
+2. **Port conflicts**
+   - Change `SERVER_PORT` in backend .env file
+   - Change `PORT` in frontend .env file
+   - Ensure your chosen ports are available
 
-```bash
-sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
-```
+3. **Code generation errors**
+   - Run `go mod tidy` to ensure dependencies are correct
+   - Check that all required Go packages are installed
+   - Verify the `entc.go` file has correct import paths
 
----
+4. **Frontend build errors**
+   - Run `yarn install` to install dependencies
+   - Check Node.js version (requires 18+)
+   - Verify environment variables are set correctly
 
-## Contributing
-Check our [Contributing guide](https://github.com/GoLabra/labra/blob/feature/labra-module/CONTRIBUTING.md)
+## 📚 Documentation
+
+- [API Reference](docs/api-reference.md)
+- [Architecture Overview](docs/architecture.md)
+- [Development Guide](docs/development.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- [GitHub Issues](https://github.com/GoLabra/labra/issues)
+- [Discussions](https://github.com/GoLabra/labra/discussions)
