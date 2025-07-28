@@ -11,11 +11,13 @@ type {{$.Name}} interface {
     GetOne(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
     GetTx(ctx context.Context, tx *ent.Tx, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error)
     GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput) (*ent.{{$.Name}}, error)
-    {{- if eq $.Owner "User" }}
+    {{- if not (ShouldSkip $ "mutation_create_input") }}
     Create(ctx context.Context, u ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
     CreateTx(ctx context.Context, tx *ent.Tx, u ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error)
     CreateMany(ctx context.Context, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error)
     CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Create{{$.Name}}Input) ([]*ent.{{$.Name}}, error)
+    {{- end }}
+    {{- if not (ShouldSkip $ "mutation_update_input") }}
     Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error)
     UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error)
     UpdateMany(ctx context.Context, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error)

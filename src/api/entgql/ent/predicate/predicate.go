@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// File is the predicate function for file builders.
+type File func(*sql.Selector)
+
 // Permission is the predicate function for permission builders.
 type Permission func(*sql.Selector)
 

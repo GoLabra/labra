@@ -67,6 +67,7 @@ func (sm SchemaManager) WriteEntityToSchema(entityTemplateData EntityTemplateDat
 		"IsTrue": func(val *bool) bool {
 			return val != nil && *val
 		},
+		"ToLower": strings.ToLower,
 		"IsFalse": func(val *bool) bool {
 			return val == nil || !*val
 		},
@@ -91,6 +92,9 @@ func (sm SchemaManager) WriteEntityToSchema(entityTemplateData EntityTemplateDat
 			return strings.Join(stringValues, ",")
 		},
 	})
+	if err != nil {
+		return fmt.Errorf("[WriteEntityToSchema]error loading template: %w", err)
+	}
 
 	f, err := sm.fs.Create(fmt.Sprintf(sm.userSchemaRelativePath+"%s.go", strcase.ToSnake(entityTemplateData.Entity.Caption)))
 	if err != nil {

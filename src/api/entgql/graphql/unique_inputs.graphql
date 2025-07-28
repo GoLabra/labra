@@ -5,6 +5,10 @@ scalar DateOnly
 scalar TimeOnly
 
 scalar DateTime
+input FileWhereUniqueInput {
+  id: ID
+  caption: String
+}
 input PermissionWhereUniqueInput {
   id: ID
 }

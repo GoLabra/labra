@@ -10,6 +10,9 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
+	adminRepo "github.com/GoLabra/labra/src/api/entgql/domain/repo"
+	adminEnt "github.com/GoLabra/labra/src/api/entgql/ent"
+	adminInterfaces "github.com/GoLabra/labra/src/api/entgql/interfaces/repo"
 	"github.com/iancoleman/strcase"
 	"github.com/mitchellh/mapstructure"
 )
@@ -27,16 +30,24 @@ type Repository struct {
 	// Node                  repo.Node
 	Tx   Txer
     {{- range $n := $.Nodes }}
+	{{- if ne $n.Annotations.Entity.Owner "User" }}
+	{{$n.Name}}              adminInterfaces.{{$n.Name}}
+	{{- else }}
 	{{$n.Name}}              repo.{{$n.Name}}
+	{{- end }}
     {{- end }}
 }
 
-func New(client *ent.Client) *Repository {
+func New(client *ent.Client, adminClient *adminEnt.Client) *Repository {
 	return &Repository{
 		// Node:                  NewNode(client),
 		Tx:   NewTx(client),
         {{- range $n := $.Nodes }}
+		{{- if ne $n.Annotations.Entity.Owner "User" }}
+        {{$n.Name}}:              adminRepo.New{{$n.Name}}(adminClient),
+		{{- else }}
         {{$n.Name}}:              New{{$n.Name}}(client),
+		{{- end }}
         {{- end }}
 	}
 }

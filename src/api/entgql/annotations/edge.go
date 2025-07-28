@@ -9,6 +9,7 @@ import (
 type Edge struct {
 	Caption      string
 	RelationType entity.RelationType
+	RelatedTo    any
 }
 
 func (Edge) Name() string {

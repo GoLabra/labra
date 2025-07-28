@@ -7,9 +7,11 @@ package resolvers
 import (
 	"app/ent"
 	"context"
+
+	admin "github.com/GoLabra/labra/src/api/entgql/ent"
 )
 
-{{- if eq $.Owner "User" }}
+{{- if eq $.Annotations.Entity.Owner "User" }}
 // Create{{$.Name}} is the resolver for the create{{$.Name}} field.
 func (r *mutationResolver) Create{{$.Name}}(ctx context.Context, data ent.Create{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	return r.Service.{{$.Name}}.Create(ctx, data)
@@ -68,3 +70,42 @@ func (r *queryResolver) {{$.Name | Plural}}Connection(ctx context.Context, where
 func (r *queryResolver) {{$.Name | Plural}}(ctx context.Context, where *ent.{{$.Name}}WhereInput, orderBy *ent.{{$.Name}}Order, skip *int, first *int, last *int) ([]*ent.{{$.Name}}, error) {
     return r.Service.{{$.Name}}.Get(ctx, where, orderBy, skip, first, last)
 }
+
+{{- range $e := $.Edges }}
+{{- if eq $e.Type.Annotations.Entity.Owner "User" }}
+{{- continue }}
+{{- end }}
+// {{ ToCamel $e.Name }} is the resolver for the {{ ToCamel $e.Name }} field. 
+func (r *{{$.Name | LowerFirstLetter}}Resolver) {{ ToCamel $e.Name }}(ctx context.Context, obj *ent.{{ $.Name }}) (*ent1.{{$e.Type.Name}}, error) {  
+	relObj, err := obj.{{ ToCamel $e.Name }}(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[{{$.Name | LowerFirstLetter}}Resolver.{{ $e.Name }}]: %w", err)
+	}
+	{{- if $e.Unique }}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.{{$e.Type.Name}}.GetOne(ctx, ent1.{{$e.Type.Name}}WhereUniqueInput{ID: &relObj.ID})
+	{{- else }}
+	if len(relObj) == 0 {
+		return nil, nil
+	}
+
+	var ids = make([]string, len(relObj))
+
+	for idx, o := range relObj {
+		ids[idx] = o.ID
+	}
+
+	adminObj, err := r.Service.{{$e.Type.Name}}.Get(ctx, &ent1.{{$e.Type.Name}}WhereInput{IDIn: ids}, nil, nil, nil, nil)
+	{{- end }}
+	if err != nil {
+		return nil, fmt.Errorf("[{{$.Name | LowerFirstLetter}}Resolver. {{ ToCamel $e.Name }}]: %w", err)
+	}
+
+	return adminObj, nil
+}
+
+
+{{- end}}

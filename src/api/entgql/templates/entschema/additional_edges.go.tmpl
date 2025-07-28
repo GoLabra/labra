@@ -1,0 +1,18 @@
+package schema
+
+import (
+	"entgo.io/ent"
+{{- if gt (len $) 0 }}
+	"entgo.io/ent/schema/edge"
+{{- end }}
+)
+
+var additionalFileEdges = []ent.Edge{
+{{- range $edge := $ }}
+{{- if ne $edge.Type.Name "File" }}
+{{- continue }}
+{{- end }}
+    edge.From("{{ToLower $edge.Owner.Name}}_{{$edge.Name}}", {{$edge.Owner.Name}}.Type).
+        Ref("{{$edge.Name}}"),
+{{- end }}
+}

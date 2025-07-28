@@ -13,6 +13,7 @@ type store struct {
 	MutationSetEdge       *gen.Template
 	MutationAddEdges      *gen.Template
 	MutationUpdatedFields *gen.Template
+	AdditionalFields      *gen.Template
 }
 
 var (
@@ -39,7 +40,7 @@ func Load(templateFuncMap template.FuncMap) (store, error) {
 		return templateStore, err
 	}
 
-	templateStore.MutationSetEdge, err = loadT("mutation_set_edge.go.tmpl", "entgql/mutation_set_edge.go.tmpl", templateFuncMap)
+	templateStore.MutationSetEdge, err = loadT("mutation_set_edge", "entgql/mutation_set_edge.go.tmpl", templateFuncMap)
 	if err != nil {
 		log.Fatalf("cannot parse mutation add edges template: %v", err)
 		return templateStore, err
@@ -48,6 +49,12 @@ func Load(templateFuncMap template.FuncMap) (store, error) {
 	templateStore.MutationInput, err = loadT("mutation_input.go.tmpl", "entgql/mutation_input.go.tmpl", templateFuncMap)
 	if err != nil {
 		log.Fatalf("cannot parse mutation updated fields template: %v", err)
+		return templateStore, err
+	}
+
+	templateStore.AdditionalFields, err = loadT("additional_fields.go.tmpl", "entgql/additional_fields.go.tmpl", templateFuncMap)
+	if err != nil {
+		log.Fatalf("cannot parse additional fields template: %v", err)
 		return templateStore, err
 	}
 

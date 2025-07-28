@@ -9,7 +9,6 @@ import (
 	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
 	"github.com/GoLabra/labra/src/api/entgql/ent"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type SignupFormData struct {
@@ -49,14 +48,6 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(signupFormData.Password), 14)
-
-	if err != nil {
-		fmt.Printf("error hashing password: %v", err)
-		writeErrorResponse(w, "unable to hash password", http.StatusInternalServerError)
-		return
-	}
-
 	superAdminRole, err = service.Role.GetOne(r.Context(), ent.RoleWhereUniqueInput{Name: &superAdmin})
 	if err != nil && !ent.IsNotFound(err) {
 		fmt.Printf("error getting super admin role: %v", err)
@@ -75,7 +66,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	user, err := service.User.Create(r.Context(), ent.CreateUserInput{
 		Email:     signupFormData.Email,
-		Password:  string(hashedPassword),
+		Password:  signupFormData.Password,
 		FirstName: signupFormData.FirstName,
 		LastName:  signupFormData.LastName,
 		Roles: &ent.CreateManyRoleInput{

@@ -52,6 +52,10 @@ func (e Entity) UpdateEntity(ctx context.Context, where entity.EntityWhereUnique
 	entitiesToGenerate = append(entitiesToGenerate, entityToUpdate.Entity)
 
 	for _, relatedEntity := range entityToUpdate.RelatedEntities {
+		if relatedEntity.Entity.Owner == entity.EntityOwnerAdmin {
+			continue
+		}
+
 		entitiesToGenerate = append(entitiesToGenerate, relatedEntity.Entity)
 
 		err = e.schemaManager.WriteEntityToSchema(*relatedEntity)
@@ -91,6 +95,10 @@ func (e Entity) CreateEntity(ctx context.Context, data entity.CreateEntityInput)
 	}
 
 	for _, relatedEntity := range entityToUpdate.RelatedEntities {
+		if relatedEntity.Entity.Owner == entity.EntityOwnerAdmin {
+			continue
+		}
+
 		entitiesToGenerate = append(entitiesToGenerate, relatedEntity.Entity)
 
 		err = e.schemaManager.WriteEntityToSchema(*relatedEntity)
@@ -123,6 +131,10 @@ func (e Entity) DeleteEntity(ctx context.Context, where entity.EntityWhereUnique
 	entitiesToGenerate := []entity.Entity{entityToDelete.Entity}
 
 	for _, relatedEntity := range entityToDelete.RelatedEntities {
+		if relatedEntity.Entity.Owner == entity.EntityOwnerAdmin {
+			continue
+		}
+
 		entitiesToGenerate = append(entitiesToGenerate, relatedEntity.Entity)
 
 		err = e.schemaManager.WriteEntityToSchema(*relatedEntity)

@@ -6,7 +6,7 @@
             {{- if ne $.Edge.Ref "" }}
             Ref("{{ $.Edge.Ref }}").
             {{- end}}
-            {{- if  or (eq $.Edge.RelationType "OneToOne") (eq $.Edge.RelationType "OneToMany") (eq $.Edge.RelationType "One")}}
+            {{- if  or (eq $.Edge.RelationType "OneToOne") (eq $.Edge.RelationType "ManyToOne") (eq $.Edge.RelationType "One")}}
             Unique().
             {{- end }}
             Annotations(

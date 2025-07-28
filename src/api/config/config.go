@@ -15,6 +15,8 @@ type Config struct {
 	SecretKey            string `env:"SECRET_KEY,required"`
 	CentrifugoApiAddress string `env:"CENTRIFUGO_API_ADDRESS,required"`
 	CentrifugoKey        string `env:"CENTRIFUGO_API_KEY,required"`
+	FileStorageProvider  string `env:"FILE_STORAGE_PROVIDER,required"`
+	FileStoragePath      string `env:"FILE_STORAGE_PATH,required"`
 }
 
 func New() (*Config, error) {

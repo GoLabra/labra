@@ -8,6 +8,39 @@ import (
 )
 
 var (
+	// FilesColumns holds the columns for the "files" table.
+	FilesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
+		{Name: "caption", Type: field.TypeString, Unique: true, Nullable: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
+		{Name: "name", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
+		{Name: "mime_type", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
+		{Name: "storage_file_name", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
+		{Name: "size", Type: field.TypeInt64},
+		{Name: "file_created_by", Type: field.TypeString, Nullable: true},
+		{Name: "file_updated_by", Type: field.TypeString, Nullable: true},
+	}
+	// FilesTable holds the schema information for the "files" table.
+	FilesTable = &schema.Table{
+		Name:       "files",
+		Columns:    FilesColumns,
+		PrimaryKey: []*schema.Column{FilesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "files_users_created_by",
+				Columns:    []*schema.Column{FilesColumns[8]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "files_users_updated_by",
+				Columns:    []*schema.Column{FilesColumns[9]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// PermissionsColumns holds the columns for the "permissions" table.
 	PermissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -141,6 +174,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		FilesTable,
 		PermissionsTable,
 		RolesTable,
 		UsersTable,
@@ -149,6 +183,8 @@ var (
 )
 
 func init() {
+	FilesTable.ForeignKeys[0].RefTable = UsersTable
+	FilesTable.ForeignKeys[1].RefTable = UsersTable
 	PermissionsTable.ForeignKeys[0].RefTable = UsersTable
 	PermissionsTable.ForeignKeys[1].RefTable = UsersTable
 	PermissionsTable.ForeignKeys[2].RefTable = RolesTable

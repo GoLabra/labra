@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"app/config"
-	"app/ent"
 	"encoding/json"
 	"net/http"
 	"time"
 
+	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
+	"github.com/GoLabra/labra/src/api/entgql/ent"
 	"github.com/golang-jwt/jwt"
 )
 

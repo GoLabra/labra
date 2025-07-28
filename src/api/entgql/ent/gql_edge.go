@@ -8,6 +8,22 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (f *File) CreatedBy(ctx context.Context) (*User, error) {
+	result, err := f.Edges.CreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = f.QueryCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (f *File) UpdatedBy(ctx context.Context) (*User, error) {
+	result, err := f.Edges.UpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = f.QueryUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (pe *Permission) CreatedBy(ctx context.Context) (*User, error) {
 	result, err := pe.Edges.CreatedByOrErr()
 	if IsNotLoaded(err) {

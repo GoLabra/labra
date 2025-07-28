@@ -3,15 +3,61 @@ package ent
 import (
 	"errors"
 
+	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
+var ErrEmptyFileWhereUniqueInput = errors.New("empty predicate FileWhereUniqueInput")
+
+// FileWhereUniqueInput represents a where input for filtering File queries.
+type FileWhereUniqueInput struct {
+	Predicates []predicate.File `json:"-"`
+
+	ID      *string `json:"id,omitempty"`
+	Caption *string `json:"caption,omitempty"`
+}
+
+func (i *FileWhereUniqueInput) AddPredicates(predicates ...predicate.File) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+func (i *FileWhereUniqueInput) Filter(q *FileQuery) (*FileQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+func (i *FileWhereUniqueInput) P() (predicate.File, error) {
+	var predicates []predicate.File
+
+	if i.ID != nil {
+		predicates = append(predicates, file.IDEQ(*i.ID))
+	}
+	if i.Caption != nil {
+		predicates = append(predicates, file.CaptionEQ(*i.Caption))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyFileWhereUniqueInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return file.And(predicates...), nil
+	}
+}
+
 var ErrEmptyPermissionWhereUniqueInput = errors.New("empty predicate PermissionWhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// PermissionWhereUniqueInput represents a where input for filtering Permission queries.
 type PermissionWhereUniqueInput struct {
 	Predicates []predicate.Permission `json:"-"`
 
@@ -52,7 +98,7 @@ func (i *PermissionWhereUniqueInput) P() (predicate.Permission, error) {
 
 var ErrEmptyRoleWhereUniqueInput = errors.New("empty predicate RoleWhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// RoleWhereUniqueInput represents a where input for filtering Role queries.
 type RoleWhereUniqueInput struct {
 	Predicates []predicate.Role `json:"-"`
 
@@ -97,7 +143,7 @@ func (i *RoleWhereUniqueInput) P() (predicate.Role, error) {
 
 var ErrEmptyUserWhereUniqueInput = errors.New("empty predicate UserWhereUniqueInput")
 
-// RoleWhereInput represents a where input for filtering Role queries.
+// UserWhereUniqueInput represents a where input for filtering User queries.
 type UserWhereUniqueInput struct {
 	Predicates []predicate.User `json:"-"`
 

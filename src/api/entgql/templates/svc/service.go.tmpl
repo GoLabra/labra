@@ -3,6 +3,10 @@ package svc
 import (
 	"app/domain/repo"
 	"app/interfaces/svc"
+
+	adminRepo "github.com/GoLabra/labra/src/api/entgql/domain/repo"
+	adminSvc "github.com/GoLabra/labra/src/api/entgql/domain/svc"
+	adminInterfaces "github.com/GoLabra/labra/src/api/entgql/interfaces/svc"
 )
 
 var (
@@ -12,15 +16,25 @@ var (
 type Service struct {
 	// Node                  svc.Node
     {{- range $n := $.Nodes }}
+	{{- if ne $n.Annotations.Entity.Owner "User" }}
+	{{$n.Name}}              adminInterfaces.{{$n.Name}}
+	{{- else }}
 	{{$n.Name}}              svc.{{$n.Name}}
+	{{- end }}
     {{- end }}
 }
 
-func New(repository *repo.Repository) *Service {
+func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service {
 	return &Service{
 		// Node:                  NewNode(repository),
         {{- range $n := $.Nodes }}
-        {{$n.Name}}:              New{{$n.Name}}(repository),
+		//  {{ $n.Annotations.Entity.Owner }}
+		//  {{ $n.Annotations.Entity }}
+		{{- if ne $n.Annotations.Entity.Owner "User" }}
+        {{$n.Name}}:              adminSvc.New{{$n.Name}}(adminRepo),
+		{{- else }}
+		{{$n.Name}}:              New{{$n.Name}}(repository),
+		{{- end }}
         {{- end }}
 	}
 }

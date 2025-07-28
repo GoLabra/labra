@@ -1,15 +1,15 @@
 package handler
 
 import (
-	"app/config"
-	"app/domain/svc"
-	"app/ent"
 	"encoding/json"
 	"io"
 	"net/http"
 	"time"
 
+	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
+	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
+	"github.com/GoLabra/labra/src/api/entgql/ent"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -37,7 +37,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service) // TODO @David use admin service and move to api
+	service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -85,6 +85,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	signedToken, err := token.SignedString([]byte(config.SecretKey))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	response, _ := json.Marshal(map[string]string{

@@ -1,10 +1,10 @@
 package hooks
 
 import (
-	"app/ent"
 	"context"
 
 	"github.com/GoLabra/labra/src/api/constants"
+	"github.com/GoLabra/labra/src/api/entgql/ent"
 )
 
 func CreatedByUpdatedByHook(next ent.Mutator) ent.Mutator {

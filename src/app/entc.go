@@ -20,6 +20,7 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/GoLabra/labra/src/api/entgql/templates"
 	"github.com/GoLabra/labra/src/api/strcase"
+	"github.com/GoLabra/labra/src/api/utils"
 	pluralize "github.com/gertd/go-pluralize"
 	"github.com/mitchellh/mapstructure"
 )
@@ -31,39 +32,25 @@ const templatesFolderPath = "./templates/%s"
 func init() {
 	pluralizeClient := pluralize.NewClient()
 	templateFuncMap = entgql.TemplateFuncs
-	templateFuncMap["ToUpper"] = strings.Title
-	templateFuncMap["LowerFirstLetter"] = func(val string) string {
-		return strings.ToLower(val[:1]) + val[1:]
-	}
+	templateFuncMap["LowerFirstLetter"] = strcase.LowerFirstLetter
 	templateFuncMap["ToLower"] = strings.ToLower
 	templateFuncMap["Singular"] = pluralizeClient.Singular
 	templateFuncMap["Plural"] = pluralizeClient.Plural
-	templateFuncMap["Camel"] = strcase.ToLowerCamel
+	templateFuncMap["Camel"] = strcase.ToLowerCamel // TODO @David these camels can be improved
+	templateFuncMap["ToCamel"] = strcase.ToCamel
 	templateFuncMap["Pascal"] = strcase.ToPascal
-	templateFuncMap["ToTitle"] = func(val string) string {
-		return strings.ToTitle(val[:1]) + val[1:]
-	}
+	templateFuncMap["ToTitle"] = strcase.ToTitle
 	templateFuncMap["CreateInputs"] = CreateInputs
-	templateFuncMap["CustomFieldName"] = func(val string) string {
-		val = strings.TrimSuffix(val, "_id")
-		val = strings.TrimSuffix(val, "_ids")
-		return val
-	}
-
-	templateFuncMap["InputEdges"] = func(m *entgql.MutationDescriptor) []*gen.Edge {
-		inputEdges := make([]*gen.Edge, 0, len(m.Type.Edges))
-		for _, e := range m.Type.Edges {
-			if e.Type.IsEdgeSchema() || e.Immutable || e.Annotations["Skip"] == entgql.SkipMutationUpdateInput {
-				continue
-			}
-			inputEdges = append(inputEdges, e)
-		}
-		return inputEdges
-	}
+	templateFuncMap["CustomFieldName"] = utils.CustomFieldName
+	templateFuncMap["InputEdges"] = utils.InputEdges
 	templateFuncMap["GetExtendedTypes"] = getExtendedTypes
 	templateFuncMap["GraphqlInputName"] = GraphqlInputName
 	templateFuncMap["GoInputName"] = GoInputName
 	templateFuncMap["EntMutationFieldName"] = entMutationFieldName
+	templateFuncMap["ShouldSkip"] = utils.ShouldSkip
+	templateFuncMap["Ignore"] = func(t *gen.Type) bool {
+		return t.Annotations["Entity"] == nil || t.Annotations["Entity"].(map[string]any)["Owner"] != "User"
+	}
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
 	os.MkdirAll("./domain/resolvers", os.ModePerm)
@@ -105,6 +92,12 @@ func main() {
 		entc.Extensions(ex),
 		entc.FeatureNames("sql/execquery", "sql/upsert"),
 	}
+	
+	graph, err := entc.LoadGraph("./ent/schema", &gen.Config{})
+	if err != nil {
+		panic(err)
+	}
+	CreateSystemEntitiesReverseRelations(graph)
 
 	if err := entc.Generate("./ent/schema", &gen.Config{
 		Features: []gen.Feature{
@@ -245,6 +238,11 @@ func CreateGraphqlSchema() gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 			for _, n := range g.Nodes {
+
+				if n.Annotations["Entity"] == nil || n.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+					continue
+				}
+
 				var createInputs = map[string]map[string]string{}
 				var entityAnnotation = annotations.Entity{}
 
@@ -377,6 +375,10 @@ func CreateRepositories() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -452,6 +454,10 @@ func CreateServices() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -499,6 +505,10 @@ func CreateServiceInterface() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != "User" {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -515,17 +525,12 @@ func CreateServiceInterface() gen.Hook {
 					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
 				}
 
-				data := GraphqlSchemaTemplateData{
-					Name:  node.Name,
-					Owner: entityAnnotation.Owner,
-				}
-
 				f, err := os.Create("./interfaces/svc/" + fileName)
 				if err != nil {
 					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
 				}
 
-				err = tmpl.Execute(f, data)
+				err = tmpl.Execute(f, node)
 				if err != nil {
 					f.Close()
 					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
@@ -550,6 +555,10 @@ func CreateRepositoryInterface() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -567,17 +576,12 @@ func CreateRepositoryInterface() gen.Hook {
 					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
 				}
 
-				data := GraphqlSchemaTemplateData{
-					Name:  node.Name,
-					Owner: entityAnnotation.Owner,
-				}
-
 				f, err := os.Create("./interfaces/repo/" + fileName)
 				if err != nil {
 					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
 				}
 
-				err = tmpl.Execute(f, data)
+				err = tmpl.Execute(f, node)
 				if err != nil {
 					f.Close()
 					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
@@ -602,6 +606,10 @@ func CreateResolvers() gen.Hook {
 					panic(err) // TODO treat errir
 				}
 
+				if entityAnnotation.Owner != entity.EntityOwnerUser {
+					continue
+				}
+
 				fileName := strcase.ToSnake(node.Name) + ".resolvers.go"
 
 				if entityAnnotation.Owner == entity.EntityOwnerUser {
@@ -619,17 +627,12 @@ func CreateResolvers() gen.Hook {
 					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
 				}
 
-				data := GraphqlSchemaTemplateData{
-					Name:  node.Name,
-					Owner: entityAnnotation.Owner,
-				}
-
 				f, err := os.Create("./domain/resolvers/" + fileName)
 				if err != nil {
 					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
 				}
 
-				err = tmpl.Execute(f, data)
+				err = tmpl.Execute(f, node)
 				if err != nil {
 					f.Close()
 					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
@@ -685,6 +688,45 @@ func CreateTxRepo() gen.Hook {
 			return next.Generate(g)
 		})
 	}
+}
+
+func CreateSystemEntitiesReverseRelations(g *gen.Graph) error {
+	errFormat := "[CreateSystemEntitiesReverseRelations] %w"
+	f, _ := os.Create("./ent/schema/additional_edges.go")
+
+	tmpl, err := templates.LoadTemplate("additional_edges.go.tmpl", "entschema/additional_edges.go.tmpl", templateFuncMap)
+	if err != nil {
+		return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
+	}
+	additionalEdges := []*gen.Edge{}
+
+	for _, node := range g.Nodes {
+		if node.Annotations["Entity"] == nil || node.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+			continue
+		}
+
+		for _, edge := range node.Edges {
+			if edge.Unique {
+				continue
+			}
+			edge.Owner.ClientName()
+
+			if owner, ok := node.Annotations["Entity"].(map[string]any)["Owner"].(string); !ok || owner != "User" {
+				continue
+			}
+
+			additionalEdges = append(additionalEdges, edge)
+		}
+	}
+
+	err = tmpl.Execute(f, additionalEdges)
+	if err != nil {
+		f.Close()
+		return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
+	}
+
+	f.Close()
+	return nil
 }
 
 func getExtendedTypes(fields []*gen.Field) []*gen.Field {
@@ -774,7 +816,13 @@ func mapScalar(f *gen.Field) string {
 func CreateInputs(nodes []*gen.Type) map[string]map[string]string {
 	var createInputs = map[string]map[string]string{}
 	for _, n := range nodes {
+		if n.Annotations["Entity"] != nil && n.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+			continue
+		}
 		for _, e := range n.Edges {
+			if e.Type.Annotations["Entity"] == nil || e.Type.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+				continue
+			}
 			var inputName = fmt.Sprintf("Create%sWithout%sInput", e.Type.Name, n.Name)
 			if e.Ref == nil || e.Ref.Optional {
 				continue
@@ -827,6 +875,9 @@ func CreateInputs(nodes []*gen.Type) map[string]map[string]string {
 
 func GoInputName(isCreate bool, node *gen.Type, edge *gen.Edge) string {
 	input := InputName(isCreate, node, edge)
+	if edge.Type.Annotations["Entity"] == nil || edge.Type.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+		input = "admin." + input
+	}
 	if !isCreate || edge.Optional {
 		input = "*" + input
 	}

@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/schema"
@@ -15,6 +16,22 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	fileFields := schema.File{}.Fields()
+	_ = fileFields
+	// fileDescCreatedAt is the schema descriptor for created_at field.
+	fileDescCreatedAt := fileFields[1].Descriptor()
+	// file.DefaultCreatedAt holds the default value on creation for the created_at field.
+	file.DefaultCreatedAt = fileDescCreatedAt.Default.(time.Time)
+	// fileDescUpdatedAt is the schema descriptor for updated_at field.
+	fileDescUpdatedAt := fileFields[2].Descriptor()
+	// file.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	file.DefaultUpdatedAt = fileDescUpdatedAt.Default.(time.Time)
+	// file.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	file.UpdateDefaultUpdatedAt = fileDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// fileDescID is the schema descriptor for id field.
+	fileDescID := fileFields[0].Descriptor()
+	// file.DefaultID holds the default value on creation for the id field.
+	file.DefaultID = fileDescID.Default.(func() string)
 	permissionFields := schema.Permission{}.Fields()
 	_ = permissionFields
 	// permissionDescCreatedAt is the schema descriptor for created_at field.

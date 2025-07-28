@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"app/config"
 	"context"
 	"net/http"
 	"strings"
 
+	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
 	"github.com/GoLabra/labra/src/api/entgql/ent"

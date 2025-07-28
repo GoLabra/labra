@@ -327,6 +327,7 @@ func (r *Permission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 	if err != nil {
 		return nil, fmt.Errorf("error getting item to update: %v", err)
 	}
+	created_byToDelete := ent.UserWhereUniqueInput{}
 	if data.CreatedBy != nil {
 
 		if data.CreatedBy.Connect != nil {
@@ -356,7 +357,15 @@ func (r *Permission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 
 			data.CreatedByID = &toConnect.ID
 		}
+		if data.CreatedBy.Delete != nil && *data.CreatedBy.Delete {
+			itemToDelete, err := item.CreatedBy(ctx)
+			if err != nil {
+				return nil, err
+			}
+			created_byToDelete.ID = &itemToDelete.ID
+		}
 	}
+	updated_byToDelete := ent.UserWhereUniqueInput{}
 	if data.UpdatedBy != nil {
 
 		if data.UpdatedBy.Connect != nil {
@@ -386,7 +395,15 @@ func (r *Permission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 
 			data.UpdatedByID = &toConnect.ID
 		}
+		if data.UpdatedBy.Delete != nil && *data.UpdatedBy.Delete {
+			itemToDelete, err := item.UpdatedBy(ctx)
+			if err != nil {
+				return nil, err
+			}
+			updated_byToDelete.ID = &itemToDelete.ID
+		}
 	}
+	roleToDelete := ent.RoleWhereUniqueInput{}
 	if data.Role != nil {
 
 		if data.Role.Connect != nil {
@@ -416,11 +433,36 @@ func (r *Permission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 
 			data.RoleID = &toConnect.ID
 		}
+		if data.Role.Delete != nil && *data.Role.Delete {
+			itemToDelete, err := item.Role(ctx)
+			if err != nil {
+				return nil, err
+			}
+			roleToDelete.ID = &itemToDelete.ID
+		}
 	}
 
 	updatedInput, err := tx.Permission.UpdateOne(item).SetInput(data).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error updating item: %v", err)
+	}
+	if data.CreatedBy != nil && data.CreatedBy.Delete != nil && *data.CreatedBy.Delete {
+		_, err := repository.User.DeleteTx(ctx, tx, created_byToDelete)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if data.UpdatedBy != nil && data.UpdatedBy.Delete != nil && *data.UpdatedBy.Delete {
+		_, err := repository.User.DeleteTx(ctx, tx, updated_byToDelete)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if data.Role != nil && data.Role.Delete != nil && *data.Role.Delete {
+		_, err := repository.Role.DeleteTx(ctx, tx, roleToDelete)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return updatedInput, nil

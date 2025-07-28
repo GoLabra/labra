@@ -7,31 +7,29 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
-	"app/config"
 	"app/domain/repo"
 	"app/domain/resolvers"
 	"app/domain/svc"
 	"app/ent"
 	"app/ent/migrate"
 	"app/generated"
-	"app/handler"
-	"app/hooks"
 
+	atlas "ariga.io/atlas/sql/schema"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-	"entgo.io/ent/entc"
-	"entgo.io/ent/entc/gen"
+	"entgo.io/ent/dialect/sql/schema"
 	gqlHandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/GoLabra/labra/src/api/cache"
+	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
-	"github.com/GoLabra/labra/src/api/entgql/annotations"
-	"github.com/GoLabra/labra/src/api/entgql/entity"
 	"github.com/GoLabra/labra/src/api/entgql/generator"
-	"github.com/GoLabra/labra/src/api/strcase"
+	"github.com/GoLabra/labra/src/api/handler"
+	"github.com/GoLabra/labra/src/api/hooks"
 	"github.com/GoLabra/labra/src/api/subscription"
 	"github.com/GoLabra/labra/src/api/utils"
 	"github.com/centrifugal/gocent/v3"
@@ -39,7 +37,6 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/gorilla/websocket"
 	_ "github.com/lib/pq"
-	"github.com/mitchellh/mapstructure"
 	"github.com/rs/cors"
 
 	adminRepo "github.com/GoLabra/labra/src/api/entgql/domain/repo"
@@ -86,12 +83,8 @@ func main() {
 		context.Background(),
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
+		schema.WithDiffHook(skipDiffOnAdminEntities),
 	); err != nil {
-		panic(err)
-	}
-
-	graph, err := entc.LoadGraph(conf.EntSchemaPath, &gen.Config{})
-	if err != nil {
 		panic(err)
 	}
 
@@ -99,13 +92,15 @@ func main() {
 	cache.NewEdgeCache(1 * time.Hour)
 	cache.NewFieldCache(1 * time.Hour)
 
-	LoadSchema(graph)
+	utils.LoadSchema(conf)
 
-	repository := repo.New(client)
+	adminClient, adminRepository, adminService, adminResolver := InitAdmin(drv)
+
+	repository := repo.New(client, adminClient)
 
 	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
 
-	service := svc.New(repository)
+	service := svc.New(repository, adminRepository)
 
 	gocentClient := gocent.New(gocent.Config{
 		Addr: conf.CentrifugoApiAddress,
@@ -115,8 +110,6 @@ func main() {
 	resolver := &resolvers.Resolver{
 		Service: service,
 	}
-
-	adminRepository, adminService, adminResolver := InitAdmin(drv)
 
 	router := chi.NewRouter()
 	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
@@ -219,7 +212,26 @@ func InitApp() {
 
 }
 
-func InitAdmin(drv *entsql.Driver) (*adminRepo.Repository, *adminSvc.Service, *adminResolver.Resolver) {
+func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
+	return schema.DiffFunc(func(current, desired *atlas.Schema) ([]atlas.Change, error) {
+		changes, err := next.Diff(current, desired)
+		if err != nil {
+			return nil, err
+		}
+
+		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
+			m, ok := c.(*atlas.ModifyTable)
+			if ok && (m.T.Name == "users" || m.T.Name == "files") {
+				return true
+			}
+			return false
+		})
+		
+		return changes, nil
+	})
+}
+
+func InitAdmin(drv *entsql.Driver) (*adminEnt.Client, *adminRepo.Repository, *adminSvc.Service, *adminResolver.Resolver) {
 	client := adminEnt.NewClient(adminEnt.Driver(drv))
 
 	client = client.Debug()
@@ -251,103 +263,5 @@ func InitAdmin(drv *entsql.Driver) (*adminRepo.Repository, *adminSvc.Service, *a
 		SubscriptionClient: graphqlSubscriptionClient,
 	}
 
-	return repository, service, adminResolver
-}
-
-func LoadSchema(graph *gen.Graph) {
-	for _, node := range graph.Nodes {
-		var entityAnnotations annotations.Entity
-		err := mapstructure.Decode(node.Annotations["Entity"], &entityAnnotations)
-		if err != nil {
-			panic(err)
-		}
-
-		entityName := strcase.NodeNameToGraphqlName(node.Name)
-		cache.Entity.Set(entityName, entity.Entity{
-			Name:             entityName,
-			EntName:          node.Name,
-			Caption:          entityAnnotations.Caption,
-			Owner:            entityAnnotations.Owner,
-			DisplayFieldName: entityAnnotations.DisplayField,
-		})
-
-		fields := []entity.Field{
-			{
-				Caption: "Id",
-				Name:    "id",
-				Type:    string(entity.FieldTypeID),
-			},
-		}
-		for _, nodeField := range node.Fields {
-			var fieldAnnotations annotations.Field
-			err := mapstructure.Decode(nodeField.Annotations["Field"], &fieldAnnotations)
-			if err != nil {
-				panic(err)
-			}
-
-			required := !nodeField.Optional
-			unique := nodeField.Unique
-
-			field := entity.Field{
-				Name:           strcase.ToLowerCamel(nodeField.Name),
-				EntName:        nodeField.Name,
-				Caption:        fieldAnnotations.Caption,
-				Type:           string(fieldAnnotations.Type),
-				Required:       &required,
-				Unique:         &unique,
-				Nillable:       nodeField.Nillable,
-				UpdateDefault:  nodeField.UpdateDefault,
-				AcceptedValues: fieldAnnotations.AcceptedValues,
-			}
-
-			if nodeField.Default {
-				defaultValue := fmt.Sprint(nodeField.DefaultValue())
-				if fieldAnnotations.DefaultValue != "" {
-					defaultValue = fieldAnnotations.DefaultValue
-				}
-				field.DefaultValue = &defaultValue
-			}
-
-			if fieldAnnotations.Min != "" {
-				field.Min = &fieldAnnotations.Min
-			}
-
-			if fieldAnnotations.Max != "" {
-				field.Max = &fieldAnnotations.Max
-			}
-
-			if fieldAnnotations.Private {
-				field.Private = &fieldAnnotations.Private
-			}
-
-			fields = append(fields, field)
-		}
-		cache.Field.Set(entityName, fields)
-
-		edges := []entity.Edge{}
-		for _, edge := range node.Edges {
-			var edgeAnnotations annotations.Edge
-			err := mapstructure.Decode(edge.Annotations["Edge"], &edgeAnnotations)
-			if err != nil {
-				panic(err)
-			}
-
-			required := !edge.Optional
-			ref := ""
-			if edge.Ref != nil && edge.IsInverse() {
-				ref = edge.Ref.Name
-			}
-
-			edges = append(edges, entity.Edge{
-				Name:         strcase.ToLowerCamel(edge.Name),
-				EntName:      edge.Name,
-				Caption:      edgeAnnotations.Caption,
-				Required:     &required,
-				Type:         edge.Type.Name,
-				Ref:          ref,
-				RelationType: edgeAnnotations.RelationType,
-			})
-		}
-		cache.Edge.Set(entityName, edges)
-	}
+	return client, repository, service, adminResolver
 }

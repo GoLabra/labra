@@ -2,9 +2,11 @@ package svc
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/GoLabra/labra/src/api/entgql/domain/repo"
 	"github.com/GoLabra/labra/src/api/entgql/ent"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -44,6 +46,15 @@ func (s *User) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateUserInpu
 }
 
 func (s *User) Create(ctx context.Context, data ent.CreateUserInput) (*ent.User, error) {
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
+
+	if err != nil {
+		return nil, fmt.Errorf("error hashing password: %w", err)
+	}
+
+	data.Password = string(hashedPassword)
+
 	createdInput, err := s.repository.User.Create(ctx, data)
 	if err != nil {
 		return nil, err
