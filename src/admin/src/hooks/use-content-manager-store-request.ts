@@ -4,8 +4,6 @@ import { gql, useApolloClient } from "@apollo/client";
 import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { EdgeRequest, GqlDataQueryBuilder } from "@/lib/apollo/builders/gqlQueryBuilder";
 import { GqlDataCREATEMutationBuilder, GqlDataDELETEBulkMutationBuilder, GqlDataDELETEMutationBuilder, GqlDataUPDATEMutationBuilder } from "@/lib/apollo/builders/gqlMutationBuilder";
-import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
-import { getAdvancedFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
 import { AdvancedFilter } from "@/core-features/dynamic-filter/filter";
 import { Order } from "mosaic-data-table";
 import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";

@@ -1,6 +1,5 @@
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import { LGSelectInclude } from "../LGSelectInclude";
-import { string } from "zod";
 
 export type Unarray<T> = T extends Array<infer U> ? U : T;
 
@@ -18,16 +17,6 @@ export type FilterOperators =
 
 export type EntityBaseType = { id: string }
 
-export type Filters<T extends EntityBaseType> = {
-	[K in keyof T as `${Extract<K, string>}${FilterOperators}`]?: T[K] | T[K][];
-};
-
-export type WhereInput<T extends EntityBaseType= any> = Filters<T> & {
-	not?: WhereInput<T>;
-	and?: WhereInput<T>[];
-	or?: WhereInput<T>[];
-};
-
 export type ObjectKeys<T> = {
     [K in keyof T]: T[K] extends object ? K : never
 }[keyof T];
@@ -37,39 +26,68 @@ export type FieldRequest<T = any, K extends ObjectKeys<T> = ObjectKeys<T>> =
 	| LGSelectInclude<Unarray<T[K]>>;
 
 // Query Filter class
-
 export class GplFilter<T extends EntityBaseType> {
-	private constructor(public readonly expression: WhereInput<T>) { }
 
-	static and<T extends EntityBaseType>(...filters: Array<GplFilter<T> | WhereInput<T> | null | undefined>): GplFilter<T> {
-		return new GplFilter<T>({ and: filters.filter(i => !!i).map(f => {
-			if(f instanceof GplFilter){
-				f.expression
-			}
-			return f;
-		}) } as WhereInput<T>);
+	private constructor(key?: Extract<keyof T, string>, operator?: FilterOperators, value?: any, not?: boolean, and?: GplFilter<T>[], or?: GplFilter<T>[]) {
+		this.key = key;
+		this.operator = operator;
+		this.value = value;
+		this.not = not ?? false;
+		this.and = and;
+		this.or = or;
 	}
 
-	static or<T extends EntityBaseType>(...filters: Array<GplFilter<T> | null | undefined>): GplFilter<T> {
-		return new GplFilter<T>({ or: filters.filter(i => !!i).map(f => {
-			if(f instanceof GplFilter){
-				f.expression
-			}
-			return f;
-		}) } as WhereInput<T>);
+	public key?: Extract<keyof T, string>
+	public operator?: FilterOperators
+	public value?: any
+	public not: boolean = false;
+	
+	public and?: GplFilter<T>[];
+	public or?: GplFilter<T>[];
+
+	static and<T extends EntityBaseType>(...filters: GplFilter<T>[]): GplFilter<T> {
+		return new GplFilter<T>(undefined, undefined, undefined, undefined, filters); 
 	}
 
-	static not<T extends EntityBaseType>(filter: GplFilter<T>): GplFilter<T> {
-		return new GplFilter<T>({ not: filter.expression } as WhereInput<T>);
+	static or<T extends EntityBaseType>(...filters: GplFilter<T>[]): GplFilter<T> {
+		return new GplFilter<T>(undefined, undefined, undefined, undefined, undefined, filters); 
 	}
 
-	static field<T extends EntityBaseType, K extends Extract<keyof T, string>, Op extends FilterOperators, V = T[K]>(
-		key: K,
-		operator: Op,
-		value: Op extends 'In' | 'NotIn' ? V[] : V
+	static not<T extends EntityBaseType>(
+		key: Extract<keyof T, string>,
+		operator: FilterOperators,
+		value: any
 	): GplFilter<T> {
-		const fieldKey = `${key}${operator}` as keyof WhereInput<T>;
-		return new GplFilter<T>({ [fieldKey]: value } as WhereInput<T>);
+		return new GplFilter<T>(key, operator, value, true);
+	}
+
+	static field<T extends EntityBaseType>(
+		key: Extract<keyof T, string>,
+		operator: FilterOperators,
+		value: any
+	): GplFilter<T> {
+		return new GplFilter<T>(key, operator, value);
+	}
+
+	public getExpression = (): any => {
+
+		if(this.key){
+			const field = {[`${this.key}${this.operator}`]: this.value};
+			if(this.not){
+				return {not: field};
+			}
+			return field;
+		}
+
+		if(this.and){
+			return {and: this.and.map(i => i.getExpression())};
+		}
+
+		if(this.or){
+			return {or: this.or.map(i => i.getExpression())};
+		}
+
+		return undefined;
 	}
 }
 
@@ -82,7 +100,6 @@ export class GplOrder<T> {
 		this.ascending = ascending;
 	}
 }
-
 
 export interface ILGQuery {
 	readonly isMutation: boolean;

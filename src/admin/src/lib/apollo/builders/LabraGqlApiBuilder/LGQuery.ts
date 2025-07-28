@@ -2,7 +2,7 @@ import * as gqlBuilder from 'gql-query-builder'
 import Fields from 'gql-query-builder/build/Fields';
 import IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions';
 import pluralize from "pluralize";
-import { EntityBaseType, FieldRequest, GplFilter, GplOrder, ILGQuery, ObjectKeys, Unarray, WhereInput } from './types/types';
+import { EntityBaseType, FieldRequest, GplFilter, GplOrder, ILGQuery, ObjectKeys, Unarray } from './types/types';
 import { LGSelectInclude } from './LGSelectInclude';
 import { LGConnectionQuery } from './LGConnectionQuery';
 import { LGDelete } from './LGDelete';
@@ -16,13 +16,13 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 
 	private readonly _field: string;
 	private readonly _select: FieldRequest<T>[] = [];
-	private readonly _filter?: WhereInput<T>;
+	private readonly _filter?: GplFilter<T>;
 	private readonly _order?: GplOrder<T>;
 	private readonly _skip?: number;
 	private readonly _first?: number;
 	private readonly _last?: number;
 
-	private constructor(operation: string, fields: FieldRequest<T>[] , filter?: WhereInput<T>, order?: GplOrder<T>, skip?: number, first?: number, last?: number) {
+	private constructor(operation: string, fields: FieldRequest<T>[] , filter?: GplFilter<T>, order?: GplOrder<T>, skip?: number, first?: number, last?: number) {
 		this._field = operation;
 		this._select = fields;
 		this._filter = filter;
@@ -45,7 +45,7 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	}
 
 	public where = (filter: GplFilter<T>) => {
-		const whereInput = !!this._filter ? GplFilter.and(this._filter, filter.expression).expression : filter.expression
+		const whereInput = !!this._filter ? GplFilter.and(this._filter, filter) : filter
 		return new LGQuery<T>(this._field, this._select, whereInput);
 	};
 
@@ -95,7 +95,7 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 			variables: {
 				where: {
 					type: `${pascalCase(this._field)}WhereInput`,
-					value: this._filter,
+					value: this._filter?.getExpression(),
 				},
 
 				...(this._skip != null &&  {

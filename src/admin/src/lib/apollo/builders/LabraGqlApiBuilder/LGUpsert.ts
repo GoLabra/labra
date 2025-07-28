@@ -1,5 +1,5 @@
 import { pascalCase } from "change-case";
-import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray, WhereInput } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
@@ -21,9 +21,9 @@ export class LGUpsert<T extends EntityBaseType> implements ILGQuery {
 
 	public getOperationName = (): string => {
 		if(Array.isArray(this._data)){
-			return `createMany${pascalCase(pluralize(this._field))}`;
+			return `upsertMany${pascalCase(pluralize(this._field))}`;
 		}
-		return `create${pascalCase(this._field)}`;
+		return `upsert${pascalCase(this._field)}`;
 	}
 
 	public select = (...fields: FieldRequest<T>[]) => {
