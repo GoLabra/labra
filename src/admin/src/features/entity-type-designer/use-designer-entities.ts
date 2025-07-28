@@ -3,7 +3,8 @@ import { ChangedFullEntity, ChangedNameCaptionEntity, DesignerEdge, DesignerFiel
 import { gql, useApolloClient } from "@apollo/client";
 import { useEntitiesDesignerChanges } from "./use-designer-entities-changes";
 import { useEntities, useFullEntity } from "@/hooks/use-entities";
-import { ENTITY_CONTEXT } from "@/lib/apollo/apolloWrapper";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
+import { EntityOwner } from "@/lib/apollo/graphql.entities";
 
 export const useEntitiesDesigner = () => {
 
@@ -16,6 +17,7 @@ export const useEntitiesDesigner = () => {
         let allEntities: ChangedNameCaptionEntity[] = graphEntities.entities.map((i) => ({
                 name: i.name,
                 caption: i.caption,
+				owner: i.owner,
                 designerStatus: 'unchanged'
             }));
 
@@ -71,6 +73,7 @@ export const useEntitiesDesigner = () => {
             const result: ChangedFullEntity = {
                 name: entity.name,
                 caption: designerChanges.changedFullEntitiesMap[entity.name]?.caption ?? entity.caption,
+				owner: entity.owner,
                 displayFieldCaption: children.filter(i => i.designerStatus != 'deleted')
                                             .find(i => i.caption == displayFieldCaption)?.caption
                                             ?? 'Id',
@@ -140,7 +143,7 @@ export const useEntitiesDesigner = () => {
             return;
         }
 
-        client.mutate({ mutation: gql(query.query), variables: query.variables, fetchPolicy: "network-only", context: ENTITY_CONTEXT })
+        client.mutate({ mutation: gql(query.query), variables: query.variables, fetchPolicy: "network-only", context: ADMIN_CONTEXT })
             .then((response) => {
                 // clear designer changes
                 designerChanges.revertEntityChange(fullEntity.name);

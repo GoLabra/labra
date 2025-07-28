@@ -4,7 +4,7 @@ import { useSubscription } from "./use-subscription";
 import { handleApplicationStatusFailed, handleApplicationStatusGenerating, handleApplicationStatusRestarting, handleApplicationStatusReverting, handleApplicationStatusUP } from "@/store/handlers/handleApplicationStatus";
 import { AppStatus } from "@/lib/apollo/graphql.entities";
 import { GraphQlSubscriptionProviderType } from "./graphql-provider";
-import { ENTITY_CONTEXT } from '@/lib/apollo/apolloWrapper';
+import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
 
 const appStatusSubscription = gql`
     subscription appStatus {
@@ -29,7 +29,7 @@ export const ApplicationStatusSubscription = () => {
 
 
     useEffect(() => {
-        return client.subscribe('appStatus', appStatusSubscription, ENTITY_CONTEXT, (data: AppStatus ) => {
+        return client.subscribe('appStatus', appStatusSubscription, ADMIN_CONTEXT, (data: AppStatus ) => {
             
             if (data === AppStatus.Generating) {
                 handleApplicationStatusGenerating()

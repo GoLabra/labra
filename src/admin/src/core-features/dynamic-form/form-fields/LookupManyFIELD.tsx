@@ -1,7 +1,6 @@
 "use client";
 
-import { Control, FieldError, FieldErrorsImpl, Merge, useFormContext, UseFormRegister } from 'react-hook-form';
-import { gql } from "@apollo/client";
+import { useFormContext } from 'react-hook-form';
 import { AutocompleteChangeReason, Box, Chip, IconButton, List, ListItemButton, ListItemText, Stack, SvgIcon, TextField } from '@mui/material';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { useLiteController } from '../lite-controller';
@@ -9,11 +8,7 @@ import { useMyDialogContext } from '@/core-features/dynamic-dialog/src/use-my-di
 import { Edge } from '@/lib/apollo/graphql.entities';
 import { useFullEntity } from '@/hooks/use-entities';
 import { useContentManagerSearch } from '@/hooks/use-content-manager-search';
-import { eqStringFoldOperator } from '@/core-features/dynamic-filter/filter-operators';
-import { useContentManagerStore } from '@/hooks/use-content-manager-store';
-import { getAdvancedFiltersFromGridFilter } from '@/lib/utils/get-advanced-filters-from-grid-filters';
 import { useCallback, useMemo } from 'react';
-import { getAdvancedFiltersFromQuery } from '@/lib/utils/get-filters-from-query';
 import { ContentManagerEntryDialogContent } from '@/features/content-manager/content-manager-entry-form';
 import { FormOpenMode } from '../form-field';
 import { Options, Option } from '@/core-features/dynamic-form/form-field';
@@ -22,6 +17,10 @@ import { ActionList } from '@/shared/components/action-list';
 import { ActionListItem } from '@/shared/components/action-list-item';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
 import { EdgeStatus } from '@/lib/utils/edge-status';
+import { useRelationDiff } from '@/features/content-manager/use-relation-diff';
+import { OptionDiffWrapper } from './LookupOneFIELD';
+import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
+import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
 
 interface RelationManyFIELDFormComponentProps {
     name: string;
@@ -31,7 +30,7 @@ interface RelationManyFIELDFormComponentProps {
     required?: boolean;
     errors?: string;
 
-    value: Array<Option<string, OptionTag>>;
+    value: OptionDiffWrapper[];
     onChange: (event: any) => void;
     onBlur: (event: any) => void;
 
@@ -43,158 +42,82 @@ interface RelationManyFIELDFormComponentProps {
 export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormComponentProps) {
     const { name, label, placeholder, disabled, errors, entityName, edge, value, onChange, onBlur, editId } = props;
 
-    const myDialogContext = useMyDialogContext();
-    const savedValue = useGetEdgeValue(entityName, editId ?? null, edge);
-
-    // SEARCH LOOKUP
-    const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
-    const contentManagerSearch = useContentManagerSearch();
-    const contentManagerStore = useContentManagerStore({
-        entityName: edge.relatedEntity.name,
-        page: contentManagerSearch.state.page,
-        rowsPerPage: contentManagerSearch.state.rowsPerPage,
-        sortBy: contentManagerSearch.state.sortBy,
-        order: contentManagerSearch.state.order,
-        fields: useMemo(() => {
-            if (!fullEntity?.displayField) {
-                return [];
-            }
-
-            return ['id', fullEntity.displayField.name];
-
-        }, [fullEntity?.displayField]),
-
-        orFilters: useMemo(() => getAdvancedFiltersFromQuery(contentManagerSearch.state.query, fullEntity?.fields ?? []), [contentManagerSearch.state.query, fullEntity?.fields])
-    });
+	const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
+	const contentManagerSearch = useContentManagerSearch();
+	const contentManagerStore = useLookupContentManagerStore({
+		fullEntity: fullEntity,
+		searchState: contentManagerSearch.state,
+	});
 
     const search = useCallback((searchValue: string) => {
         contentManagerSearch.handleQueryChange(searchValue);
     }, [contentManagerSearch]);
     // END SEARCH LOOKUP
 
+	const myDialogContext = useMyDialogContext();
+	const savedValue = useRelationContentManagerStore({
+		entityName: entityName, 
+		entryId: editId, 
+		edge: props.edge,
+		fields: 'iddisplay'
+	});
     const displayPropertyName = useMemo(() => fullEntity?.displayField?.name ?? 'name', [fullEntity?.displayField?.name]);
 
-
-    const savedValueItems = useMemo((): Option<string, OptionTag>[] => {
-        return savedValue?.data.map((i: any): Option<string, OptionTag> => ({
-            ...i,
-            tag: 'saved',
+    const savedValueItems = useMemo((): OptionDiffWrapper[] => {
+        return savedValue?.data?.map((i: any) => ({
+            id: i.id,
+			label: i[displayPropertyName],
+			value: i,
+            status: 'saved',
         })) ?? []
-    }, [savedValue, displayPropertyName]);
+    }, [savedValue.data]);
 
-    const connectedValueItems = useMemo((): Option<string, OptionTag>[] => {
-        return value?.filter(i => i.tag === 'connect') ?? []
-    }, [value]);
-
-    const createdValueItems = useMemo((): Option<string, OptionTag>[] => {
-        return value?.filter(i => i.tag === 'create') ?? []
-    }, [value]);
-
-    const disconnectedValueItems = useMemo((): Option<string, OptionTag>[] => {
-        return value?.filter(i => i.tag === 'disconnect') ?? []
-    }, [value]);
-
-    const computedDisplayValue = useMemo((): Option<string, OptionTag>[] => {
-
-        const disconnectIds = disconnectedValueItems.map(i => i.value);
-
-        const result = [
-            ...savedValueItems.filter((i: any) => disconnectIds.includes(i.value) === false),
-            ...connectedValueItems,
-            ...createdValueItems
-        ]
-
-        return result;
-    }, [savedValueItems, connectedValueItems, createdValueItems, disconnectedValueItems]);
-
+	const relationDiff = useRelationDiff<OptionDiffWrapper>({ saved: savedValueItems, changedArray: value });
+	
+	const computedDisplayValue = useMemo((): Option[] => relationDiff.showingItems.map(i => ({
+		label: i.label,
+		value: i.id
+	})), [relationDiff.showingItems]);
 
     const onChangedValue = useCallback((event: {
         reason: AutocompleteChangeReason;
-        option: Option<string, OptionTag> | null;
+        option: Option<string> | null;
     }) => {
 
         switch (event.reason) {
-            case 'selectOption': {
-                // check if selected item is in disconnect list
-                if (disconnectedValueItems.find(i => i.value === event.option?.value)) {
-
-                    const newValue = value.filter(i => (i.tag === 'disconnect' && i.value === event.option?.value) == false);
-                    onChange({
-                        target: {
-                            name: name,
-                            value: newValue
-                        }
-                    });
-                    return;
-                }
-
-                // check if selected item is in saved list
-                if (savedValueItems.find(i => i.value === event.option?.value)) {
-                    return; // do nothing, it is already saved
-                }
-
-                const newValue = [
-                    ...(value ?? []),
-                    {
-                        label: event.option?.label,
-                        tag: 'connect',
-                        value: event.option?.value
-                    }]
-
-                onChange({
-                    target: {
-                        name: name,
-                        value: newValue
-                    }
-                });
-            }
+            case 'selectOption': 
+				onChange({
+					target: {
+						name: name,
+						value: relationDiff.connect({
+									id: event.option!.value,
+									label: event.option!.label,
+									value: event.option!.value
+								})
+					}
+				});
                 break;
 
-            case 'removeOption': {
-
-                if (event.option?.tag === 'saved') {
-                    const newItem = {
-                        label: event.option.label,
-                        tag: 'disconnect',
-                        value: event.option.value
-                    }
-
-                    onChange({
-                        target: {
-                            name: name,
-                            value: [...value ?? [], newItem]
-                        }
-                    });
-                    return;
-                }
-
-                const newValue = value?.filter((i: any) => i.value !== event!.option!.value);
-                onChange({
+            case 'removeOption': 
+				onChange({
                     target: {
                         name: name,
-                        value: newValue
-                    }
-                });
-
-                break;
-            }
-            case 'clear': {
-
-                const newValue = savedValueItems.map((i: any) => ({
-                    label: i.label,
-                    tag: 'disconnect',
-                    value: i.value
-                }))
-                onChange({
-                    target: {
-                        name: name,
-                        value: newValue
+                        value: relationDiff.remove(event.option!.value)
                     }
                 });
                 break;
-            }
+            
+            case 'clear': 
+                onChange({
+					target: {
+						name: name,
+						value: relationDiff.disconnectAll()
+					}
+				});
+                break;
+            
         }
-    }, [onChange, savedValueItems, disconnectedValueItems]);
+    }, [onChange, savedValueItems, relationDiff.connect]);
 
     const options = useMemo(() => {
 
@@ -283,7 +206,7 @@ export function LookupManyFIELDFormField(props: FormFieldProps) {
     useFormDynamicContext(props.name, { disabled: props.disabled });
     const myDialogContext = useMyDialogContext();
     const formContext = useFormContext();
-    const formControllerHandler = useLiteController({ name: props.name, control: formContext.control, disabled: props.disabled });
+    const formControllerHandler = useLiteController({ name: props.name, disabled: props.disabled });
 
     if (props.hide) {
         return null;
@@ -300,62 +223,3 @@ export function LookupManyFIELDFormField(props: FormFieldProps) {
         {...formControllerHandler}
     />)
 }
-
-const useGetEdgeValue = (entityName: string, entryId: string | null, edge: Edge) => {
-
-    const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
-    const contentManagerSearch = useContentManagerSearch({
-        initialFilter: {
-            id: {
-                operator: eqStringFoldOperator.name,
-                value: entryId
-            }
-        }
-    });
-
-    const contentManagerStore = useContentManagerStore({
-        entityName: entityName,
-
-        page: contentManagerSearch.state.page,
-        rowsPerPage: contentManagerSearch.state.rowsPerPage,
-        sortBy: contentManagerSearch.state.sortBy,
-        order: contentManagerSearch.state.order,
-        lazy: entryId == null,
-        edges: useMemo(() => {
-            if (!fullEntity?.displayField) {
-                return undefined;
-            }
-
-            return [{
-                name: edge.name,
-                fields: ['id', fullEntity.displayField.name],
-            }]
-        }, [fullEntity?.displayField]),
-
-        filters: useMemo(() => getAdvancedFiltersFromGridFilter(contentManagerSearch.state.filter), [contentManagerSearch.state.filter]),
-    });
-
-    const gridData = useMemo(() => {
-        if (!contentManagerStore.state.data?.length) {
-            return undefined;
-        }
-
-        return contentManagerStore.state.data[0][edge.name];
-    }, [contentManagerStore.state.data]);
-
-    return useMemo(() => ({
-        data: gridData?.map((i: any): Option => {
-
-            const label = i[fullEntity!.displayField!.name];
-
-            return {
-                label: label || `Id: ${i['id']}`,
-                value: i.id,
-            }
-        }) ?? [],
-        ids: gridData?.map((i: any) => i.id) ?? [],
-    }), [gridData]);
-}
-
-
-export type OptionTag = EdgeStatus;

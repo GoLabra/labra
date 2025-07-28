@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from 'react';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { gql, useApolloClient } from '@apollo/client';
 import { GRAPHQL_ADMIN_PLAYGROUND_URL, GRAPHQL_QUERY_PLAYGROUND_URL } from '@/config/CONST';
-import { ENTITY_CONTEXT } from '@/lib/apollo/apolloWrapper';
+import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
 
 const Chip = styled(MuiChip)(({ theme }) => ({
     borderRadius: '3px',

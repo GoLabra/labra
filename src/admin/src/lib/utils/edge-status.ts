@@ -1,1 +1,1 @@
-export type EdgeStatus = 'saved' | 'connect' | 'create' | 'disconnect' | 'delete';
+export type EdgeStatus = 'saved' | 'connect' | 'create' | 'unset' |'disconnect' | 'delete';

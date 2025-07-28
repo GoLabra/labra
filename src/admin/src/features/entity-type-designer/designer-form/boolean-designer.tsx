@@ -26,7 +26,7 @@ export const schema = z.object({
 		}, {
 			message: 'Caption must start with a letter',
 		}),
-	required: z.preprocess((value) => !!value, z.coerce.boolean().optional()),
+	required: z.preprocess((value) => value, z.coerce.boolean().optional()),
 	defaultValue: z.boolean().optional().nullish().transform((val) => val?.toString())
 });
 
@@ -50,7 +50,13 @@ export const toDefaultValue = (value: any): any => {
 
 	return {
 		...value,
-		defaultValue: (String(value).toLowerCase() === 'true')
+		defaultValue:  (() => {
+			const defaultValue = value.defaultValue;
+			if (defaultValue == null) {
+				return undefined;
+			}
+			return defaultValue.toLowerCase() === 'true';
+		})()
 	}
 }
 

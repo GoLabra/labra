@@ -1,10 +1,10 @@
 import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { ApolloLink, DocumentNode, gql, useApolloClient, useSubscription as useApolloSubscription, useSubscription } from "@apollo/client";
 import { unsubscribe } from 'diagnostics_channel';
-import { ENTITY_CONTEXT } from '@/lib/apollo/apolloWrapper';
+import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
 
 export type GraphQlSubscriptionProviderType = {
-    subscribe: (channel: string, query: DocumentNode, context: typeof ENTITY_CONTEXT | null, onMessage: (data: any) => void) => void;
+    subscribe: (channel: string, query: DocumentNode, context: typeof ADMIN_CONTEXT | null, onMessage: (data: any) => void) => void;
     onReconnected: (callback: () => void) => () => void;
     // isConnected: () => boolean;
     // disconnect: () => void;
@@ -40,7 +40,7 @@ export const SubscriptionProvider = ({ children }: PropsWithChildren<Subscriptio
     }, [apolloClient]);
 
 
-    const subscribe = useCallback((channel: string, query: DocumentNode, context: typeof ENTITY_CONTEXT | null, onMessage: (data: any) => void) => {
+    const subscribe = useCallback((channel: string, query: DocumentNode, context: typeof ADMIN_CONTEXT | null, onMessage: (data: any) => void) => {
 
         const unsubscribe = apolloClient.subscribe({
             query: query,

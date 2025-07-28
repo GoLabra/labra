@@ -1,5 +1,5 @@
 import { useFullEntity } from "@/hooks/use-entities";
-import { GqlDataCREATEMutationBuilder, GqlDataDELETEMutationBuilder } from "@/lib/apollo/builders/gqlMutationBuilder";
+import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { useMemo } from "react";
 
 export const useEntityDataNewMutation = (entityName: string) => {
@@ -18,10 +18,15 @@ export const useEntityDataNewMutation = (entityName: string) => {
 }
 
 export const getEntityDataNewMutationQuery = (entityName: string) => {
-    return new GqlDataCREATEMutationBuilder()
-        .addEntityName(entityName)
-        .addField('id')
-        .build({
 
-        });
+	return LGQuery.create(entityName, {})
+				  .select('id')
+				  .build();
+
+    // return new GqlDataCREATEMutationBuilder()
+    //     .addEntityName(entityName)
+    //     .addField('id')
+    //     .build({
+
+    //     });
 }

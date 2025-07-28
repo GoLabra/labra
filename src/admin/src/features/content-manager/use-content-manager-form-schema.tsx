@@ -14,11 +14,18 @@ import { BooleanSelectFormField } from "@/core-features/dynamic-form/form-fields
 import { JSONFormField } from "@/core-features/dynamic-form/form-fields/JSONField";
 import { SingleChoiceFormField } from "@/core-features/dynamic-form/form-fields/SingleChoice";
 import dayjs, { Dayjs } from "dayjs";
-import { LookupManyFIELDFormField, OptionTag as OptionTagMany } from "@/core-features/dynamic-form/form-fields/LookupManyFIELD";
-import { LookupOneFIELDFormField, OptionTag as OptionTagOne } from "@/core-features/dynamic-form/form-fields/LookupOneFIELD";
+import { LookupManyFIELDFormField } from "@/core-features/dynamic-form/form-fields/LookupManyFIELD";
+import { LookupOneFIELDFormField, OptionDiffWrapper } from "@/core-features/dynamic-form/form-fields/LookupOneFIELD";
 import { Options, Option } from "@/core-features/dynamic-form/form-field";
 import { MultipleChoiceFormField } from "@/core-features/dynamic-form/form-fields/MultipleChoice";
 import { isJsonOrNull, toJsonOrNull } from "@/lib/utils/is-json";
+import { Upload } from "@mui/icons-material";
+import { UploadFilesBaseField } from "@/core-features/dynamic-form/form-fields/UploadFilesBaseField";
+import { FileDiffWrapper, FileFormField } from "@/core-features/dynamic-form/form-fields/FileField";
+import { fileToBase64 } from "@/lib/utils/file-to-base64";
+import { createId } from "@paralleldrive/cuid2";
+import { RelationInfo, RelationInfoType } from "@/core-features/dynamic-form/relationMany-lite-controller";
+
 
 type FieldDetails = {
 	schema: z.ZodTypeAny;
@@ -323,17 +330,17 @@ const getTime = (field: Field): FieldDetails => {
 }
 
 const getBoolean = (field: Field): FieldDetails => {
-	const baseSchema = z.boolean();
 
-	let schema;
-	if (field.required) {
-		schema = baseSchema.refine(
-			(data) => data !== undefined,
-			{ message: `${field.caption} is required` }
-		);
-	} else {
-		schema = baseSchema.optional();
-	}
+	const schema = (() => {
+		if (field.required) {
+			return z.boolean().nullish().refine(
+				(data) => data != null,
+				{ message: `${field.caption} is required` }
+			);
+		}
+		return z.boolean().optional().nullish();
+	})();
+	
 	return {
 		schema,
 		//defaultValue: field.defaultValue ? !!field.defaultValue : undefined,
@@ -437,25 +444,140 @@ const getMultiChoice = (field: Field): FieldDetails => {
 	}
 }
 
-const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
+const getUploadOneFile = (entityName: string, edge: Edge): FieldDetails => {
 
 	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => !val,
+		? z.any().refine((val: any[]) => {
+				const dataValue = val?.filter((i: RelationInfo) => i.type !== RelationInfoType) ?? [];
+
+				const savedCount = val?.find((i: RelationInfo) => i.type === RelationInfoType)?.savedCount ?? 0;
+				const removedCount = dataValue?.filter((i: FileDiffWrapper) => {
+										return i.status === 'delete' || i.status === 'disconnect' || i.status === 'unset';
+									  }).length ?? 0;
+				const addedCount = dataValue.length - removedCount;
+				const resultCount = savedCount + addedCount - removedCount;
+
+				return resultCount > 0
+			},
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
 
-	schema = schema.transform((val?: Option<string, OptionTagOne>) => {
+	schema = schema.transform(async (val?: FileDiffWrapper[]) => {
 
 		if (!val) {
 			return undefined;
 		}
 
-		if (!val.tag) {
+		if (!val.length) {
 			return undefined;
 		}
 
-		switch (val.tag) {
+		const file = val[0];
+
+		if(!file){
+			return undefined;
+		}
+
+		switch (file.status) {
+			case 'create':
+				return {
+					create: {
+						name: (file.file as File).name,
+						content: await fileToBase64(file.file as File),
+					}
+				}
+			case 'delete':
+				return {
+					delete: true
+				}
+		}
+
+	});
+
+	return {
+		schema,
+		convertFromRawValue: (val) => undefined,
+		input: <FileFormField key={edge.name} name={edge.name} label={edge.caption} entityName={entityName} edge={edge} maxFiles={1} />
+	}
+}
+
+const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => { 
+
+	let schema: z.ZodTypeAny = edge.required
+		? z.any().refine((val: any[]) => {
+				const dataValue = val?.filter((i: RelationInfo) => i.type !== RelationInfoType) ?? [];
+
+				const savedCount = val?.find((i: RelationInfo) => i.type === RelationInfoType)?.savedCount ?? 0;
+				const removedCount = dataValue?.filter((i: FileDiffWrapper) => {
+										return i.status === 'delete' || i.status === 'disconnect' || i.status === 'unset';
+									  }).length ?? 0;
+				const addedCount = dataValue.length - removedCount;
+				const resultCount = savedCount + addedCount - removedCount;
+
+				return resultCount > 0
+			},
+			{ message: `${edge.caption} is required` }
+		)
+		: z.any().optional().nullable();
+
+	schema = schema.transform(async (val?: FileDiffWrapper[]) => {
+
+		if (!val) {
+			return undefined;
+		}
+
+		const create = val.filter(i => i.status === 'create' && i.file instanceof File);
+		const remove = val.filter(i => i.status === 'delete');
+
+		const result = {
+			...(create.length && {
+				create: await Promise.all(val.filter(i => i.status === 'create')
+					.filter((i) => i.file instanceof File)
+					.map(async (i: FileDiffWrapper) => ({
+						name: (i.file as File).name,
+						content: await fileToBase64(i.file as File),
+
+					})))
+			}),
+			...(remove.length && {
+				delete: val.filter(i => i.status === 'delete')
+					.map(i => ({
+						id: i.id
+					}))
+			})
+		}
+		console.log(result);
+		return result;
+	});
+
+	return {
+		schema,
+		convertFromRawValue: (val) => undefined,
+		input: <FileFormField key={edge.name} name={edge.name} label={edge.caption} entityName={entityName} edge={edge} />
+	}
+}
+
+
+const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
+
+	let schema: z.ZodTypeAny = edge.required
+		? z.any().refine((val): val is Record<string, unknown> => val || Array.isArray(val) && val.length > 0,
+			{ message: `${edge.caption} is required` }
+		)
+		: z.any().optional().nullable();
+
+	schema = schema.transform((val?: OptionDiffWrapper) => {
+
+		if (!val) {
+			return undefined;
+		}
+
+		if (!val.status) {
+			return undefined;
+		}
+
+		switch (val.status) {
 			case 'create':
 				return {
 					create: val.value
@@ -470,6 +592,10 @@ const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 				return {
 					unset: true
 				}
+			case 'delete':
+				return {
+					delete: true
+				}
 		}
 
 	});
@@ -483,28 +609,41 @@ const getRelationOne = (entityName: string, edge: Edge): FieldDetails => {
 
 const getRelationMany = (entityName: string, edge: Edge): FieldDetails => {
 	let schema: z.ZodTypeAny = edge.required
-		? z.any().refine((val): val is Record<string, unknown> => !val,
+		? z.any().refine((val): val is Record<string, unknown> => val,
 			{ message: `${edge.caption} is required` }
 		)
 		: z.any().optional().nullable();
 
-	schema = schema.transform((val?: Options<string, OptionTagMany>) => {
+	schema = schema.transform((val?: OptionDiffWrapper[]) => {
 
-		if (!val) {
+		if (!val || !val.length) {
 			return undefined;
 		}
 
+		const connect = val.filter(i => i.status === 'connect'); 
+		const create = val.filter(i => i.status === 'create');
+		const disconnect = val.filter(i => i.status === 'disconnect');
+		const remove = val.filter(i => i.status === 'delete');
+
 		return {
-			connect: val.filter(i => i.tag == 'connect')
-				.map(i => ({
-					id: i.value
+			...(connect.length && {
+				connect: connect.map(i => ({
+					id: i.id
 				})),
-			create: val.filter(i => i.tag == 'create')
-				.map(i => i.value),
-			disconnect: val.filter(i => i.tag == 'disconnect')
-				.map(i => ({
-					id: i.value
+			}),
+			...(create.length && {
+				create: create.map(i => i.value),
+			}),
+			...(disconnect.length && {
+				disconnect: disconnect.map(i => ({
+					id: i.id
 				}))
+			}),
+			...(remove.length && {
+				delete: remove.map(i => ({
+					id: i.id
+				}))
+			})
 		}
 	});
 
@@ -537,15 +676,28 @@ const getFormField = (field: Field): FieldDetails => {
 }
 
 const getFormEdge = (entityName: string, edge: Edge): FieldDetails => {
+
+	const isFile = edge.relatedEntity.caption == 'File';
+
 	switch (edge.relationType) {
 		case RelationType.One:
 		case RelationType.OneToOne:
 		case RelationType.OneToMany:
+
+			if (isFile) {
+				return getUploadOneFile(entityName, edge);
+			}
+
 			return getRelationOne(entityName, edge);
 
 		case RelationType.Many:
 		case RelationType.ManyToOne:
 		case RelationType.ManyToMany:
+
+			if (isFile) {
+				return getUploadManyFile(entityName, edge);
+			}
+
 			return getRelationMany(entityName, edge);
 
 		default:
@@ -687,7 +839,7 @@ export const useGenericEdgeFormSchema = (entity: FullEntity | null, edgeName: st
 		return value;
 	}, [edgeDescriptor, edge]);
 
-	const field = useMemo(():ReactNode => {
+	const field = useMemo((): ReactNode => {
 		if (!edgeDescriptor) {
 			return <></>;
 		}

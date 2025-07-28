@@ -1,191 +1,226 @@
 import { ContentManagerSearchState } from "@/types/content-manager-search-state";
 import { UsersStore } from "@/types/content-manager-store-state";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useContentManagerStoreRequest } from "./use-content-manager-store-request";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FullEntity } from "@/types/entity";
 import { addNotification } from "@/lib/notifications/store";
-import { Edge, Field } from "@/lib/apollo/graphql.entities";
-import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
-import { getAdvancedFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
-import { EdgeRequest } from "@/lib/apollo/builders/gqlQueryBuilder";
-import { Order } from "mosaic-data-table";
-import { AdvancedFilter } from "@/core-features/dynamic-filter/filter";
+import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
+import { getFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
+import { useApolloClient } from "@apollo/client";
+import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
+import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
+import { RunQuery, useLgQuery } from "./use-lg-query";
 
-interface UseContentManagerStoreParams {
-    entityName: string
-    //fullEntity?: FullEntity | null,
-
-    page: number;
-    rowsPerPage: number;
-    sortBy: string | null;
-    order: Order;
-    
-    fields?: string[],
-    edges?: EdgeRequest[],
-    // searchState: ContentManagerSearchState;
-
-    filters?: AdvancedFilter[];
-    orFilters?: AdvancedFilter[];
-
-    lazy?: boolean;
+interface UseGridContentManagerStoreparams {
+	fullEntity?: FullEntity;
+	searchState: ContentManagerSearchState;
 }
-export const useContentManagerStore = (params: UseContentManagerStoreParams): UsersStore => {
+export const useContentManagerStore = (params: UseGridContentManagerStoreparams): UsersStore => {
 
-    const { entityName, fields, edges, page, rowsPerPage, sortBy, order, filters, orFilters, lazy } = params;
+    const { name:entityName } = params.fullEntity ?? {};
 
-    const contentManagerStoreRequest = useContentManagerStoreRequest({entityName});
-    const [dataLoading, setDataLoading] = useState<boolean>(false);
-    const [data, setData] = useState<[]>([]);
-    const [dataConnection, setDataConnection] = useState<{ totalCount: number } | null>(null);
+	const client = useApolloClient();
 
-    const fetch = useCallback(() => {
-        setDataLoading(true);
-        contentManagerStoreRequest.fetchData({
+	const fields = useMemo(() => params.fullEntity?.fields.map(i => i.name), [params.fullEntity?.fields]);
+	const edges = useMemo(() => params.fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
+													.filter(i => i.relationType !== 'ManyToOne')
+													.filter(i => i.relationType !== 'Many'), [params.fullEntity?.edges]);
 
-            page: page ?? 1,
-            rowsPerPage: rowsPerPage ?? 10,
-            sortBy: sortBy ?? null,
-            order: order ?? 'desc',            
-            fields: fields ?? [],
-            edges: edges ?? [],
-            
-            // fields: fields?.map(i => i.name) ?? [],
-            // edges: edges?.filter(i => i.relationType !== 'ManyToMany')
-            //                         .filter(i => i.relationType !== 'ManyToOne')
-            //                         .filter(i => i.relationType !== 'Many')
-            //                         .map(i => ({
-            //                             name: i.name,
-            //                             fields: [i.relatedEntity.displayField.name],
-            //                         })) ?? [],
-            // searchState: searchState!,
-            filters: filters ?? [], // getAdvancedFiltersFromGridFilter(searchState.filter),
-            orFilters: orFilters ?? [] //getAdvancedFiltersFromQuery(searchState.query, fields ?? [])
-        })
-            ?.then((response: any) => {
-                setData(response.data as []);
-                setDataConnection(response.connection ?? { totalCount: 0 });
-            }).finally(() => {
-                setDataLoading(false);
-            });
-    }, [contentManagerStoreRequest, setData, setDataLoading, fields, edges, page, rowsPerPage, sortBy, order, filters, orFilters]);
+	const dataQuery = useMemo(() => {
 
-    const refresh = useCallback(() => {
-        fetch();
-    }, [fetch]);
+		if(params.fullEntity?.loading ?? true){
+			return null;
+		}
+
+		if(!fields || !edges){
+			return null;
+		}
+
+		let query = LGQuery.from<any>(params.fullEntity!.name)
+							.select( ...fields)
+		// add edges							
+		query = edges.reduce((query: LGQuery<any>, edge) => {
+			return query.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
+		}, query);
+
+		// add filters
+		if(Object.entries(params.searchState.filter).length){
+			query = query.where(
+				GplFilter.and(
+					...Object.entries(params.searchState.filter).map(([key, filter]) => { 
+						const restul = GplFilter.field(key, filter.operator, filter.value) as GplFilter<any>; 
+						return restul;
+					})
+				)
+			);
+		}
+		
+		const queryFilter = getFiltersFromQuery(params.searchState.query, params.fullEntity?.fields ?? [])
+		if(Object.entries(queryFilter).length){
+			query = query.where(
+				GplFilter.or(
+					...Object.entries(queryFilter).map(([key, filter]) => { 
+						return GplFilter.field(key, filter.operator, filter.value) as GplFilter<any>; 
+					})
+				)
+			);
+		}
+
+		// add skip
+		query = query.skip((params.searchState.page - 1) * params.searchState.rowsPerPage);
+		// add first
+		query = query.first(params.searchState.rowsPerPage);
+		// add order
+		if(params.searchState.sortBy) {
+			if(params.searchState.order == 'asc'){
+				query = query.orderByAscending(params.searchState.sortBy);
+			} else {
+				query = query.orderByDescending(params.searchState.sortBy);
+			}
+		}
+		
+		return query;	
+	}, [entityName, fields, edges, params.searchState]);
+
+	const connectionQuery = useMemo(() => {
+		if(!entityName){
+			return null!;
+		}
+
+		let query = LGQuery.fromConnection<any>(entityName)
+			     .select('totalCount');
+
+		// add filters
+		query = Object.entries(params.searchState.filter).reduce((query, [key, value]) => { 
+			return query.where(GplFilter.field(key, value.operator, value.value));
+		}, query);
+
+		return query;
+	}, [entityName]);
+
+	const apiType = params.fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
+
+	const dataResponse = useLgQuery({
+		apiType,
+		query: useMemo(() => [dataQuery, connectionQuery], [dataQuery, connectionQuery]),
+		skip: dataQuery == null
+	});
     
     const addItem = useCallback((data: any) => {
-        contentManagerStoreRequest.addItem(entityName,data)
-            ?.then((response) => {
-                fetch();
-            })
-            ?.catch(({message}) => {
-                addNotification({ message, type: 'error' });
-            });
-    }, [ contentManagerStoreRequest.addItem, entityName, fetch, setDataLoading]);
+		if(!params.fullEntity){
+			return;
+		}
+
+		const query = LGQuery.create(params.fullEntity.name, data)
+							.select('id');
+
+		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+       	RunQuery(client, apiType, query)
+		.then((response) => {
+			dataResponse.refetch();
+		});
+			
+    }, [client, params.fullEntity, dataResponse.refetch]);
 
 
     const addItems = useCallback((data: any[]) => {
-        const promises = data.map(item => {
-            return contentManagerStoreRequest.addItem(entityName, item)
-                .catch(({message}) => {
-                    addNotification({ message, type: 'error' });
-                });
-        });
+		if(!params.fullEntity){
+			return;
+		}
 
-        Promise.all(promises)
-            .then(() => {
-                fetch();
-            });
-    }, [contentManagerStoreRequest.addItem, entityName, fetch, setDataLoading]);
+		const query = LGQuery.create(params.fullEntity.name, data)
+							.select('id');
+
+		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+       	RunQuery(client, apiType, query)
+		.then((response) => {
+			dataResponse.refetch();
+		});
+    }, [client, params.fullEntity, dataResponse.refetch]);
 
     const updateItem = useCallback((id: string, data: any) => {
-        contentManagerStoreRequest.updateItem(entityName, id, data)
-            ?.then((response) => {
-                fetch();
-            })
-            ?.catch(({message}) => {
-                addNotification({ message, type: 'error' });
-            });
-    }, [fetch, entityName, setDataLoading]);
+
+		if(!params.fullEntity){
+			return;
+		}
+
+		const query = LGQuery.update(params.fullEntity.name, data)
+							.where(GplFilter.field('id', '', id))
+							.select('id');
+
+		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+       	RunQuery(client, apiType, query)
+		.then((response) => {
+			dataResponse.refetch();
+		});
+
+    }, [client, params.fullEntity, dataResponse.refetch]);
 
     const deleteItem = useCallback((id: string) => {
-        contentManagerStoreRequest.deleteItem(entityName, id)
-            ?.then((response) => {
-                fetch();
-            })
-            ?.catch(({message}) => {
-                addNotification({ message, type: 'error' });
-            });
-    }, [fetch, entityName, setDataLoading]);
+		if(!params.fullEntity){
+			return;
+		}
+
+		const query = LGQuery.deleteFrom(params.fullEntity.name)
+							.where(GplFilter.field('id', '', id))
+							.select('id');
+
+		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+       	RunQuery(client, apiType, query)
+		.then((response) => {
+			dataResponse.refetch();
+		});
+
+    }, [client, params.fullEntity, dataResponse.refetch]);
 
     const deleteBulk = useCallback((ids: Array<string>) => {
-        contentManagerStoreRequest.deleteBulk(entityName, ids)
-            ?.then((response) => {
-                fetch();
-            })
-            ?.catch(({message}) => {
-                addNotification({ message, type: 'error' });
-            });
-    }, [entityName, fetch]);
+        if(!params.fullEntity){
+			return;
+		}
 
-    useEffect(() => {
-        if(lazy){
-            return;
-        }
+		const query = LGQuery.deleteFrom(params.fullEntity.name)
+							.where(GplFilter.field('id', 'In', ids));
 
-        if(!fields && !edges){
-            return;
-        }
+		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+       	RunQuery(client, apiType, query)
+		.then((response) => {
+			dataResponse.refetch();
+		});
 
-        // if(!fullEntity){
-        //     return;
-        // }
+    }, [client, params.fullEntity, dataResponse.refetch]);
 
-        // if (fullEntity.loading) {
-        //     return;
-        // }
+	const onlyData = useMemo(() => ({
+		data: dataQuery?.getResultData(dataResponse.data) ?? [],
+ 		dataConnection: connectionQuery?.getResultData(dataResponse.data) ?? [],
+	}), [dataResponse.data]);
 
-        // if (fullEntity.isError) {
-        //     return;
-        // }
-        
-        fetch();
-    }, [fields, edges, fetch]);
-
-    const numberOfPages = useMemo(() => {
-        if (!dataConnection) {
+	const numberOfPages = useMemo(() => {
+        if (!onlyData.dataConnection) {
             return 1;
         }
 
-        if (!dataConnection.totalCount) {
+        if (!onlyData.dataConnection.totalCount) {
             return 1;
         }
 
-        if (!rowsPerPage) {
+        if (!params.searchState.rowsPerPage) {
             return 1;
         }
 
-        return Math.ceil(dataConnection.totalCount / rowsPerPage);
-    }, [dataConnection, rowsPerPage]);
+        return Math.ceil(onlyData.dataConnection.totalCount / params.searchState.rowsPerPage);
+    }, [onlyData.dataConnection, params.searchState.rowsPerPage]);
 
     return useMemo(() => ({
         state: {
-            data: data,
-            // schemaLoading: !fullEntity || fullEntity.loading,
-            // dataLoading: !fullEntity || fullEntity.loading || dataLoading,
-            // entityFields: fullEntity?.fields ?? [],
-            // entityEdges: fullEntity?.edges ?? [],
-            dataLoading,
-
-            dataConnection,
+            data: onlyData.data,
+            dataLoading: dataResponse.loading,
             pagesCount: numberOfPages,
-            totalItems: dataConnection?.totalCount ?? 0
+            totalItems: onlyData.dataConnection?.totalCount ?? 0
         },
-        refresh,
+        refresh: () => dataResponse.refetch(),
         addItem,
         addItems,
         updateItem,
         deleteItem,
         deleteBulk
-    }), [data,  dataLoading, dataConnection?.totalCount, addItem, dataConnection, deleteBulk, deleteItem, numberOfPages, updateItem]);
+    }), [dataResponse.refetch, dataResponse.loading, onlyData, addItem, deleteBulk, deleteItem, updateItem, numberOfPages]);
 }

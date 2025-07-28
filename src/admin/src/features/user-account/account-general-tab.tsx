@@ -3,15 +3,13 @@ import { useAuth } from "@/core-features/auth/use-auth";
 import { AvatarUploadField } from "@/core-features/dynamic-form/form-fields/AvatarUploadField";
 import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/TextShortField";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
-import { UploadAvatar } from "@/shared/components/upload/upload-avatar";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Avatar, Box, Button, Card, CardContent, Grid, Stack, Typography } from "@mui/material"
+import { Box, Button, Card, CardContent, Grid, Stack, Typography } from "@mui/material"
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-
 const avatarSchema = z.object({
-    avatar: z.custom().transform((data, ctx) => {
+    avatar: z.custom().transform((data: any, ctx: any) => {
         const hasFile = data instanceof File || (typeof data === 'string' && !!data.length);
   
         if (!hasFile) {
@@ -81,7 +79,7 @@ export const AccountGeneralTab = () => {
                                     <TextShortFormField name="name" label="Name" required disabled/>
                                     <TextShortFormField name="email" label="Email" required disabled/>
                                     <TextShortFormField name="firstName" label="First Name" required disabled/>
-                                    <TextShortFormField name="lastName" label="Last Name" required disabled/>
+                                    <TextShortFormField name="lastName" label="Last Name" required />
 
                                     <Stack direction="row" justifyContent="end">
                                         <Button

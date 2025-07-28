@@ -197,7 +197,6 @@ export const ContentManagerScene = () => {
 
                 <CardContent>
 
-
                     <MosaicDataTable
                         plugins={gridPlugins}
                         caption={`${contentManager.entityName} content`}

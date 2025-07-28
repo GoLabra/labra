@@ -11,294 +11,248 @@ import { ActionList } from '@/shared/components/action-list';
 import { ActionListItem } from '@/shared/components/action-list-item';
 import { useFullEntity } from '@/hooks/use-entities';
 import { useContentManagerSearch } from '@/hooks/use-content-manager-search';
-import { useContentManagerStore } from '@/hooks/use-content-manager-store';
 import { useMyDialogContext } from '@/core-features/dynamic-dialog/src/use-my-dialog-context';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { useLiteController } from '../lite-controller';
 import { Edge } from '@/lib/apollo/graphql.entities';
-import { getAdvancedFiltersFromGridFilter } from '@/lib/utils/get-advanced-filters-from-grid-filters';
-import { eqStringFoldOperator } from '@/core-features/dynamic-filter/filter-operators';
-import { getAdvancedFiltersFromQuery } from '@/lib/utils/get-filters-from-query';
 import { Options, Option } from '@/core-features/dynamic-form/form-field';
+import { EdgeStatus } from '@/lib/utils/edge-status';
+import { nullable } from 'zod';
+import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
+import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
+
+export type OptionDiffWrapper = {
+	id: string;
+	label: string;
+	value: string | any;
+	status: EdgeStatus;
+}
 
 interface RelationOneFIELDFormComponentProps {
-    name: string;
-    label: string;
-    placeholder?: string;
-    disabled?: boolean;
-    required?: boolean;
-    errors?: string;
+	name: string;
+	label: string;
+	placeholder?: string;
+	disabled?: boolean;
+	required?: boolean;
+	errors?: string;
 
-    value: Option<string, OptionTag>;
-    onChange: (event: any) => void;
-    onBlur: (event: any) => void;
+	value: OptionDiffWrapper;
+	onChange: (event: any) => void;
+	onBlur: (event: any) => void;
 
-    entityName: string;
-    editId?: string;
-    edge: Edge;
+	entityName: string;
+	editId?: string;
+	edge: Edge;
 }
 
 export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponentProps) {
-    const { name, label, placeholder, disabled, errors, entityName, edge, value, onChange, onBlur, editId } = props;
+	const { name, label, placeholder, disabled, errors, entityName, edge, value, onChange, onBlur, editId } = props;
 
-    const myDialogContext = useMyDialogContext();
-    const savedValue = useGetEdgeValue(entityName, editId ?? null, edge);
 
-    // SEARCH LOOKUP
-    const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
-    const contentManagerSearch = useContentManagerSearch();
-    const contentManagerStore = useContentManagerStore({
-        entityName: edge.relatedEntity.name,
-        page: contentManagerSearch.state.page,
-        rowsPerPage: contentManagerSearch.state.rowsPerPage,
-        sortBy: contentManagerSearch.state.sortBy,
-        order: contentManagerSearch.state.order,
-        fields: useMemo(() => {
-            if (!fullEntity?.displayField) {
-                return [];
-            }
+	// SEARCH LOOKUP
+	const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
+	const contentManagerSearch = useContentManagerSearch();
+	const contentManagerStore = useLookupContentManagerStore({
+		fullEntity: fullEntity,
+		searchState: contentManagerSearch.state,
+	});
 
-            return ['id', fullEntity.displayField.name];
+	const search = useCallback((searchValue: string) => {
+		contentManagerSearch.handleQueryChange(searchValue);
+	}, [contentManagerSearch]);
+	// END SEARCH LOOKUP
 
-        }, [fullEntity?.displayField]),
 
-        orFilters: useMemo(() => getAdvancedFiltersFromQuery(contentManagerSearch.state.query, fullEntity?.fields ?? []), [contentManagerSearch.state.query, fullEntity?.fields])
-    });
+	const myDialogContext = useMyDialogContext();
+	const displayPropertyName = useMemo(() => fullEntity?.displayField?.name ?? 'name', [fullEntity?.displayField?.name]);
+	const edgeValue = useRelationContentManagerStore({
+		entityName: entityName,
+		entryId: editId,
+		edge: edge,
+		fields: 'iddisplay'
+	});
 
-    const search = useCallback((searchValue: string) => {
-        contentManagerSearch.handleQueryChange(searchValue);
-    }, [contentManagerSearch]);
-    // END SEARCH LOOKUP
+	const saved = useMemo((): OptionDiffWrapper | null => {
+		if (!fullEntity?.displayField) {
+			return null;
+		}
 
-    const displayPropertyName = useMemo(() => fullEntity?.displayField?.name ?? 'name', [fullEntity?.displayField?.name]);
+		if (!edgeValue.data) {
+			return null;
+		}
 
-    const computedValue = useMemo((): Option<string, OptionTag> | undefined => {
-        if (value) {
-            if(value.tag === 'unset'){
-                return undefined;
-            }
-            return value;
-        }
+		return {
+			id: edgeValue.data.id,
+			value: edgeValue.data.id,
+			label: edgeValue.data[displayPropertyName],
+			status: 'saved'
+		};
+	}, [edgeValue, displayPropertyName]);
 
-        if(!savedValue?.data){
-            return undefined;
-        }
+	const computedValue = useMemo((): OptionDiffWrapper | undefined => {
+		if (value) {
+			if (value.status === 'unset') {
+				return undefined;
+			}
+			return value;
+		}
 
-        if (savedValue) {
-            return {
-                ...savedValue.data!,
-                tag: 'saved'
-            };
-        }
+		if (!saved) {
+			return undefined;
+		}
 
-        return undefined;
-    }, [value, savedValue, fullEntity?.displayField]);
+		if (saved) {
+			return {
+				...saved,
+				status: 'saved'
+			};
+		}
 
-    const onChangedValue = useCallback((event: {
-        reason: AutocompleteChangeReason;
-        option: Option<string, OptionTag> | null;
-    }) => {
+		return undefined;
+	}, [value, saved, fullEntity?.displayField]);
 
-        switch (event.reason) {
-            case 'selectOption': {
-                onChange({
-                    target: {
-                        name: name,
-                        value: {
-                            ...event.option,
-                            tag: 'connect'
-                        }
-                    }
-                });
-                break;
-            }
+	const onChangedValue = useCallback((event: {
+		reason: AutocompleteChangeReason;
+		option: OptionDiffWrapper | null;
+	}) => {
 
-            case 'removeOption':
-            case 'clear': {
+		switch (event.reason) {
+			case 'selectOption': {
+				onChange({
+					target: {
+						name: name,
+						value: {
+							...event.option,
+							status: 'connect'
+						}
+					}
+				});
+				break;
+			}
 
-                if (!savedValue?.data) {
-                    onChange({
-                        target: {
-                            name: name,
-                            value: null
-                        }
-                    });
-                    return;
-                }
+			case 'removeOption':
+			case 'clear': {
 
-                onChange({
-                    target: {
-                        name: name,
-                        value: {
-                            label: savedValue?.data.label,
-                            value: savedValue?.data.value,
-                            tag: 'unset'
-                        }
-                    }
-                });
-                break;
-            }
-        }
+				if (!saved) {
+					onChange({
+						target: {
+							name: name,
+							value: null
+						}
+					});
+					return;
+				}
 
-    }, [onChange, savedValue]);
+				onChange({
+					target: {
+						name: name,
+						value: {
+							label: saved.label,
+							value: saved.value,
+							status: 'unset'
+						}
+					}
+				});
+				break;
+			}
+		}
 
-    const options = useMemo(() => {
+	}, [onChange, saved]);
 
-        const result = contentManagerStore.state.data.map((i: any): Option<any> => ({
-            label: i[displayPropertyName] || `Id: ${i['id']}`,
-            value: i.id,
-        }));
+	const options = useMemo(() => {
 
-        return result;
+		const result = contentManagerStore.state.data.map((i: any): Option<any> => ({
+			label: i[displayPropertyName] || `Id: ${i['id']}`,
+			value: i.id,
+		}));
 
-    }, [contentManagerStore.state.data]);
+		return result;
 
-    const addNew = () => {
-        myDialogContext.addPopup(name, ContentManagerEntryDialogContent, { entityName: edge.relatedEntity.name }, FormOpenMode.New, undefined,
-            (upperResults: any) => {
+	}, [contentManagerStore.state.data]);
 
-                onChange({
-                    target: {
-                        name: name,
-                        value:  {
-                            label: upperResults[displayPropertyName],
-                            tag: 'create',
-                            value: upperResults
-                        }
-                    }
-                });
+	const addNew = () => {
+		myDialogContext.addPopup(name, ContentManagerEntryDialogContent, { entityName: edge.relatedEntity.name }, FormOpenMode.New, undefined,
+			(upperResults: any) => {
 
-                return upperResults;
-            })
-    };
+				onChange({
+					target: {
+						name: name,
+						value: {
+							label: upperResults[displayPropertyName],
+							status: 'create',
+							value: upperResults
+						}
+					}
+				});
 
-    return (
-        <>
-            <AutocompleteBaseFieldFormComponent
-                name={name}
-                label={label}
-                placeholder={placeholder}
-                disabled={disabled}
-                errors={errors}
-                search={search}
-                options={options}
+				return upperResults;
+			})
+	};
 
-                value={computedValue}
-                onChange={onChangedValue as AutocompleteFieldFormComponentProps['onChange']}
-                onBlur={onBlur}
+	return (
+		<>
+			<AutocompleteBaseFieldFormComponent
+				name={name}
+				label={label}
+				placeholder={placeholder}
+				disabled={disabled}
+				errors={errors}
+				search={search}
+				options={options}
 
-                customHeader={
-                    <ActionList>
-                        <ActionListItem
-                            onClick={() => addNew()}
-                            icon={(
-                                <SvgIcon fontSize="small">
-                                    <PlusCircleIcon />
-                                </SvgIcon>
-                            )}
-                            aria-label="Add new entry"
-                            aria-haspopup="dialog"
-                            label="Add New"
-                        />
-                    </ActionList>
-                }
-            />
-        </>
-    );
+				value={computedValue}
+				onChange={onChangedValue as AutocompleteFieldFormComponentProps['onChange']}
+				onBlur={onBlur}
+
+				customHeader={
+					<ActionList>
+						<ActionListItem
+							onClick={() => addNew()}
+							icon={(
+								<SvgIcon fontSize="small">
+									<PlusCircleIcon />
+								</SvgIcon>
+							)}
+							aria-label="Add new entry"
+							aria-haspopup="dialog"
+							label="Add New"
+						/>
+					</ActionList>
+				}
+			/>
+		</>
+	);
 }
 
 interface FormFieldProps {
-    name: string;
-    placeholder?: string;
-    label: string;
-    disabled?: boolean;
-    hide?: boolean;
-    required?: boolean;
+	name: string;
+	placeholder?: string;
+	label: string;
+	disabled?: boolean;
+	hide?: boolean;
+	required?: boolean;
 
-    entityName: string;
-    edge: Edge;
+	entityName: string;
+	edge: Edge;
 }
 export function LookupOneFIELDFormField(props: FormFieldProps) {
-    useFormDynamicContext(props.name, { disabled: props.disabled });
-    const myDialogContext = useMyDialogContext();
-    const formContext = useFormContext();
-    const formControllerHandler = useLiteController({ name: props.name, control: formContext.control, disabled: props.disabled });
-    
-    if (props.hide) {
-        return null;
-    }
+	useFormDynamicContext(props.name, { disabled: props.disabled });
+	const myDialogContext = useMyDialogContext();
+	const formContext = useFormContext();
+	const formControllerHandler = useLiteController({ name: props.name, disabled: props.disabled });
 
-    return (<LookupOneFIELDFormComponent
-        label={props.label}
-        placeholder={props.placeholder}
-        required={props.required}
-        errors={formContext.formState.errors[props.name]?.message as string}
-        editId={myDialogContext.editId}
-        entityName={props.entityName}
-        edge={props.edge}
-        {...formControllerHandler}
-    />)
+	if (props.hide) {
+		return null;
+	}
+
+	return (<LookupOneFIELDFormComponent
+		label={props.label}
+		placeholder={props.placeholder}
+		required={props.required}
+		errors={formContext.formState.errors[props.name]?.message as string}
+		editId={myDialogContext.editId}
+		entityName={props.entityName}
+		edge={props.edge}
+		{...formControllerHandler}
+	/>)
 }
-
-const useGetEdgeValue = (entityName: string, entryId: string | null, edge: Edge) => {
-
-    const fullEntity = useFullEntity({ entityName: edge.relatedEntity.name });
-    const contentManagerSearch = useContentManagerSearch({
-        initialFilter: {
-            id: {
-                operator: eqStringFoldOperator.name,
-                value: entryId
-            }
-        }
-    });
-
-    const contentManagerStore = useContentManagerStore({
-        entityName: entityName,
-
-        page: contentManagerSearch.state.page,
-        rowsPerPage: contentManagerSearch.state.rowsPerPage,
-        sortBy: contentManagerSearch.state.sortBy,
-        order: contentManagerSearch.state.order,
-        lazy: entryId == null,
-        edges: useMemo(() => {
-            if (!fullEntity?.displayField) {
-                return undefined;
-            }
-
-            return [{
-                name: edge.name,
-                fields: ['id', fullEntity.displayField.name],
-            }]
-        }, [fullEntity?.displayField]),
-
-        filters: useMemo(() => getAdvancedFiltersFromGridFilter(contentManagerSearch.state.filter), [contentManagerSearch.state.filter]),
-    });
-
-    const gridData = useMemo(() => {
-        if (!contentManagerStore.state.data?.length) {
-            return undefined;
-        }
-
-        return contentManagerStore.state.data[0][edge.name];
-    }, [contentManagerStore.state.data]);
-
-    return useMemo(() => {
-
-        if(!gridData){
-            return {
-                data: undefined,
-                id: undefined,
-            }
-        }
-
-        return {
-            data: {
-                label: gridData[fullEntity!.displayField!.name] || `Id: ${gridData['id']}`,
-                value: gridData.id,
-            },
-            id: gridData.id,
-        }
-    }, [gridData]);
-}
-
-export type OptionTag = 'saved' | 'connect' | 'create' | 'unset';

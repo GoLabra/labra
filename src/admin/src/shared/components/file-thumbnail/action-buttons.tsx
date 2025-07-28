@@ -1,6 +1,8 @@
 import { useTheme } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
 import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 //import { bgBlur, varAlpha } from 'src/theme/styles';
 
@@ -37,7 +39,7 @@ export function DownloadButton({ sx, ...other }: DownloadButtonProps) {
             }}
             {...other}
         >
-            {/* <Iconify icon="eva:arrow-circle-down-fill" width={24} /> */}
+            <HighlightOffIcon fontSize="inherit" />
         </ButtonBase>
     );
 }
@@ -53,6 +55,7 @@ export function RemoveButton({ sx, ...other }: RemoveButtonProps) {
     return (
         <IconButton
             size="small"
+			
             sx={{
                 p: 0.35,
                 top: 4,
@@ -65,7 +68,7 @@ export function RemoveButton({ sx, ...other }: RemoveButtonProps) {
             }}
             {...other}
         >
-            {/* <Iconify icon="mingcute:close-line" width={12} /> */}
+			<HighlightOffIcon fontSize="inherit" />
         </IconButton>
     );
 }

@@ -1,4 +1,4 @@
-import { ENTITY_CONTEXT } from "@/lib/apollo/apolloWrapper";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 import { Edge, Entity, Field } from "@/lib/apollo/graphql.entities";
 import { FullEntity, NameCaptionEntity } from "@/types/entity";
 import { gql, makeVar, useLazyQuery, useQuery, useReactiveVar } from "@apollo/client";
@@ -51,6 +51,7 @@ export const GetEntitiesNameCaption = gql`query GetEntitiesNameCaption {
     entities{
       name
       caption
+	  owner
   }
 }`
 
@@ -63,9 +64,9 @@ export const useEntities = () => {
     const nameCaptionEntities = useReactiveVar<NameCaptionEntity[]>(nameCaptionEntitiesVar);
     const fullEntitiesMap = useReactiveVar<Record<string, FullEntity>>(fullEntitiesMapVar);
 
-    const { data, loading: loadingNameCaptionEntities } = useQuery(GetEntitiesNameCaption, {context: ENTITY_CONTEXT}); //useGetEntitiesNameCaptionQuery();
+    const { data, loading: loadingNameCaptionEntities } = useQuery(GetEntitiesNameCaption, {context: ADMIN_CONTEXT}); //useGetEntitiesNameCaptionQuery();
 
-    const [loadFullEntity] = useLazyQuery<{entity: Entity}>(GetEntityFirstLevelSchema, {context: ENTITY_CONTEXT}); //useGetEntityFirstLevelSchemaLazyQuery(); 
+    const [loadFullEntity] = useLazyQuery<{entity: Entity}>(GetEntityFirstLevelSchema, {context: ADMIN_CONTEXT}); //useGetEntityFirstLevelSchemaLazyQuery(); 
 
     // set entities
     useEffect(() => {

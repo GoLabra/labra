@@ -29,26 +29,26 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
     const myDialogContext = useMyDialogContext();
 
 
-    const type = designerFieldsMap[props.selectedChildTypeDescriptor.type];
-    if (!type) {
+    //const type = designerFieldsMap[props.selectedChildTypeDescriptor.type];
+    if (!selectedChildTypeDescriptor) {
         throw new Error('Designer Form Type not found');
     }
 
-    if (!type.schema) {
+    if (!selectedChildTypeDescriptor.schema) {
         throw new Error('Designer Form Type not found');
     }
 
-    if (!type.formContent) {
+    if (!selectedChildTypeDescriptor.formContent) {
         throw new Error('Designer Form Type not found');
     }
 
-    const effectFunc = useSchemaEffectEntityParams(myDialogContext.editId, type.schemaEffect);
-    const formDynamicSchema = useSchemaOptions(type.schema!, effectFunc);
+    const effectFunc = useSchemaEffectEntityParams(myDialogContext.editId, selectedChildTypeDescriptor.schemaEffect);
+    const formDynamicSchema = useSchemaOptions(selectedChildTypeDescriptor.schema!, effectFunc);
 
     const formMethods = useForm({
         resolver: zodResolver(formDynamicSchema.pickedSchema),
         mode: 'all',
-        defaultValues: type.toDefaultValue?.(defaultValue) ?? defaultValue
+        defaultValues: selectedChildTypeDescriptor.toDefaultValue?.(defaultValue) ?? defaultValue
     });
     
 
@@ -112,7 +112,7 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
                 }} />}
 
                 <Form methods={formMethods} dynamicSchema={formDynamicSchema} onSubmit={formMethods.handleSubmit(console.log)} >
-                    <type.formContent formMethods={formMethods} openMode={myDialogContext.openMode} />
+                    <selectedChildTypeDescriptor.formContent formMethods={formMethods} openMode={myDialogContext.openMode} />
                 </Form>
 
 

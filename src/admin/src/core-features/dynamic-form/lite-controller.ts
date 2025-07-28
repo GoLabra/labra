@@ -1,17 +1,18 @@
 import { GenericEvent } from "@/lib/utils/event";
 import { useCallback, useRef } from "react";
-import { Control, useWatch } from "react-hook-form";
+import { Control, useFormContext, useWatch } from "react-hook-form";
 
 
 interface useLiteControllerProps {
     name: string;
-    control: Control;
     disabled?: boolean;
 }
 export const useLiteController = <T = any>(props: useLiteControllerProps) => {
 
-    const { name, control, disabled } = props;
-
+    const { name, disabled } = props;
+	const formContext = useFormContext();
+	const control = formContext.control;
+	
     const value = useWatch({
         control,
         name,

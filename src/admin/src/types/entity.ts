@@ -3,6 +3,7 @@ import { Edge, Entity, EntityOwner, Field, Maybe } from "@/lib/apollo/graphql.en
 export type NameCaptionEntity = {
     name: string;
     caption: string;
+	owner: EntityOwner;
 }
 
 
@@ -22,12 +23,14 @@ export type ChangedNameCaptionEntity = {
     //__typename?: 'Entity';
     name: string;
     caption?: string;
+	owner: EntityOwner;
     designerStatus: DesignerEntityStatus;
 };
 
 export type ChangedFullEntity = {
     name: string;
     caption?: string;
+	owner: EntityOwner;
     displayFieldCaption?: string;
     fields: DesignerField[];
     edges: DesignerEdge[];

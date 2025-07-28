@@ -21,7 +21,7 @@ import { createClient } from 'graphql-ws';
 import { getMainDefinition } from "@apollo/client/utilities";
 import { STORAGE_KEY as JWT_STORAGE_KEY } from "@/core-features/auth/jwt-context";
 
-export const ENTITY_CONTEXT = { clientName: "entity" }
+export const ADMIN_CONTEXT = { clientName: "admin" }
 
 const getBearerToken = () => {
     const token = localStorage?.getItem(JWT_STORAGE_KEY);
@@ -112,7 +112,7 @@ function makeClient() {
 
     const link = typeof window !== "undefined" ? ApolloLink.split(
         (operation) => {
-            return operation.getContext().clientName === "entity"
+            return operation.getContext().clientName === "admin"
         },
         adminLink(),
         queryLink()

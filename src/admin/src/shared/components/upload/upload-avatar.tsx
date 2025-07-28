@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from "@/shared/components/image/image";
 import { Box, Typography } from '@mui/material';
-import { RejectionFiles } from './rejection-files';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { AvatarShell } from '../avatar';
 
@@ -118,7 +117,7 @@ export const UploadAvatar = (props: UploadAvatarProps) => {
 
             {props.helperText && props.helperText}
 
-            <RejectionFiles files={dropzone.fileRejections} />
+            {/* <RejectionFiles files={dropzone.fileRejections} /> */}
         </>
     );
 }

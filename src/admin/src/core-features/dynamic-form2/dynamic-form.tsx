@@ -14,21 +14,22 @@ interface formProps {
     dynamicSchema?: FormDynamicContextType
 }
 export function Form(props: PropsWithChildren<formProps>) {
-    return (
-            <FormDynamicContext.Provider value={props.dynamicSchema ?? null}>
-        <FormProvider {...props.methods}>
-                <form onSubmit={props.onSubmit} noValidate autoComplete="off">
-                    {props.children}
-                </form>
-        </FormProvider>
-            </FormDynamicContext.Provider>
-    );
+	return (
+		<FormDynamicContext.Provider value={props.dynamicSchema ?? null}>
+			<FormProvider {...props.methods}>
+				<form onSubmit={props.onSubmit} noValidate autoComplete="off">
+					{props.children}
+				</form>
+			</FormProvider>
+		</FormDynamicContext.Provider>
+	);
 }
 
 export type FormDynamicContextType = {
     fieldsOptions: Record<string, SchemaFieldOptions>,
     pickedSchema: z.ZodObject<any, any> | z.ZodEffects<any, any>,
     disable: (name: string, disabled?: boolean) => void;
+	hide: (name: string, disabled?: boolean) => void;
     min: (name: string, min?: number | Date) => void;
     max: (name: string, max?: number | Date) => void;
 }
@@ -51,7 +52,7 @@ const triggerValidation = (name: string, disabled: boolean, formContext: UseForm
     
 }
 
-export const useFormDynamicContext = (name: string, options?: { min?: number, max?: number, disabled?: boolean }) => {
+export const useFormDynamicContext = (name: string, options?: { min?: number, max?: number, disabled?: boolean, hide?: boolean }) => {
     const context = useContext(FormDynamicContext)
     const formContextRef = useRef<UseFormReturn>(null!);
     formContextRef.current = useFormContext();
@@ -63,6 +64,14 @@ export const useFormDynamicContext = (name: string, options?: { min?: number, ma
         context.disable(name, options?.disabled);
         triggerValidation(name, options?.disabled ?? false, formContextRef.current!);
     }, [options?.disabled]);
+
+	useEffect(() => {
+        if(!context){
+            return;
+        }
+        context.hide(name, options?.hide);
+        triggerValidation(name, options?.hide ?? false, formContextRef.current!);
+    }, [options?.hide]);
 
     useEffect(() => {
         if(!context){
@@ -95,6 +104,22 @@ export function useSchemaOptions(schema: z.ZodObject<any, any>, schemaEffect?: (
                     [name]: {
                         ...prev[name],
                         disabled: disabled
+                    }
+                }
+            }
+            return prev;
+        });
+        
+    }, [setFieldsOptions]);
+
+	const hide = useCallback((name: string, hide?: boolean) => {
+        setFieldsOptions((prev: Record<string, SchemaFieldOptions>) => {
+            if ((hide ?? false) != (prev[name]?.hide ?? false)) {
+                return {
+                    ...prev,
+                    [name]: {
+                        ...prev[name],
+                        hide: hide
                     }
                 }
             }
@@ -136,6 +161,7 @@ export function useSchemaOptions(schema: z.ZodObject<any, any>, schemaEffect?: (
     const pickedSchema = useMemo(() => {
         const keys = zodKeys(schema);
         const pickedKeys = keys.filter(key => fieldsOptions[key]?.disabled !== true)
+			.filter(key => fieldsOptions[key]?.hide !== true)
             .reduce((acc: any, key: string) => {
                 acc[key] = true;
                 return acc;
@@ -153,13 +179,15 @@ export function useSchemaOptions(schema: z.ZodObject<any, any>, schemaEffect?: (
         fieldsOptions,
         pickedSchema,
         disable,
+		hide,
         min,
         max
-    }), [fieldsOptions, pickedSchema, disable, min, max ]);
+    }), [fieldsOptions, pickedSchema, disable, hide, min, max ]);
 }
 
 export type SchemaFieldOptions = {
     disabled?: boolean;
+	hide?: boolean;
     min?: number | Date;
     max?: number | Date;
 }

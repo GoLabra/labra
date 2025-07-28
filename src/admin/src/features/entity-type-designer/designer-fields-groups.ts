@@ -44,7 +44,7 @@ export const designerFieldsGroups: Array<DesignerFieldGroup> = [
             designerFieldsMap.MultipleChoice,
         ]
     }, {
-        main: designerFieldsMap.media,
+        main: designerFieldsMap.FileContent,
 
     }, {
         main: designerFieldsMap.Json

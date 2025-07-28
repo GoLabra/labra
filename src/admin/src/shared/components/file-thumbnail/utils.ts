@@ -1,3 +1,5 @@
+import { FileWithPath } from "react-dropzone";
+import { FileData } from "./file-thumbnail";
 
 // Define more types here
 const FORMAT_PDF = ['pdf'];
@@ -12,141 +14,104 @@ const FORMAT_AUDIO = ['wav', 'aif', 'mp3', 'aac'];
 const FORMAT_IMG = ['jpg', 'jpeg', 'gif', 'bmp', 'png', 'svg', 'webp'];
 const FORMAT_VIDEO = ['m4v', 'avi', 'mpg', 'mp4', 'webm'];
 
-//const iconUrl = (icon) => `${CONFIG.site.basePath}/assets/icons/files/${icon}.svg`;
-const iconUrl = (icon: string) => '';
+const iconUrl = (icon: string) => `/assets/icons/files/${icon}.svg`;
 
-// ----------------------------------------------------------------------
+export function fileIcon(extension?: string | null) {
+	
+	if(!extension){
+		return iconUrl('ic-file');
+	}
 
-export function fileFormat(fileUrl: string) {
-  let format;
+	switch (true) {
+		case extension === 'folder':
+		 	return iconUrl('ic-folder');
 
-  const fileByUrl = fileTypeByUrl(fileUrl);
+		case FORMAT_TEXT.includes(extension):
+			return iconUrl('ic-txt');
 
-  switch (fileUrl.includes(fileByUrl)) {
-    case FORMAT_TEXT.includes(fileByUrl):
-      format = 'txt';
-      break;
-    case FORMAT_ZIP.includes(fileByUrl):
-      format = 'zip';
-      break;
-    case FORMAT_AUDIO.includes(fileByUrl):
-      format = 'audio';
-      break;
-    case FORMAT_IMG.includes(fileByUrl):
-      format = 'image';
-      break;
-    case FORMAT_VIDEO.includes(fileByUrl):
-      format = 'video';
-      break;
-    case FORMAT_WORD.includes(fileByUrl):
-      format = 'word';
-      break;
-    case FORMAT_EXCEL.includes(fileByUrl):
-      format = 'excel';
-      break;
-    case FORMAT_POWERPOINT.includes(fileByUrl):
-      format = 'powerpoint';
-      break;
-    case FORMAT_PDF.includes(fileByUrl):
-      format = 'pdf';
-      break;
-    case FORMAT_PHOTOSHOP.includes(fileByUrl):
-      format = 'photoshop';
-      break;
-    case FORMAT_ILLUSTRATOR.includes(fileByUrl):
-      format = 'illustrator';
-      break;
-    default:
-      format = fileTypeByUrl(fileUrl);
-  }
+		case FORMAT_AUDIO.includes(extension):
+			return iconUrl('ic-audio');
 
-  return format;
+		case FORMAT_ZIP.includes(extension):
+			return iconUrl('ic-zip');
+
+		case FORMAT_IMG.includes(extension):
+			return iconUrl('ic-img');
+
+		case FORMAT_VIDEO.includes(extension):
+			return iconUrl('ic-video');
+
+		case FORMAT_WORD.includes(extension):
+			return iconUrl('ic-word');
+
+		case FORMAT_EXCEL.includes(extension):
+			return iconUrl('ic-excel');
+
+		case FORMAT_POWERPOINT.includes(extension):
+			return iconUrl('ic-power_point');
+
+		case FORMAT_PDF.includes(extension):
+			return iconUrl('ic-pdf');
+
+		case FORMAT_PHOTOSHOP.includes(extension):
+			return iconUrl('ic-pts');
+
+		case FORMAT_ILLUSTRATOR.includes(extension):
+			return iconUrl('ic-ai');
+
+		default:
+			return iconUrl('ic-file');
+	}
 }
 
 // ----------------------------------------------------------------------
 
-export function fileThumb(fileUrl: string) {
-  let thumb;
-
-  switch (fileFormat(fileUrl)) {
-    case 'folder':
-      thumb = iconUrl('ic-folder');
-      break;
-    case 'txt':
-      thumb = iconUrl('ic-txt');
-      break;
-    case 'zip':
-      thumb = iconUrl('ic-zip');
-      break;
-    case 'audio':
-      thumb = iconUrl('ic-audio');
-      break;
-    case 'video':
-      thumb = iconUrl('ic-video');
-      break;
-    case 'word':
-      thumb = iconUrl('ic-word');
-      break;
-    case 'excel':
-      thumb = iconUrl('ic-excel');
-      break;
-    case 'powerpoint':
-      thumb = iconUrl('ic-power_point');
-      break;
-    case 'pdf':
-      thumb = iconUrl('ic-pdf');
-      break;
-    case 'photoshop':
-      thumb = iconUrl('ic-pts');
-      break;
-    case 'illustrator':
-      thumb = iconUrl('ic-ai');
-      break;
-    case 'image':
-      thumb = iconUrl('ic-img');
-      break;
-    default:
-      thumb = iconUrl('ic-file');
-  }
-  return thumb;
+export function fileIsImage(extension?: string | null) {
+	if(!extension){
+		return false;
+	}
+	return FORMAT_IMG.includes(extension);
 }
 
-// ----------------------------------------------------------------------
-
-export function fileTypeByUrl(fileUrl: string) {
-  return (fileUrl && fileUrl.split('.').pop()) || '';
+export function fileTypeByUrl(fileUrl?: string | null): string | null {
+	if(!fileUrl){
+		return null;
+	}
+	return (fileUrl && fileUrl.split('.').pop())?.toLowerCase() || '';
 }
 
 // ----------------------------------------------------------------------
 
 export function fileNameByUrl(fileUrl: string) {
-  return fileUrl.split('/').pop();
+	return fileUrl.split('/').pop();
 }
 
 // ----------------------------------------------------------------------
 
-export function fileData(file: any) {
-  // From url
-  if (typeof file === 'string') {
-    return {
-      preview: file,
-      name: fileNameByUrl(file),
-      type: fileTypeByUrl(file),
-      size: undefined,
-      path: file,
-      lastModified: undefined,
-      lastModifiedDate: undefined,
-    };
-  }
+export function fileData(file: FileWithPath | FileData | string): FileData {
 
-  // From file
-  return {
-    name: file.name,
-    size: file.size,
-    path: file.path,
-    type: file.type,
-    preview: file.preview,
-    lastModified: file.lastModified,
-    lastModifiedDate: file.lastModifiedDate,
-  };
+	// From content
+	if (file && typeof file === 'object' && !('path' in file)) { 
+		return file;
+	}
+	
+	// From url
+	if (typeof file === 'string') {
+		return {
+			preview: file,
+			name: fileNameByUrl(file),
+			size: undefined,
+			lastModified: undefined,
+		};
+	}
+
+
+	const isImage = fileIsImage(fileTypeByUrl(file.name));
+	// From file
+	return {
+		name: file.name,
+		size: file.size,
+		preview: isImage ? URL.createObjectURL(file) : undefined,
+		lastModified: file.lastModified,
+	};
 }

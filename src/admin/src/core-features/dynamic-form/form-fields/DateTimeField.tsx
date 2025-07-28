@@ -107,7 +107,7 @@ interface FormFieldProps {
 }
 export function DateTimeFormField(props: FormFieldProps) {
     const formContext = useFormContext();
-    const controllerHandler = useLiteController({ name: props.name, control: formContext.control, disabled: props.disabled});
+    const controllerHandler = useLiteController({ name: props.name, disabled: props.disabled});
     useFormDynamicContext(props.name, { disabled: controllerHandler.disabled });
     
     if(props.hide){

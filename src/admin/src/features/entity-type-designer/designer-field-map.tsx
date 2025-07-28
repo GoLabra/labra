@@ -38,6 +38,7 @@ import { DesignerForm as booleanDesignerForm, schema as booleanSchema, schemaEff
 import { DesignerForm as jsonDesignerForm, schema as jsonSchema, schemaEffect as jsonSchemaEffect, toDefaultValue as jsonToDefaultValue } from "./designer-form/json-designer";
 import { DesignerForm as singleChoiceDesignerForm, schema as singleChoiceSchema, schemaEffect as singleChoiceSchemaEffect, toDefaultValue as singleChoiceToDefaultValue } from "./designer-form/single-select-designer";
 import { DesignerForm as multipleChoiceDesignerForm, schema as multipleChoiceSchema, schemaEffect as multipleChoiceSchemaEffect, toDefaultValue as multipleChoiceToDefaultValue } from "./designer-form/multiple-select-designer";
+import { DesignerForm as fileContentDesignerForm, schema as fileContentSchema, schemaEffect as fileContentEffect, toDefaultValue as fileContentToDefaultValue } from "./designer-form/file-content-designer";  
 import { DesignerForm as relationDesignerForm, schema as relationSchema, schemaEffect as relationEffect, toDefaultValue as relationToDefaultValue } from "./designer-form/relation-designer";
 
 import { ChangedFullEntity } from "@/types/entity";
@@ -50,6 +51,7 @@ export interface DesignerFormProps {
 
 export type ChildTypeDescriptor = {
     type: ApiFieldTypes;
+	alias: ApiFieldTypes;
     icon: JSX.Element;
     label: string;
     description?: string;
@@ -69,11 +71,13 @@ export type ChildTypeDescriptor = {
 
 export const designerFields: Array<ChildTypeDescriptor> = [{
     type: 'ID',
+	alias: 'ID',
     icon: <MdKey size={18} />,
     label: 'Text Short',
     description: 'Enter brief text',
 }, {
     type: 'ShortText',
+	alias: 'ShortText',
     icon: <MdShortText size={18} />,
     label: 'Text Short',
     description: 'Enter brief text',
@@ -84,6 +88,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: shortTextDesignerForm
 }, {
     type: 'LongText',
+	alias: 'LongText',
     icon: <LuText size={18} />,
     label: 'Text Long',
     description: 'Enter extended text',
@@ -94,6 +99,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: longTextDesignerForm
 }, {
     type: 'Email',
+	alias: 'Email',
     icon: <MdAlternateEmail size={18} />,
     label: 'Email',
     description: 'Input email address',
@@ -104,6 +110,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: emailDesignerForm
 }, {
     type: 'RichText',
+	alias: 'RichText',
     icon: <DocumentIcon />,
     label: 'Rich Text',
     description: 'Format text richly',
@@ -114,6 +121,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: rtfDesignerForm
 }, {
     type: 'Integer',
+	alias: 'Integer',
     icon: <NumbersIcon />,
     label: 'Number',
     description: 'Input numerical number',
@@ -124,6 +132,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: numberDesignerForm
 }, {
     type: 'Decimal',
+	alias: 'Decimal',
     icon: <NumbersIcon />,
     label: 'Decimal',
     description: 'Input decimal number',
@@ -134,6 +143,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: numberDesignerForm
 }, {
     type: 'Float',
+	alias: 'Float',
     icon: <NumbersIcon />,
     label: 'Float',
     description: 'Input floating number',
@@ -144,6 +154,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: numberDesignerForm
 }, {
     type: 'DateTime',
+	alias: 'DateTime',
     icon: <RiCalendarScheduleFill size={18} />,
     label: 'Date Time',
     description: 'Select date and time',
@@ -154,6 +165,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: dateTimeDesignerForm
 }, {
     type: 'Date',
+	alias: 'Date',
     icon: <RiCalendarFill size={18} />,
     label: 'Date',
     description: 'Select a date',
@@ -164,6 +176,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: dateDesignerForm
 }, {
     type: 'Time',
+	alias: 'Time',
     icon: <TbClockFilled size={18} />,
     label: 'Time',
     description: 'Select a time',
@@ -173,13 +186,19 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     toDefaultValue: timeToDefaultValue,
     formContent: timeDesignerForm
 }, {
-    type: 'media',
+    type: 'Relation',
+	alias: 'FileContent',
     icon: <PiMountainsFill size={18} />,
     label: 'Media',
     description: 'Upload image or video',
-    disabled: true
+	//----
+	schema: fileContentSchema,
+	schemaEffect: fileContentEffect,
+	toDefaultValue: fileContentToDefaultValue,
+	formContent: fileContentDesignerForm
 }, {
     type: 'Boolean',
+	alias: 'Boolean',
     icon: <SwitchIcon />,
     label: 'Boolean',
     description: 'Toggle true/false',
@@ -190,6 +209,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: booleanDesignerForm
 }, {
     type: 'Json',
+	alias: 'Json',
     icon: <BracesIcon />,
     label: 'JSON',
     description: 'Add JSON data',
@@ -200,6 +220,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: jsonDesignerForm
 }, {
     type: 'SingleChoice',
+	alias: 'SingleChoice',
     icon: <MdPlaylistAddCheck size={18} />,
     label: 'Single Choice',
     description: 'Choose an option',
@@ -210,6 +231,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: singleChoiceDesignerForm
 }, {
     type: 'MultipleChoice',
+	alias: 'MultipleChoice',
     icon: <MdOutlineChecklistRtl size={18} />,
     label: 'Multiple Choice',
     description: 'Choose an option',
@@ -220,6 +242,7 @@ export const designerFields: Array<ChildTypeDescriptor> = [{
     formContent: multipleChoiceDesignerForm
 }, {
     type: 'Relation',
+	alias: 'Relation',
     icon: <PiGraphFill size={18} />,
     label: 'Relation',
     description: 'Foreign key to another entity',
@@ -234,8 +257,26 @@ type DesignerFieldMap = {
     [key in ApiFieldTypes]: ChildTypeDescriptor;
 };
 
+export const getDescriptorByEntityChild = (child: Field | Edge) => {
+	const childType: ApiFieldTypes = 'type' in child ? child.type as ApiFieldTypes : 'Relation';
+
+	if(childType == 'Relation'){
+		const relatedEntityName = (child as Edge).relatedEntity.caption;
+		switch(relatedEntityName){
+			case 'File':
+				return designerFieldsMap.FileContent;
+			default: 
+				const field = designerFieldsMap[childType];
+				return field;		
+		}
+	}
+
+	const field = designerFieldsMap[childType];
+	return field;
+}
+
 export const designerFieldsMap: Record<ApiFieldTypes, ChildTypeDescriptor> = designerFields.reduce((map, field) => {
-    map[field.type] = field;
+    map[field.alias] = field;
     return map;
 }, {} as DesignerFieldMap);
 
@@ -245,10 +286,12 @@ export const designerFieldsMap: Record<ApiFieldTypes, ChildTypeDescriptor> = des
 
 export const getIconForEntityChild = (child: Field | Edge): ReactNode => {
 
-    const childType: ApiFieldTypes = 'type' in child ? child.type as ApiFieldTypes : 'Relation';
-    const field = designerFieldsMap[childType]
-    if (field) {
-        return field.icon;
+    // const childType: ApiFieldTypes = 'type' in child ? child.type as ApiFieldTypes : 'Relation';
+    // const field = designerFieldsMap[childType]
+
+	const descriptor = getDescriptorByEntityChild(child);
+    if (descriptor) {
+        return descriptor.icon;
     }
     return <PiSpiral size={18} />;
     //}
