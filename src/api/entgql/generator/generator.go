@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
@@ -37,6 +38,7 @@ type SchemaManager struct {
 	userSchemaRelativePath        string
 	adminSchemaRelativePath       string
 	userSchemaBackupRelativePath  string
+	schemaLogRelativePath         string
 	adminSchemaBackupRelativePath string
 }
 
@@ -50,6 +52,7 @@ func NewSchemaManager(fs FileSystem, schemaPath string, generateLocation string,
 		userSchemaRelativePath:        fmt.Sprintf("%s/_user/", schemaPath),
 		adminSchemaRelativePath:       fmt.Sprintf("%s/_admin/", schemaPath),
 		userSchemaBackupRelativePath:  fmt.Sprintf("%s/_user_backup/", schemaPath),
+		schemaLogRelativePath:         fmt.Sprintf("%s/_schema_logs/", schemaPath),
 		adminSchemaBackupRelativePath: fmt.Sprintf("%s/_admin_backup/", schemaPath),
 	}
 }
@@ -124,20 +127,29 @@ func (sm SchemaManager) Generate(ctx context.Context, entities []entity.Entity) 
 	sm.subscriptionClient.PublishAppStatusMessage(subscription.AppStatusGenerating)
 
 	go func() {
+		log.Print("Start generating schema")
+
 		err := sm.RunGenerateCommand()
 
 		if err != nil {
+			log.Printf("Error generating schema: %v", err)
 			sm.subscriptionClient.PublishAppStatusMessage(subscription.AppStatusReverting)
+
+			if err := sm.LogSchema(); err != nil {
+				log.Printf("Error logging schema: %v", err)
+			}
 
 			sm.RevertSchema()
 
 			err = sm.RunGenerateCommand()
 			if err != nil {
 				sm.subscriptionClient.PublishAppStatusMessage(subscription.AppStatusFatal)
-				panic("FATAL ERROR app is in an unrecoverable state") // TODO log fatal
+				log.Fatalf("Error generating schema after revert: %v", err)
 			}
+			log.Print("Schema reverted successfully")
 		}
 
+		log.Print("Schema generation completed")
 		// TODO fix ugly hack
 		sm.subscriptionClient.PublishAppStatusMessage(subscription.AppStatusRestarting)
 		time.Sleep(2 * time.Second)
@@ -188,6 +200,16 @@ func (sm SchemaManager) RevertSchema() error {
 	err = sm.fs.CopyDirectory(sm.adminSchemaBackupRelativePath, sm.adminSchemaRelativePath)
 	if err != nil {
 		return fmt.Errorf("[RevertSchema] error reverting admin schema: %w", err)
+	}
+
+	return nil
+}
+
+func (sm SchemaManager) LogSchema() error {
+	logFolderName := time.Now().Format("2006-01-02_15-04-05")
+	err := sm.fs.CopyDirectory(sm.userSchemaRelativePath, filepath.Join(sm.schemaLogRelativePath, logFolderName))
+	if err != nil {
+		return fmt.Errorf("[LogSchema] error copying schema: %w", err)
 	}
 
 	return nil

@@ -2,7 +2,12 @@ package repo
 
 import (
 	"app/ent"
+    {{- range $n := $.Nodes }}
+	{{- if eq $n.Annotations.Entity.Owner "User" }}
 	"app/interfaces/repo"
+	{{- break }}
+	{{- end }}
+    {{- end }}
 	"context"
 	"reflect"
 	"regexp"

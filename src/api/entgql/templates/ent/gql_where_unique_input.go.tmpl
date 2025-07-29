@@ -1,20 +1,22 @@
 package ent
 
 import (
-    "errors"
-
-	"app/ent/predicate"
-
+	{{- $nodesExist := false }}
     {{- range $n := $.Nodes}}
 	{{- if Ignore $n }}
 	{{- continue }}
 	{{- end }}
+	{{-  $nodesExist = true }}
 	{{- if ne $n.Annotations.Entity.Owner "User" }}
 	"github.com/GoLabra/labra/src/api/entgql/ent/{{$n.Name | ToLower}}"
 	{{- else }}
     "app/ent/{{$n.Name | ToLower}}"
 	{{- end}}
     {{- end}}
+	{{- if $nodesExist }}
+    "errors"
+	"app/ent/predicate"
+	{{- end }}
 )
 
 {{- range $n := $.Nodes}}

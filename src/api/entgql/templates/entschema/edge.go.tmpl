@@ -1,6 +1,6 @@
 {{- define "edge"}}
         edge.{{ if eq $.Edge.Ref "" }}To{{ else }}From{{end}}("{{$.Edge.EntName}}", {{$.Edge.Type}}.Type).
-            {{- if $.Edge.Required | IsTrue  }}
+            {{- if and ($.Edge.Required | IsTrue) (eq $.Edge.Ref "") }}
             Required().
             {{- end}}
             {{- if ne $.Edge.Ref "" }}
@@ -10,6 +10,7 @@
             Unique().
             {{- end }}
             Annotations(
+                entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Edge{
 					Caption:      "{{$.Edge.Caption}}",
                     RelationType: entity.RelationType{{$.Edge.RelationType.VariableName}},
@@ -26,6 +27,7 @@
             Unique().
             {{- end }}
 			Annotations(
+                entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Edge{
 					Caption:      "{{$.Ref.Caption}}",
                     RelationType: entity.RelationType{{$.Edge.RelationType.VariableName}},
