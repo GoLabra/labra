@@ -34,17 +34,20 @@ import HistoryIcon from "@mui/icons-material/History";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { useRelationDiff } from "../use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
+import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
+import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
+import { useLgQuery } from "@/hooks/use-lg-query";
 
-const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
-	roles(where: $where)  {
-		name
-		permissions {
-			id
-    		entity
-    		operation
-    	}
-  	}
-}`
+// const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
+// 	roles(where: $where)  {
+// 		name
+// 		permissions {
+// 			id
+//     		entity
+//     		operation
+//     	}
+//   	}
+// }`
 
 type PermissionItem = {
 	id: string;
@@ -172,24 +175,44 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	const formControllerHandler = useLiteController<PermissionItem[]>({ name: props.name });
 	const myDialogContext = useMyDialogContext();
 
-	const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
-		variables: {
-			where: {
-				id: myDialogContext.editId
-			}
-		},
-		fetchPolicy: 'network-only',
+	const query = useMemo(() => {
+		
+		if(!myDialogContext.editId){
+			return null;
+		}
+
+		return LGQuery.from<Role>('role')
+					.where(GplFilter.field('id', '', myDialogContext.editId))
+					.select('name')
+					.include('permissions', q => q.select('id', 'entity', 'operation'))
+
+	}, [myDialogContext.editId] );
+
+	const permission = useLgQuery<{ roles: Role[] }>({
+		query: query,
+		apiType: 'admin',
 		skip: myDialogContext.openMode === FormOpenMode.New
 	});
+
+	// const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
+	// 	variables: {
+	// 		where: {
+	// 			id: myDialogContext.editId
+	// 		}
+	// 	},
+	// 	fetchPolicy: 'network-only',
+	// 	skip: myDialogContext.openMode === FormOpenMode.New
+	// });
 
 
 	const saved = useMemo(() => {
 
-		if (!permissionRequest.data?.roles?.length) {
+		const result = query?.getResultData(permission.data);
+		if (!result) {
 			return [];
 		}
 
-		const savedValueItems = permissionRequest.data!.roles[0].permissions?.map((i: Permission): PermissionItem => ({
+		const savedValueItems = permission!.data?.roles[0].permissions?.map((i: Permission): PermissionItem => ({
 			id: i.id,
 			entityName: i.entity,
 			operation: i.operation,
@@ -197,7 +220,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 		}));
 
 		return savedValueItems ?? [];
-	}, [permissionRequest.data]);
+	}, [permission.data]);
 
 	const relationDiff = useRelationDiff<PermissionItem>({ saved, changedArray: formControllerHandler.value });
 
@@ -344,20 +367,30 @@ export const schema = z.object({
 			return val;
 		}
 
+		const connect = val.filter(i => i.status == 'connect');
+		const create = val.filter(i => i.status == 'create');
+		const remove = val.filter(i => i.status == 'delete');
+
 		return {
-			connect: val.filter(i => i.status == 'connect')
-				.map(i => ({
-					entity: i.entityName,
-					operation: i.operation
-				})),
-			create: val.filter(i => i.status == 'create')
-				.map(i => ({
-					entity: i.entityName,
-					operation: i.operation
-				})),
-			delete: val.filter(i => i.status == 'delete')
-				.filter(i => i.id)
-				.map(i => ({ id: i.id }))
+			...(connect.length && {
+				connect: connect
+					.map(i => ({
+						entity: i.entityName,
+						operation: i.operation
+					}))
+			}),
+			...(create.length && {
+				create: create
+					.map(i => ({
+						entity: i.entityName,
+						operation: i.operation
+					}))
+			}),
+			...(remove.length && {
+				delete: remove
+					.filter(i => i.id)
+					.map(i => ({ id: i.id }))
+			})
 		}
 	})
 });

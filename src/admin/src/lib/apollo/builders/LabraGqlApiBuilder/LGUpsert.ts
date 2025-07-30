@@ -1,5 +1,5 @@
 import { pascalCase } from "change-case";
-import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, Maybe, ObjectKeys, Unarray } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
@@ -31,10 +31,10 @@ export class LGUpsert<T extends EntityBaseType> implements ILGQuery {
 	};
 
 	public include<K extends keyof T>(
-		key: K extends keyof T ? T[K] extends object ? K : never : never,
-		builder: (query: LGSelectInclude<Unarray<T[ObjectKeys<T>]>>) => LGSelectInclude<Unarray<T[ObjectKeys<T>]>>
+		key: K extends keyof T ? T[K] extends Maybe<object> ? K : never : never,
+				builder: (query: LGSelectInclude<NonNullable<Unarray<T[ObjectKeys<T>]>>>) => LGSelectInclude<NonNullable<Unarray<T[ObjectKeys<T>]>>>
 	): LGUpsert<T> {
-		const nestedFields = builder(LGSelectInclude.from<Unarray<T[ObjectKeys<T>]>>(key as string));
+		const nestedFields = builder(LGSelectInclude.from<NonNullable<Unarray<T[ObjectKeys<T>]>>>(key as string));
 		return new LGUpsert(this._data, this._field, [...this._select, nestedFields]);
 	}
 

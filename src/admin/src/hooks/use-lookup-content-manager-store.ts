@@ -46,7 +46,7 @@ export const useLookupContentManagerStore = (props: UseLookupGridContentManagerS
 		}, query);
 
 		// add skip
-		query = query.skip(props.searchState.page * props.searchState.rowsPerPage);
+		query = query.skip((props.searchState.page - 1) * props.searchState.rowsPerPage);
 		// add first
 		query = query.first(props.searchState.rowsPerPage);
 		// add order

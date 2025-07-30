@@ -83,7 +83,11 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 
 	const connectionQuery = useMemo(() => {
 		if(!entityName){
-			return null!;
+			return null;
+		}
+
+		if(!dataQuery){
+			return null;
 		}
 
 		let query = LGQuery.fromConnection<any>(entityName)

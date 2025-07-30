@@ -6,14 +6,16 @@ import { useEffect, useMemo, useState } from "react";
 
 
 interface UseLgQueryParams {
-	apiType: ApiType;
-	query: Array<ILGQuery | null>;
+	query: Array<ILGQuery | null> | ILGQuery | null;
+	apiType?: ApiType;
 	skip?: boolean;
 }
-export const useLgQuery = (props: UseLgQueryParams) => {
+export const useLgQuery = <T>(props: UseLgQueryParams) => {
 
 	const gplQuery = useMemo(() => {
-		const notNullQuery = props.query.filter(i => !!i);
+
+		const query = Array.isArray(props.query) ? props.query : [props.query];
+		const notNullQuery = query.filter(i => !!i);
 
 		if(!notNullQuery.length){
 			return null;
@@ -28,7 +30,7 @@ export const useLgQuery = (props: UseLgQueryParams) => {
 	const context = props.apiType == 'admin' ? ADMIN_CONTEXT : {};
 
 	 // Use the hook
-	const data = useQuery( 
+	const data = useQuery<T>( 
 		gql(gplQuery?.query ?? `query { __typename }`), 
 		{
 			notifyOnNetworkStatusChange: true,
