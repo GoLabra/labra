@@ -17,15 +17,11 @@ import { z } from "zod";
 import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/TextShortField";
 import { BooleanFormComponent, BooleanFormField } from "@/core-features/dynamic-form/form-fields/BooleanField";
 import { SectionTitle } from "@/shared/components/section-title";
-import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import { Permission, Role } from "@/lib/apollo/graphql";
 import { EdgeStatus } from "@/lib/utils/edge-status";
 import { groupByMap } from "@/lib/utils/array";
-import { PiMathOperations } from "react-icons/pi";
 import { GenericEvent } from "@/lib/utils/event";
 import { useLiteController } from "@/core-features/dynamic-form/lite-controller";
-import { SavedSearch } from "@mui/icons-material";
-import { permission } from "node:process";
 import React from "react";
 import { MenuButton } from "@/shared/components/menu/menu-button";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -37,17 +33,6 @@ import { createId } from "@paralleldrive/cuid2";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { useLgQuery } from "@/hooks/use-lg-query";
-
-// const GET_ROLE_PERMISSION_QUERY = gql`query getRolePermissionQuery($where: RoleWhereInput) {
-// 	roles(where: $where)  {
-// 		name
-// 		permissions {
-// 			id
-//     		entity
-//     		operation
-//     	}
-//   	}
-// }`
 
 type PermissionItem = {
 	id: string;
@@ -184,7 +169,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 		return LGQuery.from<Role>('role')
 					.where(GplFilter.field('id', '', myDialogContext.editId))
 					.select('name')
-					.include('permissions', q => q.select('id', 'entity', 'operation'))
+					.include('permissions', q => q.select('id', 'entity', 'operation'));
 
 	}, [myDialogContext.editId] );
 
@@ -194,19 +179,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 		skip: myDialogContext.openMode === FormOpenMode.New
 	});
 
-	// const permissionRequest = useQuery<{ roles: Role[] }>(GET_ROLE_PERMISSION_QUERY, {
-	// 	variables: {
-	// 		where: {
-	// 			id: myDialogContext.editId
-	// 		}
-	// 	},
-	// 	fetchPolicy: 'network-only',
-	// 	skip: myDialogContext.openMode === FormOpenMode.New
-	// });
-
-
 	const saved = useMemo(() => {
-
 		const result = query?.getResultData(permission.data);
 		if (!result) {
 			return [];

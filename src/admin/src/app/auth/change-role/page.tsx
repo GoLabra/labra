@@ -17,6 +17,7 @@ import { PasswordFormField } from "@/core-features/dynamic-form/form-fields/Pass
 import { SelectFormField } from "@/core-features/dynamic-form/form-fields/SelectField";
 import { z } from "zod";
 import { Avatar } from "@/shared/components/avatar";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 
 
 const getMeRoles = gql`query getMeRoles($where:UserWhereInput!) {
@@ -38,7 +39,8 @@ export default function AuthPage() {
     const auth = useAuth<AuthContextType>();
     const accessToken = globalThis.localStorage.getItem(STORAGE_KEY);
     const roles = useQuery<any>(getMeRoles, { variables: { where: { email: getJwtSub(accessToken) } },
-                                            fetchPolicy: 'network-only' });
+                                            fetchPolicy: 'network-only',
+											context: ADMIN_CONTEXT });
 
     const router = useRouter();
     const searchParams = useSearchParams();
