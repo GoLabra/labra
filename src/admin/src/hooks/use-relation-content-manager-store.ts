@@ -139,7 +139,7 @@ export const useRelationContentManagerStore = <T = any>(props: UseRelationConten
 			});			
 		} 
 		return query;	
-	}, [rootEntity, edgeEntity, props.entryId, props.fields]);
+	}, [rootEntity, edgeEntity, props.entryId, props.edge.name, props.fields]);
 
 	const apiType = rootEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
 	const data = useLgQuery({
