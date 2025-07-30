@@ -1,7 +1,10 @@
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import { LGSelectInclude } from "../LGSelectInclude";
 
+
 export type Unarray<T> = T extends Array<infer U> ? U : T;
+export declare type Maybe<T> = null | undefined | T;
+
 
 export type FilterOperators =
 	| ''
@@ -18,12 +21,12 @@ export type FilterOperators =
 export type EntityBaseType = { id: string }
 
 export type ObjectKeys<T> = {
-    [K in keyof T]: T[K] extends object ? K : never
+    [K in keyof T]: T[K] extends Maybe<object> ? K : never
 }[keyof T];
 
-export type FieldRequest<T = any, K extends ObjectKeys<T> = ObjectKeys<T>> =
-	| keyof T
-	| LGSelectInclude<Unarray<T[K]>>;
+export type FieldRequest<T = any> =
+    | keyof T
+    | LGSelectInclude<any>;
 
 // Query Filter class
 export class GplFilter<T extends EntityBaseType> {

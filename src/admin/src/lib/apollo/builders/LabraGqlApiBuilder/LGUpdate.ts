@@ -1,5 +1,5 @@
 import { pascalCase } from "change-case";
-import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, ObjectKeys, Unarray } from "./types/types";
+import { EntityBaseType, FieldRequest, GplFilter, ILGQuery, Maybe, ObjectKeys, Unarray } from "./types/types";
 import { LGSelectInclude } from "./LGSelectInclude";
 import IQueryBuilderOptions from "gql-query-builder/build/IQueryBuilderOptions";
 import Fields from "gql-query-builder/build/Fields";
@@ -23,7 +23,8 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 	}
 
 	private isMany = () => {
-		return this._filter?.key == null || this._filter?.key == 'id';
+		const isSingle = this._filter?.key == 'id' && this._filter?.operator == ''; 
+		return isSingle == false;
 	}
 
 	public getOperationName = (): string => {
@@ -38,10 +39,10 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 	};
 
 	public include<K extends keyof T>(
-		key: K extends keyof T ? T[K] extends object ? K : never : never,
-		builder: (query: LGSelectInclude<Unarray<T[ObjectKeys<T>]>>) => LGSelectInclude<Unarray<T[ObjectKeys<T>]>>
+		key: K extends keyof T ? T[K] extends Maybe<object> ? K : never : never,
+				builder: (query: LGSelectInclude<NonNullable<Unarray<T[ObjectKeys<T>]>>>) => LGSelectInclude<NonNullable<Unarray<T[ObjectKeys<T>]>>>
 	): LGUpdate<T> {
-		const nestedFields = builder(LGSelectInclude.from<Unarray<T[ObjectKeys<T>]>>(key as string));
+		const nestedFields = builder(LGSelectInclude.from<NonNullable<Unarray<T[ObjectKeys<T>]>>>(key as string));
 		return new LGUpdate(this._data, this._field, [...this._select, nestedFields], this._filter);
 	}
 
@@ -79,7 +80,7 @@ export class LGUpdate<T extends EntityBaseType> implements ILGQuery {
 				where: {
 					type: whereType,
 					required: true,
-					value: this._filter
+					value: this._filter?.getExpression(),
 				},
 				 data: {
 					type: `Update${pascalCase(this._field!)}Input`,

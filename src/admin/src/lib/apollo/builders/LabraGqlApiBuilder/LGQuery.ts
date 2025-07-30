@@ -2,7 +2,7 @@ import * as gqlBuilder from 'gql-query-builder'
 import Fields from 'gql-query-builder/build/Fields';
 import IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions';
 import pluralize from "pluralize";
-import { EntityBaseType, FieldRequest, GplFilter, GplOrder, ILGQuery, ObjectKeys, Unarray } from './types/types';
+import { EntityBaseType, FieldRequest, GplFilter, GplOrder, ILGQuery, Maybe, ObjectKeys, Unarray } from './types/types';
 import { LGSelectInclude } from './LGSelectInclude';
 import { LGConnectionQuery } from './LGConnectionQuery';
 import { LGDelete } from './LGDelete';
@@ -37,10 +37,10 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	};
 
 	public include<K extends keyof T>(
-		key: K extends keyof T ? T[K] extends object ? K : never : never,
-		builder: (query: LGSelectInclude<Unarray<T[ObjectKeys<T>]>>) => LGSelectInclude<Unarray<T[ObjectKeys<T>]>>
+		key: K extends keyof T ? T[K] extends Maybe<object> ? K : never : never,
+		builder: (query: LGSelectInclude<NonNullable<Unarray<T[K]>>>) => LGSelectInclude<NonNullable<Unarray<T[K]>>>
 	): LGQuery<T> {
-		const nestedFields = builder(LGSelectInclude.from<Unarray<T[ObjectKeys<T>]>>(key as string));
+		const nestedFields = builder(LGSelectInclude.from<NonNullable<Unarray<T[K]>>>(key as string));
 		return new LGQuery(this._field, [...this._select, nestedFields], this._filter, this._order);
 	}
 
@@ -181,17 +181,28 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 
 type Permission = {
 	id: string;
-	name2: string;
+	name: string;
 	role: {
 		id: string;
-		name2dsdf: string;
+		name: string;
+	};
+};
+
+type Permission2 = {
+	id2: string;
+	name2: string;
+	role2: {
+		id2: string;
+		name2: string;
 	};
 };
 
 type User = {
 	id: string;
 	name: string;
-	permissions: Permission[];
+	permissions?: Maybe<Permission[]>;
+	permissions2: Maybe<Permission2[]>;
+	testProp: string;
 };
 
 // Example usage
@@ -209,8 +220,8 @@ const query = LGQuery.from<User>('user')
 	.orderByAscending('id')
 	.skip(0)
 	.first(10)
-	.include('permissions', q => q.select('id', 'name2')
-									.include('role', q => q.select('id', 'name2dsdf')
+	.include('permissions', q => q.select('id', 'name')
+									.include('role', q => q.select('id', 'name')
 								)
 			)
 	.select('id', 'name');

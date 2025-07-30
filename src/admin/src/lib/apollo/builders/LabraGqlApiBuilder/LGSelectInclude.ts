@@ -1,5 +1,5 @@
 import NestedField from "gql-query-builder/build/NestedField";
-import { FieldRequest, ObjectKeys, Unarray } from "./types/types";
+import { FieldRequest, Maybe, ObjectKeys, Unarray } from "./types/types";
 import Fields from "gql-query-builder/build/Fields";
 
 export class LGSelectInclude<T> {
@@ -20,10 +20,10 @@ export class LGSelectInclude<T> {
 	};
 
 	public include<K extends keyof T>(
-		key: K extends keyof T ? T[K] extends object ? K : never : never,
-		builder: (query: LGSelectInclude<Unarray<T[ObjectKeys<T>]>>) => LGSelectInclude<Unarray<T[ObjectKeys<T>]>>
+		key: K extends keyof T ? T[K] extends Maybe<object> ? K : never : never,
+				builder: (query: LGSelectInclude<NonNullable<Unarray<T[ObjectKeys<T>]>>>) => LGSelectInclude<NonNullable<Unarray<T[ObjectKeys<T>]>>>
 	): LGSelectInclude<T> {
-		const nestedFields = builder(LGSelectInclude.from<Unarray<T[ObjectKeys<T>]>>(key as string));
+		const nestedFields = builder(LGSelectInclude.from<NonNullable<Unarray<T[ObjectKeys<T>]>>>(key as string));
 		return new LGSelectInclude(this._field, [...this._select, nestedFields]);
 	}
 

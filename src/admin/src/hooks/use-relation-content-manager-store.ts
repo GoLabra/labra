@@ -39,6 +39,8 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 	});
 
 	const files = useMemo(() => {
+		console.log('edgeValueData.data', edgeValueData.data);
+
 		if(!edgeValueData.data){
 			return [];
 		}
@@ -119,9 +121,9 @@ export const useRelationContentManagerStore = <T = any>(props: UseRelationConten
 							.where(GplFilter.field('id', '', props.entryId));
 							
 		if(props.fields === 'iddisplay'){
-			query = query.include(edgeEntity!.name, q => q.select('id', edgeEntity!.displayField!.name));
+			query = query.include(props.edge.name, q => q.select('id', edgeEntity!.displayField!.name));
 		} else if (Array.isArray(props.fields) && props.fields.every(item => typeof item === 'string')) {
-			query = query.include(edgeEntity!.name, q => q.select(...props.fields));
+			query = query.include(props.edge.name, q => q.select(...props.fields));
 		} else if(props.fields === 'grid'){
 			
 			query = query.include(props.edge.name, q => {
@@ -137,7 +139,7 @@ export const useRelationContentManagerStore = <T = any>(props: UseRelationConten
 			});			
 		} 
 		return query;	
-	}, [rootEntity, edgeEntity, props.entryId, props.fields]);
+	}, [rootEntity, edgeEntity, props.entryId, props.edge.name, props.fields]);
 
 	const apiType = rootEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
 	const data = useLgQuery({
