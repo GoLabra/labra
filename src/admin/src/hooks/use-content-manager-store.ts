@@ -98,7 +98,7 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 		}, query);
 
 		return query;
-	}, [entityName]);
+	}, [entityName, dataQuery]);
 
 	const apiType = params.fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
 

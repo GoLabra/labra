@@ -71,7 +71,7 @@
     "i18next": "^24.2.3",
     "jwt-decode": "^4.0.0",
     "mosaic-data-table": "^0.0.52",
-	"lg-query": "^1.0.0",
+	"lg-query": "^1.0.1",
     "mui-tiptap": "^1.18.1",
     "next": "14.2.2",
     "notistack": "^3.0.2",
