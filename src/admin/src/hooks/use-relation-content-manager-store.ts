@@ -3,10 +3,8 @@ import { useFullEntity } from "./use-entities";
 import { useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
-import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { useLgQuery } from "./use-lg-query";
-import { LGSelectInclude } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGSelectInclude";
+import { GplFilter, LGQuery, LGSelectInclude } from "lg-query";
 
 const GET_FILES_CONTENT = gql`query files($or: [FileWhereInput!]) {
 	files(where: { or: $or }) {

@@ -6,9 +6,8 @@ import { addNotification } from "@/lib/notifications/store";
 import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { getFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
 import { useApolloClient } from "@apollo/client";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
-import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { RunQuery, useLgQuery } from "./use-lg-query";
+import { GplFilter, LGQuery } from "lg-query";
 
 interface UseGridContentManagerStoreparams {
 	fullEntity?: FullEntity;

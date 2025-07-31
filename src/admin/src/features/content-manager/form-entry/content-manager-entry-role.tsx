@@ -30,9 +30,8 @@ import HistoryIcon from "@mui/icons-material/History";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { useRelationDiff } from "../use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
-import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { useLgQuery } from "@/hooks/use-lg-query";
+import { GplFilter, LGQuery } from "lg-query";
 
 type PermissionItem = {
 	id: string;

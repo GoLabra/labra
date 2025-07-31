@@ -1,8 +1,8 @@
 import { useFullEntity } from "@/hooks/use-entities";
 import { ApiType } from "@/lib/apollo/apolloWrapper";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { EntityOwner } from "@/lib/apollo/graphql.entities";
 import { pascalCase } from "change-case";
+import { LGQuery } from "lg-query";
 import { useMemo } from "react";
 
 export const useEntityDataNewMutation = (entityName: string) => {

@@ -1,7 +1,6 @@
 import { ADMIN_CONTEXT, ApiType } from "@/lib/apollo/apolloWrapper";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
-import { ILGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { ApolloClient, gql, useApolloClient, useQuery } from "@apollo/client";
+import { ILGQuery, LGQuery } from "lg-query";
 import { useEffect, useMemo, useState } from "react";
 
 

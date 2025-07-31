@@ -6880,6 +6880,15 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
+lg-query@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/lg-query/-/lg-query-1.0.0.tgz#00d5cc29cfd59af0c90c87086b2218568cee7e80"
+  integrity sha512-a9MKPLZsSM264Wm9pTBiS+n3oSlIwTCE/ongNE6AEU8ZIULk78aRNc9MQzxPjb03gBCZz8+jf6TaQS7v+GE1Fg==
+  dependencies:
+    change-case "^5.4.4"
+    gql-query-builder "^3.8.0"
+    pluralize "^8.0.0"
+
 lie@3.1.1:
   version "3.1.1"
   resolved "https://registry.npmjs.org/lie/-/lie-3.1.1.tgz"

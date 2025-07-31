@@ -3,9 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FullEntity } from "@/types/entity";
 import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { useApolloClient } from "@apollo/client";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
-import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { RunQuery } from "./use-lg-query";
+import { GplFilter, LGQuery } from "lg-query";
 
 interface UseLookupGridContentManagerStoreParams {
 	fullEntity: FullEntity | null;
