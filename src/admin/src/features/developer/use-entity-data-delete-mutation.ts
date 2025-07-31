@@ -1,4 +1,5 @@
 import { useFullEntity } from "@/hooks/use-entities";
+import { ApiType } from "@/lib/apollo/apolloWrapper";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { EntityOwner } from "@/lib/apollo/graphql.entities";
@@ -17,8 +18,8 @@ export const useEntityDataDeleteMutation = (entityName: string) => {
     return useMemo(() => ({
 		...query,
 		lgQuery: getEntityDataDeleteMutationLGQuery(entityName),
-		apiType:fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user'
-	}), [query]);
+		apiType: fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user' as ApiType
+	}), [query, entityName, fullEntity?.owner]);
 }
 
 export const getEntityDataDeleteMutationQuery = (entityName: string) => {

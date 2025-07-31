@@ -1,4 +1,4 @@
-import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
+import { ADMIN_CONTEXT, ApiType } from "@/lib/apollo/apolloWrapper";
 import { useMemo } from "react";
 
 
@@ -63,6 +63,6 @@ export const useEntitySchema = (entityName: string | null) => {
     return useMemo(() => ({
         query: entitySchemaQuery,
         variables,
-        context: ADMIN_CONTEXT
+        apiType: 'admin' as ApiType
     }), []);
 }

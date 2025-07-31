@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from 'react';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { gql, useApolloClient } from '@apollo/client';
 import { GRAPHQL_ADMIN_PLAYGROUND_URL, GRAPHQL_QUERY_PLAYGROUND_URL } from '@/config/CONST';
-import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
+import { ADMIN_CONTEXT, ApiType } from '@/lib/apollo/apolloWrapper';
 
 const Chip = styled(MuiChip)(({ theme }) => ({
     borderRadius: '3px',
@@ -16,7 +16,7 @@ export interface ShowGraphQlQueryProps {
     query: string;
     variables: Record<string, any> | null | undefined;
 	lqQuery?: string;
-    context: any | null;
+    apiType: ApiType;
 }
 export const ShowGraphQlQuery: React.FC<ShowGraphQlQueryProps> = (props: ShowGraphQlQueryProps) => {
 
@@ -27,27 +27,36 @@ export const ShowGraphQlQuery: React.FC<ShowGraphQlQueryProps> = (props: ShowGra
 
     const [result, setResult] = useState<any>(null);
 
+	const context = props.apiType == 'admin' ? ADMIN_CONTEXT : {};
+
     const runQuery = useCallback(() => {
-        client.query({ query: gql(query), variables: props.variables ?? {}, fetchPolicy: "network-only", context: props.context }).then((response) => {
+        client.query({ query: gql(query), variables: props.variables ?? {}, fetchPolicy: "network-only", context: context }).then((response) => {
             setResult(response);
         }).catch((error) => {
             setResult(error);
         });
 
-    }, [client, query, variables, props.context]);
+    }, [client, query, variables, context]);
 
     const runQueryInPlayground = useCallback(() => {
-        const playgroundUrl = props.context ? GRAPHQL_ADMIN_PLAYGROUND_URL : GRAPHQL_QUERY_PLAYGROUND_URL;
+        const playgroundUrl = props.apiType == 'admin' ? GRAPHQL_ADMIN_PLAYGROUND_URL : GRAPHQL_QUERY_PLAYGROUND_URL;
         window.open(`${playgroundUrl!}?q=${encodeURIComponent(query)}&v=${encodeURIComponent(variables ?? '{}')}`, '_blank');
-    }, [query, variables, props.context]);
+    }, [query, variables, context]);
 
+	const api = props.apiType == 'admin' ? 'ADMIN API' : 'USER API';
     return (<>
 
         <Card>
-            <CardHeader title={props.title} />
+            <CardHeader title={
+				<Stack direction="row" justifyContent="space-between" alignItems="center">
+					{props.title}
+
+					<Chip label={api} color="warning" variant="outlined" size="small" />
+				</Stack>
+
+			} />
             <Divider />
             <CardContent>
-
                 <Stack direction="row" width={1} justifyContent="space-between">
                     <Chip label="QUERY" color="success" variant="outlined" size="small" />
                     <Button variant="outlined" onClick={() => copy(query)}>

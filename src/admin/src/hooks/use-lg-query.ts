@@ -1,4 +1,4 @@
-import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
+import { ADMIN_CONTEXT, ApiType } from "@/lib/apollo/apolloWrapper";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { ILGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { ApolloClient, gql, useApolloClient, useQuery } from "@apollo/client";
@@ -43,10 +43,6 @@ export const useLgQuery = <T>(props: UseLgQueryParams) => {
 
 	return data;
 }
-
-
-
-export type ApiType = 'admin' | 'user';
 
 export const RunQuery = (client: ApolloClient<object>, apiType: ApiType, ...query: Array<ILGQuery | null>):Promise<any> => { 
 	const promise = new Promise((resolve, reject) => {

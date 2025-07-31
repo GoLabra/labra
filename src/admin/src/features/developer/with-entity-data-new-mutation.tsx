@@ -19,7 +19,7 @@ export const WithEntityDataNewMutation = (Component: ComponentType<ShowGraphQlQu
                 query={query.query}
                 variables={query.variables}
 				lqQuery={query.lgQuery}
-                context={query.apiType == 'admin' ? ADMIN_CONTEXT : null}
+				apiType={query.apiType}
             />
         )
     };

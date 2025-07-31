@@ -1,4 +1,5 @@
 import { useFullEntity } from "@/hooks/use-entities";
+import { ApiType } from "@/lib/apollo/apolloWrapper";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { EntityOwner } from "@/lib/apollo/graphql.entities";
 import { FullEntity } from "@/types/entity";
@@ -28,8 +29,8 @@ export const useEntityData = (entityName: string) => {
     return useMemo(() => ({
 		...query,
 		lgQuery: lgQuery,
-		apiType:fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user'
-	}), [query]);
+		apiType: fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user' as ApiType
+	}), [query, entityName, fullEntity?.owner]);
 }
 
 export const getEntityDataQuery = (fullEntity: FullEntity) => {
@@ -60,9 +61,6 @@ export const getEntityDataLGQuery = (fullEntity: FullEntity): string => {
 		query += `
 	.include('${edge.name}', q => q.select('id', '${edge.relatedEntity.displayField.name}'))`;
 	}
-	// query = fullEntity.edges.reduce((query: LGQuery<any>, edge) => {
-	// 	return query.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
-	// }, query)
 
 	return query;
 }
