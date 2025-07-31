@@ -22,7 +22,7 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 
 	const fields = useMemo(() => params.fullEntity?.fields.map(i => i.name), [params.fullEntity?.fields]);
 	const edges = useMemo(() => params.fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
-													.filter(i => i.relationType !== 'ManyToOne')
+													.filter(i => i.relationType !== 'OneToMany')
 													.filter(i => i.relationType !== 'Many'), [params.fullEntity?.edges]);
 
 	const dataQuery = useMemo(() => {

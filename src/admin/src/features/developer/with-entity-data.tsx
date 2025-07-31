@@ -1,6 +1,7 @@
 import { ComponentType, FC } from "react";
 import { ShowGraphQlQueryProps } from "./show-graph-ql-query";
 import { useEntityData } from "./use-entity-data";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 
 export const WithEntityData = (Component: ComponentType<ShowGraphQlQueryProps>) => {
 
@@ -8,7 +9,7 @@ export const WithEntityData = (Component: ComponentType<ShowGraphQlQueryProps>) 
 
         var query = useEntityData(entityName);
 
-        if (!query) {
+        if (!query?.query) {
             return null;
         }
 
@@ -17,7 +18,8 @@ export const WithEntityData = (Component: ComponentType<ShowGraphQlQueryProps>) 
                 title="Get Entries"
                 query={query.query}
                 variables={query.variables}
-                context={null}
+				lqQuery={query.lgQuery}
+                context={query.apiType == 'admin' ? ADMIN_CONTEXT : null}
             />
         )
     };

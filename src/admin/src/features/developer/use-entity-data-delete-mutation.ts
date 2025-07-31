@@ -1,16 +1,24 @@
 import { useFullEntity } from "@/hooks/use-entities";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
 import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
+import { EntityOwner } from "@/lib/apollo/graphql.entities";
+import { pascalCase } from "change-case";
 import { useMemo } from "react";
 
 
 export const useEntityDataDeleteMutation = (entityName: string) => {
 
+	const fullEntity = useFullEntity({ entityName });
+
     var query = useMemo(() => {
         return getEntityDataDeleteMutationQuery(entityName);
     }, [entityName]);
 
-    return query;
+    return useMemo(() => ({
+		...query,
+		lgQuery: getEntityDataDeleteMutationLGQuery(entityName),
+		apiType:fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user'
+	}), [query]);
 }
 
 export const getEntityDataDeleteMutationQuery = (entityName: string) => {
@@ -19,4 +27,11 @@ export const getEntityDataDeleteMutationQuery = (entityName: string) => {
 		.where(GplFilter.field('id', '', '123'))
 		.select('id')
 		.build();
+}
+
+export const getEntityDataDeleteMutationLGQuery = (entityName: string) => {
+
+	return `LGQuery.deleteFrom<${pascalCase(entityName)}>('${entityName}')
+	.where(GplFilter.field('id', '', '123'))
+	.select('id')`;
 }

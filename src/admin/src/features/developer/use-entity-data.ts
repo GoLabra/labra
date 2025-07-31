@@ -1,6 +1,8 @@
 import { useFullEntity } from "@/hooks/use-entities";
 import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
+import { EntityOwner } from "@/lib/apollo/graphql.entities";
 import { FullEntity } from "@/types/entity";
+import { pascalCase } from "change-case";
 import { useMemo } from "react";
 
 export const useEntityData = (entityName: string) => {
@@ -15,7 +17,19 @@ export const useEntityData = (entityName: string) => {
         return getEntityDataQuery(fullEntity);
     }, [fullEntity]);
 
-    return query;
+	var lgQuery = useMemo(() => {
+        if (!fullEntity || fullEntity.loading) {
+            return;
+        }
+
+        return getEntityDataLGQuery(fullEntity);
+    }, [fullEntity]);
+
+    return useMemo(() => ({
+		...query,
+		lgQuery: lgQuery,
+		apiType:fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user'
+	}), [query]);
 }
 
 export const getEntityDataQuery = (fullEntity: FullEntity) => {
@@ -31,19 +45,24 @@ export const getEntityDataQuery = (fullEntity: FullEntity) => {
 	}, query)
 	
 	return query.build();
+}
 
+export const getEntityDataLGQuery = (fullEntity: FullEntity): string => {
 
-    // return new GqlDataQueryBuilder()
-    //     .addEntityName(fullEntity.name)
-    //     .setPagination(1, 10)
-    //     .setOrder(fullEntity.displayField!.name, 'asc')
-    //     .addFields(fullEntity.fields.map(i => i.name))
-    //     .addEdges(fullEntity.edges.map(i => ({
-    //         name: i.name,
-    //         fields: ['id', i.relatedEntity.displayField.name],
-    //     })))
-    //     //.addAdvancedFilters(searchState.advancedFilters)
-    //     // .addAdvancedFilters(getAdvancedFiltersFromGridFilter(searchState.filter, fields))
-    //     // .addOrAdvancedFilters(getAdvancedFiltersFromQuery(searchState.query, fields))
-    //     .build();
+	let query = `LGQuery.from<${pascalCase(fullEntity.name)}>('${fullEntity.name}')
+	.skip(0)
+	.first(10)
+	.orderByAscending('${fullEntity.displayField!.name}')
+	.select(${fullEntity.fields.map(i => `'${i.name}'`).join(', ')})`;
+	// select edges
+
+	for(var edge of fullEntity.edges){
+		query += `
+	.include('${edge.name}', q => q.select('id', '${edge.relatedEntity.displayField.name}'))`;
+	}
+	// query = fullEntity.edges.reduce((query: LGQuery<any>, edge) => {
+	// 	return query.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
+	// }, query)
+
+	return query;
 }

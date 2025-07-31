@@ -1,6 +1,7 @@
 import { ComponentType, FC } from "react";
 import { ShowGraphQlQueryProps } from "./show-graph-ql-query";
 import { useEntityDataNewMutation } from "./use-entity-data-new-mutation";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 
 export const WithEntityDataNewMutation = (Component: ComponentType<ShowGraphQlQueryProps>) => {
 
@@ -17,7 +18,8 @@ export const WithEntityDataNewMutation = (Component: ComponentType<ShowGraphQlQu
                 title="Create new Entry"
                 query={query.query}
                 variables={query.variables}
-                context={null}
+				lqQuery={query.lgQuery}
+                context={query.apiType == 'admin' ? ADMIN_CONTEXT : null}
             />
         )
     };

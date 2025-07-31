@@ -682,8 +682,8 @@ const getFormEdge = (entityName: string, edge: Edge): FieldDetails => {
 	switch (edge.relationType) {
 		case RelationType.One:
 		case RelationType.OneToOne:
-		case RelationType.OneToMany:
-
+		case RelationType.ManyToOne:
+		
 			if (isFile) {
 				return getUploadOneFile(entityName, edge);
 			}
@@ -691,7 +691,7 @@ const getFormEdge = (entityName: string, edge: Edge): FieldDetails => {
 			return getRelationOne(entityName, edge);
 
 		case RelationType.Many:
-		case RelationType.ManyToOne:
+		case RelationType.OneToMany:
 		case RelationType.ManyToMany:
 
 			if (isFile) {

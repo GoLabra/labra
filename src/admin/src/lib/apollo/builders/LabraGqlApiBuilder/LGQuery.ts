@@ -33,7 +33,7 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 	}
 
 	public select = (...fields: FieldRequest<T>[]) => {
-		return new LGQuery<T>(this._field, [...this._select, ...fields], this._filter, this._order);
+		return new LGQuery<T>(this._field, [...this._select, ...fields], this._filter, this._order, this._skip, this._first, this._last);
 	};
 
 	public include<K extends keyof T>(
@@ -41,12 +41,12 @@ export class LGQuery<T extends EntityBaseType>  implements ILGQuery {
 		builder: (query: LGSelectInclude<NonNullable<Unarray<T[K]>>>) => LGSelectInclude<NonNullable<Unarray<T[K]>>>
 	): LGQuery<T> {
 		const nestedFields = builder(LGSelectInclude.from<NonNullable<Unarray<T[K]>>>(key as string));
-		return new LGQuery(this._field, [...this._select, nestedFields], this._filter, this._order);
+		return new LGQuery(this._field, [...this._select, nestedFields], this._filter, this._order, this._skip, this._first, this._last);
 	}
 
 	public where = (filter: GplFilter<T>) => {
 		const whereInput = !!this._filter ? GplFilter.and(this._filter, filter) : filter
-		return new LGQuery<T>(this._field, this._select, whereInput);
+		return new LGQuery<T>(this._field, this._select, whereInput, this._order, this._skip, this._first, this._last);
 	};
 
 	public orderByAscending = (field: keyof T) => {		

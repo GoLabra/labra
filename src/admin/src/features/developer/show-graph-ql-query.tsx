@@ -14,7 +14,8 @@ const Chip = styled(MuiChip)(({ theme }) => ({
 export interface ShowGraphQlQueryProps {
     title: string
     query: string;
-    variables: Record<string, any> | null;
+    variables: Record<string, any> | null | undefined;
+	lqQuery?: string;
     context: any | null;
 }
 export const ShowGraphQlQuery: React.FC<ShowGraphQlQueryProps> = (props: ShowGraphQlQueryProps) => {
@@ -60,20 +61,41 @@ export const ShowGraphQlQuery: React.FC<ShowGraphQlQueryProps> = (props: ShowGra
             </CardContent>
             <Divider />
             
-            {props.variables && (<CardContent>
-                <Stack direction="row" width={1} justifyContent="space-between">
-                    <Chip label="VARIABLES" color="success" variant="outlined" size="small" />
-                    <Button variant="outlined" onClick={() => copy(variables!)}>
-                        <ContentCopyIcon fontSize='small' />
-                    </Button>
-                </Stack>
+            {props.variables && (<>
+				<CardContent>
+					<Stack direction="row" width={1} justifyContent="space-between">
+						<Chip label="VARIABLES" color="success" variant="outlined" size="small" />
+						<Button variant="outlined" onClick={() => copy(variables!)}>
+							<ContentCopyIcon fontSize='small' />
+						</Button>
+					</Stack>
 
-                <Box component="pre" sx={{ whiteSpace: 'pre-wrap', maxHeight: '200px', overflow: 'auto' }}>
-                    {variables}
-                </Box>
-            </CardContent>)}
+					<Box component="pre" sx={{ whiteSpace: 'pre-wrap', maxHeight: '200px', overflow: 'auto' }}>
+						{variables}
+					</Box>
+				</CardContent>
+				
+				<Divider />
+			</>)}
 
-            <Divider />
+			{props.lqQuery && (<>
+				<CardContent>
+					<Stack direction="row" width={1} justifyContent="space-between">
+						<Chip label="LGQuery LIBRARY" color="success" variant="outlined" size="small" />
+						<Button variant="outlined" onClick={() => copy(variables!)}>
+							<ContentCopyIcon fontSize='small' />
+						</Button>
+					</Stack>
+
+					<Box component="pre" sx={{ whiteSpace: 'pre-wrap', maxHeight: '200px', overflow: 'auto' }}>
+						{props.lqQuery}
+					</Box>
+				</CardContent>
+				
+				<Divider />
+			</>)}
+
+            
             <CardContent>
                 <Stack direction="row" width={1} justifyContent="space-between"> 
                     <Box>

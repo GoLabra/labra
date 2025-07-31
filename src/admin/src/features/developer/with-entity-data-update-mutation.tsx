@@ -1,6 +1,7 @@
 import { ComponentType, FC } from "react";
 import { ShowGraphQlQueryProps } from "./show-graph-ql-query";
 import { useEntityDataUpdateMutation } from "./use-entity-data-update-mutation";
+import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 
 export const WithEntityDataUpdateMutation = (Component: ComponentType<ShowGraphQlQueryProps>) => {
 
@@ -17,7 +18,8 @@ export const WithEntityDataUpdateMutation = (Component: ComponentType<ShowGraphQ
                 title="Update Entry"
                 query={query.query}
                 variables={query.variables}
-                context={null}
+				lqQuery={query.lgQuery}
+                context={query.apiType == 'admin' ? ADMIN_CONTEXT : null}
             />
         )
     };
