@@ -3,7 +3,7 @@ import type { AdvanedFilterOperator } from '../../core-features/dynamic-filter/f
 //STRING
 export const eqStringOperator: AdvanedFilterOperator = {
     label: 'Equal (case sensitive)',
-    name: '_', // no suffix
+    name: '', // no suffix
     field: 'string'
 };
 
@@ -25,29 +25,29 @@ export const containsFoldOperator: AdvanedFilterOperator = {
     field: 'string'
 };
 
-export const containsOperator: AdvanedFilterOperator = {
-    label: 'Contains (case sensitive)',
-    name: 'Contains',
-    field: 'string'
-};
+// export const containsOperator: AdvanedFilterOperator = {
+//     label: 'Contains (case sensitive)',
+//     name: 'Contains',
+//     field: 'string'
+// };
 
-export const hasPrefixOperator: AdvanedFilterOperator = {
-    label: 'Starts with',
-    name: 'HasPrefix',
-    field: 'string'
-};
+// export const hasPrefixOperator: AdvanedFilterOperator = {
+//     label: 'Starts with',
+//     name: 'HasPrefix',
+//     field: 'string'
+// };
 
-export const hasSufixOperator: AdvanedFilterOperator = {
-    label: 'Ends with',
-    name: 'HasSufix',
-    field: 'string'
-};
+// export const hasSufixOperator: AdvanedFilterOperator = {
+//     label: 'Ends with',
+//     name: 'HasSufix',
+//     field: 'string'
+// };
 
 
 //NUMBER
 export const eqNumberOperator: AdvanedFilterOperator = {
     label: 'Equal',
-    name: '_', // no suffix
+    name: '', // no suffix
     field: 'number'
 };
 
@@ -86,7 +86,7 @@ export const lessThanOrEqualNumberOperator: AdvanedFilterOperator = {
 // BOOLEAN
 export const eqBooleanOperator: AdvanedFilterOperator = {
     label: 'Equal',
-    name: '_', // no suffix
+    name: '', // no suffix
     field: 'boolean'
 };
 

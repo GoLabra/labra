@@ -10,7 +10,6 @@ import { Box, Button, IconButton, Link, ListItemIcon, MenuItem, Stack, styled, T
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import { useRouter } from "next/navigation";
 import { Edge } from "@/lib/apollo/graphql.entities";
-import { getAdvancedFiltersFromGridFilter } from "@/lib/utils/get-advanced-filters-from-grid-filters";
 import { ArrowRoot, RoundPanelPlaceholder } from "./style";
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';

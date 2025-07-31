@@ -32,6 +32,7 @@ import { useRelationDiff } from "../use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
 import { useLgQuery } from "@/hooks/use-lg-query";
 import { GplFilter, LGQuery } from "lg-query";
+import { Key, ShortcutView } from "@/shared/components/key-handler";
 
 type PermissionItem = {
 	id: string;
@@ -445,7 +446,10 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 						color="primary"
 						variant="contained"
 						onClick={formMethods.handleSubmit(onSave)}
-					>Save</Button>
+					>
+						Save
+						<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
+					</Button>
 				</Stack>
 			</DynamicDialogFooter>
 		</>

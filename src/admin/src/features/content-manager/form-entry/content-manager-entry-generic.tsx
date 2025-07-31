@@ -13,6 +13,7 @@ import { DialogContent, Stack, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useContentManagerFormSchema } from "../use-content-manager-form-schema";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
+import { Key, ShortcutView } from "@/shared/components/key-handler";
 
 export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, ContentManagerEntryDialogContentProps>((props, ref) => {
 
@@ -116,7 +117,10 @@ export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, Cont
 						color="primary"
 						variant="contained"
 						onClick={formMethods.handleSubmit(onSave)}
-					>Save</Button>
+					>
+						Save
+						<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
+					</Button>
 				</Stack>
 			</DynamicDialogFooter>
 		</>

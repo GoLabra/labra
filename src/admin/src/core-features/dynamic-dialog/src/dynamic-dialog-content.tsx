@@ -16,7 +16,7 @@ export const DynamicDialogContent = (props: DynamicDialogContentProps) => {
     const dynaicDialogContext = useDynamicDialogContext();
     const ContentFC = useMemo(() => props.dialog.contentFC, [props.dialog]);
     const contentRef = useRef<ChainDialogContentRef>();
-    const keyHandler = useKeyHandler({ keyToHandle: Key.Enter, modifiers:["ctrl"], onPressed: (e) => contentRef.current?.enterPressed?.(e) });
+    const keyHandler = useKeyHandler({ keyToHandle: Key.Enter, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => contentRef.current?.enterPressed?.(e) });
     const mdDown = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
     const dialogStyle = useMemo(() => {

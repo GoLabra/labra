@@ -6,7 +6,6 @@ import ChecklistIcon from '@mui/icons-material/Checklist';
 import CachedIcon from '@mui/icons-material/Cached';
 import { Button, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, SvgIcon, Tooltip } from '@mui/material';
 import { FieldScalarTypes } from '@/types/field-type-descriptor';
-import { AdvancedFilter as AdvancedFilter } from '@/core-features/dynamic-filter/filter';
 import { MenuButton } from '@/shared/components/menu/menu-button';
 import { MenuItemSelect } from '@/shared/components/menu/menu-item-select';
 import { BulkActionsMenu } from '@/shared/components/bulk-actions-menu';
@@ -31,10 +30,6 @@ interface OrdersSearchProps {
     disabled?: boolean;
     onRefresh?: () => void;
 
-    filters?: AdvancedFilter[];
-    onAdvancedFiltersApply?: (filters: AdvancedFilter[]) => void;
-    onAdvancedFiltersClear?: () => void;
-
     onQueryChange?: (query: string) => void;
     query?: string;
     selected?: string[];
@@ -53,7 +48,7 @@ interface OrdersSearchProps {
 }
 export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
-    const { headCells, disabled = false, filters = [], onQueryChange, query = '', selected = [], onBulkDelete } = props;
+    const { headCells, disabled = false, onQueryChange, query = '', selected = [], onBulkDelete } = props;
     const hasSelection = selected.length > 0;
 
     return (
@@ -213,9 +208,6 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
 ContentManagerSearch.propTypes = {
     disabled: PropTypes.bool,
-    filters: PropTypes.array,
-    onFiltersApply: PropTypes.func,
-    onFiltersClear: PropTypes.func,
     onQueryChange: PropTypes.func,
     query: PropTypes.string,
     selected: PropTypes.array

@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from 'zod';
 import { ChildTypeDescriptor, designerFieldsMap } from "./designer-field-map";
 import { useSchemaEffectEntityParams } from "./use-designer-system-validation";
+import { Key, ShortcutView } from "@/shared/components/key-handler";
 
 interface EntityTypeDesignerNewFieldPropsDialogProps {
     entityName: string;
@@ -79,7 +80,7 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
     }, [myDialogContext.addPopupAsFirst]);
 
     useImperativeHandle(ref, () => ({
-        enterPressed: (e: React.KeyboardEvent<HTMLDivElement>) => {
+        enterPressed: (e: React.KeyboardEvent<HTMLElement>) => {
             formMethods.handleSubmit(onSetResult)(e);
         }
     }));
@@ -135,6 +136,7 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
                         variant="contained"
                         onClick={formMethods.handleSubmit(onSetResult)}>
                         Save
+						<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
                     </Button>
                 </Stack>
             </DynamicDialogFooter>

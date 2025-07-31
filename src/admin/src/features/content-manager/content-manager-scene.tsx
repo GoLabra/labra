@@ -166,9 +166,6 @@ export const ContentManagerScene = () => {
                     headCells={headCells}
                     disabled={false}
                     onRefresh={contentManager.contentManagerStore.refresh}
-                    filters={contentManager.contentManagerSearch.state.advancedFilters}
-                    onFiltersApply={contentManager.contentManagerSearch.handleAdvancedFiltersApply}
-                    onFiltersClear={contentManager.contentManagerSearch.handleAdvancedFiltersClear}
                     onBulkDelete={() => bulkDeleteConfirmationDialog.handleOpen()}
                     onQueryChange={contentManager.contentManagerSearch.handleQueryChange}
                     query={contentManager.contentManagerSearch.state.query}

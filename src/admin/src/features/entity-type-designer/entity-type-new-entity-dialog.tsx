@@ -16,6 +16,7 @@ import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/Tex
 import pluralize from "pluralize";
 import { ENTITY_SYSTEM_KEYWORDS } from "@/config/CONST";
 import { useEntitiesDesigner } from "./use-designer-entities";
+import { Key, ShortcutView } from "@/shared/components/key-handler";
 
 export const getSchema = (entitiesDesigner: ReturnType<typeof useEntitiesDesigner>, editId?: string) =>
     z.object({
@@ -114,7 +115,10 @@ export const EntityTypeNewEntityDialog = forwardRef<ChainDialogContentRef, Entit
                 color="primary"
                 variant="contained"
                 onClick={formMethods.handleSubmit(onFinish)}
-            >Save</Button>
+            >
+				Save
+				<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
+			</Button>
         </DynamicDialogFooter>
     </>)
 });
