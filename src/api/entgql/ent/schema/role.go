@@ -121,7 +121,7 @@ func (Role) Edges() []ent.Edge {
 			Annotations(
 				annotations.Edge{
 					Caption:      "Permissions",
-					RelationType: entity.RelationTypeM2O,
+					RelationType: entity.RelationTypeO2M,
 				},
 			),
 	}
