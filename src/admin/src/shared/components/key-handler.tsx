@@ -1,5 +1,5 @@
 import React, { ComponentType, forwardRef, MouseEventHandler, MutableRefObject, PropsWithChildren, Ref, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, BoxProps, Button, SxProps, Theme } from '@mui/material';
 import EnterIcon from '@/assets/icons/labra/enter';
 
 
@@ -13,6 +13,7 @@ export enum Key {
 	ArrowRight = 'ArrowRight',
 	n = 'n',
 	s = 's',
+	slash = '/',
 	// Add more keys as needed
 }
 
@@ -49,7 +50,7 @@ export const useKeyHandler = (props: KeyHandlerProps) => {
 			return;
 		}
 
-		e.shortcutBubbleCancelled = props.cancelledShortcutBubble;
+		e.shortcutBubbleCancelled = propRef.current.cancelledShortcutBubble;
 
 		const target = e.target as HTMLElement;
 		const isEditable =
@@ -176,7 +177,7 @@ function withShortcut<T>(
         target: shortcutTarget ?? 'global',
 		disabled: disabled,
         forceInEditable: shortcutForceInEditable,
-        cancelledShortcutBubble: true,
+        cancelledShortcutBubble: false,
         onTriggered: () => onClick?.()
       });
 
@@ -190,6 +191,9 @@ function withShortcut<T>(
             <ShortcutView
               keyToHandle={shortcutKey}
               modifiers={shortcutModifiers}
+			  sx={{
+				marginLeft: '10px',
+			  }}
             />
           </>
         </WrappedComponent>
@@ -207,6 +211,7 @@ function withShortcut<T>(
 interface ShortcutViewProps {
 	keyToHandle: Key;
 	modifiers?: Modifier | Modifier[];
+	sx?: SxProps<Theme>;
 }
 export const ShortcutView = (props: ShortcutViewProps) => {
 
@@ -225,7 +230,7 @@ export const ShortcutView = (props: ShortcutViewProps) => {
 				display: 'inline-block',
 				padding: '0 5px',
 				border: `1px solid color-mix(in srgb, var(--mui-palette-common-onBackground) 10%, #00000000 90%)`,
-				marginLeft: '10px',
+				// marginLeft: '10px',
 				minWidth: '20px',
 				fontSize: '10px',
 				borderRadius: '2px',
@@ -234,7 +239,8 @@ export const ShortcutView = (props: ShortcutViewProps) => {
 				textShadow: '0px 1px 1px #0000008c',
 				'svg': {
 					verticalAlign: 'middle'
-				}
+				},
+				...props.sx,
 			}}>
 
 			{modifier && (
