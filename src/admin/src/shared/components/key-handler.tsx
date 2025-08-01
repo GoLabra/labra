@@ -1,5 +1,6 @@
 import React, { ComponentType, forwardRef, MouseEventHandler, MutableRefObject, PropsWithChildren, Ref, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Button } from '@mui/material';
+import EnterIcon from '@/assets/icons/labra/enter';
 
 
 export enum Key {
@@ -211,19 +212,29 @@ export const ShortcutView = (props: ShortcutViewProps) => {
 
 	const modifier = useMemo(() => props.modifiers ? Array.isArray(props.modifiers) ? props.modifiers : [props.modifiers] : null, [props.modifiers]);
 
+	const keyToHandle = useMemo(() => {
+		if(props.keyToHandle == Key.Enter){
+			return <EnterIcon />
+		}
+		return props.keyToHandle;
+	}, [props.keyToHandle]);
+
 	return (
 		<Box
 			sx={{
 				display: 'inline-block',
-				border: '1px solid white',
 				padding: '0 5px',
+				border: `1px solid color-mix(in srgb, var(--mui-palette-common-onBackground) 10%, #00000000 90%)`,
 				marginLeft: '10px',
 				minWidth: '20px',
 				fontSize: '10px',
 				borderRadius: '2px',
 				textAlign: 'center',
-				backgroundColor: '#ffffff10',
-				textShadow: '0px 1px 2px #0000008c'
+				backgroundColor: `color-mix(in srgb, var(--mui-palette-common-onBackground) 5%, #00000000 95%)`,
+				textShadow: '0px 1px 1px #0000008c',
+				'svg': {
+					verticalAlign: 'middle'
+				}
 			}}>
 
 			{modifier && (
@@ -232,7 +243,7 @@ export const ShortcutView = (props: ShortcutViewProps) => {
 
 			{modifier && ' + '}
 
-			{props.keyToHandle}
+			{keyToHandle}	
 
 		</Box>
 	)

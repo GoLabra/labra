@@ -52,7 +52,6 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
         mode: 'all',
         defaultValues: selectedChildTypeDescriptor.toDefaultValue?.(defaultValue) ?? defaultValue
     });
-    
 
     const onSetResult = useCallback(
         (data: any) => {
