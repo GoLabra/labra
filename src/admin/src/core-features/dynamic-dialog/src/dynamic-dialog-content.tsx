@@ -10,13 +10,16 @@ import { Key, useKeyHandler } from "@/shared/components/key-handler";
 interface DynamicDialogContentProps {
     dialog: DialogChainPopupStack;
     dialogIndex: number;
+	// dialogRef: (instance: HTMLDivElement | null) => void;
 }
 export const DynamicDialogContent = (props: DynamicDialogContentProps) => {
 
     const dynaicDialogContext = useDynamicDialogContext();
     const ContentFC = useMemo(() => props.dialog.contentFC, [props.dialog]);
     const contentRef = useRef<ChainDialogContentRef>();
-    const keyHandler = useKeyHandler({ keyToHandle: Key.Enter, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => contentRef.current?.enterPressed?.(e) });
+	const dialogRef = useRef<HTMLDivElement | null>(null);
+
+    //const keyHandler = useKeyHandler({ keyToHandle: Key.Enter, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => contentRef.current?.enterPressed?.(e) });
     const mdDown = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
     const dialogStyle = useMemo(() => {
@@ -37,6 +40,7 @@ export const DynamicDialogContent = (props: DynamicDialogContentProps) => {
         dialogId: props.dialog.dialogId,
         upperResults: props.dialog.upperResults,
         localState: props.dialog.localState,
+		dialogRef: dialogRef,
         openMode: props.dialog.openMode,
         editId: props.dialog.editId,
         addPopup
@@ -46,7 +50,7 @@ export const DynamicDialogContent = (props: DynamicDialogContentProps) => {
         <MyDialogContext.Provider value={provider}>
 
             <Dialog
-                ref={keyHandler.setRef}
+                ref={dialogRef}
                 keepMounted={false}
                 onClose={() => dynaicDialogContext.close(props.dialog.dialogId)}
                 TransitionComponent={Transition}

@@ -20,4 +20,5 @@ export type DialogChainPopupStack = {
     beforeUpperResults?: (upperResults: any) => any;
     openMode?: FormOpenMode;
     editId?:string;
+	dialogRef?: HTMLDivElement | null;
 }

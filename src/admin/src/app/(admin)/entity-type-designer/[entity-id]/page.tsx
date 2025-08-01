@@ -30,7 +30,7 @@ import { SkeletonEntityPage } from "@/shared/components/skeleton-entity-page";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import { MenuButton } from "@/shared/components/menu/menu-button";
 import { ChildTypeDescriptor } from "@/features/entity-type-designer/designer-field-map";
-import { Key, ShortcutView, useKeyHandler } from "@/shared/components/key-handler";
+import { Key, ShortcutButton } from "@/shared/components/key-handler";
 
 export default function EntityTypeDesigner() {
 
@@ -89,11 +89,6 @@ const PageContent = (props: PageContentProps) => {
     const saveChangesDialogConfirmation = useDialog();
     const deleteEntityConfirmationDialog = useDialog();
     const revertAllChangesConfirmationDialog = useDialog();
-	useKeyHandler({ keyToHandle: Key.s, 
-					global: true, 
-					disabled: entityDesigner.hasChanges == false || appStatus.applicationStatus != AppStatus.Up, 
-					onTriggered: (e) => saveChangesDialogConfirmation.handleOpen() 
-				});
 	
     const onEntityDynamicDialogFinish = useCallback(({ data, openMode, editId }: FinishResult<ChangedNameCaptionEntity>) => {
         if (!editId) {
@@ -152,7 +147,9 @@ const PageContent = (props: PageContentProps) => {
                             direction="row"
                             spacing={1}>
 
-                            <Button
+                            <ShortcutButton
+								shortcutKey={Key.s}
+
                                 size="medium"
                                 variant="contained"
                                 startIcon={<VscSave size={16} />}
@@ -162,8 +159,7 @@ const PageContent = (props: PageContentProps) => {
                                 aria-haspopup="dialog"
                             >
                                 Save
-								<ShortcutView keyToHandle={Key.s} />
-                            </Button>
+                            </ShortcutButton>
 
 
                             <MenuButton

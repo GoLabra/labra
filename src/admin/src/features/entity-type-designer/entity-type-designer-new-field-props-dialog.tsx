@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from 'zod';
 import { ChildTypeDescriptor, designerFieldsMap } from "./designer-field-map";
 import { useSchemaEffectEntityParams } from "./use-designer-system-validation";
-import { Key, ShortcutView } from "@/shared/components/key-handler";
+import { Key, ShortcutButton, useWithShortcut } from "@/shared/components/key-handler";
 
 interface EntityTypeDesignerNewFieldPropsDialogProps {
     entityName: string;
@@ -28,7 +28,8 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
 
     const { selectedChildTypeDescriptor, defaultValue } = props;
     const myDialogContext = useMyDialogContext();
-
+	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onSetResult)()});
+	const saveAndAddAnotherHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:['Ctrl', 'Shift'], forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onSetResultAndAddAnother)()});
 
     //const type = designerFieldsMap[props.selectedChildTypeDescriptor.type];
     if (!selectedChildTypeDescriptor) {
@@ -122,22 +123,24 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
             <DynamicDialogFooter>
                 <Stack direction="row" gap={1}>
                     {myDialogContext.openMode === FormOpenMode.New && (
-                        <Button
+                        <ShortcutButton
+							{...saveAndAddAnotherHandler}
                             color="secondary"
                             variant="outlined"
-                            onClick={formMethods.handleSubmit(onSetResultAndAddAnother)}
+                            //onClick={formMethods.handleSubmit(onSetResultAndAddAnother)}
                         >
                             Save and Add Another Field
-                        </Button>
+                        </ShortcutButton>
                     )}
 
-                    <Button
-                        color="primary"
-                        variant="contained"
-                        onClick={formMethods.handleSubmit(onSetResult)}>
-                        Save
-						<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
-                    </Button>
+					<ShortcutButton
+						{...saveHandler}
+						color="primary"
+						variant="contained"
+						>
+						Save
+					</ShortcutButton>
+
                 </Stack>
             </DynamicDialogFooter>
         </>

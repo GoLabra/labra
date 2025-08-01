@@ -32,7 +32,7 @@ import { useRelationDiff } from "../use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
 import { useLgQuery } from "@/hooks/use-lg-query";
 import { GplFilter, LGQuery } from "lg-query";
-import { Key, ShortcutView } from "@/shared/components/key-handler";
+import { Key, ShortcutButton, useWithShortcut } from "@/shared/components/key-handler";
 
 type PermissionItem = {
 	id: string;
@@ -372,6 +372,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 
 	const myDialogContext = useMyDialogContext();
 	const fullEntity = useFullEntity({ entityName: props.entityName });
+	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onSave)()});
 
 	const id = useMemo(() => {
 
@@ -442,14 +443,14 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 				<Stack
 					direction="row"
 					gap={1}>
-					<Button
+
+					<ShortcutButton
+						{...saveHandler}
+
 						color="primary"
-						variant="contained"
-						onClick={formMethods.handleSubmit(onSave)}
-					>
+						variant="contained">
 						Save
-						<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
-					</Button>
+					</ShortcutButton>
 				</Stack>
 			</DynamicDialogFooter>
 		</>

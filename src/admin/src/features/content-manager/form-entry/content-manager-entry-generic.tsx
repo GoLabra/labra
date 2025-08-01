@@ -13,13 +13,15 @@ import { DialogContent, Stack, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useContentManagerFormSchema } from "../use-content-manager-form-schema";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
-import { Key, ShortcutView } from "@/shared/components/key-handler";
+import { Key, ShortcutButton, useWithShortcut } from "@/shared/components/key-handler";
 
 export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, ContentManagerEntryDialogContentProps>((props, ref) => {
 
 	const myDialogContext = useMyDialogContext();
 	const fullEntity = useFullEntity({ entityName: props.entityName });
 	const formSchema = useContentManagerFormSchema(fullEntity);
+
+	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onSave)()});
 
 	const id = useMemo(() => {
 
@@ -113,14 +115,15 @@ export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, Cont
 				<Stack
 					direction="row"
 					gap={1}>
-					<Button
-						color="primary"
-						variant="contained"
-						onClick={formMethods.handleSubmit(onSave)}
-					>
-						Save
-						<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
-					</Button>
+
+						<ShortcutButton
+							{...saveHandler}
+							color="primary"
+							variant="contained"
+							>
+							Save
+						</ShortcutButton>
+
 				</Stack>
 			</DynamicDialogFooter>
 		</>

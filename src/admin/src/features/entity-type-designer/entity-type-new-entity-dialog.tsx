@@ -16,7 +16,7 @@ import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/Tex
 import pluralize from "pluralize";
 import { ENTITY_SYSTEM_KEYWORDS } from "@/config/CONST";
 import { useEntitiesDesigner } from "./use-designer-entities";
-import { Key, ShortcutView } from "@/shared/components/key-handler";
+import { Key, ShortcutButton, useWithShortcut } from "@/shared/components/key-handler";
 
 export const getSchema = (entitiesDesigner: ReturnType<typeof useEntitiesDesigner>, editId?: string) =>
     z.object({
@@ -62,6 +62,7 @@ export const EntityTypeNewEntityDialog = forwardRef<ChainDialogContentRef, Entit
     const { defaultValue } = props;
     const myDialogContext = useMyDialogContext();
     const entitiesDesigner = useEntitiesDesigner();
+	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onFinish)()});
 
     const schema = useMemo(() => getSchema(entitiesDesigner, myDialogContext.editId), [entitiesDesigner, myDialogContext.editId]);
 
@@ -111,14 +112,15 @@ export const EntityTypeNewEntityDialog = forwardRef<ChainDialogContentRef, Entit
 
         </DialogContent>
         <DynamicDialogFooter>
-            <Button
-                color="primary"
-                variant="contained"
-                onClick={formMethods.handleSubmit(onFinish)}
-            >
+
+			<ShortcutButton
+				{...saveHandler}
+				color="primary"
+				variant="contained"
+				>
 				Save
-				<ShortcutView keyToHandle={Key.Enter} modifiers={['Ctrl']} />
-			</Button>
+			</ShortcutButton>
+
         </DynamicDialogFooter>
     </>)
 });

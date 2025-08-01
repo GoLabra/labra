@@ -73,6 +73,18 @@ export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((pro
         }));
     }, [setComponents]);
 
+	// const setDialogRef = useCallback((dialogId: string | null, dialogRef: HTMLDivElement | null) => {
+	// 	setComponents((currentComponents: DialogChainPopupStack[]) => currentComponents.map((i) => {
+	// 		if (i.dialogId != dialogId) {
+	// 			return i;
+	// 		}
+	// 		return {
+	// 			...i,
+	// 			dialogRef
+	// 		}
+	// 	}));
+	// }, [setComponents]);
+
     const close = useCallback((dialogId: string | null) => {
         const targetIndex = components.findIndex(item => item.dialogId === dialogId);
         if (targetIndex < 0) {
@@ -143,32 +155,33 @@ export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((pro
 
     return (
         <ChainDialogContext.Provider value={provider}>
-            <DynamicDialogContentManager />
+            {/* <DynamicDialogContentManager /> */}
+
+			{components.map((dialog, index) => (
+				<DynamicDialogContent key={`dialog-${dialog.dialogId}`} dialog={dialog} dialogIndex={index} />
+			))}
+			
         </ChainDialogContext.Provider>
     );
 });
 
 
-const DynamicDialogContentManager = () => {
+// const DynamicDialogContentManager = () => {
 
-    const dynaicDialogContext = useDynamicDialogContext();
+//     const dynaicDialogContext = useDynamicDialogContext();
 
-    // const lastPopup = useMemo(() => {
-    //     return dynaicDialogContext.components[dynaicDialogContext.components.length - 1];
-    // }, [dynaicDialogContext.components]);
+//     // const lastPopup = useMemo(() => {
+//     //     return dynaicDialogContext.components[dynaicDialogContext.components.length - 1];
+//     // }, [dynaicDialogContext.components]);
 
 
-    // const isOpen = useMemo(() => {
-    //     return !!lastPopup;
-    // }, [lastPopup]);
+//     // const isOpen = useMemo(() => {
+//     //     return !!lastPopup;
+//     // }, [lastPopup]);
 
-    return (
-        dynaicDialogContext.components.map((dialog, index) => {
-            return (
-                <DynamicDialogContent key={dialog.dialogId} dialog={dialog} dialogIndex={index} />
-            );
-        })
-    )
-};
-DynamicDialog.displayName = 'DynamicDialog';
+//     return (
+        
+//     )
+// };
+// DynamicDialog.displayName = 'DynamicDialog';
 
