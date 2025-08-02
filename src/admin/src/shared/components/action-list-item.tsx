@@ -7,7 +7,7 @@ import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
 interface ActionListItemProps extends ListItemButtonProps {
     icon?: ReactNode;
-    label: string;
+    label: ReactNode;
 }
 
 export const ActionListItem: FC<ActionListItemProps> = (props) => {

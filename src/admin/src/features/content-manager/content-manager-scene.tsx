@@ -25,6 +25,8 @@ import { useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
 import { RelationViewerGridRoot } from "@/core-features/view-item/relation-viewer-grid";
 import { useViewRelationStore } from "@/core-features/view-item/use-view-relation-store";
 import { Edge } from "@/lib/apollo/graphql.entities";
+import { Key } from "@/shared/components/key-handler/types";
+import { ShortcutActionItem } from "@/shared/components/key-handler/with-label-shortcut";
 
 export const ContentManagerScene = () => {
 
@@ -215,18 +217,20 @@ export const ContentManagerScene = () => {
 
                 <MuiCardFooter>
                     <ActionList>
-                    <ActionListItem
-                            onClick={() => {
-                                dynamicDialog.addPopup(ContentManagerEntryDialogContent, { entityName: contentManager.entityName }, FormOpenMode.New);
-                            }}
-                            icon={(
-                                <SvgIcon fontSize="small">
-                                    <PlusCircleIcon />
-                                </SvgIcon>
-                            )}
-                            label="Add New"
-                            aria-label="Add new entry"
-                            aria-haspopup="dialog" />
+						<ShortcutActionItem
+								shortcutKey={Key.n}
+								
+								onClick={() => {
+									dynamicDialog.addPopup(ContentManagerEntryDialogContent, { entityName: contentManager.entityName }, FormOpenMode.New);
+								}}
+								icon={(
+									<SvgIcon fontSize="small">
+										<PlusCircleIcon />
+									</SvgIcon>
+								)}
+								label="Add New"
+								aria-label="Add new entry"
+								aria-haspopup="dialog" />
                             
                     </ActionList>
                 </MuiCardFooter>

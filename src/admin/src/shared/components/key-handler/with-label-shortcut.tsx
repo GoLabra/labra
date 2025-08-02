@@ -1,11 +1,11 @@
-import { ComponentType, forwardRef, MutableRefObject, PropsWithChildren } from "react";
+import { ComponentType, forwardRef, MutableRefObject, PropsWithChildren, ReactNode } from "react";
 import { Key, Modifier } from "./types";
 import { useKeyHandler } from "./use-key-handler";
 import { ShortcutViewer } from "./shortcut-viewer";
-import { Button } from "@mui/material";
-import { ResponsiveButton } from "@/styles/button.responsive";
+import { Button, ListItem, Stack } from "@mui/material";
+import { ActionListItem } from "../action-list-item";
 
-export interface useWithClickShortcutProps {
+export interface useWithLabelShortcutProps {
 	keyToHandle: Key;
 	modifiers?: Modifier | Modifier[];
 	onClick: (e: React.KeyboardEvent<HTMLElement> | undefined) => void;
@@ -14,7 +14,7 @@ export interface useWithClickShortcutProps {
 	forceInEditable?: boolean;
 	disabled?: boolean;
 }
-export const useWithClickShortcut = (props: useWithClickShortcutProps) => {
+export const useWithLabelShortcut = (props: useWithLabelShortcutProps) => {
 	const { onClick, ...rest } = props;
 	const keyHandler = useKeyHandler({ ...rest, onTriggered: onClick });
 
@@ -31,19 +31,20 @@ export const useWithClickShortcut = (props: useWithClickShortcutProps) => {
 	}
 }
 
-interface WithShortcutProps {
+interface WithLabelShortcutProps {
 	shortcutKey: Key;
 	shortcutModifiers?: Modifier | Modifier[];
 	shortcutTarget?: 'global' | HTMLElement | MutableRefObject<HTMLDivElement | null> | null;
 	shortcutForceInEditable?: boolean;
 	disabled?: boolean;
 	onClick?: (...args: any[]) => void;
+	label: ReactNode;
 }
 
-export function withClickShortcut<T>(
+export function withLabelShortcut<T>(
 	WrappedComponent: ComponentType<T>
 ) {
-	const ComponentWithShortcut = forwardRef<any, T & PropsWithChildren<WithShortcutProps>>(
+	const ComponentWithShortcut = forwardRef<any, T & WithLabelShortcutProps>(
 		(props, ref) => {
 			const {
 				shortcutKey,
@@ -52,7 +53,7 @@ export function withClickShortcut<T>(
 				shortcutForceInEditable,
 				disabled,
 				onClick,
-				children,
+				label,
 				...rest
 			} = props;
 
@@ -69,9 +70,8 @@ export function withClickShortcut<T>(
 			const restProps = rest as unknown as T;
 
 			return (
-				<WrappedComponent {...restProps} onClick={onClick} disabled={disabled} ref={ref}>
-					<>
-						{children}
+				<WrappedComponent label={<Stack direction="row" alignItems="center">
+						{label}
 						<ShortcutViewer
 							keyToHandle={shortcutKey}
 							modifiers={shortcutModifiers}
@@ -79,8 +79,8 @@ export function withClickShortcut<T>(
 								marginLeft: '10px',
 							}}
 						/>
-					</>
-				</WrappedComponent>
+				</Stack>}
+				 {...restProps} onClick={onClick} disabled={disabled} ref={ref} />
 			);
 		}
 	);
@@ -90,9 +90,4 @@ export function withClickShortcut<T>(
 	return ComponentWithShortcut;
 }
 
-
-
-export const ShortcutButton = withClickShortcut(Button);
-
-
-
+export const ShortcutActionItem = withLabelShortcut(ActionListItem);
