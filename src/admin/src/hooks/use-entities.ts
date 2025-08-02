@@ -38,6 +38,7 @@ export const GetEntityFirstLevelSchema = gql`
                 relatedEntity {
                     name
                     caption
+					owner
                     displayField {
                         name
                     }
@@ -55,10 +56,8 @@ export const GetEntitiesNameCaption = gql`query GetEntitiesNameCaption {
   }
 }`
 
-
 export const nameCaptionEntitiesVar = makeVar<NameCaptionEntity[]>([]);
 export const fullEntitiesMapVar = makeVar<Record<string, FullEntity>>({});
-
 
 export const useEntities = () => {
     const nameCaptionEntities = useReactiveVar<NameCaptionEntity[]>(nameCaptionEntitiesVar);

@@ -14,12 +14,31 @@ import { useContentManagerSearch } from '@/hooks/use-content-manager-search';
 import { useMyDialogContext } from '@/core-features/dynamic-dialog/src/use-my-dialog-context';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { useLiteController } from '../lite-controller';
-import { Edge } from '@/lib/apollo/graphql.entities';
+import { Edge, EntityOwner } from '@/lib/apollo/graphql.entities';
 import { Options, Option } from '@/core-features/dynamic-form/form-field';
 import { EdgeStatus } from '@/lib/utils/edge-status';
 import { nullable } from 'zod';
 import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
 import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
+import { hasValue } from '@/lib/utils/has-value';
+
+
+const getLabel = (valueObj: any, displayFieldName?: string) => {
+
+	if(displayFieldName && hasValue(valueObj[displayFieldName])){
+		return valueObj[displayFieldName];
+	}
+
+	if(hasValue(valueObj.label)){
+		return valueObj.label;
+	}
+
+	if(hasValue(valueObj.id)){
+		return `Id: ${valueObj.id}`;
+	}
+
+	return '[No Display]';
+}
 
 export type OptionDiffWrapper = {
 	id: string;
@@ -57,6 +76,8 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 		searchState: contentManagerSearch.state,
 	});
 
+	console.log(fullEntity, props.edge)
+
 	const search = useCallback((searchValue: string) => {
 		contentManagerSearch.handleQueryChange(searchValue);
 	}, [contentManagerSearch]);
@@ -84,16 +105,18 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 		return {
 			id: edgeValue.data.id,
 			value: edgeValue.data.id,
-			label: edgeValue.data[displayPropertyName],
+			label: getLabel(edgeValue.data, displayPropertyName),
 			status: 'saved'
 		};
 	}, [edgeValue, displayPropertyName]);
 
 	const computedValue = useMemo((): OptionDiffWrapper | undefined => {
+		
 		if (value) {
 			if (value.status === 'unset') {
 				return undefined;
 			}
+
 			return value;
 		}
 
@@ -109,7 +132,8 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 		}
 
 		return undefined;
-	}, [value, saved, fullEntity?.displayField]);
+	}, [value, saved, displayPropertyName]);
+
 
 	const onChangedValue = useCallback((event: {
 		reason: AutocompleteChangeReason;
@@ -162,7 +186,7 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 	const options = useMemo(() => {
 
 		const result = contentManagerStore.state.data.map((i: any): Option<any> => ({
-			label: i[displayPropertyName] || `Id: ${i['id']}`,
+			label: getLabel(i, displayPropertyName),
 			value: i.id,
 		}));
 
@@ -178,7 +202,7 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 					target: {
 						name: name,
 						value: {
-							label: upperResults[displayPropertyName],
+							label: getLabel(upperResults, displayPropertyName), 
 							status: 'create',
 							value: upperResults
 						}
@@ -205,7 +229,7 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 				onBlur={onBlur}
 
 				customHeader={
-					<ActionList>
+					(props.edge?.relatedEntity?.owner == EntityOwner.User && (<ActionList>
 						<ActionListItem
 							onClick={() => addNew()}
 							icon={(
@@ -217,7 +241,7 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 							aria-haspopup="dialog"
 							label="Add New"
 						/>
-					</ActionList>
+					</ActionList>))
 				}
 			/>
 		</>
