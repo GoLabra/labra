@@ -23,7 +23,7 @@ import { addNotification } from "@/lib/notifications/store";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { MenuButton } from "@/shared/components/menu/menu-button";
-import { ShortcutButton } from "@/shared/components/key-handler/with-click-shortcut";
+import { ShortcutButton, ShortcutIconButton } from "@/shared/components/key-handler/with-click-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
 
 export default function EntityTypeDesigner() {
@@ -160,7 +160,7 @@ const PageContent = (props: PageContentProps) => {
 
                         <MenuButton
                             slots={{
-                                button: (<IconButton><MoreVertIcon /></IconButton>)
+                                button: (<ShortcutIconButton shortcutKey={Key.o} tooltip="Options"><MoreVertIcon /></ShortcutIconButton>)
                             }}
                         >
                             <MenuItem data-autoclose onClick={() => importData()}>

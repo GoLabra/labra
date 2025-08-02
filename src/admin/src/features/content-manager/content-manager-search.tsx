@@ -17,7 +17,8 @@ import { MenuItemToggle } from '@/shared/components/menu/menu-item-toggle';
 import { useContentManagerSearch } from '@/hooks/use-content-manager-search';
 import { ResponsiveButton } from '@/styles/button.responsive';
 import { Key } from '@/shared/components/key-handler/types';
-import { withClickShortcut } from '@/shared/components/key-handler/with-click-shortcut';
+import { ShortcutIconButton, withClickShortcut } from '@/shared/components/key-handler/with-click-shortcut';
+import { ShortcutViewer } from '@/shared/components/key-handler/shortcut-viewer';
 
 export const ShortcutResponsiveButton = withClickShortcut(ResponsiveButton);
 
@@ -80,21 +81,16 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                             />
                         )}
 
-                        <Tooltip title="Refresh" placement='bottom' arrow
-							sx={{
-								order: {
-									xs: 2,
-									sm: 1
-								}
-							}}>
-                            <IconButton
-                                color="primary"
-                                onClick={() => props.onRefresh?.()}
-                                size="medium">
-                                <CachedIcon />
-                            </IconButton>
-                        </Tooltip>
+						<ShortcutIconButton
+							shortcutKey={Key.r}
+							tooltip="Refresh"
 
+							color="primary"
+							onClick={() => props.onRefresh?.()}
+							size="medium">
+							<CachedIcon />
+						</ShortcutIconButton>
+                        
                         <QueryField
                             disabled={disabled}
                             placeholder="Search..."

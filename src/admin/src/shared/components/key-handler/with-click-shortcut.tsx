@@ -2,7 +2,7 @@ import { ComponentType, forwardRef, MutableRefObject, PropsWithChildren } from "
 import { Key, Modifier } from "./types";
 import { useKeyHandler } from "./use-key-handler";
 import { ShortcutViewer } from "./shortcut-viewer";
-import { Button } from "@mui/material";
+import { Button, ButtonBase, IconButton, Stack, Tooltip } from "@mui/material";
 import { ResponsiveButton } from "@/styles/button.responsive";
 
 export interface useWithClickShortcutProps {
@@ -38,51 +38,66 @@ interface WithShortcutProps {
 	shortcutForceInEditable?: boolean;
 	disabled?: boolean;
 	onClick?: (...args: any[]) => void;
+	tooltip?: string;
 }
 
 export function withClickShortcut<T>(
-	WrappedComponent: ComponentType<T>
+	WrappedComponent: ComponentType<T>,
+	showShortcut: boolean = true,
 ) {
-	const ComponentWithShortcut = forwardRef<any, T & PropsWithChildren<WithShortcutProps>>(
-		(props, ref) => {
-			const {
-				shortcutKey,
-				shortcutModifiers,
-				shortcutTarget,
-				shortcutForceInEditable,
-				disabled,
-				onClick,
-				children,
-				...rest
-			} = props;
+	const ComponentWithShortcut = forwardRef<any, T & PropsWithChildren<WithShortcutProps>>((props, ref) => {
+		const {
+			shortcutKey,
+			shortcutModifiers,
+			shortcutTarget,
+			shortcutForceInEditable,
+			disabled,
+			onClick,
+			tooltip,
+			children,
+			...rest
+		} = props;
 
-			useKeyHandler({
-				keyToHandle: shortcutKey,
-				modifiers: shortcutModifiers,
-				target: shortcutTarget ?? 'global',
-				disabled: disabled,
-				forceInEditable: shortcutForceInEditable,
-				cancelledShortcutBubble: false,
-				onTriggered: () => onClick?.()
-			});
+		useKeyHandler({
+			keyToHandle: shortcutKey,
+			modifiers: shortcutModifiers,
+			target: shortcutTarget ?? 'global',
+			disabled: disabled,
+			forceInEditable: shortcutForceInEditable,
+			cancelledShortcutBubble: false,
+			onTriggered: () => onClick?.()
+		});
 
-			const restProps = rest as unknown as T;
+		const restProps = rest as unknown as T;
 
-			return (
-				<WrappedComponent {...restProps} onClick={onClick} disabled={disabled} ref={ref}>
-					<>
-						{children}
-						<ShortcutViewer
-							keyToHandle={shortcutKey}
-							modifiers={shortcutModifiers}
-							sx={{
-								marginLeft: '10px',
-							}}
-						/>
-					</>
-				</WrappedComponent>
-			);
-		}
+		const component = (<WrappedComponent {...restProps} onClick={onClick} disabled={disabled} ref={ref}>
+				<>
+					{children}
+					{showShortcut && <ShortcutViewer
+						keyToHandle={shortcutKey}
+						modifiers={shortcutModifiers}
+						sx={{
+							marginLeft: '10px',
+						}}
+					/>}
+				</>
+			</WrappedComponent>
+		);
+
+		return tooltip ? (
+			<Tooltip  
+				placement='bottom' 
+				arrow 
+				title={<Stack direction="row" alignItems="center" gap={1}>
+							{tooltip}
+							<ShortcutViewer 
+								keyToHandle={shortcutKey}
+								modifiers={shortcutModifiers} />
+						</Stack>}>
+				{component}
+			</Tooltip>
+		) : component;
+	}
 	);
 
 	ComponentWithShortcut.displayName = `withClickShortcut(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
@@ -93,6 +108,5 @@ export function withClickShortcut<T>(
 
 
 export const ShortcutButton = withClickShortcut(Button);
-
-
-
+export const ShortcutIconButton = withClickShortcut(IconButton, false);
+export const ShortcutButtonBase = withClickShortcut(ButtonBase, false);

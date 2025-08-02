@@ -30,7 +30,7 @@ import { SkeletonEntityPage } from "@/shared/components/skeleton-entity-page";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import { MenuButton } from "@/shared/components/menu/menu-button";
 import { ChildTypeDescriptor } from "@/features/entity-type-designer/designer-field-map";
-import { ShortcutButton } from "@/shared/components/key-handler/with-click-shortcut";
+import { ShortcutButton, ShortcutIconButton } from "@/shared/components/key-handler/with-click-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
 
 export default function EntityTypeDesigner() {
@@ -165,7 +165,7 @@ const PageContent = (props: PageContentProps) => {
 
                             <MenuButton
                                 slots={{
-                                    button: (<IconButton><MoreVertIcon /></IconButton>)
+                                    button: (<ShortcutIconButton shortcutKey={Key.o} tooltip="Options"><MoreVertIcon /></ShortcutIconButton>)
                                 }}
                             >
                                 <MenuItem data-autoclose
