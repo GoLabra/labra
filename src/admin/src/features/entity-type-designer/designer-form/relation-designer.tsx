@@ -49,7 +49,6 @@ export const schema = z.object({
     belongsToCaption: z.preprocess(i => i ?? '',
 				z.string().min(1, 'Belongs To Caption is required')
 			),
-    required: z.coerce.boolean(),
 });
 
 export const schemaEffect = (schema: z.ZodObject<any, any>, editId: string | undefined, entity: ChangedFullEntity): z.ZodEffects<any, any> => {
@@ -136,7 +135,6 @@ export const DesignerForm = (props: DesignerFormProps) => {
         	<SelectFormField name="relationType" label="Relation Type" disabled={props.openMode == FormOpenMode.Edit} options={relationTypeOptions} required />
             <TextShortFormField name="belongsToCaption" label="Belongs To Caption" disabled={props.openMode == FormOpenMode.Edit} hide={belongsToCaptionHide} required />
         </Stack>
-        <BooleanFormField name="required" label="Required" />
     </Stack>
     )
 }

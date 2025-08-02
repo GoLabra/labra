@@ -29,8 +29,7 @@ export const schema = z.object({
         }),
 	relationType: z.preprocess(i => i ?? '',
 			z.string().min(1, `Relation Type is required`)
-		),
-    required: z.coerce.boolean()
+		)
 });
 
 export const toDefaultValue = (value: any): any => {
@@ -70,7 +69,6 @@ export const DesignerForm = (props: DesignerFormProps) => {
     return (<Stack gap={1.5}>
         <TextShortFormField name="caption" label="Caption" required />
 		<SelectFormField name="relationType" label="Relation Type" disabled={props.openMode == FormOpenMode.Edit} options={relationTypeOptions} required />
-		<BooleanFormField name="required" label="Required" />
     </Stack>
     )
 }
