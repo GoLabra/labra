@@ -28,7 +28,7 @@ export const MenuButton = (props: MenuButtonProps) => {
         'aria-controls': popover.open ? 'basic-menu' : undefined,
         'aria-haspopup': "true" as "true",
         'aria-expanded': popover.open ? 'true' : undefined as "true" | undefined
-    }), []);
+    }), [popover.handleOpen, popover.open, disabled]);
 
     return (
         <>

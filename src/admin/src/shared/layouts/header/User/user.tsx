@@ -18,6 +18,8 @@ import { paths } from '@/lib/paths';
 import { MenuButton } from '@/shared/components/menu/menu-button';
 import { MenuItemToggle } from '@/shared/components/menu/menu-item-toggle';
 import { InlineAvatar } from '@/shared/components/avatar';
+import { ShortcutButtonBase } from '@/shared/components/key-handler/with-click-shortcut';
+import { Key } from '@/shared/components/key-handler/types';
 
 export const NavUser = () => {
 
@@ -36,7 +38,10 @@ export const NavUser = () => {
 
             <MenuButton
                 slots={{
-                    button: (<ButtonBase
+                    button: (<ShortcutButtonBase
+					shortcutKey={Key.u}
+					tooltip='User settings'
+
                         sx={{
                             padding: '0 10px 0 5px',
                             borderRadius: '50px',
@@ -58,7 +63,7 @@ export const NavUser = () => {
                                 <ChevronDownIcon />
                             </SvgIcon>
                         </Stack>
-                    </ButtonBase>)
+                    </ShortcutButtonBase>)
                 }}>
 
                 <MenuItem component={NextLink} href="/account">

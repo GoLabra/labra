@@ -11,7 +11,10 @@ export enum Key {
 	c = 'c',
 	f = 'f',
 	n = 'n',
+	o = 'o',
+	r = 'r',
 	s = 's',
+	u = 'u',
 	slash = '/',
 	// Add more keys as needed
 }
