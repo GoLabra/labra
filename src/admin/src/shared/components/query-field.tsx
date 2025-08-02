@@ -7,7 +7,10 @@ import MagnifyingGlassIcon from '@heroicons/react/24/outline/MagnifyingGlassIcon
 import type { SxProps } from '@mui/system';
 import { InputBase, SvgIcon } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Key, ShortcutView, useKeyHandler } from './key-handler';
+import { useKeyHandler } from './key-handler/use-key-handler';
+import { Key } from './key-handler/types';
+import { ShortcutViewer } from './key-handler/shortcut-viewer';
+import { Shortcut } from './key-handler/shortcut';
 
 const QueryFieldRoot = styled('div')(
 	(({ theme }) => ({
@@ -40,16 +43,6 @@ export const QueryField: FC<QueryFieldProps> = (props) => {
 	const [autoFocus, setAutoFocus] = useState<boolean>(false);
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const [value, setValue] = useState<string>('');
-
-	useKeyHandler({
-		keyToHandle: Key.slash, 
-		target: 'global', 
-		disabled, 
-		onTriggered: (e) => {
-			e.preventDefault();
-			inputRef.current?.focus();
-		}
-	});
 
 	useEffect(
 		() => {
@@ -110,11 +103,16 @@ export const QueryField: FC<QueryFieldProps> = (props) => {
 
 	return (
 		<QueryFieldRoot {...other}>
-			<ShortcutView
+			<Shortcut
 				keyToHandle={Key.slash}
-				sx={{
-					marginRight: '10px',
-				}} />
+				onTriggered={() => inputRef.current?.focus()}
+				slotProps={{
+					ShortcutViewer: {
+						sx: {
+							marginRight: '10px',
+						}
+					}
+				}}/>
 			<InputBase
 				disabled={disabled}
 				inputProps={{

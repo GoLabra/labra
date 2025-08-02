@@ -30,7 +30,8 @@ import { SkeletonEntityPage } from "@/shared/components/skeleton-entity-page";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import { MenuButton } from "@/shared/components/menu/menu-button";
 import { ChildTypeDescriptor } from "@/features/entity-type-designer/designer-field-map";
-import { Key, ShortcutButton } from "@/shared/components/key-handler";
+import { ShortcutButton } from "@/shared/components/key-handler/with-click-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 export default function EntityTypeDesigner() {
 

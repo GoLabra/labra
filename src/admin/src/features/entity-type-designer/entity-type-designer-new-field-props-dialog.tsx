@@ -17,7 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from 'zod';
 import { ChildTypeDescriptor, designerFieldsMap } from "./designer-field-map";
 import { useSchemaEffectEntityParams } from "./use-designer-system-validation";
-import { Key, ShortcutButton, useWithShortcut } from "@/shared/components/key-handler";
+import { Key } from "@/shared/components/key-handler/types";
+import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
 
 interface EntityTypeDesignerNewFieldPropsDialogProps {
     entityName: string;
@@ -28,8 +29,8 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
 
     const { selectedChildTypeDescriptor, defaultValue } = props;
     const myDialogContext = useMyDialogContext();
-	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onSetResult)()});
-	const saveAndAddAnotherHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:['Ctrl', 'Shift'], forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onSetResultAndAddAnother)()});
+	const saveHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSetResult)()});
+	const saveAndAddAnotherHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:['Ctrl', 'Shift'], forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSetResultAndAddAnother)()});
 
     //const type = designerFieldsMap[props.selectedChildTypeDescriptor.type];
     if (!selectedChildTypeDescriptor) {
@@ -125,9 +126,7 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
                         <ShortcutButton
 							{...saveAndAddAnotherHandler}
                             color="secondary"
-                            variant="outlined"
-                            //onClick={formMethods.handleSubmit(onSetResultAndAddAnother)}
-                        >
+                            variant="outlined">
                             Save and Add Another Field
                         </ShortcutButton>
                     )}

@@ -5,8 +5,6 @@ import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import { ChainDialogContentRef, ChainDialogRef, DialogChainPopupStack } from "./dynamic-dialog-types";
 import { DynamicDialogContent } from "./dynamic-dialog-content";
 
-
-
 export type FinishResult<T = any> = {
 	data: T;
 	openMode?: FormOpenMode;
@@ -72,18 +70,6 @@ export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((pro
             }
         }));
     }, [setComponents]);
-
-	// const setDialogRef = useCallback((dialogId: string | null, dialogRef: HTMLDivElement | null) => {
-	// 	setComponents((currentComponents: DialogChainPopupStack[]) => currentComponents.map((i) => {
-	// 		if (i.dialogId != dialogId) {
-	// 			return i;
-	// 		}
-	// 		return {
-	// 			...i,
-	// 			dialogRef
-	// 		}
-	// 	}));
-	// }, [setComponents]);
 
     const close = useCallback((dialogId: string | null) => {
         const targetIndex = components.findIndex(item => item.dialogId === dialogId);
@@ -155,7 +141,6 @@ export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((pro
 
     return (
         <ChainDialogContext.Provider value={provider}>
-            {/* <DynamicDialogContentManager /> */}
 
 			{components.map((dialog, index) => (
 				<DynamicDialogContent key={`dialog-${dialog.dialogId}`} dialog={dialog} dialogIndex={index} />
@@ -165,23 +150,4 @@ export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((pro
     );
 });
 
-
-// const DynamicDialogContentManager = () => {
-
-//     const dynaicDialogContext = useDynamicDialogContext();
-
-//     // const lastPopup = useMemo(() => {
-//     //     return dynaicDialogContext.components[dynaicDialogContext.components.length - 1];
-//     // }, [dynaicDialogContext.components]);
-
-
-//     // const isOpen = useMemo(() => {
-//     //     return !!lastPopup;
-//     // }, [lastPopup]);
-
-//     return (
-        
-//     )
-// };
-// DynamicDialog.displayName = 'DynamicDialog';
-
+DynamicDialog.displayName = 'DynamicDialog';

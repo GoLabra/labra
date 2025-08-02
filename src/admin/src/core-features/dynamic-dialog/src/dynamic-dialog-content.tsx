@@ -5,7 +5,6 @@ import { ChainDialogContentRef, DialogChainPopupStack } from "./dynamic-dialog-t
 import { useDynamicDialogContext } from "./dynamic-dialog";
 import { TransitionProps } from "@mui/material/transitions";
 import { MyDialogContext } from "./use-my-dialog-context";
-import { Key, useKeyHandler } from "@/shared/components/key-handler";
 
 interface DynamicDialogContentProps {
     dialog: DialogChainPopupStack;
@@ -18,8 +17,6 @@ export const DynamicDialogContent = (props: DynamicDialogContentProps) => {
     const ContentFC = useMemo(() => props.dialog.contentFC, [props.dialog]);
     const contentRef = useRef<ChainDialogContentRef>();
 	const dialogRef = useRef<HTMLDivElement | null>(null);
-
-    //const keyHandler = useKeyHandler({ keyToHandle: Key.Enter, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => contentRef.current?.enterPressed?.(e) });
     const mdDown = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
     const dialogStyle = useMemo(() => {

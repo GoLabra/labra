@@ -23,7 +23,8 @@ import { addNotification } from "@/lib/notifications/store";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { MenuButton } from "@/shared/components/menu/menu-button";
-import { Key, ShortcutButton } from "@/shared/components/key-handler";
+import { ShortcutButton } from "@/shared/components/key-handler/with-click-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 export default function EntityTypeDesigner() {
 

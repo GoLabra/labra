@@ -16,7 +16,8 @@ import {
     SvgIcon,
     Typography
 } from '@mui/material';
-import { Key, ShortcutButton, useWithShortcut } from './key-handler';
+import { ShortcutButton, useWithClickShortcut } from './key-handler/with-click-shortcut';
+import { Key } from './key-handler/types';
 
 type Variant = 'error' | 'warning' | 'info';
 
@@ -70,7 +71,7 @@ export const ConfirmationDialog: FC<ConfirmationDialogProps> = (props) => {
 
     const icon = iconMap[variant];
 
-	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, forceInEditable: true, cancelledShortcutBubble: true, onTriggered: () => onConfirm?.() });
+	const confirmHandler = useWithClickShortcut({ keyToHandle: Key.Enter, forceInEditable: true, cancelledShortcutBubble: true, onClick: () => onConfirm?.() });
 	
     return (
       
@@ -79,7 +80,7 @@ export const ConfirmationDialog: FC<ConfirmationDialogProps> = (props) => {
                 fullWidth
                 onClose={onCancel}
                 open={open}
-                ref={saveHandler.setRef}
+                ref={confirmHandler.setRef}
                 slotProps={{
                     
                 }}
@@ -116,7 +117,7 @@ export const ConfirmationDialog: FC<ConfirmationDialogProps> = (props) => {
                     </Button>
 
 					<ShortcutButton
-						{...saveHandler}
+						{...confirmHandler}
 						color="primary"
 						variant="contained"
 						>

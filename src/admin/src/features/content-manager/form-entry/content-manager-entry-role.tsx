@@ -32,7 +32,8 @@ import { useRelationDiff } from "../use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
 import { useLgQuery } from "@/hooks/use-lg-query";
 import { GplFilter, LGQuery } from "lg-query";
-import { Key, ShortcutButton, useWithShortcut } from "@/shared/components/key-handler";
+import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 type PermissionItem = {
 	id: string;
@@ -372,7 +373,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 
 	const myDialogContext = useMyDialogContext();
 	const fullEntity = useFullEntity({ entityName: props.entityName });
-	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onSave)()});
+	const saveHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSave)()});
 
 	const id = useMemo(() => {
 

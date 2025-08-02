@@ -16,7 +16,8 @@ import { TextShortFormField } from "@/core-features/dynamic-form/form-fields/Tex
 import pluralize from "pluralize";
 import { ENTITY_SYSTEM_KEYWORDS } from "@/config/CONST";
 import { useEntitiesDesigner } from "./use-designer-entities";
-import { Key, ShortcutButton, useWithShortcut } from "@/shared/components/key-handler";
+import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 export const getSchema = (entitiesDesigner: ReturnType<typeof useEntitiesDesigner>, editId?: string) =>
     z.object({
@@ -62,7 +63,7 @@ export const EntityTypeNewEntityDialog = forwardRef<ChainDialogContentRef, Entit
     const { defaultValue } = props;
     const myDialogContext = useMyDialogContext();
     const entitiesDesigner = useEntitiesDesigner();
-	const saveHandler = useWithShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onTriggered: (e) => formMethods.handleSubmit(onFinish)()});
+	const saveHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onFinish)()});
 
     const schema = useMemo(() => getSchema(entitiesDesigner, myDialogContext.editId), [entitiesDesigner, myDialogContext.editId]);
 
