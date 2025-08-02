@@ -6,9 +6,8 @@ import { addNotification } from "@/lib/notifications/store";
 import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { getFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
 import { useApolloClient } from "@apollo/client";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
-import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { RunQuery, useLgQuery } from "./use-lg-query";
+import { GplFilter, LGQuery } from "lg-query";
 
 interface UseGridContentManagerStoreparams {
 	fullEntity?: FullEntity;
@@ -22,7 +21,7 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 
 	const fields = useMemo(() => params.fullEntity?.fields.map(i => i.name), [params.fullEntity?.fields]);
 	const edges = useMemo(() => params.fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
-													.filter(i => i.relationType !== 'ManyToOne')
+													.filter(i => i.relationType !== 'OneToMany')
 													.filter(i => i.relationType !== 'Many'), [params.fullEntity?.edges]);
 
 	const dataQuery = useMemo(() => {
@@ -99,7 +98,7 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 		}, query);
 
 		return query;
-	}, [entityName]);
+	}, [entityName, dataQuery]);
 
 	const apiType = params.fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
 

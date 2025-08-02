@@ -23,6 +23,8 @@ import { addNotification } from "@/lib/notifications/store";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { MenuButton } from "@/shared/components/menu/menu-button";
+import { ShortcutButton } from "@/shared/components/key-handler/with-click-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 export default function EntityTypeDesigner() {
 
@@ -75,7 +77,7 @@ const PageContent = (props: PageContentProps) => {
 
     const graphEntities = useEntities();
     const entity = useMemo(() => graphEntities?.entities.find(i => i.name == props.entityId), [graphEntities?.entities, props.entityId]);
-
+	// useKeyHandler({ keyToHandle: Key.n, target: 'global', onTriggered: (e) => addNewEntry() });
     const contentManager = useContentManagerContext();
     const dynamicDialog = useDynamicDialog();
 
@@ -143,7 +145,9 @@ const PageContent = (props: PageContentProps) => {
                         direction="row"
                         spacing={1}>
 
-                        <Button
+                        <ShortcutButton
+							shortcutKey={Key.n}
+
                             size="medium"
                             variant="contained"
                             startIcon={<SvgIcon fontSize="small"><PlusIcon /></SvgIcon>}
@@ -151,7 +155,7 @@ const PageContent = (props: PageContentProps) => {
                             aria-label="Add new entry"
                             aria-haspopup="dialog">
                             Add New
-                        </Button>
+                        </ShortcutButton>
 
 
                         <MenuButton

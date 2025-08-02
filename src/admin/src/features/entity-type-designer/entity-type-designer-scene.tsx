@@ -24,6 +24,8 @@ import Defaults from "@/config/Defaults.json";
 import { useAppStatus } from "@/store/app-state/use-app-state";
 import { SYSTEM_CHILDREN } from "@/config/CONST";
 import { EntityOwner } from "@/lib/apollo/graphql.entities";
+import { ShortcutActionItem } from "@/shared/components/key-handler/with-label-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 interface EntityTypeDesignerSceneProps {
     entityName: string;
@@ -200,7 +202,8 @@ export default function EntityTypeDesignerScene(
 
                 <MuiCardFooter>
                     <ActionList>
-                        <ActionListItem
+                        <ShortcutActionItem
+							shortcutKey={Key.n}
                             onClick={() => entityTypeDesignerEntryDialog.openAddNewChild()}
                             disabled={isEntityBusy}
                             icon={

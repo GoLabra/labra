@@ -7,7 +7,7 @@ export interface ChainDialogRef {
 
 export interface ChainDialogContentRef {
     deactivated?: () => void;
-    enterPressed?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+    enterPressed?: (e: React.KeyboardEvent<HTMLElement>) => void;
 }
 
 export type DialogChainPopupStack = {
@@ -20,4 +20,5 @@ export type DialogChainPopupStack = {
     beforeUpperResults?: (upperResults: any) => any;
     openMode?: FormOpenMode;
     editId?:string;
+	dialogRef?: HTMLDivElement | null;
 }

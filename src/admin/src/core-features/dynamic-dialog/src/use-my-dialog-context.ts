@@ -1,5 +1,5 @@
 import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
-import { createContext, ForwardRefExoticComponent, RefAttributes, useCallback, useContext, useMemo } from "react";
+import { createContext, ForwardRefExoticComponent, MutableRefObject, RefAttributes, useCallback, useContext, useMemo } from "react";
 import { ChainDialogContentRef } from "./dynamic-dialog-types";
 import { useDynamicDialogContext } from "./dynamic-dialog";
 
@@ -7,6 +7,7 @@ export const MyDialogContext = createContext<{
     dialogId: string | null;
     upperResults: any;
     localState: any;
+	dialogRef: MutableRefObject<HTMLDivElement | null>;
     openMode: FormOpenMode | undefined;
     editId: string | undefined;
 
@@ -34,6 +35,7 @@ export const useMyDialogContext = () => {
         setLocalState: setLocalState,
         upperResults: myDialogContext.upperResults,
         localState: myDialogContext.localState,
+		dialogRef: myDialogContext.dialogRef,
         openMode: myDialogContext.openMode,
         editId: myDialogContext.editId,
 

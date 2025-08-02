@@ -53,6 +53,15 @@ export const useRelationDiff = <T extends RelationDiffItem = any>(props: Relatio
 	
 	}, [props.saved, props.changedArray]);
 
+	const create = useCallback((item: Omit<T, 'id' | 'status'>) => {
+		return [...props.changedArray ?? [],
+					{
+						...item,
+						status: 'create'
+					}
+				];
+	}, [props.saved, props.changedArray]);
+
 	// const remove = useCallback((find: (value: T, index: number, obj: T[]) => unknown) => {
 	const remove = useCallback((id: string) => {
 
@@ -94,6 +103,7 @@ export const useRelationDiff = <T extends RelationDiffItem = any>(props: Relatio
 	
 	return useMemo(() => ({
 		showingItems,
+		create,
 		connect,
 		remove,
 		disconnectAll

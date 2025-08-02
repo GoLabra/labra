@@ -21,6 +21,7 @@ import { createClient } from 'graphql-ws';
 import { getMainDefinition } from "@apollo/client/utilities";
 import { STORAGE_KEY as JWT_STORAGE_KEY } from "@/core-features/auth/jwt-context";
 
+export type ApiType = 'admin' | 'user';
 export const ADMIN_CONTEXT = { clientName: "admin" }
 
 const getBearerToken = () => {

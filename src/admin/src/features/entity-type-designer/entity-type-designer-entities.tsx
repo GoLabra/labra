@@ -20,6 +20,8 @@ import { ChangedNameCaptionEntity } from "@/types/entity";
 import Defaults from "@/config/Defaults.json";
 import { useAppStatus } from "@/store/app-state/use-app-state";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
+import { withLabelShortcut } from "@/shared/components/key-handler/with-label-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 const iconStatus = {
     'new': <SvgIcon fontSize="small"><PlusIcon /></SvgIcon>,
@@ -46,6 +48,8 @@ const TreeListItemButtonStyled = styled(TreeListItemButton)(({ theme }) => [
         borderColor: 'var(--mui-palette-background-paper)',
     }),
 ]);
+
+const ShortcutTreeListItem = withLabelShortcut(TreeListItemButtonStyled);
 
 
 export default function EntityTypeBuilderEntities() {
@@ -85,7 +89,9 @@ export default function EntityTypeBuilderEntities() {
                         <TreeListItemSkeleton key={i} />
                     ))}
 
-                    <TreeListItemButtonStyled
+                    <ShortcutTreeListItem
+						shortcutKey={Key.a}
+
                         label="Add Entity"
                         icon={<SvgIcon fontSize="small"><PlusIcon /></SvgIcon>}
                         onClick={() => dynamicDialog.addPopup(EntityTypeNewEntityDialog, {}, FormOpenMode.New)}

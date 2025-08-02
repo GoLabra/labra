@@ -30,9 +30,10 @@ import HistoryIcon from "@mui/icons-material/History";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { useRelationDiff } from "../use-relation-diff";
 import { createId } from "@paralleldrive/cuid2";
-import { LGQuery } from "@/lib/apollo/builders/LabraGqlApiBuilder/LGQuery";
-import { GplFilter } from "@/lib/apollo/builders/LabraGqlApiBuilder/types/types";
 import { useLgQuery } from "@/hooks/use-lg-query";
+import { GplFilter, LGQuery } from "lg-query";
+import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
+import { Key } from "@/shared/components/key-handler/types";
 
 type PermissionItem = {
 	id: string;
@@ -372,6 +373,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 
 	const myDialogContext = useMyDialogContext();
 	const fullEntity = useFullEntity({ entityName: props.entityName });
+	const saveHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSave)()});
 
 	const id = useMemo(() => {
 
@@ -442,11 +444,14 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 				<Stack
 					direction="row"
 					gap={1}>
-					<Button
+
+					<ShortcutButton
+						{...saveHandler}
+
 						color="primary"
-						variant="contained"
-						onClick={formMethods.handleSubmit(onSave)}
-					>Save</Button>
+						variant="contained">
+						Save
+					</ShortcutButton>
 				</Stack>
 			</DynamicDialogFooter>
 		</>

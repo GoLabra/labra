@@ -5,7 +5,7 @@ import { AutocompleteChangeReason, Box, Chip, IconButton, List, ListItemButton, 
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { useLiteController } from '../lite-controller';
 import { useMyDialogContext } from '@/core-features/dynamic-dialog/src/use-my-dialog-context';
-import { Edge } from '@/lib/apollo/graphql.entities';
+import { Edge, EntityOwner } from '@/lib/apollo/graphql.entities';
 import { useFullEntity } from '@/hooks/use-entities';
 import { useContentManagerSearch } from '@/hooks/use-content-manager-search';
 import { useCallback, useMemo } from 'react';
@@ -21,6 +21,24 @@ import { useRelationDiff } from '@/features/content-manager/use-relation-diff';
 import { OptionDiffWrapper } from './LookupOneFIELD';
 import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
 import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
+import { hasValue } from '@/lib/utils/has-value';
+
+const getLabel = (valueObj: any, displayFieldName?: string) => {
+
+	if(displayFieldName && hasValue(valueObj[displayFieldName])){
+		return valueObj[displayFieldName];
+	}
+
+	if(hasValue(valueObj.label)){
+		return valueObj.label;
+	}
+
+	if(hasValue(valueObj.id)){
+		return `Id: ${valueObj.id}`;
+	}
+
+	return '[No Display]';
+}
 
 interface RelationManyFIELDFormComponentProps {
     name: string;
@@ -66,7 +84,7 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
     const savedValueItems = useMemo((): OptionDiffWrapper[] => {
         return savedValue?.data?.map((i: any) => ({
             id: i.id,
-			label: i[displayPropertyName],
+			label: getLabel(i, displayPropertyName),
 			value: i,
             status: 'saved',
         })) ?? []
@@ -122,7 +140,7 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
     const options = useMemo(() => {
 
         const result = contentManagerStore.state.data.map((i: any): Option<any> => ({
-            label: i[displayPropertyName] || `Id: ${i['id']}`,
+            label: getLabel(i, displayPropertyName),
             value: i.id,
         }));
 
@@ -134,19 +152,29 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
         myDialogContext.addPopup(name, ContentManagerEntryDialogContent, { entityName: edge.relatedEntity.name }, FormOpenMode.New, undefined,
             (upperResults: any) => {
 
-                onChange({
-                    target: {
-                        name: name,
-                        value: [
-                            ...(value ?? []),
-                            {
-                                label: upperResults[displayPropertyName],
-                                tag: 'create',
-                                value: upperResults
-                            }
-                        ]
-                    }
-                });
+				onChange({
+					target: {
+						name: name,
+						value: relationDiff.create({
+									label: getLabel(upperResults, displayPropertyName),
+									value: upperResults
+								})
+					}
+				});
+				
+                // onChange({
+                //     target: {
+                //         name: name,
+                //         value: [
+                //             ...(value ?? []),
+                //             {
+                //                 label: upperResults[displayPropertyName],
+                //                 tag: 'create',
+                //                 value: upperResults
+                //             }
+                //         ]
+                //     }
+                // });
 
                 return upperResults;
             })
@@ -170,7 +198,7 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
 
                 customHeader={
 
-                    <ActionList>
+                    (props.edge?.relatedEntity?.owner == EntityOwner.User && (<ActionList>
                         <ActionListItem
                             onClick={() => addNew()}
                             icon={(
@@ -182,8 +210,7 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
                             aria-haspopup="dialog"
                             label="Add New"
                         />
-                    </ActionList>
-
+                    </ActionList>))
                 }
             />
         </>

@@ -5,8 +5,6 @@ import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import { ChainDialogContentRef, ChainDialogRef, DialogChainPopupStack } from "./dynamic-dialog-types";
 import { DynamicDialogContent } from "./dynamic-dialog-content";
 
-
-
 export type FinishResult<T = any> = {
 	data: T;
 	openMode?: FormOpenMode;
@@ -143,32 +141,13 @@ export const DynamicDialog = forwardRef<ChainDialogRef, DynamicDialogProps>((pro
 
     return (
         <ChainDialogContext.Provider value={provider}>
-            <DynamicDialogContentManager />
+
+			{components.map((dialog, index) => (
+				<DynamicDialogContent key={`dialog-${dialog.dialogId}`} dialog={dialog} dialogIndex={index} />
+			))}
+			
         </ChainDialogContext.Provider>
     );
 });
 
-
-const DynamicDialogContentManager = () => {
-
-    const dynaicDialogContext = useDynamicDialogContext();
-
-    // const lastPopup = useMemo(() => {
-    //     return dynaicDialogContext.components[dynaicDialogContext.components.length - 1];
-    // }, [dynaicDialogContext.components]);
-
-
-    // const isOpen = useMemo(() => {
-    //     return !!lastPopup;
-    // }, [lastPopup]);
-
-    return (
-        dynaicDialogContext.components.map((dialog, index) => {
-            return (
-                <DynamicDialogContent key={dialog.dialogId} dialog={dialog} dialogIndex={index} />
-            );
-        })
-    )
-};
 DynamicDialog.displayName = 'DynamicDialog';
-

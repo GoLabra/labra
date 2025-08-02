@@ -1,4 +1,3 @@
-import { AdvancedFilter } from "@/core-features/dynamic-filter/filter";
 import { containsFoldOperator, eqNumberOperator, eqBooleanOperator } from "@/core-features/dynamic-filter/filter-operators";
 import { Field } from "@/lib/apollo/graphql.entities";
 import { Filter } from "mosaic-data-table";

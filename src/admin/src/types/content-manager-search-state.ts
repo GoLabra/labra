@@ -1,5 +1,4 @@
 import { Filter, Order } from "mosaic-data-table";
-import { AdvancedFilter as AdvancedFilters } from "../core-features/dynamic-filter/filter";
 
 export interface ContentManagerSearchState {
     //entityName: string;
@@ -8,7 +7,6 @@ export interface ContentManagerSearchState {
     sortBy: string | null;
     order: Order;
     query: string;
-    advancedFilters: AdvancedFilters[];
     filter: Filter;
 }
 

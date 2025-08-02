@@ -17,6 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from 'zod';
 import { ChildTypeDescriptor, designerFieldsMap } from "./designer-field-map";
 import { useSchemaEffectEntityParams } from "./use-designer-system-validation";
+import { Key } from "@/shared/components/key-handler/types";
+import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
 
 interface EntityTypeDesignerNewFieldPropsDialogProps {
     entityName: string;
@@ -27,7 +29,8 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
 
     const { selectedChildTypeDescriptor, defaultValue } = props;
     const myDialogContext = useMyDialogContext();
-
+	const saveHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSetResult)()});
+	const saveAndAddAnotherHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:['Ctrl', 'Shift'], forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSetResultAndAddAnother)()});
 
     //const type = designerFieldsMap[props.selectedChildTypeDescriptor.type];
     if (!selectedChildTypeDescriptor) {
@@ -50,7 +53,6 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
         mode: 'all',
         defaultValues: selectedChildTypeDescriptor.toDefaultValue?.(defaultValue) ?? defaultValue
     });
-    
 
     const onSetResult = useCallback(
         (data: any) => {
@@ -79,7 +81,7 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
     }, [myDialogContext.addPopupAsFirst]);
 
     useImperativeHandle(ref, () => ({
-        enterPressed: (e: React.KeyboardEvent<HTMLDivElement>) => {
+        enterPressed: (e: React.KeyboardEvent<HTMLElement>) => {
             formMethods.handleSubmit(onSetResult)(e);
         }
     }));
@@ -121,21 +123,22 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
             <DynamicDialogFooter>
                 <Stack direction="row" gap={1}>
                     {myDialogContext.openMode === FormOpenMode.New && (
-                        <Button
+                        <ShortcutButton
+							{...saveAndAddAnotherHandler}
                             color="secondary"
-                            variant="outlined"
-                            onClick={formMethods.handleSubmit(onSetResultAndAddAnother)}
-                        >
+                            variant="outlined">
                             Save and Add Another Field
-                        </Button>
+                        </ShortcutButton>
                     )}
 
-                    <Button
-                        color="primary"
-                        variant="contained"
-                        onClick={formMethods.handleSubmit(onSetResult)}>
-                        Save
-                    </Button>
+					<ShortcutButton
+						{...saveHandler}
+						color="primary"
+						variant="contained"
+						>
+						Save
+					</ShortcutButton>
+
                 </Stack>
             </DynamicDialogFooter>
         </>

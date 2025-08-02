@@ -1,7 +1,4 @@
 import { usePopover } from "@/hooks/use-popover";
-import ArrowRightOnRectangleIcon from "@heroicons/react/24/outline/ArrowRightOnRectangleIcon";
-import UserIcon from "@heroicons/react/24/outline/UserIcon";
-import WrenchScrewdriverIcon from "@heroicons/react/24/outline/WrenchScrewdriverIcon";
 import { Button, ButtonProps, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, Popover, SvgIcon, Switch } from "@mui/material";
 import WifiIcon from '@mui/icons-material/Wifi';
 import React, { useMemo } from "react";

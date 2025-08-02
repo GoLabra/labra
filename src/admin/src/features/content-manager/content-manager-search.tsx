@@ -4,9 +4,8 @@ import PropTypes from 'prop-types';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import CachedIcon from '@mui/icons-material/Cached';
-import { Button, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, SvgIcon, Tooltip } from '@mui/material';
+import { Button, ButtonTypeMap, ExtendButtonBase, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, SvgIcon, Tooltip } from '@mui/material';
 import { FieldScalarTypes } from '@/types/field-type-descriptor';
-import { AdvancedFilter as AdvancedFilter } from '@/core-features/dynamic-filter/filter';
 import { MenuButton } from '@/shared/components/menu/menu-button';
 import { MenuItemSelect } from '@/shared/components/menu/menu-item-select';
 import { BulkActionsMenu } from '@/shared/components/bulk-actions-menu';
@@ -17,6 +16,10 @@ import WrenchScrewdriverIcon from '@heroicons/react/24/outline/WrenchScrewdriver
 import { MenuItemToggle } from '@/shared/components/menu/menu-item-toggle';
 import { useContentManagerSearch } from '@/hooks/use-content-manager-search';
 import { ResponsiveButton } from '@/styles/button.responsive';
+import { Key } from '@/shared/components/key-handler/types';
+import { withClickShortcut } from '@/shared/components/key-handler/with-click-shortcut';
+
+export const ShortcutResponsiveButton = withClickShortcut(ResponsiveButton);
 
 export type SearchField = {
     label: string;
@@ -30,10 +33,6 @@ interface OrdersSearchProps {
     headCells?: ColumnDef[];
     disabled?: boolean;
     onRefresh?: () => void;
-
-    filters?: AdvancedFilter[];
-    onAdvancedFiltersApply?: (filters: AdvancedFilter[]) => void;
-    onAdvancedFiltersClear?: () => void;
 
     onQueryChange?: (query: string) => void;
     query?: string;
@@ -53,7 +52,7 @@ interface OrdersSearchProps {
 }
 export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
-    const { headCells, disabled = false, filters = [], onQueryChange, query = '', selected = [], onBulkDelete } = props;
+    const { headCells, disabled = false, onQueryChange, query = '', selected = [], onBulkDelete } = props;
     const hasSelection = selected.length > 0;
 
     return (
@@ -125,7 +124,9 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 								}
 							}}>
 
-                            <ResponsiveButton
+                            <ShortcutResponsiveButton
+								shortcutKey={Key.c}
+
                                 disabled={disabled}
                                 onClick={() => props.onSelectionEnabledChange?.(!props.selectionEnabled)}
                                 size="medium"
@@ -138,9 +139,10 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                                 aria-haspopup="dialog"
                             >
                                 <span className="button-text">Selection</span>
-                            </ResponsiveButton>
+                            </ShortcutResponsiveButton>
 
-                            <ResponsiveButton
+                            <ShortcutResponsiveButton
+								shortcutKey={Key.f}
                                 disabled={disabled}
                                 onClick={() => {
                                     var newValue = !props.filterEnabled;
@@ -159,7 +161,7 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                                 aria-haspopup="dialog"
                             >
                                 <span className="button-text">Filter</span>
-                            </ResponsiveButton>
+                            </ShortcutResponsiveButton>
 
                             <MenuButton
                                 text="Configure"
@@ -213,10 +215,8 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
 ContentManagerSearch.propTypes = {
     disabled: PropTypes.bool,
-    filters: PropTypes.array,
-    onFiltersApply: PropTypes.func,
-    onFiltersClear: PropTypes.func,
     onQueryChange: PropTypes.func,
     query: PropTypes.string,
     selected: PropTypes.array
 };
+

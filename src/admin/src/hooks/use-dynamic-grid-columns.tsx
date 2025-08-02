@@ -92,10 +92,10 @@ const edgeToColumn = (entityName: string, edge: Edge, openRelation: MutableRefOb
     switch (edge.relationType) {
         case RelationType.One:
         case RelationType.OneToOne:
-        case RelationType.OneToMany:
+        case RelationType.ManyToOne:
             return oneColumnDef(entityName, edge, openRelation);
         case RelationType.Many:
-        case RelationType.ManyToOne:
+		case RelationType.OneToMany:
         case RelationType.ManyToMany:
             return manyColumnDef(entityName, edge, openRelation);
     }
