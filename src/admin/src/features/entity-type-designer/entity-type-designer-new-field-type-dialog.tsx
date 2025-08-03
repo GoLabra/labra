@@ -12,7 +12,7 @@ import { ChainDialogContentRef } from "@/core-features/dynamic-dialog/src/dynami
 import { DesignerEdge, DesignerField } from "@/types/entity";
 import { useMyDialogContext } from "@/core-features/dynamic-dialog/src/use-my-dialog-context";
 import { DynamicDialogHeader } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog-header";
-import { ApiFieldTypes } from "@/types/field-type-descriptor";
+import { DialogContentWithAutofocus } from "@/core-features/dynamic-dialog/src/dialog-content-with-autofocus";
 
 export const useEntityTypeDesignerEntryDialog = () => {
 
@@ -53,7 +53,7 @@ export const useEntityTypeDesignerEntryDialog = () => {
 export const EntityTypeDesignerEntryDialogContent = forwardRef<ChainDialogContentRef>((props, ref) => {
 
     const myDialogContext = useMyDialogContext();
-    
+
     useImperativeHandle(ref, () => ({
 
     }));
@@ -70,7 +70,7 @@ export const EntityTypeDesignerEntryDialogContent = forwardRef<ChainDialogConten
             Select Field Type
         </DynamicDialogHeader>
 
-        <DialogContent>
+        <DialogContentWithAutofocus>
             
             <Stack gap={2}>
                 <Grid container spacing={1}>
@@ -99,7 +99,7 @@ export const EntityTypeDesignerEntryDialogContent = forwardRef<ChainDialogConten
 
             </Stack>
 
-        </DialogContent>
+        </DialogContentWithAutofocus>
     </>);
 });
 EntityTypeDesignerEntryDialogContent.displayName = 'EntityTypeDesignerEntryDialogContent';

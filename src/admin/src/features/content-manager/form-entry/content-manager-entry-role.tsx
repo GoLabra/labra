@@ -34,6 +34,7 @@ import { useLgQuery } from "@/hooks/use-lg-query";
 import { GplFilter, LGQuery } from "lg-query";
 import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
+import { DialogContentWithAutofocus } from "@/core-features/dynamic-dialog/src/dialog-content-with-autofocus";
 
 type PermissionItem = {
 	id: string;
@@ -419,7 +420,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 			<DynamicDialogHeader>
 				Role
 			</DynamicDialogHeader>
-			<DialogContent>
+			<DialogContentWithAutofocus>
 				<Stack
 					gap={2}>
 
@@ -439,7 +440,7 @@ export const ContentManagerEntryRole = forwardRef<ChainDialogContentRef, Content
 					{myDialogContext.openMode !== FormOpenMode.New && <BasicAuditTrail defaultValues={props.defaultValue} />}
 
 				</Stack>
-			</DialogContent>
+			</DialogContentWithAutofocus>
 			<DynamicDialogFooter>
 				<Stack
 					direction="row"

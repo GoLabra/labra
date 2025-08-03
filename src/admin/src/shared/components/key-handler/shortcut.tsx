@@ -11,11 +11,7 @@ interface ShortcutProps extends useKeyHandlerProps
 export const Shortcut = (props: ShortcutProps) => {
 
 	useKeyHandler({...props, 
-		target: props.target ?? 'global',
-		onTriggered: (e) => {
-			e?.preventDefault();
-			props.onTriggered?.(e);
-		}
+		target: props.target ?? 'global'
 	});
 	
 	return (<ShortcutViewer 

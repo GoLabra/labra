@@ -19,6 +19,7 @@ import { ChildTypeDescriptor, designerFieldsMap } from "./designer-field-map";
 import { useSchemaEffectEntityParams } from "./use-designer-system-validation";
 import { Key } from "@/shared/components/key-handler/types";
 import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
+import { DialogContentWithAutofocus } from "@/core-features/dynamic-dialog/src/dialog-content-with-autofocus";
 
 interface EntityTypeDesignerNewFieldPropsDialogProps {
     entityName: string;
@@ -107,7 +108,7 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
                 </Stack>
             </DynamicDialogHeader>
 
-            <DialogContent>
+            <DialogContentWithAutofocus>
 
                 {myDialogContext.openMode != FormOpenMode.New && <Id id="Name" value={defaultValue.name} rootProps={{
                     marginLeft: 'auto',
@@ -118,7 +119,7 @@ export const EntityTypeDesignerNewFieldPropsDialog = forwardRef<ChainDialogConte
                 </Form>
 
 
-            </DialogContent>
+            </DialogContentWithAutofocus>
 
             <DynamicDialogFooter>
                 <Stack direction="row" gap={1}>

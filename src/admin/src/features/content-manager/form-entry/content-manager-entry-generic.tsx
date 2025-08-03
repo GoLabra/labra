@@ -15,6 +15,7 @@ import { useContentManagerFormSchema } from "../use-content-manager-form-schema"
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
 import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
+import { DialogContentWithAutofocus } from "@/core-features/dynamic-dialog/src/dialog-content-with-autofocus";
 
 export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, ContentManagerEntryDialogContentProps>((props, ref) => {
 
@@ -94,7 +95,7 @@ export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, Cont
 			<DynamicDialogHeader>
 				{header}
 			</DynamicDialogHeader>
-			<DialogContent>
+			<DialogContentWithAutofocus>
 				<Stack
 					gap={2}>
 
@@ -111,7 +112,7 @@ export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, Cont
 					{myDialogContext.openMode !== FormOpenMode.New && <BasicAuditTrail defaultValues={props.defaultValue} />}
 
 				</Stack>
-			</DialogContent>
+			</DialogContentWithAutofocus>
 			<DynamicDialogFooter>
 				<Stack
 					direction="row"
