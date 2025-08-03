@@ -94,7 +94,7 @@ func (Role) Edges() []ent.Edge {
 				entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Edge{
 					Caption:      "Created By",
-					RelationType: entity.RelationTypeO2M,
+					RelationType: entity.RelationTypeOne,
 				},
 			),
 		edge.To("updated_by", User.Type).
@@ -103,7 +103,7 @@ func (Role) Edges() []ent.Edge {
 				entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Edge{
 					Caption:      "Updated By",
-					RelationType: entity.RelationTypeO2M,
+					RelationType: entity.RelationTypeOne,
 				},
 			),
 
@@ -121,7 +121,7 @@ func (Role) Edges() []ent.Edge {
 			Annotations(
 				annotations.Edge{
 					Caption:      "Permissions",
-					RelationType: entity.RelationTypeM2O,
+					RelationType: entity.RelationTypeO2M,
 				},
 			),
 	}
