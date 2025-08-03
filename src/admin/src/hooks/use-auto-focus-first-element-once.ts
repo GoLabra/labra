@@ -1,10 +1,23 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 export function useAutoFocusFirstElementOnce() {
 	const hasFocusedRef = useRef(false);
+	const containerRef = useRef<HTMLElement | null>(null);
 
 	const setRef = useCallback((node: HTMLElement | null) => {
-		if (!node || hasFocusedRef.current) return;
+		containerRef.current = node;
+
+		if (!hasFocusedRef.current) {
+			focus();
+		}
+	}, []);
+
+	const focus = useCallback(() => {
+		const node = containerRef.current;
+
+		if (!node) {
+			return;
+		}
 
 		// Skip if something inside the container already has focus
 		if (node.contains(document.activeElement)) {
@@ -28,5 +41,13 @@ export function useAutoFocusFirstElementOnce() {
 		}
 	}, []);
 
-	return setRef;
+	return useMemo(() => ({
+		setRef,
+		focus: () => {
+			setTimeout(() => {
+				focus();
+			}, 0);
+		}
+	}), [setRef, focus]);
+
 }
