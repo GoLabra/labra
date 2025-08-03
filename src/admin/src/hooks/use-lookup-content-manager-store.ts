@@ -4,7 +4,7 @@ import { FullEntity } from "@/types/entity";
 import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { useApolloClient } from "@apollo/client";
 import { RunQuery } from "./use-lg-query";
-import { GplFilter, LGQuery } from "lg-query";
+import { FilterOperators, GplFilter, LGQuery } from "lg-query";
 
 interface UseLookupGridContentManagerStoreParams {
 	fullEntity: FullEntity | null;
@@ -41,7 +41,7 @@ export const useLookupContentManagerStore = (props: UseLookupGridContentManagerS
 
 		// add filters
 		query = Object.entries(props.searchState.filter).reduce((query, [key, value]) => { 
-			return query.where(GplFilter.field(key, value.operator, value.value));
+			return query.where(GplFilter.field(key, value.operator as FilterOperators, value.value)); 
 		}, query);
 
 		// add skip
@@ -70,7 +70,7 @@ export const useLookupContentManagerStore = (props: UseLookupGridContentManagerS
 
 		// add filters
 		query = Object.entries(props.searchState.filter).reduce((query, [key, value]) => { 
-			return query.where(GplFilter.field(key, value.operator, value.value));
+			return query.where(GplFilter.field(key, value.operator as FilterOperators, value.value));
 		}, query);
 
 		return query;
