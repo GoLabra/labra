@@ -2,7 +2,12 @@ package svc
 
 import (
 	"app/domain/repo"
+    {{- range $n := $.Nodes }}
+	{{- if eq $n.Annotations.Entity.Owner "User" }}
 	"app/interfaces/svc"
+	{{- break }}
+	{{- end }}
+    {{- end }}
 
 	adminRepo "github.com/GoLabra/labra/src/api/entgql/domain/repo"
 	adminSvc "github.com/GoLabra/labra/src/api/entgql/domain/svc"

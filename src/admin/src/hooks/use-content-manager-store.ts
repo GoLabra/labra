@@ -7,7 +7,7 @@ import { Edge, EntityOwner, Field } from "@/lib/apollo/graphql.entities";
 import { getFiltersFromQuery } from "@/lib/utils/get-filters-from-query";
 import { useApolloClient } from "@apollo/client";
 import { RunQuery, useLgQuery } from "./use-lg-query";
-import { GplFilter, LGQuery } from "lg-query";
+import { FilterOperators, GplFilter, LGQuery } from "lg-query";
 
 interface UseGridContentManagerStoreparams {
 	fullEntity?: FullEntity;
@@ -46,7 +46,7 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 			query = query.where(
 				GplFilter.and(
 					...Object.entries(params.searchState.filter).map(([key, filter]) => { 
-						const restul = GplFilter.field(key, filter.operator, filter.value) as GplFilter<any>; 
+						const restul = GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
 						return restul;
 					})
 				)
@@ -58,7 +58,7 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 			query = query.where(
 				GplFilter.or(
 					...Object.entries(queryFilter).map(([key, filter]) => { 
-						return GplFilter.field(key, filter.operator, filter.value) as GplFilter<any>; 
+						return GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
 					})
 				)
 			);
@@ -94,7 +94,7 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 
 		// add filters
 		query = Object.entries(params.searchState.filter).reduce((query, [key, value]) => { 
-			return query.where(GplFilter.field(key, value.operator, value.value));
+			return query.where(GplFilter.field(key, value.operator as FilterOperators, value.value));
 		}, query);
 
 		return query;

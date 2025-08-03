@@ -163,7 +163,7 @@ func (Permission) Edges() []ent.Edge {
 			Annotations(
 				annotations.Edge{
 					Caption:      "Role",
-					RelationType: entity.RelationTypeO2M,
+					RelationType: entity.RelationTypeM2O,
 				},
 			),
 	}
