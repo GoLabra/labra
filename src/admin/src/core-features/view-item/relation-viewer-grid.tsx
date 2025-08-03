@@ -1,12 +1,10 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useOneViewRelationStore, useViewRelationStore } from "./use-view-relation-store";
-import { useContentManagerSearch } from "@/hooks/use-content-manager-search";
-import { useContentManagerStore } from "@/hooks/use-content-manager-store";
 import { useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
 import { useEntities, useFullEntity } from "@/hooks/use-entities";
 import { Action, ColumnsFillRowSpacePlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, Filter, HighlightColumnPlugin, MosaicDataTable, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, useGridPlugins, usePluginWithParams } from "mosaic-data-table";
 import { eqStringFoldOperator } from "../dynamic-filter/filter-operators";
-import { Box, Button, IconButton, Link, ListItemIcon, MenuItem, Stack, styled, Typography } from "@mui/material";
+import { Box, Button, IconButton, Link, ListItemIcon, MenuItem, Stack, styled, Tooltip, Typography } from "@mui/material";
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import { useRouter } from "next/navigation";
 import { Edge } from "@/lib/apollo/graphql.entities";
@@ -16,6 +14,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NextLink from 'next/link';
 import { EmptyMessage } from "@/shared/components/empty-message";
 import { useRelationContentManagerStore } from "@/hooks/use-relation-content-manager-store";
+import { Key } from "@/shared/components/key-handler/types";
+import { ShortcutIconButton } from "@/shared/components/key-handler/with-click-shortcut";
+import { useAutoFocusFirstElementOnce } from "@/hooks/use-auto-focus-first-element-once";
 
 interface RelationViewerGridRootProps {
 	showId: boolean
@@ -33,16 +34,46 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 	const { entities: nameCaptionEntities } = useEntities();
 	const nameCaptionEntity = useMemo(() => nameCaptionEntities.find(i => i.name == visibleEdge?.entityName), [visibleEdge?.entityName, nameCaptionEntities]);
 
+	const autoFocusHandler = useAutoFocusFirstElementOnce()
+	const hostRef = useRef<HTMLDivElement | null>(null);
+
+	const setHostRef = useCallback((instance: HTMLDivElement | null) => {
+		autoFocusHandler.setRef(instance);
+		hostRef.current = instance;
+	}, [autoFocusHandler.setRef]);
+
+	const goBack = useCallback(() => {
+		oneViewRelationStore.goBack();
+		autoFocusHandler.focus();
+	}, [oneViewRelationStore.goBack]);
+
+	const close = useCallback(() => {
+		oneViewRelationStore.close();
+	}, [oneViewRelationStore.close]);
+
+
+	useEffect(() => {
+		if(hostRef.current){
+			hostRef.current.focus();
+		}
+	}, [`${visibleEdge?.entityName}-${visibleEdge?.entryId}`]);
+	
 	if (!visibleEdge) {
 		return;
 	}
 
 	return (
-		<Box sx={{
-			padding: '10px',
-			// backgroundImage: 'url(/rough-diagonal.png)',
-			background: 'url(/assets/img/relation-background.svg)',
-		}}>
+		<Box
+			ref={setHostRef} 
+			tabIndex={0}
+			sx={{
+				padding: '10px',
+				// backgroundImage: 'url(/rough-diagonal.png)',
+				background: 'url(/assets/img/relation-background.svg)',
+				'&:focus': {
+					outline: 'none'
+				}
+			}}>
 
 			<Box sx={{
 				position: 'relative',
@@ -56,9 +87,14 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 						<Stack direction="row" gap={1} alignItems="center" justifyContent="space-between">
 							<Stack direction="row" gap={1} alignItems="center">
 
-								<IconButton aria-label="back" size="medium" onClick={oneViewRelationStore.goBack}>
+								<ShortcutIconButton 
+									shortcutKey={Key.b}
+									shortcutTarget={hostRef}
+									tooltip="Back"
+									aria-label="back" size="medium" onClick={goBack}>
 									<ArrowBackIcon fontSize="inherit" />
-								</IconButton>
+								</ShortcutIconButton>
+								
 
 								{hasHistory && (<Typography variant="h6">
 									{'.'.repeat(oneViewRelationStore.edges.length)} /
@@ -84,9 +120,13 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 
 							</Stack>
 
-							<IconButton aria-label="close" size="medium" onClick={oneViewRelationStore.close}>
+							<ShortcutIconButton 
+								shortcutKey={Key.Escape}
+								shortcutTarget={hostRef}
+								tooltip="Back"
+								aria-label="close" size="medium" onClick={close}>
 								<CloseIcon fontSize="inherit" />
-							</IconButton>
+							</ShortcutIconButton>
 
 						</Stack>
 					</RoundPanelPlaceholder>

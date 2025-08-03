@@ -8,6 +8,7 @@ export enum Key {
 	ArrowLeft = 'ArrowLeft',
 	ArrowRight = 'ArrowRight',
 	a = 'a',
+	b = 'b',
 	c = 'c',
 	f = 'f',
 	n = 'n',
