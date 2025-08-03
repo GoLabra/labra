@@ -61,9 +61,8 @@ export const useKeyHandler = (props: useKeyHandlerProps) => {
 
 
 		if (modifiersPressed && e.key === propRef.current.keyToHandle) {
-
 			propRef.current.onTriggered(e as unknown as React.KeyboardEvent<HTMLDivElement>);
-
+			e.preventDefault();
 			e.shortcutBubbleCancelled = true;
 		}
 	}, []);

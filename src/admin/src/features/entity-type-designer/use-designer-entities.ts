@@ -161,6 +161,34 @@ export const useEntitiesDesigner = () => {
         designerChanges.setDisplayField(entityName, displayFieldCaption);
     }, [designerChanges.setDisplayField, graphEntities.fullEntitiesMap]);
 
+	const trySetDisplayField = useCallback((entityName: string, field: DesignerField) => {
+		if(field.__typename != 'Field'){
+			return;
+		}
+
+		const originalDisplayField = graphEntities.fullEntitiesMap[entityName]?.displayField?.name
+		if(originalDisplayField && originalDisplayField != 'id'){
+			return;
+		}
+
+		const changedDisplayField = designerChanges.changedFullEntitiesMap[entityName]?.displayFieldCaption;
+		
+		if(changedDisplayField){
+			return;
+		}
+		designerChanges.setDisplayField(entityName, field.caption);
+	}, [ designerChanges.setDisplayField, designerChanges.changedFullEntitiesMap, graphEntities.fullEntitiesMap]);
+
+	const addChild = useCallback((entityName: string, field: DesignerField | DesignerEdge) => {
+		designerChanges.addChild(entityName, field);
+
+		// try set display field if not set
+		if(field.__typename == 'Field'){
+			trySetDisplayField(entityName, field as DesignerField);
+		}
+
+	}, [designerChanges.addChild, designerChanges.setDisplayField, trySetDisplayField]);
+
     return useMemo(() => ({
         allEntities: allFullEntities,
         allFullEntitiesMap: allFullEntitiesMap,
@@ -172,8 +200,8 @@ export const useEntitiesDesigner = () => {
 
         setDisplayField: setDisplayField,
 
-        addChild: designerChanges.addChild,
-        updateChild: updateChild,
+        addChild,
+        updateChild,
         
         deleteEntity,
         deleteChild,

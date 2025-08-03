@@ -48,6 +48,9 @@ export const DynamicDialogContent = (props: DynamicDialogContentProps) => {
 
             <Dialog
                 ref={dialogRef}
+				disableAutoFocus
+				disableEnforceFocus
+				disableRestoreFocus
                 keepMounted={false}
                 onClose={() => dynaicDialogContext.close(props.dialog.dialogId)}
                 TransitionComponent={Transition}
