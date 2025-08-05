@@ -44,6 +44,7 @@ const formattedDefaultValue = (type: string, value: any) => {
 
 const FlagBox = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
+	// border: '1px solid var(--mui-palette-divider)',
     fontSize: "10px",
     minWidth: "20px",
     height: "16px",
@@ -83,7 +84,9 @@ export const EntityTypeDesignerFieldFlags = (props: EntityTypeDesignerFieldFlags
 
 
     const fieldFlags = useCallback((field: DesignerField) => (
-        <Stack gap="1px" direction="row" borderRadius={1} overflow="hidden" alignItems="center">
+        <Stack gap="1px" direction="row" borderRadius={1} overflow="hidden" alignItems="center" sx={{
+			border: '1px solid var(--mui-palette-divider)'
+		}}>
             {getFlag(!!field.required, "R", "Required")}
             {getFlag(!!field.unique, "U", "Unique")}
             {getFlag(!!field.min, "M", `Min: ${formattedDefaultValue(field.type, field.min)}`)}
@@ -95,7 +98,9 @@ export const EntityTypeDesignerFieldFlags = (props: EntityTypeDesignerFieldFlags
     ), []);
 
     const edgeFlags = useCallback((field: DesignerEdge) => (
-        <Stack gap="1px" direction="row" borderRadius={1} overflow="hidden" alignItems="center">
+        <Stack gap="1px" direction="row" borderRadius={1} overflow="hidden" alignItems="center" sx={{
+			border: '1px solid var(--mui-palette-divider)'
+		}}>
             {getFlag(!!field.required, "R", "Required")}
             {getFlag(field.relationType === 'One', `➔ O`, "One")}
             {getFlag(field.relationType === 'Many', "➔ M", "Many")}

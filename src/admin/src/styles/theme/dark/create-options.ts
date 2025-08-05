@@ -18,7 +18,10 @@ export const createOptions = (config: Config): ThemeOptions => {
         palette,
         components: {
             
-        }
+        },
+		shape: {
+			borderRadius: 6
+		}
         //shadows
     };
 };

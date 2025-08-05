@@ -187,7 +187,7 @@ export default function EntityTypeDesignerScene(
 
     return (<>
         <Card>
-            <CardContent>
+            <CardContent data-noxpadding="true">
                 <MosaicDataTable
                     plugins={gridPlugins}
                     caption="Entity fields and edges"

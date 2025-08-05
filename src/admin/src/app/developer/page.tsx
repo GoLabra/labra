@@ -47,6 +47,7 @@ export default function ContentManager() {
 
                             <Stack
                                 direction="row"
+								alignItems="center"
                                 spacing={1}>
 
                                 {/* <Button

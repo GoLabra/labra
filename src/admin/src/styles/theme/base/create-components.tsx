@@ -47,10 +47,31 @@ export const createComponents = (): Components => {
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'var(--mui-palette-background-paper)'
-                }
+                    '--mui-palette-AppBar-darkBg': 'var(--mui-palette-background-default)',
+					'--AppBar-background': 'var(--mui-palette-background-default)',
+					"--Paper-shadow": "none",
+            		"--Paper-overlay": "none",
+					borderBottom: '1px solid var(--mui-palette-divider)'
+                },
+				
             }
         },
+		MuiCard: {
+			styleOverrides: {
+				root: {
+					border: '1px solid var(--mui-palette-divider)'
+				}
+			}
+		},
+		MuiCardContent: {
+			styleOverrides: {
+				root: {
+					'&[data-noxpadding]': {
+						paddingInline: 0,
+					}
+				}
+			}
+		}, 	
         MuiAutocomplete: {
             styleOverrides: {
                 root: {
@@ -107,18 +128,18 @@ export const createComponents = (): Components => {
             },
             styleOverrides: {
                 root: ({ theme }: { theme: any }) => ({
-                    fontWeight: 500,
-                    borderRadius: 3,
+                    fontWeight: 100,
+                    // borderRadius: 6,
                     textTransform: 'none',
                     '&:focus': {
                         boxShadow: `${alpha((theme.palette.primary as PaletteColor).main, 0.25)} 0 0 0 0.2rem`
                     }
                 }),
                 sizeLarge: {
-                    fontSize: 16
+                    fontSize: 14
                 },
                 sizeMedium: {
-                    fontSize: 15
+                    fontSize: 14
                 },
                 sizeSmall: {
                     fontSize: 14
@@ -211,6 +232,13 @@ export const createComponents = (): Components => {
         //         },
         //     }
         // },
+		MuiDialog: {
+			styleOverrides: {
+				paper: {
+					border: `1px solid var(--mui-palette-divider)`,
+				}
+			}
+		}, 
         MuiDialogActions: {
             styleOverrides: {
                 root: {
@@ -221,7 +249,7 @@ export const createComponents = (): Components => {
                     borderBottomLeftRadius: 6,
                     borderBottomRightRadius: 6,
 
-                    backgroundColor: 'var(--mui-palette-background-default)',
+                    // backgroundColor: 'var(--mui-palette-background-default)',
 
                     '&>:not(:first-of-type)': {
                         marginLeft: 16
@@ -316,9 +344,9 @@ export const createComponents = (): Components => {
         MuiFilledInput: {
             styleOverrides: {
                 root: ({ theme }: { theme: any }) => ({
-                    borderRadius: 3,
+                    borderRadius: 6,
                     borderStyle: 'solid',
-                    borderWidth: 1,
+                    borderWidth: 2,
                     overflow: 'hidden',
                     padding: '6px 12px',
 
@@ -337,11 +365,11 @@ export const createComponents = (): Components => {
                     [`&.${filledInputClasses.focused}`]: {
                         backgroundColor: 'transparent',
                         borderColor: (theme.palette.primary as PaletteColor).main,
-                        boxShadow: `${alpha((theme.palette.primary as PaletteColor).main, 0.25)} 0 0 0 0.2rem`
+                        // boxShadow: `${alpha((theme.palette.primary as PaletteColor).main, 0.25)} 0 0 0 0.2rem`
                     },
                     [`&.${filledInputClasses.error}`]: {
                         borderColor: (theme.palette.error as PaletteColor).main,
-                        boxShadow: `${alpha((theme.palette.error as PaletteColor).main, 0.25)} 0 0 0 0.2rem`
+                        // boxShadow: `${alpha((theme.palette.error as PaletteColor).main, 0.25)} 0 0 0 0.2rem`
                     },
                     '&:hover': {
                         backgroundColor: theme.palette.action!.hover
@@ -350,7 +378,7 @@ export const createComponents = (): Components => {
                     ...(theme.palette.mode === 'light' ? {
 
                         borderColor: theme.palette.neutral![300],
-                        boxShadow: `0px 1px 2px 0px ${alpha(theme.palette.neutral![800], 0.08)}`,
+                        // boxShadow: `0px 1px 2px 0px ${alpha(theme.palette.neutral![800], 0.08)}`,
 
                         [`&.${filledInputClasses.disabled}`]: {
                             backgroundColor: theme.palette.action!.disabledBackground,
@@ -360,7 +388,7 @@ export const createComponents = (): Components => {
                     } : {
 
                         borderColor: theme.palette.neutral![600],
-                        boxShadow: `0px 1px 2px 0px ${alpha(theme.palette.neutral![900], 0.08)}`,
+                        // boxShadow: `0px 1px 2px 0px ${alpha(theme.palette.neutral![900], 0.08)}`,
 
                         [`&.${filledInputClasses.disabled}`]: {
                             backgroundColor: theme.palette.action!.disabledBackground,

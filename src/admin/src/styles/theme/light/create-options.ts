@@ -8,7 +8,7 @@ interface Config {
     colorPreset?: ColorPreset;
 }
 
-export const createOptions = (config: Config): ColorSystemOptions => {
+export const createOptions = (config: Config): ThemeOptions => {
     const { colorPreset } = config;
     const palette = createPalette({ colorPreset });
     //   const components = createComponents({ palette });
@@ -16,6 +16,9 @@ export const createOptions = (config: Config): ColorSystemOptions => {
 
     return {
         palette,
+		shape: {
+			borderRadius: 6
+		}
         //shadows
     };
 };

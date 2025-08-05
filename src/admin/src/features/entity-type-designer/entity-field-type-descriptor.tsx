@@ -33,9 +33,10 @@ export default function EntityFieldTypeDescriptor(props: EntityFieldTypeDescript
                 sx={{
                     paddingY: '4px',
                     paddingX: '8px',
-                    borderRadius: 0.4,
-                    backgroundColor: (theme) => lighten(theme.palette.neutral[400], 0.8),
-                    color: 'primary.main',
+                    // borderRadius: 0.4,
+					//border
+                    //backgroundColor: (theme) => lighten(theme.palette.neutral[400], 0.8),
+                    //color: 'primary.main',
                 }}>
 
                 <Typography sx={{

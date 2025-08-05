@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 export const PageHeader = styled(Box)(
     ({ theme }) => ({
         position: "sticky",
-        top: 64,
+        top: 0,
         zIndex: 10,
         backgroundColor: 'var(--mui-palette-background-default)',
         padding: '8px 0',

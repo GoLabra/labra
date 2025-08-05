@@ -69,7 +69,8 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 			sx={{
 				padding: '10px',
 				// backgroundImage: 'url(/rough-diagonal.png)',
-				background: 'url(/assets/img/relation-background.svg)',
+				//background: 'url(/assets/img/relation-background.svg)',
+				backgroundColor: 'var(--mui-palette-background-default)',
 				'&:focus': {
 					outline: 'none'
 				}

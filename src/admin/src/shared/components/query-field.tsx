@@ -13,7 +13,7 @@ const QueryFieldRoot = styled('div')(
 	(({ theme }) => ({
 		alignItems: 'center',
 		backgroundColor: 'background.paper',
-		border: `1px solid ${theme.palette.divider}`,
+		border: `1px solid var(--mui-palette-divider)`,
 		borderRadius: theme.shape.borderRadius,
 		display: 'flex',
 		height: 42,

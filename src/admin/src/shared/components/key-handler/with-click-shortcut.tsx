@@ -4,6 +4,7 @@ import { useKeyHandler } from "./use-key-handler";
 import { ShortcutViewer } from "./shortcut-viewer";
 import { Button, ButtonBase, IconButton, Stack, Tooltip } from "@mui/material";
 import { ResponsiveButton } from "@/styles/button.responsive";
+import { IconTextButton } from "../IconTextButton";
 
 export interface useWithClickShortcutProps {
 	keyToHandle: Key;
@@ -107,6 +108,6 @@ export function withClickShortcut<T>(
 
 
 
-export const ShortcutButton = withClickShortcut(Button);
+export const ShortcutButton = withClickShortcut(IconTextButton);
 export const ShortcutIconButton = withClickShortcut(IconButton, false);
 export const ShortcutButtonBase = withClickShortcut(ButtonBase, false);

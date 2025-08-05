@@ -1,6 +1,6 @@
 import type { ColorSystemOptions, PaletteOptions } from '@mui/material';
 import { common } from '@mui/material/colors';
-import { alpha } from '@mui/material/styles';
+import { alpha, darken } from '@mui/material/styles';
 import { error, info, neutral, success, warning } from '../colors';
 import type { ColorPreset } from '../index';
 import { getPrimary } from '../utils';
@@ -22,20 +22,25 @@ export const createPalette = (config: Config): ColorSystemOptions['palette'] => 
       selected: alpha('#516377', 0.12)
     },
     background: {
-      default: '#f3f4f4',
-      paper: '#ffffff'
+      default: '#f5f7f9',
+      paper: '#fdfdfd'
     },
-    divider: '#dce3e3',
+    divider: '#b8bfcd',
     error,
     info,
     mode: 'light',
     neutral,
     primary: getPrimary(colorPreset),
-    secondary: getPrimary(colorPreset),
+    secondary: {
+		light: '#6e7986',
+		main: '#66707c',
+		dark: '#565e68',
+		contrastText: '#000000'
+	},
     success,
     text: {
       primary: '#283543',
-      secondary: '#57616c',
+      secondary: '#66707c',
       disabled: alpha(neutral[900], 0.38)
     },
     warning,
