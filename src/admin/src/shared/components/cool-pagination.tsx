@@ -32,7 +32,8 @@ export const CoolPagination = (props: CoolPaginationProps) => {
                             padding: '0 10px',
                             backgroundColor: (theme) => theme.palette.mode === 'dark' ? alpha(theme.palette.neutral[900], .6) : alpha(theme.palette.neutral[50], .2),
                             margin: '0 10px',
-                            borderRadius: 1
+                            borderRadius: 1,
+                            border: '1px solid var(--mui-palette-divider)'
                         }} />
                     </Tooltip>
                 )}

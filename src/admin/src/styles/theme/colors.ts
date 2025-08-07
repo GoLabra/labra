@@ -17,9 +17,9 @@ export const neutral: NeutralColors = {
 
 export const blue = {
   //light: 'color-mix(in srgb, var(--mui-palette-primary-main), var(--mui-palette-common-onBackground) 30%)',
-  light: '#3273dd',
-  main: '#3273dd',
-  dark: '#3273dd',
+  light: '#4475b2',
+  main: '#4475b2',
+  dark: '#4475b2',
   //dark: 'color-mix(in srgb, var(--mui-palette-primary-main), var(--mui-palette-common-background) 30%)',
   contrastText: '#FFFFFF'
 };

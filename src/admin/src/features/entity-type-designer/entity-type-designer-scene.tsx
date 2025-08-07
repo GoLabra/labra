@@ -189,6 +189,7 @@ export default function EntityTypeDesignerScene(
         <Card>
             <CardContent data-noxpadding="true">
                 <MosaicDataTable
+					className="lpadding"
                     plugins={gridPlugins}
                     caption="Entity fields and edges"
                     items={entityDesigner.fullDesignerEntity?.children.filter(i => i.designerStatus != 'deleted')}

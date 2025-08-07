@@ -198,6 +198,7 @@ export const ContentManagerScene = () => {
                 <CardContent data-noxpadding="true">
 
                     <MosaicDataTable
+						className="lpadding"
                         plugins={gridPlugins}
                         caption={`${contentManager.entityName} content`}
                         items={contentManager.contentManagerStore.state.data}

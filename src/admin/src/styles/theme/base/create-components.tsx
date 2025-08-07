@@ -567,38 +567,66 @@ export const createComponents = (): Components => {
         MosaicDataTable: {
             styleOverrides: {
                 root: {
-                    'table>caption': {
-                        display: 'none'
-                    },
-                    '.MosaicDataTablePaper-root': {
-                        boxShadow: 'none'
-                    },
+
+					'.MosaicDataTable-root:not(.lpadding)': {
+						'--mosaic-first-column-padding': '0'
+					},
+
+					
+					'&.lpadding': {
+						'--mosaic-first-column-padding': '10px',
+						'.MuiTableHead-root': {
+							'.MuiTableRow-root': {
+								'th:nth-child(1)': {
+									'.MosaicDataTable-headcell-data': {
+										'padding-left': 'var(--mosaic-first-column-padding)'
+									}
+								}
+							}
+						},
+						'.MuiTableBody-root': {
+							'.MuiTableRow-root': {
+								'td:nth-child(1)': {
+									'.MosaicDataTable-cell-data': {
+										'padding-left': 'var(--mosaic-first-column-padding)'
+									}
+								}
+							}
+						}
+					},
+
+                    // 'table>caption': {
+                    //     display: 'none'
+                    // },
+                    // '.MosaicDataTablePaper-root': {
+                    //     boxShadow: 'none'
+                    // },
                     '.MuiTableContainer-root': {
                         width: '100px',
                         minWidth: '100%',
                     },
-                    '.MuiTableCell-head': {
-                        padding: 0,
-                        height: '100%',
+                    // '.MuiTableCell-head': {
+                    //     padding: 0,
+                    //     height: '100%',
 
-                        '.MuiTableCellDockedDiv-root': {
-                            // padding: '10px 10px',
-                            // margin: 0,
-                            borderTopLeftRadius: 2,
-                            borderTopRightRadius: 2,
-                        }
-                    },
-                    '.MuiTableCell-body': {
-                        height: '100%'
-                    },
-                    '.MuiTableCell-root': {
-                        padding: 0,
+                    //     '.MuiTableCellDockedDiv-root': {
+                    //         // padding: '10px 10px',
+                    //         // margin: 0,
+                    //         borderTopLeftRadius: 2,
+                    //         borderTopRightRadius: 2,
+                    //     }
+                    // },
+                    // '.MuiTableCell-body': {
+                    //     height: '100%'
+                    // },
+                    // '.MuiTableCell-root': {
+                    //     padding: 0,
 
-                        // '.MuiTableCellDockedDiv-root': {
-                        //     padding: '10px 10px',
-                        //     margin: 0
-                        // }
-                    }
+                    //     // '.MuiTableCellDockedDiv-root': {
+                    //     //     padding: '10px 10px',
+                    //     //     margin: 0
+                    //     // }
+                    // }
                 }
             }
         },
