@@ -564,6 +564,15 @@ export const createComponents = (): Components => {
                 }
             }
         },
+		MuiMenuItem: {
+			styleOverrides: {
+				root: {
+					'.MuiListItemIcon-root': {
+						opacity: .5
+					}
+				}
+			}
+		},
         MosaicDataTable: {
             styleOverrides: {
                 root: {

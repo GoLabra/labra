@@ -33,14 +33,14 @@ export const createPalette = (config: Config): ColorSystemOptions['palette'] => 
     primary: getPrimary(colorPreset),
     secondary: {
 		light: '#a8b4c4',
-		main: '#9faab9',
+		main: '#9198a1',
 		dark: '#828b97',
 		contrastText: '#FFFFFF'
 	},
     success,
     text: {
       primary: '#e9ecef',
-      secondary: '#9faab9',
+      secondary: '#9198a1',
       disabled: alpha(common.white, 0.38)
     },
     warning, 

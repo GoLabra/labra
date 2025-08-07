@@ -10,6 +10,7 @@ import { useMemo } from "react";
 import Defaults from "@/config/Defaults.json";
 import { useAppStatus } from "@/store/app-state/use-app-state";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
+import { Counter } from "@/shared/components/counter";
 
 export default function ContentManagernEntities() {
 
@@ -23,7 +24,7 @@ export default function ContentManagernEntities() {
             <CategoryCollapse
                 label={<Stack direction="row" alignItems="center" gap={1}>
                     ENTITIES
-                    {!loading && <Chip component="span" label={entities.length} color="secondary" variant="outlined" size="small" />}
+                    {!loading && <Counter label={entities.length}/>}
                 </Stack>}
                 openImmediately={true}>
                 <TreeList>
