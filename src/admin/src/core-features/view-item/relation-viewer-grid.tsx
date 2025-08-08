@@ -124,7 +124,7 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 							<ShortcutIconButton 
 								shortcutKey={Key.Escape}
 								shortcutTarget={hostRef}
-								tooltip="Back"
+								tooltip="Close"
 								aria-label="close" size="medium" onClick={close}>
 								<CloseIcon fontSize="inherit" />
 							</ShortcutIconButton>

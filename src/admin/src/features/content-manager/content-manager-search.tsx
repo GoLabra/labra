@@ -126,7 +126,7 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 								tooltip='Selection'
                                 disabled={disabled}
                                 onClick={() => props.onSelectionEnabledChange?.(!props.selectionEnabled)}
-								size="small"
+								size="medium"
 								color={props.selectionEnabled ? 'primary' : 'secondary'}
                             >
                                  <ChecklistIcon />
@@ -144,7 +144,7 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                                     }
                                 }}
     
-								size="small"
+								size="medium"
 								color={props.filterEnabled ? 'primary' : 'secondary'}
                             >
 								<FilterAltIcon />
@@ -152,15 +152,23 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
                             <MenuButton
                                 text="Configure"
-                                slotProps={{
-                                    buttonProps: {
-										color: "secondary",
-                                        startIcon: (
+								slots={{
+									button: (<ResponsiveButton 
+										color="secondary"
+										mobileProps={{
+											endIcon: (
+												<SvgIcon style={{ fontSize: 18 }} >
+													<WrenchScrewdriverIcon />
+												</SvgIcon>)
+										}}
+                                        startIcon={(
                                             <SvgIcon style={{ fontSize: 18 }} >
-                                                <WrenchScrewdriverIcon />
-                                            </SvgIcon>)
-                                    }
-                                }}>
+                                                <ArrowDropDownIcon />
+                                            </SvgIcon>)} 
+										>
+											<span className="button-text">Configure</span>
+										</ResponsiveButton>)
+								}} >
 
                                 <MenuItem>
                                     <ListItemText>Show Id Column</ListItemText>
