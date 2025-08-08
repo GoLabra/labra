@@ -60,7 +60,7 @@ export const CounterGroup = forwardRef<HTMLDivElement, CounterGroupProps>((props
 		</CounterGroupRoot>
 	);
 });
-
+CounterGroup.displayName = 'Counter';
 
 
 const CounterRoot = styled(Box, {
@@ -86,3 +86,4 @@ export const Counter = forwardRef<HTMLDivElement, CounterProps>(({ label, classN
 		{label}
 	</CounterRoot>
 ));
+Counter.displayName = 'Counter';
