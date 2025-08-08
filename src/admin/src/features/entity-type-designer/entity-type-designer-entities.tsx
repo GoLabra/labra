@@ -37,17 +37,12 @@ const newEntityBorderStyle = (theme: Theme) => {
 
 const TreeListItemButtonStyled = styled(TreeListItemButton)(({ theme }) => [
     {
-        color: 'text.secondary',
+        color: 'var(--mui-palette-primary-main)',
         borderWidth: '2px',
-        borderStyle: 'dashed'
-    },
-    theme.applyStyles('light', {
-        borderColor: 'var(--mui-palette-neutral-100)',
-
-    }),
-    theme.applyStyles('dark', {
-        borderColor: 'var(--mui-palette-background-paper)',
-    }),
+        borderStyle: 'dashed',
+		borderColor: 'var(--mui-palette-primary-main)',
+		borderRadius: '6px'
+    }
 ]);
 
 const ShortcutTreeListItem = withLabelShortcut(TreeListItemButtonStyled);

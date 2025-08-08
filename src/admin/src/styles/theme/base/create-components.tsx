@@ -434,10 +434,22 @@ export const createComponents = (): Components => {
         MuiListItemIcon: {
             styleOverrides: {
                 root: {
-                    minWidth: '36px'
+                    minWidth: '36px',
+					'.MuiSvgIcon-root': {
+						opacity: .5
+					}
                 }
             }
         },
+		MuiListItemButton: {
+			styleOverrides: {
+				root: {
+					'.MuiSvgIcon-root': {
+						opacity: .5
+					}
+				}
+			}
+		},
         MuiPaper: {
             styleOverrides: {
                 root: {
