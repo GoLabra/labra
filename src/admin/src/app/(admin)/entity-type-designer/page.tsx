@@ -5,6 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CreateIcon from '@mui/icons-material/Create';
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { OfficialCommunicationChannels } from "@/shared/components/official-communication-channels";
+import { Counter, CounterGroup } from "@/shared/components/counter";
 
 
 export default function EntityTypeDesigner() {
