@@ -52,7 +52,7 @@ export default function SideNav(props: SideNavProps) {
                 overflowX: 'hidden',
                 height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
                 position: 'sticky',
-                top: TOP_NAV_HEIGHT,
+                top: 0,
             }}>
 
 

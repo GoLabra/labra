@@ -14,7 +14,7 @@ export const TreeListItem = styled(ListItem)(({ theme }) => {
                 content: '""',
                 display: 'block',
                 position: 'absolute',
-                top: '-14px',
+                top: 'calc(-25px / 2)',
                 left: '-2px',
                 width: '12px',
                 height: '35px',
@@ -38,9 +38,9 @@ export const TreeListItem = styled(ListItem)(({ theme }) => {
             }
         }),
         theme.applyStyles('dark', {
-            borderLeftColor: 'var(--mui-palette-background-paper)',
+            borderLeftColor: 'var(--mui-palette-divider)',
             '&:before': {
-                borderColor: 'var(--mui-palette-background-paper)',
+                borderColor: 'var(--mui-palette-divider)',
             }
         }),
     ]
@@ -141,11 +141,20 @@ export const TreeListItemNavigation = (props: TreeListItemNavigationProps) => {
     const ListItemButtonStyled = styled(ListItemButton)<ListItemButtonProps & { href: string }>(({ theme }) => ({
         marginTop: '5px',
         marginBottom: '5px',
-        padding: '0px 10px',
-        borderRadius: 1,
+        padding: '2px 12px',
+        borderRadius: '6px',
         ...(active && {
             // color: 'primary.main',
-            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+            // backgroundColor: alpha(theme.palette.primary.main, 0.1),
+
+
+
+			    border: '1px solid var(--mui-palette-divider)',
+				
+				// backgroundColor: 'var(--mui-palette-background-default)',
+				backgroundColor: 'var(--mui-palette-background-paper)'
+
+
         }),
     }));
 
@@ -174,9 +183,9 @@ export const TreeListItemNavigation = (props: TreeListItemNavigationProps) => {
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 fontSize: '0.9rem',
-                                ...(active && {
-                                    color: 'var(--mui-palette-primary-main)'
-                                }),
+                                // ...(active && {
+                                //     color: 'var(--mui-palette-primary-main)'
+                                // }),
                             }
                         }
                     }}

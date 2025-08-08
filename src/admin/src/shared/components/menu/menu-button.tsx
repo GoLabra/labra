@@ -2,7 +2,6 @@ import { usePopover } from "@/hooks/use-popover";
 import { Button, ButtonProps, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, Popover, SvgIcon, Switch } from "@mui/material";
 import WifiIcon from '@mui/icons-material/Wifi';
 import React, { useMemo } from "react";
-import { ResponsiveButton } from "@/styles/button.responsive";
 
 
 interface MenuButtonProps {
@@ -37,13 +36,13 @@ export const MenuButton = (props: MenuButtonProps) => {
             ? React.cloneElement(props.slots.button as React.ReactElement, {
                 ...buttonProps
             }) 
-            : (<ResponsiveButton
+            : (<Button
                 variant="text"
                 size="medium"
                 {...buttonProps}
                 {...slotProps?.buttonProps}
             >
-                <span className="button-text">{text}</span></ResponsiveButton>)}
+                <span className="button-text">{text}</span></Button>)}
 
             <Menu
                 id="basic-menu"

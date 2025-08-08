@@ -3,6 +3,7 @@ import PlusCircleIcon from "@heroicons/react/24/outline/PlusCircleIcon"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+
 import { ContentManagerSearch } from "./content-manager-search"
 import { useSelection } from "@/hooks/use-selection";
 import { DynamicDialog, FinishResult } from "../../core-features/dynamic-dialog/src/dynamic-dialog"
@@ -194,9 +195,10 @@ export const ContentManagerScene = () => {
 
                 <Divider />
 
-                <CardContent>
+                <CardContent data-noxpadding="true">
 
                     <MosaicDataTable
+						className="lpadding"
                         plugins={gridPlugins}
                         caption={`${contentManager.entityName} content`}
                         items={contentManager.contentManagerStore.state.data}

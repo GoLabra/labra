@@ -1,5 +1,6 @@
 import { localeConfig } from "@/config/locale-config";
 import { stringToDate, stringToDateTime, stringToTime, timeToString } from "@/core-features/dynamic-form/value-convertor";
+import { Counter, CounterGroup } from "@/shared/components/counter";
 import { DesignerEdge, DesignerField } from "@/types/entity";
 import { FieldScalarTypes } from "@/types/field-type-descriptor";
 import { Box, Stack, styled, Tooltip } from "@mui/material";
@@ -41,35 +42,14 @@ const formattedDefaultValue = (type: string, value: any) => {
     return value;
 }
 
-
-const FlagBox = styled(Box)(({ theme }) => ({
-    backgroundColor: theme.palette.background.default,
-    fontSize: "10px",
-    minWidth: "20px",
-    height: "16px",
-    display: "flex",
-    padding: '0 7px',
-    justifyContent: "center",
-    alignItems: "center",
-    opacity: 0.7,
-    cursor: "default",
-    transition: "opacity 0.2s",
-    textWrap: 'nowrap',
-    whiteSpace: 'nowrap',
-    
-    "&:hover": {
-        opacity: 1,
-    },
-}));
-
 const getFlag = (show: boolean, flag: string, title: string) => {
     if (!show) {
         return null;
     }
 
     return (
-        <Tooltip title={title}>
-            <FlagBox>{flag}</FlagBox>
+        <Tooltip title="test">
+            <Counter label={flag}></Counter>
         </Tooltip>
     );
 };
@@ -83,7 +63,7 @@ export const EntityTypeDesignerFieldFlags = (props: EntityTypeDesignerFieldFlags
 
 
     const fieldFlags = useCallback((field: DesignerField) => (
-        <Stack gap="1px" direction="row" borderRadius={1} overflow="hidden" alignItems="center">
+        <CounterGroup size="10px">
             {getFlag(!!field.required, "R", "Required")}
             {getFlag(!!field.unique, "U", "Unique")}
             {getFlag(!!field.min, "M", `Min: ${formattedDefaultValue(field.type, field.min)}`)}
@@ -91,11 +71,11 @@ export const EntityTypeDesignerFieldFlags = (props: EntityTypeDesignerFieldFlags
             {getFlag(!!field.private, "P", "Private")}
             {getFlag(!!field.acceptedValues, "V", `Accepted Values: ${field.acceptedValues}`)}
             {getFlag(field.defaultValue !== undefined && field.defaultValue !== null, "D", `Default Value: ${formattedDefaultValue(field.type, field.defaultValue)}`)}
-        </Stack>
+        </CounterGroup>
     ), []);
 
     const edgeFlags = useCallback((field: DesignerEdge) => (
-        <Stack gap="1px" direction="row" borderRadius={1} overflow="hidden" alignItems="center">
+        <CounterGroup size="10px">
             {getFlag(!!field.required, "R", "Required")}
             {getFlag(field.relationType === 'One', `➔ O`, "One")}
             {getFlag(field.relationType === 'Many', "➔ M", "Many")}
@@ -104,7 +84,7 @@ export const EntityTypeDesignerFieldFlags = (props: EntityTypeDesignerFieldFlags
             {getFlag(field.relationType === 'ManyToOne', "➔ MO", "Many To One")}
             {getFlag(field.relationType === 'ManyToMany', "➔ MM", "Many To Many")}
 
-        </Stack>), []);
+        </CounterGroup>), []);
 
     switch (child.__typename) {
         case "Field": return fieldFlags(child);

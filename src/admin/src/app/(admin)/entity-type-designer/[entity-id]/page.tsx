@@ -146,11 +146,12 @@ const PageContent = (props: PageContentProps) => {
                     {isSystemEntity == false && (
                         <Stack
                             direction="row"
+							alignItems="center"
                             spacing={1}>
 
                             <ShortcutButton
 								shortcutKey={Key.s}
-
+								iconOpacity={true}
                                 size="medium"
                                 variant="contained"
                                 startIcon={<VscSave size={16} />}

@@ -5,7 +5,7 @@ import { localeConfig } from "@/config/locale-config"
 import CheckIcon from '@mui/icons-material/Check';
 import { ColumnDef, useResponsivePin, useRowExpansionStore } from 'mosaic-data-table';
 import { Edge, Field, RelationType } from '@/lib/apollo/graphql.entities';
-import { Avatar, Button, Chip, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, Stack, Typography } from '@mui/material';
 // import { stringAvatar } from '@/lib/utils/avatar';
 import { stringToDate, stringToDateTime, stringToTime } from '@/core-features/dynamic-form/value-convertor';
 import { InlineAvatar } from '@/shared/components/avatar';
@@ -159,6 +159,10 @@ const dateTimeColumnDef = (name: string, caption: string, render: (row: any) => 
                 return '';
             }
 
+			return (<>
+				<Typography variant="body2" component='span' color='var(--mui-palette-text-secondary)'>{stringToDateTime(value)?.format(localeConfig.date.displayFormat) ?? undefined}, </Typography>
+				<Typography variant="body2" component='span'>{stringToDateTime(value)?.format(localeConfig.time.displayFormat) ?? undefined}</Typography>
+			</>)
             return stringToDateTime(value)?.format(localeConfig.dateTime.displayFormat) ?? undefined;
 
         },

@@ -28,7 +28,7 @@ export const Header = (props: HeaderProps) => {
 
     return (
         <>
-            <AppBar position="sticky" sx={{
+            <AppBar position="relative" sx={{
                   gridArea: 'header' 
                 }}>
 

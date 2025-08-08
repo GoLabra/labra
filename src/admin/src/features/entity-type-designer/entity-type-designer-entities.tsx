@@ -22,6 +22,7 @@ import { useAppStatus } from "@/store/app-state/use-app-state";
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import { withLabelShortcut } from "@/shared/components/key-handler/with-label-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
+import { Counter } from "@/shared/components/counter";
 
 const iconStatus = {
     'new': <SvgIcon fontSize="small"><PlusIcon /></SvgIcon>,
@@ -36,17 +37,12 @@ const newEntityBorderStyle = (theme: Theme) => {
 
 const TreeListItemButtonStyled = styled(TreeListItemButton)(({ theme }) => [
     {
-        color: 'text.secondary',
+        color: 'var(--mui-palette-primary-main)',
         borderWidth: '2px',
-        borderStyle: 'dashed'
-    },
-    theme.applyStyles('light', {
-        borderColor: 'var(--mui-palette-neutral-100)',
-
-    }),
-    theme.applyStyles('dark', {
-        borderColor: 'var(--mui-palette-background-paper)',
-    }),
+        borderStyle: 'dashed',
+		borderColor: 'var(--mui-palette-primary-main)',
+		borderRadius: '6px'
+    }
 ]);
 
 const ShortcutTreeListItem = withLabelShortcut(TreeListItemButtonStyled);
@@ -73,7 +69,7 @@ export default function EntityTypeBuilderEntities() {
 
             <CategoryCollapse label={<Stack direction="row" alignItems="center" gap={1}>
                 ENTITIES
-                {!graphEntities.loadingNameCaptionEntities && <Chip component="span" label={allNameCaptionEntities.length} color="secondary" variant="outlined" size="small" />}
+                {!graphEntities.loadingNameCaptionEntities && <Counter label={allNameCaptionEntities.length}/>}
             </Stack>}
                 openImmediately={true}>
                 <TreeList>
