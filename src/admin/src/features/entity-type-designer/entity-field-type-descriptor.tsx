@@ -1,4 +1,4 @@
-import { Paper, Stack, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import React, { FC, ReactNode } from "react";
 import { lighten } from '@mui/material/styles';
 import { GiPolarStar } from "react-icons/gi";
@@ -29,14 +29,12 @@ export default function EntityFieldTypeDescriptor(props: EntityFieldTypeDescript
             p={0}
             sx={{ margin: '4px' }}>
 
-            <Paper
+            <Box
                 sx={{
                     paddingY: '4px',
                     paddingX: '8px',
-                    // borderRadius: 0.4,
-					//border
-                    //backgroundColor: (theme) => lighten(theme.palette.neutral[400], 0.8),
-                    //color: 'primary.main',
+					borderRadius: 1,
+					backgroundColor: 'var(--mui-palette-background-paper)'
                 }}>
 
                 <Typography sx={{
@@ -44,7 +42,7 @@ export default function EntityFieldTypeDescriptor(props: EntityFieldTypeDescript
                 }}>
                     {icon}
                 </Typography>
-            </Paper>
+            </Box>
 
             <Stack alignItems="start">
 
@@ -63,7 +61,6 @@ export default function EntityFieldTypeDescriptor(props: EntityFieldTypeDescript
                 {description && (<Typography
                     fontSize="small"
                     sx={{
-                        // color: 'text.secondary',
                         color: 'neutral.500',
                         fontStyle: 'italic'
                     }}>{description}</Typography>)}
