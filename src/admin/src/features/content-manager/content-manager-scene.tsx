@@ -12,7 +12,7 @@ import { useDialog } from "@/hooks/use-dialog"
 import { useContentManagerIds } from "./use-content-manger-ids"
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog"
 import { ContentManagerEntryDialogContent } from "./content-manager-entry-form"
-import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer, createRowSelectionStore, RowDetailPlugin, createRowDetailStore } from "mosaic-data-table";
+import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer, createRowSelectionStore, RowDetailPlugin, createFilterRowStore } from "mosaic-data-table";
 import { useContentManagerContext } from "./use-content-manager-context"
 import { ActionList } from "@/shared/components/action-list";
 import { ActionListItem } from "@/shared/components/action-list-item";
@@ -118,7 +118,7 @@ export const ContentManagerScene = () => {
 
         usePluginWithParams(FilterRowPlugin, {
             visible: filterEnabled,
-            filter: contentManager.contentManagerSearch.state.filter,
+            store: useMemo(() => createFilterRowStore<any>(contentManager.contentManagerSearch.state.filter), []),
             filterChanged: contentManager.contentManagerSearch.handleFiltersApply,
             key: 'filter_row',
             filterColumns: gridFilter

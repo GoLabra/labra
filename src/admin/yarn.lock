@@ -6880,10 +6880,10 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-lg-query@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/lg-query/-/lg-query-1.0.2.tgz#0d7b024c4534cddd11ba24d4eac0780284ae9ac3"
-  integrity sha512-Z8hPLOots9xNC0CT1ZctAUbC/GXlofXqposXUaorOD3lBFj6CWyqY0Vhdu2AawdcFQd96y6O/GjNJF9mDIwedA==
+lg-query@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/lg-query/-/lg-query-1.0.3.tgz#1d53dc234c6c89fae8a75ff7ab70b99cedbdcf9b"
+  integrity sha512-NSPNfm2veghlk1M/YwLqMEg89ykvLDh/0n9YlxxixcmJtDTKeRPLuxL7i6lwtwV3GzWG5x9QBVR7N++9R9P/CA==
   dependencies:
     change-case "^5.4.4"
     gql-query-builder "^3.8.0"
@@ -7197,10 +7197,10 @@ mkdirp@^0.5.5:
   dependencies:
     minimist "^1.2.6"
 
-mosaic-data-table@^0.0.62:
-  version "0.0.62"
-  resolved "https://registry.yarnpkg.com/mosaic-data-table/-/mosaic-data-table-0.0.62.tgz#45250b813a82b6a66d647c3520563147cd02893a"
-  integrity sha512-gRaRWEUs8lfXgk+R3fDzvSHTMxVUVfMcL5U9DqLJu4dAZ9x0LG6chgb6VjGon+DFhrw7oE+2E/pTAoxg8VOKJw==
+mosaic-data-table@^0.0.67:
+  version "0.0.67"
+  resolved "https://registry.yarnpkg.com/mosaic-data-table/-/mosaic-data-table-0.0.67.tgz#765987e1e7c136f4be27bad3ebdb43d8459d5180"
+  integrity sha512-bHC6SEIeF0vVfKeg4B0Xp/roI428zM9Pzh13AhefWPLyTdnYC9G7tF/iuqiAfSEtKj4m4nDTVhKO1hii6qd6Pg==
 
 motion-dom@^11.18.1:
   version "11.18.1"
