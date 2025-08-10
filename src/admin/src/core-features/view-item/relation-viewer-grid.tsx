@@ -253,7 +253,7 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 		usePluginWithParams(EmptyDataPlugin, {
 			content: <EmptyMessage />
 		}),
-		PinnedColumnsPlugin
+		usePluginWithParams(PinnedColumnsPlugin, {}),
 	)
 
 	return (<MosaicDataTable

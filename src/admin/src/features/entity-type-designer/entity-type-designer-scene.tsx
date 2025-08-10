@@ -175,7 +175,6 @@ export default function EntityTypeDesignerScene(
         usePluginWithParams(HighlightRowPlugin, {
             isRowHighlighted: useCallback((row: any) => row.caption === entityDesigner.fullDesignerEntity.displayFieldCaption, [entityDesigner.fullDesignerEntity?.displayFieldCaption]),
         }),
-        PinnedColumnsPlugin,
         usePluginWithParams(SkeletonLoadingPlugin, {
             isLoading: entityDesigner.fullDesignerEntity?.loading || isEntityBusy,
             rowsWhenEmpty: Defaults.dataTable.skeletonRowsCount
