@@ -46,7 +46,7 @@ export const useDynamicGridColumns = ({
                 .map(i => fieldToColumn(i))
                 .map(i => i.id === displayFieldName ? {
                     ...i,
-                    pin: createResponsivePin('left','sm', 'up'),
+                    pin: createResponsivePin(true,'sm', 'up'),
                     highlight: true
                 } : i),
             ...edges.map(i => edgeToColumn(entityName, i, expansionStoreRef)),
