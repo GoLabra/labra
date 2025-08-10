@@ -20,7 +20,7 @@ import { SectionTitle } from "@/shared/components/section-title";
 import { Permission, Role } from "@/lib/apollo/graphql";
 import { EdgeStatus } from "@/lib/utils/edge-status";
 import { groupByMap } from "@/lib/utils/array";
-import { GenericEvent } from "@/lib/utils/event";
+import { GenericEvent, createGenericEvent } from "@/lib/utils/event";
 import { useLiteController } from "@/core-features/dynamic-form/lite-controller";
 import React from "react";
 import { MenuButton } from "@/shared/components/menu/menu-button";
@@ -218,15 +218,10 @@ const PermissionSection = (props: PermissionSectionProps) => {
 	const onPermissionValuesChanged = useCallback((entityName: string, operations: string[]) => {
 		const newPermissions = changePermission(saved, entityName, operations);
 
-		formControllerHandler.onChange({
-			target: {
-				name: props.name,
-				value: [
-					...formControllerHandler.value?.filter(i => i.entityName != entityName) ?? [],
-					...newPermissions
-				]
-			}
-		});
+        formControllerHandler.onChange(createGenericEvent(props.name, [
+            ...formControllerHandler.value?.filter(i => i.entityName != entityName) ?? [],
+            ...newPermissions
+        ]));
 	}, [saved, formControllerHandler.value, formControllerHandler.onChange]);
 
 	const selectAll = useCallback(() => {
@@ -234,12 +229,7 @@ const PermissionSection = (props: PermissionSectionProps) => {
 			return changePermission(saved, entity.name, operationDefs.map(i => i.name))
 		});
 
-		formControllerHandler.onChange({
-			target: {
-				name: props.name,
-				value: newPermissions
-			}
-		});
+        formControllerHandler.onChange(createGenericEvent(props.name, newPermissions));
 	}, [entities, onPermissionValuesChanged]);
 
 	const clearAll = useCallback(() => {
@@ -247,21 +237,11 @@ const PermissionSection = (props: PermissionSectionProps) => {
 			return changePermission(saved, entity.name, [])
 		});
 
-		formControllerHandler.onChange({
-			target: {
-				name: props.name,
-				value: newPermissions
-			}
-		});
+        formControllerHandler.onChange(createGenericEvent(props.name, newPermissions));
 	}, [entities, onPermissionValuesChanged]);
 
 	const resetChanges = useCallback(() => {
-		formControllerHandler.onChange({
-			target: {
-				name: props.name,
-				value: []
-			}
-		});
+        formControllerHandler.onChange(createGenericEvent(props.name, []));
 	}, [entities, onPermissionValuesChanged]);
 
 	const permissionsCount = useMemo(() => {

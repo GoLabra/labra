@@ -8,6 +8,7 @@ import { DateTimeToolbar } from '../pickers-extensions/date-time-toolbar';
 import { DateTimeTextField } from '../pickers-extensions/date-time-textfield';
 import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
+import { createGenericEvent } from '@/lib/utils/event';
 
 interface TimeFormComponentProps {
     name: string;
@@ -37,7 +38,7 @@ export function TimeFormComponent(props: TimeFormComponentProps) {
 
             value={value ?? null}
             onChange={(value) => {
-                onChange({ target: { name, value } })
+                onChange(createGenericEvent(name, value))
             }}
 
             slots={{

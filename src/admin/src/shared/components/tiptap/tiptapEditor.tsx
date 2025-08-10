@@ -14,6 +14,7 @@ import {
     insertImages,
     type RichTextEditorRef,
 } from "mui-tiptap";
+import { createGenericEvent } from '@/lib/utils/event';
 import EditorMenuControls, { getInlineFiles } from "./editorMenuControls";
 import useExtensions from "./useExtensions";
 import { useEditor } from "@tiptap/react";
@@ -114,14 +115,14 @@ export const TiptapEditor = forwardRef((props: InputBaseComponentProps, ref) => 
             const htmlText = editor.getHTML();
             
             if(!htmlText){
-                props.onChange?.({ target: { name: props.name, value: '' } } as any);
+                props.onChange?.(createGenericEvent(props.name!, ''));
             }
             
             const rawText = editor.getText().replace(/<!--|-->|/g, '')
                                             .replace(/\n+/g, ' ');
 
             const content = `<!-- ${rawText} --> ${htmlText}`;
-            props.onChange?.({ target: { name: props.name, value: content } } as any);
+            props.onChange?.(createGenericEvent(props.name!, content));
         },
         // optional:
         editorProps: {

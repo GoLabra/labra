@@ -22,6 +22,7 @@ import { OptionDiffWrapper } from './LookupOneFIELD';
 import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
 import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
 import { hasValue } from '@/lib/utils/has-value';
+import { createGenericEvent } from '@/lib/utils/event';
 
 const getLabel = (valueObj: any, displayFieldName?: string) => {
 
@@ -103,35 +104,27 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
     }) => {
 
         switch (event.reason) {
-            case 'selectOption': 
-				onChange({
-					target: {
-						name: name,
-						value: relationDiff.connect({
-									id: event.option!.value,
-									label: event.option!.label,
-									value: event.option!.value
-								})
-					}
-				});
+			case 'selectOption':
+				onChange(
+					createGenericEvent(name,
+						relationDiff.connect({
+							id: event.option!.value,
+							label: event.option!.label,
+							value: event.option!.value
+						}))
+				);
                 break;
 
             case 'removeOption': 
-				onChange({
-                    target: {
-                        name: name,
-                        value: relationDiff.remove(event.option!.value)
-                    }
-                });
+				onChange(createGenericEvent(name,
+					relationDiff.remove(event.option!.value))
+				);
                 break;
             
             case 'clear': 
-                onChange({
-					target: {
-						name: name,
-						value: relationDiff.disconnectAll()
-					}
-				});
+                onChange(createGenericEvent(name,
+						relationDiff.disconnectAll())
+				);
                 break;
             
         }
@@ -152,29 +145,12 @@ export function LookupManyFIELDFormComponent(props: RelationManyFIELDFormCompone
         myDialogContext.addPopup(name, ContentManagerEntryDialogContent, { entityName: edge.relatedEntity.name }, FormOpenMode.New, undefined,
             (upperResults: any) => {
 
-				onChange({
-					target: {
-						name: name,
-						value: relationDiff.create({
+				onChange(createGenericEvent(name,
+						relationDiff.create({
 									label: getLabel(upperResults, displayPropertyName),
 									value: upperResults
-								})
-					}
-				});
-				
-                // onChange({
-                //     target: {
-                //         name: name,
-                //         value: [
-                //             ...(value ?? []),
-                //             {
-                //                 label: upperResults[displayPropertyName],
-                //                 tag: 'create',
-                //                 value: upperResults
-                //             }
-                //         ]
-                //     }
-                // });
+								}))	
+				);
 
                 return upperResults;
             })

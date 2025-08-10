@@ -1,4 +1,4 @@
-import { GenericEvent } from "@/lib/utils/event";
+import { createGenericEvent, GenericEvent } from "@/lib/utils/event";
 import { useCallback, useMemo, useRef } from "react";
 import { Control, useFormContext, useWatch } from "react-hook-form";
 import { useLiteController } from "./lite-controller";
@@ -41,15 +41,12 @@ export const useRelationManyLiteController = <T = any>(props: useLiteControllerP
 	}, [liteController.value]);
 
 	const onChange = useCallback((event: GenericEvent<T> | any) => {
-		liteController.onChange({
-			target: {
-				name: props.name,
-				value: [
+		liteController.onChange(createGenericEvent(props.name,
+				[
 					...event.target.value ?? [],
 					...(relationInfoRef.current ? [relationInfoRef.current] : [])
-				]
-			}
-		});
+				])
+		);
 	}, [liteController.onChange]);
 
 	return useMemo(() => ({

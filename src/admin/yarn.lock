@@ -7197,10 +7197,10 @@ mkdirp@^0.5.5:
   dependencies:
     minimist "^1.2.6"
 
-mosaic-data-table@^0.0.60:
-  version "0.0.60"
-  resolved "https://registry.yarnpkg.com/mosaic-data-table/-/mosaic-data-table-0.0.60.tgz#45a22e6c76043184b6d3a8a3e38b8ffb316412a4"
-  integrity sha512-k3aqxqfBJcyGV2UaB3of+Nt4FUW7RC1FH2DQZ0p2GoE7e0zSRPazl0WdLls/hv/5KHWcB9rdfViaweYaAhh2lw==
+mosaic-data-table@^0.0.62:
+  version "0.0.62"
+  resolved "https://registry.yarnpkg.com/mosaic-data-table/-/mosaic-data-table-0.0.62.tgz#45250b813a82b6a66d647c3520563147cd02893a"
+  integrity sha512-gRaRWEUs8lfXgk+R3fDzvSHTMxVUVfMcL5U9DqLJu4dAZ9x0LG6chgb6VjGon+DFhrw7oE+2E/pTAoxg8VOKJw==
 
 motion-dom@^11.18.1:
   version "11.18.1"

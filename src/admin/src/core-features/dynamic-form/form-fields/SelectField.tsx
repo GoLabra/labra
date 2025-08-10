@@ -5,6 +5,7 @@ import { get, useFormContext } from 'react-hook-form';
 import { useLiteController } from '../lite-controller';
 import { selectValue } from '@/lib/utils/select-value';
 import { ClearIcon } from '@mui/x-date-pickers/icons';
+import { createGenericEvent } from '@/lib/utils/event';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 
 const TextField = styled(MuiTextField)(({ theme }) => ({
@@ -56,7 +57,7 @@ export function SelectFormComponent(props: SelectFormComponentProps) {
             disabled={disabled}
             value={optionValue ?? ''}
             onChange={onChange}
-            onBlur={onBlur}
+            onBlur={() => onBlur(createGenericEvent(name, value ?? null))}
             error={!!errors}
             helperText={errors}
             select
@@ -64,7 +65,7 @@ export function SelectFormComponent(props: SelectFormComponentProps) {
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">
-                        <IconButton size="small" onClick={() => onChange({ target: { name, value: null } })}>
+                        <IconButton size="small" onClick={() => onChange(createGenericEvent(name, null))}>
                             <ClearIcon fontSize="inherit" />
                         </IconButton>
                     </InputAdornment>)

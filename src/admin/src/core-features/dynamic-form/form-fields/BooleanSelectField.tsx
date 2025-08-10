@@ -34,6 +34,10 @@ export function BooleanSelectFieldFormComponent(props: BooleanSelectFieldProps) 
             }]
     }, []);
 
+	const ccc = (a: any) => {
+		onChange(a);
+	}
+
     return (
         <>
             <SelectFormComponent
@@ -45,7 +49,7 @@ export function BooleanSelectFieldFormComponent(props: BooleanSelectFieldProps) 
                 required={required}
                 options={options}
                 value={value}
-                onChange={onChange}
+                onChange={ccc}
                 onBlur={onBlur}>
 
             </SelectFormComponent>

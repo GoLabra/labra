@@ -12,6 +12,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { LFile, useEntityFiles } from "@/hooks/use-relation-content-manager-store";
 import { FileData, fileIsImage, fileTypeByUrl } from "@/shared/components/file-thumbnail";
 import { RelationInfo, useRelationManyLiteController } from "../relationMany-lite-controller";
+import { createGenericEvent } from "@/lib/utils/event";
 
 export type FileDiffWrapper = {
 	id: string;
@@ -85,12 +86,9 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 			return;
 		}
 
-		onChange({
-			target: {
-				name: name,
-				value: relationDiff.remove(removeId)
-			}
-		});
+		onChange(createGenericEvent(props.name,
+				relationDiff.remove(removeId))
+		);
 	}, [onChange, relationDiff.remove]);
 
 	const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
@@ -98,10 +96,8 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 			return [];
 		}
 
-		onChange({
-			target: {
-				name: name,
-				value: [
+		onChange(createGenericEvent(props.name,
+				[
 					...value ?? [],
 					...acceptedFiles.map(i => ({
 						id: createId(),
@@ -109,8 +105,7 @@ export function FileFieldFormComponent(props: RelationManyFIELDFormComponentProp
 						status: 'create'
 					}))
 				]
-			}
-		});
+		));
 	}, [value, onChange]);
 
 	return (
