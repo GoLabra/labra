@@ -3,7 +3,7 @@ import { MutableRefObject, ReactNode, useMemo, useRef } from 'react';
 import { ApiFieldTypes, FormFieldTypes } from '@/types/field-type-descriptor';
 import { localeConfig } from "@/config/locale-config"
 import CheckIcon from '@mui/icons-material/Check';
-import { ColumnDef, useResponsivePin, useRowExpansionStore } from 'mosaic-data-table';
+import { ColumnDef, createResponsivePin, useRowExpansionStore } from 'mosaic-data-table';
 import { Edge, Field, RelationType } from '@/lib/apollo/graphql.entities';
 import { Avatar, Box, Button, Chip, Stack, Typography } from '@mui/material';
 // import { stringAvatar } from '@/lib/utils/avatar';
@@ -33,8 +33,6 @@ export const useDynamicGridColumns = ({
     showId
 }: UseDynamicGridColumnsProps): ColumnDef[] => {
 
-    const displayFieldPin = useResponsivePin({ pin: 'left', breakpoint: 'sm', direction: 'up' });
-
     const expansionStoreRef = useRef(openRelation);
     expansionStoreRef.current = openRelation;
 
@@ -48,12 +46,12 @@ export const useDynamicGridColumns = ({
                 .map(i => fieldToColumn(i))
                 .map(i => i.id === displayFieldName ? {
                     ...i,
-                    pin: displayFieldPin,
+                    pin: createResponsivePin('left','sm', 'up'),
                     highlight: true
                 } : i),
             ...edges.map(i => edgeToColumn(entityName, i, expansionStoreRef)),
         ]
-    ), [displayFieldPin, showId, displayFieldName, fields, edges]);
+    ), [showId, displayFieldName, fields, edges]);
 }
 
 

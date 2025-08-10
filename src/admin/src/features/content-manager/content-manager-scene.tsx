@@ -12,7 +12,7 @@ import { useDialog } from "@/hooks/use-dialog"
 import { useContentManagerIds } from "./use-content-manger-ids"
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog"
 import { ContentManagerEntryDialogContent } from "./content-manager-entry-form"
-import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer } from "mosaic-data-table";
+import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer, createRowSelectionStore, RowDetailPlugin, createRowDetailStore } from "mosaic-data-table";
 import { useContentManagerContext } from "./use-content-manager-context"
 import { ActionList } from "@/shared/components/action-list";
 import { ActionListItem } from "@/shared/components/action-list-item";
@@ -135,23 +135,32 @@ export const ContentManagerScene = () => {
             onGetRowId: contentManagerIds.getId,
             onSelectOne: contentManagerSelection.handleSelectOne,
             onDeselectOne: contentManagerSelection.handleDeselectOne,
-            selectedIds: contentManagerSelection.selected
+            rowSelectionStore: useMemo(() => createRowSelectionStore<any>(), [])
         }),
-        usePluginWithParams(RowExpansionPlugin, {
-            showExpanderButton: false,
-            onGetRowId: contentManagerIds.getId,
-            expanstionStore: viewRelationStore.expansionStore,
-            getExpansionNode: useCallback((row: any, params: any) => (
-                <AbsoluteHeightContainer>
-                    <RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
-                </AbsoluteHeightContainer>), [showId, viewRelationStore])
-        }),
+        // usePluginWithParams(RowExpansionPlugin, {
+        //     showExpanderButton: false,
+        //     onGetRowId: contentManagerIds.getId,
+        //     expanstionStore: viewRelationStore.expansionStore,
+        //     getExpansionNode: useCallback((row: any, params: any) => (
+        //         <AbsoluteHeightContainer>
+        //             <RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
+        //         </AbsoluteHeightContainer>), [showId, viewRelationStore])
+        // }),
+		usePluginWithParams(RowDetailPlugin, {
+			showExpanderButton: false,
+			onGetRowId: contentManagerIds.getId,
+			rowDetailStore: viewRelationStore.detailsStore,
+			getExpansionNode: useCallback((row: any, params: any) => (
+				<AbsoluteHeightContainer>
+					<RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
+				</AbsoluteHeightContainer>), [showId, viewRelationStore])
+		}),
         ColumnsFillRowSpacePlugin,
         usePluginWithParams(RowActionsPlugin, {
             actions: actions
         }),
         usePluginWithParams(HighlightColumnPlugin, {}),
-        PinnedColumnsPlugin,
+        usePluginWithParams(PinnedColumnsPlugin, {}),
         usePluginWithParams(SkeletonLoadingPlugin, {
             isLoading: contentManager.contentManagerStore.state.dataLoading,
             rowsWhenEmpty: Defaults.dataTable.skeletonRowsCount,
