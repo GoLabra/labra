@@ -28,6 +28,7 @@ import { useViewRelationStore } from "@/core-features/view-item/use-view-relatio
 import { Edge } from "@/lib/apollo/graphql.entities";
 import { Key } from "@/shared/components/key-handler/types";
 import { ShortcutActionItem } from "@/shared/components/key-handler/with-label-shortcut";
+import { FilterEditor } from "@/shared/components/filter-editor";
 
 export const ContentManagerScene = () => {
 
@@ -51,7 +52,6 @@ export const ContentManagerScene = () => {
         fields: contentManager.fullEntity?.fields,
         edges: contentManager.fullEntity?.edges,
         displayFieldName: contentManager.displayFieldName,
-        //expansionStore: viewRelationStore,
 		openRelation: useCallback((entityName: string, edge: Edge, entryId: string) => {
 			viewRelationStore.addEdge(entryId, entityName, edge, entryId, true);
 		}, [viewRelationStore]),
@@ -59,6 +59,7 @@ export const ContentManagerScene = () => {
     });
 
     const gridFilter = useDyamicGridFilter({
+		search: contentManager.contentManagerSearch,
         fields: contentManager.fullEntity?.fields
     })
 
@@ -118,18 +119,20 @@ export const ContentManagerScene = () => {
 
         usePluginWithParams(FilterRowPlugin, {
             visible: filterEnabled,
-            store: useMemo(() => createFilterRowStore<any>(contentManager.contentManagerSearch.state.filter), []),
+            store: gridFilter.store,
             filterChanged: contentManager.contentManagerSearch.handleFiltersApply,
             key: 'filter_row',
-            filterColumns: gridFilter
+            filterColumns: gridFilter.filterDef
         }),
 
         usePluginWithParams(PaddingPluggin, {}),
+
         usePluginWithParams(ColumnSortPlugin, {
             order: contentManager.contentManagerSearch.state.order,
             orderBy: contentManager.contentManagerSearch.state.sortBy,
             onSort: contentManager.contentManagerSearch.handleSortChange
         }),
+
         usePluginWithParams(RowSelectionPlugin, {
             visible: selectionEnabled,
             onGetRowId: contentManagerIds.getId,
@@ -137,15 +140,7 @@ export const ContentManagerScene = () => {
             onDeselectOne: contentManagerSelection.handleDeselectOne,
             rowSelectionStore: useMemo(() => createRowSelectionStore<any>(), [])
         }),
-        // usePluginWithParams(RowExpansionPlugin, {
-        //     showExpanderButton: false,
-        //     onGetRowId: contentManagerIds.getId,
-        //     expanstionStore: viewRelationStore.expansionStore,
-        //     getExpansionNode: useCallback((row: any, params: any) => (
-        //         <AbsoluteHeightContainer>
-        //             <RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
-        //         </AbsoluteHeightContainer>), [showId, viewRelationStore])
-        // }),
+
 		usePluginWithParams(RowDetailPlugin, {
 			showExpanderButton: false,
 			onGetRowId: contentManagerIds.getId,
@@ -155,7 +150,9 @@ export const ContentManagerScene = () => {
 					<RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
 				</AbsoluteHeightContainer>), [showId, viewRelationStore])
 		}),
+
         ColumnsFillRowSpacePlugin,
+
         usePluginWithParams(RowActionsPlugin, {
             actions: actions
         }),
@@ -174,32 +171,39 @@ export const ContentManagerScene = () => {
     return (
         <>
             <Card>
-                <CardHeader title={<ContentManagerSearch
-                    headCells={headCells}
-                    disabled={false}
-                    onRefresh={contentManager.contentManagerStore.refresh}
-                    onBulkDelete={() => bulkDeleteConfirmationDialog.handleOpen()}
-                    onQueryChange={contentManager.contentManagerSearch.handleQueryChange}
-                    query={contentManager.contentManagerSearch.state.query}
-                    selected={contentManagerSelection.selected}
+                <CardHeader title={(
+					<>
+						<ContentManagerSearch
+							disabled={false}
+							onRefresh={contentManager.contentManagerStore.refresh}
+							onBulkDelete={() => bulkDeleteConfirmationDialog.handleOpen()}
+							onQueryChange={contentManager.contentManagerSearch.handleQueryChange}
+							query={contentManager.contentManagerSearch.state.query}
+							selected={contentManagerSelection.selected}
 
-                    selectionEnabled={selectionEnabled}
-                    onSelectionEnabledChange={(value) => {
-                        setSelectionEnabled(value)
-                        if (!value) {
-                            contentManagerSelection.handleDeselectAll();
-                        }
-                    }}
+							selectionEnabled={selectionEnabled}
+							onSelectionEnabledChange={(value) => {
+								setSelectionEnabled(value)
+								if (!value) {
+									contentManagerSelection.handleDeselectAll();
+								}
+							}}
 
-                    filterEnabled={filterEnabled}
-                    onFilterEnabledChange={setFilterEnabled}
+							filterEnabled={filterEnabled}
+							onFilterEnabledChange={setFilterEnabled}
 
-                    contentManagerSearch={contentManager.contentManagerSearch}
-                    showId={showId}
-                    onShowIdChange={setShowId}
-                />
-                }>
+							contentManagerSearch={contentManager.contentManagerSearch}
+							showId={showId}
+							onShowIdChange={setShowId}
+						/>
 
+						<FilterEditor filter={contentManager.contentManagerSearch.state.filter} headCells={headCells} onRemove={(key) => {
+							gridFilter.store.clear(key);
+							contentManager.contentManagerSearch.handleFiltersApply(gridFilter.store.getSnapshot())
+						}} />
+
+					</>
+				)}>
                 </CardHeader>
 
                 <Divider />

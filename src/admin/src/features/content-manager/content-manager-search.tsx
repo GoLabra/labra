@@ -32,7 +32,6 @@ export type SearchField = {
 
 interface OrdersSearchProps {
     //fields: SearchField[];
-    headCells?: ColumnDef[];
     disabled?: boolean;
     onRefresh?: () => void;
 
@@ -54,7 +53,7 @@ interface OrdersSearchProps {
 }
 export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
-    const { headCells, disabled = false, onQueryChange, query = '', selected = [], onBulkDelete } = props;
+    const { disabled = false, onQueryChange, query = '', selected = [], onBulkDelete } = props;
     const hasSelection = selected.length > 0;
 
     return (
@@ -194,7 +193,6 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
                     </Stack>
 
-                    {!!Object.keys(props.contentManagerSearch.state.filter).length && (<FilterEditor filter={props.contentManagerSearch.state.filter} onChange={props.contentManagerSearch.handleFiltersApply} headCells={headCells} />)}
                 </Stack>
             </div>
             {/* <FilterDialog
