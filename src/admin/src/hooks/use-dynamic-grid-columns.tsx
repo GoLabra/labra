@@ -16,13 +16,18 @@ export type ColumnOptions = {
     width?: number,
 }
 
+export type ColumnSourceMeta =
+    | { kind: 'field'; field: Field }
+    | { kind: 'edge'; edge: Edge };
+
 interface UseDynamicGridColumnsProps {
     entityName: string,
     fields?: Field[],
     edges?: Edge[],
     displayFieldName?: string,
 	openRelation: (entityName: string, edge: Edge, entryId: string) => void,
-    showId: boolean
+    showId: boolean,
+    transformColumn?: (column: ColumnDef, meta: ColumnSourceMeta) => ColumnDef | void,
 }
 export const useDynamicGridColumns = ({
     entityName,
@@ -30,50 +35,51 @@ export const useDynamicGridColumns = ({
     edges = [],
     displayFieldName,
     openRelation,
-    showId
+    showId,
+    transformColumn
 }: UseDynamicGridColumnsProps): ColumnDef[] => {
 
     const expansionStoreRef = useRef(openRelation);
     expansionStoreRef.current = openRelation;
 
-    return useMemo(() => (
-        [
-            ...fields
-                .filter(i => showId ? true : i.name != 'id')
-                .filter(i => !i.private) // TODO: this should be hidden from BE
-                .filter(i => i.type != 'RichText') // TODO: set RichText based on configuration
-                .filter(i => i.type != 'Json') // TODO: set JSON based on configuration
-                .map(i => fieldToColumn(i))
-                .map(i => i.id === displayFieldName ? {
-                    ...i,
-                    pin: createResponsivePin(true,'sm', 'up'),
-                    highlight: true
-                } : i),
-            ...edges.map(i => edgeToColumn(entityName, i, expansionStoreRef)),
-        ]
-    ), [showId, displayFieldName, fields, edges]);
+    return useMemo(() => {
+        const fieldColumns: ColumnDef[] = fields
+            .filter(i => showId ? true : i.name != 'id')
+            .filter(i => !i.private) // TODO: this should be hidden from BE
+            .filter(i => i.type != 'RichText')
+			.filter(i => i.type != 'LongText') 
+            .filter(i => i.type != 'Json')
+            .map(field => {
+                let col = fieldToColumn(field);
+                if (transformColumn) {
+                    col = transformColumn(col, { kind: 'field', field }) ?? col;
+                }
+                return col;
+            });
+
+        const edgeColumns: ColumnDef[] = edges.map(edge => {
+            let col = edgeToColumn(entityName, edge, expansionStoreRef);
+            if (transformColumn) {
+                col = transformColumn(col, { kind: 'edge', edge }) ?? col;
+            }
+            return col;
+        });
+
+        const builtColumns: ColumnDef[] = [
+            ...fieldColumns,
+            ...edgeColumns,
+        ];
+
+        return builtColumns;
+    }, [showId, displayFieldName, fields, edges, transformColumn, entityName]);
 }
 
 
 const fieldToColumn = (field: Field): ColumnDef<Field> => {
 
     // Add avatar for name column
-    if (field.name == 'name' && field.type == 'ShortText') {
-        return shortTextColumnDef(field.name, field.caption, (row: any) => {
-            const cellValue = row[field.name];
-            return (<Stack direction="row" gap={1} alignItems="center">
-                <InlineAvatar name={cellValue} />
-                {cellValue}
-            </Stack>)
-        }, {
-            width: 180,
-            hasSort: true
-        });
-    }
-
     switch (field.type as ApiFieldTypes) {
         case 'ShortText': return shortTextColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
-        case 'LongText': return longTextColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
         case 'RichText': return richTextColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
         case 'Integer': return integerColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
         case 'DateTime': return dateTimeColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
@@ -112,16 +118,6 @@ const shortTextColumnDef = (name: string, caption: string, render: (row: any) =>
         header: caption,
         cell: (row: any) => render(row),
         width: options?.width ?? 180,
-        hasSort: options?.hasSort ?? false
-    };
-}
-
-const longTextColumnDef = (name: string, caption: string, render: (row: any) => string, options?: ColumnOptions): ColumnDef<any> => {
-    return {
-        id: name,
-        header: caption,
-        cell: (row: any) => render(row),
-        width: options?.width ?? 300,
         hasSort: options?.hasSort ?? false
     };
 }
