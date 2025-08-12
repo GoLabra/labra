@@ -1,15 +1,19 @@
 import { containsFoldOperator, lessThanOrEqualDateTimeOperator, lessThanOrEqualNumberOperator } from "@/core-features/dynamic-filter/filter-operators";
+import { useContentManagerSearchFromQuery } from "@/hooks/use-content-manager-search-from-query";
 import { Field } from "@/lib/apollo/graphql.entities"
 import { ApiFieldTypes, FormFieldTypes } from "@/types/field-type-descriptor";
-import { ColumnDefFilter } from "mosaic-data-table";
+import { ColumnDefFilter, createFilterRowStore, Filter } from "mosaic-data-table";
 import { useMemo } from "react";
 
 interface UseDynamicGridFilterProps {
-    fields?: Field[],
+	search: ReturnType<typeof useContentManagerSearchFromQuery>;
+    fields?: Field[];
 }
-export const useDyamicGridFilter = (props: UseDynamicGridFilterProps): Record<string, ColumnDefFilter | Exclude<ColumnDefFilter["type"], "select">> => {
+export const useDyamicGridFilter = (props: UseDynamicGridFilterProps) => {
 
-    return useMemo(() => {
+	const filterStore = useMemo(() => createFilterRowStore<any>(props.search.state.filter), []);
+
+    const filterDef = useMemo(() => {
 
         if(!props.fields){
             return {}
@@ -33,6 +37,12 @@ export const useDyamicGridFilter = (props: UseDynamicGridFilterProps): Record<st
         }, {});
 
     }, [props.fields]);
+
+
+	return useMemo(() => ({
+		store: filterStore,
+		filterDef,
+	}), [filterStore, filterDef])
 }
 
 const fieldToFilter = (field: Field): [key: string, ColumnDefFilter | Exclude<ColumnDefFilter["type"], "select">] | null => {

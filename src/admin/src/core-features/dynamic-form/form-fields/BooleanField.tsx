@@ -6,6 +6,7 @@ import { Control, FieldError, FieldErrorsImpl, Merge, UseFormRegister, get, useC
 import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { ReactNode } from 'react';
+import { createGenericEvent } from '@/lib/utils/event';
 
 interface BooleanFormComponentProps {
     name: string;
@@ -30,10 +31,8 @@ export function BooleanFormComponent(props: BooleanFormComponentProps) {
             border={0} padding={0}>
             <FormControlLabel
                 name={name}
-                control={<Switch color={color} checked={value ?? false} onChange={(_, checked: boolean) => {
-                    onChange?.({ target: { name, value: checked } })
-                }
-                } />
+                control={<Switch color={color} checked={value ?? false} 
+					onChange={(_, checked: boolean) => onChange?.(createGenericEvent(props.name,checked))} />
                 }
                 labelPlacement="start"
                 label={label}

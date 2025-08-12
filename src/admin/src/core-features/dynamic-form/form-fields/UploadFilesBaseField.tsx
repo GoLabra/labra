@@ -10,6 +10,7 @@ import { UploadFiles } from '@/shared/components/upload/upload';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import { FileData } from '@/shared/components/file-thumbnail';
+import { createGenericEvent } from '@/lib/utils/event';
 
 interface UploadFilesBaseFieldProps {
 	name: string;
@@ -49,7 +50,7 @@ export function UploadFilesBaseField(props: UploadFilesBaseFieldProps) {
 				return;
 			}
 
-			props.onChange?.({ target: { name: props.name, value: [...value ?? [], ...acceptedFiles] } } as any);
+			props.onChange?.(createGenericEvent(props.name, [...value ?? [], ...acceptedFiles]) as any);
 		}
 	});
 
@@ -71,7 +72,7 @@ export function UploadFilesBaseField(props: UploadFilesBaseFieldProps) {
 			return;
 		}
 
-		props.onChange?.({ target: { name: props.name, value: value.filter(i => i != file) } } as any);
+		props.onChange?.(createGenericEvent(props.name, value.filter(i => i != file)) as any);
 	}, [value, props.onChange]);
 
 	const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: 'grid' | 'list') => {

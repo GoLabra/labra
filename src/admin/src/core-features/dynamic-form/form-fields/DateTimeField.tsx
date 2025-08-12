@@ -18,6 +18,7 @@ import { DateTimeToolbar } from '../pickers-extensions/date-time-toolbar';
 import { DateTimeTextField } from "../pickers-extensions/date-time-textfield";
 import { useLiteController } from "../lite-controller";
 import { useFormDynamicContext } from "@/core-features/dynamic-form2/dynamic-form";
+import { createGenericEvent } from "@/lib/utils/event";
 
 
 interface DateTimeFormComponentProps {
@@ -49,9 +50,7 @@ export function DateTimeFormComponent(props: DateTimeFormComponentProps) {
                 maxDate={max ? dayjs(max) : undefined}
 
                 value={value ?? null}
-                onChange={(value) => {
-                    onChange({ target: { name, value } })
-                }}
+                onChange={(value) => onChange(createGenericEvent(name,value))}
                 
                 slots={{
                     textField: DateTimeTextField,

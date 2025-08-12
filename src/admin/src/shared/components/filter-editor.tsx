@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 interface FilterEditorProps {
     filter: Filter
-    onChange: (filter: Filter) => void;
+    onRemove: (key?: string) => void;
 
     headCells?: ColumnDef[];
 }
@@ -22,17 +22,23 @@ export const FilterEditor = (props: FilterEditorProps) => {
     }, [props.headCells]);
 
     const onClear = useCallback(() => {
-        props.onChange({});
-    }, [props.onChange]);
+        props.onRemove();
+    }, [props.onRemove]);
 
     const onDelete = useCallback((key: string) => {
-        const newFilter = { ...props.filter };
-        delete newFilter[key];
-        props.onChange(newFilter);
-    }, [props.filter, props.onChange]);
+        props.onRemove(key);
+    }, [props.onRemove]);
+
+	const isVisible = !!Object.keys(props.filter).length;
+	if(!isVisible){
+		return null;
+	}
+
 
     return (
-        <Stack direction="row" gap={2} alignItems="center" flexWrap={'wrap'}>
+        <Stack direction="row" gap={2} alignItems="center" flexWrap={'wrap'} sx={{
+			marginTop: 2
+		}}>
 
             {entries.map(([key, value]) => (
                 <FilterEditorItem key={key} name={key} filter={value} onDelete={() => onDelete(key)} headCell={headCellsMap?.[key]} />
@@ -71,7 +77,7 @@ export const FilterEditorItem = (props: FilterEditorItemProps) => {
             borderStyle: 'dashed',
             borderColor: 'divider',
             padding: '3px 3px 3px 10px',
-            borderRadius: 2,
+            borderRadius: '6px',
         }}>
             <Stack direction="row" gap={1} alignItems="center" flexWrap={'wrap'}>
                 <Typography variant="subtitle1">

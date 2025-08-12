@@ -93,12 +93,30 @@ export const useContentManagerStore = (params: UseGridContentManagerStoreparams)
 			     .select('totalCount');
 
 		// add filters
-		query = Object.entries(params.searchState.filter).reduce((query, [key, value]) => { 
-			return query.where(GplFilter.field(key, value.operator as FilterOperators, value.value));
-		}, query);
+		if(Object.entries(params.searchState.filter).length){
+			query = query.where(
+				GplFilter.and(
+					...Object.entries(params.searchState.filter).map(([key, filter]) => { 
+						const restul = GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
+						return restul;
+					})
+				)
+			);
+		}
+		
+		const queryFilter = getFiltersFromQuery(params.searchState.query, params.fullEntity?.fields ?? [])
+		if(Object.entries(queryFilter).length){
+			query = query.where(
+				GplFilter.or(
+					...Object.entries(queryFilter).map(([key, filter]) => { 
+						return GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
+					})
+				)
+			);
+		}
 
 		return query;
-	}, [entityName, dataQuery]);
+	}, [entityName, fields, edges, params.searchState]);
 
 	const apiType = params.fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
 

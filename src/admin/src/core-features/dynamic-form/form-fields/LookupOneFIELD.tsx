@@ -21,6 +21,7 @@ import { nullable } from 'zod';
 import { useLookupContentManagerStore } from '@/hooks/use-lookup-content-manager-store';
 import { useRelationContentManagerStore } from '@/hooks/use-relation-content-manager-store';
 import { hasValue } from '@/lib/utils/has-value';
+import { createGenericEvent } from '@/lib/utils/event';
 
 
 const getLabel = (valueObj: any, displayFieldName?: string) => {
@@ -142,15 +143,10 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 
 		switch (event.reason) {
 			case 'selectOption': {
-				onChange({
-					target: {
-						name: name,
-						value: {
-							...event.option,
-							status: 'connect'
-						}
-					}
-				});
+					onChange(createGenericEvent(name, {
+						...event.option,
+						status: 'connect'
+					}));
 				break;
 			}
 
@@ -158,25 +154,15 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 			case 'clear': {
 
 				if (!saved) {
-					onChange({
-						target: {
-							name: name,
-							value: null
-						}
-					});
+					onChange(createGenericEvent(name, null));
 					return;
 				}
 
-				onChange({
-					target: {
-						name: name,
-						value: {
-							label: saved.label,
-							value: saved.value,
-							status: 'unset'
-						}
-					}
-				});
+				onChange(createGenericEvent(name, {
+					label: saved.label,
+					value: saved.value,
+					status: 'unset'
+				}));
 				break;
 			}
 		}
@@ -198,16 +184,11 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 		myDialogContext.addPopup(name, ContentManagerEntryDialogContent, { entityName: edge.relatedEntity.name }, FormOpenMode.New, undefined,
 			(upperResults: any) => {
 
-				onChange({
-					target: {
-						name: name,
-						value: {
-							label: getLabel(upperResults, displayPropertyName), 
-							status: 'create',
-							value: upperResults
-						}
-					}
-				});
+				onChange(createGenericEvent(name, {
+					label: getLabel(upperResults, displayPropertyName), 
+					status: 'create',
+					value: upperResults
+				}));
 
 				return upperResults;
 			})

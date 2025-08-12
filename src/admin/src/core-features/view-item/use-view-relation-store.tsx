@@ -16,16 +16,10 @@ export const useViewRelationStore = () => {
 
 	const close = useCallback((rootEntryId: string) => {
 		detailsStore.clear(rootEntryId)
-		// detailsStore.setParams(rootEntryId, {
-		// 	params: {
-		// 		edges: []
-		// 	},
-		// 	openImmediately: false
-		// });
 	}, [detailsStore]);
 
 	const closeAll = useCallback(() => {
-		//detailsStore.clear();
+		detailsStore.clear();
 	}, [detailsStore]);
 
 	const addEdge = useCallback((rootEntryId: string, entityName: string, edge: Edge, entryId: string, addAsFirst: boolean = false) => {
