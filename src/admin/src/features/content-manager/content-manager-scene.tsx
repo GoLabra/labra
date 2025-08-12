@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, Divider, ListItemIcon, MenuItem, SvgIcon } from "@mui/material"
+import { Box, Card, CardContent, CardHeader, Divider, ListItemIcon, MenuItem, Stack, SvgIcon } from "@mui/material"
 import PlusCircleIcon from "@heroicons/react/24/outline/PlusCircleIcon"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -12,7 +12,7 @@ import { useDialog } from "@/hooks/use-dialog"
 import { useContentManagerIds } from "./use-content-manger-ids"
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog"
 import { ContentManagerEntryDialogContent } from "./content-manager-entry-form"
-import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer, createRowSelectionStore, RowDetailPlugin, createFilterRowStore } from "mosaic-data-table";
+import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer, createRowSelectionStore, RowDetailPlugin, createFilterRowStore, createResponsivePin } from "mosaic-data-table";
 import { useContentManagerContext } from "./use-content-manager-context"
 import { ActionList } from "@/shared/components/action-list";
 import { ActionListItem } from "@/shared/components/action-list-item";
@@ -22,13 +22,14 @@ import { EmptyMessage } from "@/shared/components/empty-message";
 import { MuiCardFooter } from "@/shared/components/mui-card-footer";
 import { useDyamicGridFilter } from "./use-dyamic-grid-filter";
 import Defaults from "@/config/Defaults.json";
-import { useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
+import { ColumnSourceMeta, useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
 import { RelationViewerGridRoot } from "@/core-features/view-item/relation-viewer-grid";
 import { useViewRelationStore } from "@/core-features/view-item/use-view-relation-store";
 import { Edge } from "@/lib/apollo/graphql.entities";
 import { Key } from "@/shared/components/key-handler/types";
 import { ShortcutActionItem } from "@/shared/components/key-handler/with-label-shortcut";
 import { FilterEditor } from "@/shared/components/filter-editor";
+import { InlineAvatar } from "@/shared/components/avatar";
 
 export const ContentManagerScene = () => {
 
@@ -55,7 +56,32 @@ export const ContentManagerScene = () => {
 		openRelation: useCallback((entityName: string, edge: Edge, entryId: string) => {
 			viewRelationStore.addEdge(entryId, entityName, edge, entryId, true);
 		}, [viewRelationStore]),
-        showId: showId
+        showId: showId,
+		transformColumn: useCallback((column: ColumnDef, meta: ColumnSourceMeta) => {
+
+			let newColumn = column;
+			if(column.id === contentManager.displayFieldName) {
+				newColumn = {
+					...newColumn,
+					pin: createResponsivePin(true,'sm', 'up'),
+					highlight: true
+				}
+			}
+
+			if (meta.kind == 'field' && meta.field.name == 'name' && meta.field.type == 'ShortText') {
+
+				newColumn = {
+					...newColumn,
+					cell: (row: any) => { 
+						const cellValue = row[meta.field.name];
+						return (<Stack direction="row" gap={1} alignItems="center">
+						<InlineAvatar name={cellValue} />
+						{column.cell?.(row) ?? undefined}
+					</Stack>)}
+				}
+			}
+			return newColumn;
+		}, [contentManager.displayFieldName])
     });
 
     const gridFilter = useDyamicGridFilter({
