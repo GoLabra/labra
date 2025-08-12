@@ -115,14 +115,14 @@ export const TiptapEditor = forwardRef((props: InputBaseComponentProps, ref) => 
             const htmlText = editor.getHTML();
             
             if(!htmlText){
-                props.onChange?.(createGenericEvent(props.name!, ''));
+                props.onChange?.(createGenericEvent(props.name!, '') as any);
             }
             
             const rawText = editor.getText().replace(/<!--|-->|/g, '')
                                             .replace(/\n+/g, ' ');
 
             const content = `<!-- ${rawText} --> ${htmlText}`;
-            props.onChange?.(createGenericEvent(props.name!, content));
+            props.onChange?.(createGenericEvent(props.name!, content) as any);
         },
         // optional:
         editorProps: {
