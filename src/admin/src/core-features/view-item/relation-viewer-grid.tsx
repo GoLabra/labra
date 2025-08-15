@@ -123,6 +123,7 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 					</ShortcutIconButton>
 
 				</Stack>
+				<br />
 					
 				<RoundPanelPlaceholder>
 					<RelationViewerGrid key={`${visibleEdge.entityName}-${visibleEdge.entryId}`} entityName={visibleEdge.entityName} entryId={visibleEdge.entryId} edge={visibleEdge.edge} showId={props.showId} openRelation={oneViewRelationStore.addEdge} />
@@ -206,19 +207,6 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 		showId: props.showId
 	});
 
-	// Row Actions
-	const actions: Action<unknown>[] = [
-		{
-			id: 'goto',
-			render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => gotoEntry(field)}>
-				<ListItemIcon>
-					<DirectionsRunIcon />
-				</ListItemIcon>
-				Go To Entry
-			</MenuItem>)
-		},
-	];
-
 	const gotoEntry = useCallback((entry: any) => {
 		const path = `/content-manager/${props.edge.relatedEntity.name}`;
 
@@ -233,17 +221,28 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 		push(withFilters);
 	}, []);
 
+	// Row Actions
+	const actions: Action<unknown>[] = useMemo(() => [
+		{
+			id: 'goto',
+			render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => gotoEntry(field)}>
+				<ListItemIcon>
+					<DirectionsRunIcon />
+				</ListItemIcon>
+				Go To Entry
+			</MenuItem>)
+		},
+	], [gotoEntry]);
+
 	const gridPlugins = useGridPlugins(
 		CustomBodyCellContentRenderPlugin,
 		usePluginWithParams(PaddingPluggin, {}),
 		ColumnsFillRowSpacePlugin,
-		usePluginWithParams(HighlightColumnPlugin, {}),
-
 		usePluginWithParams(RowActionsPlugin, {
 			actions: actions
 		}),
 		usePluginWithParams(EmptyDataPlugin, {
-			content: <EmptyMessage />
+			content: useMemo(() =><EmptyMessage />, [])
 		}),
 		usePluginWithParams(PinnedColumnsPlugin, {}),
 	)
