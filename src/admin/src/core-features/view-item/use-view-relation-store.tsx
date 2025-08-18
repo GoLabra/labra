@@ -25,7 +25,7 @@ export const useViewRelationStore = () => {
 	const addEdge = useCallback((rootEntryId: string, entityName: string, edge: Edge, entryId: string, addAsFirst: boolean = false) => {
 
 		if (addAsFirst) {
-			detailsStore.getExpansionInfo
+			detailsStore.clear();
 			detailsStore.setParams(rootEntryId, {
 				edges: [
 					{
