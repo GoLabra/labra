@@ -107,7 +107,7 @@ export const ContentManagerScene = () => {
     }, [deleteConfirmationDialog, contentManager.contentManagerStore.deleteItem]);
 
     // Row Actions
-    const actions: Action<unknown>[] = [
+    const actions: Action<unknown>[] = useMemo(() => [
         {
             id: 'edit',
             render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => editEntry(field)}>
@@ -121,7 +121,7 @@ export const ContentManagerScene = () => {
             id: 'remove',
             render: (field: any) => (<MenuItem id='remove-menu-item' key={`remove-${field}`} onClick={() => deleteConfirmationDialog.handleOpen(field.id)}> <ListItemIcon><DeleteIcon /></ListItemIcon> Remove </MenuItem>)
         },
-    ];
+    ], [editEntry, deleteConfirmationDialog]);
 
     const finishDialog = useCallback((result: FinishResult) => {
 
@@ -142,7 +142,6 @@ export const ContentManagerScene = () => {
 
     const gridPlugins = useGridPlugins(
         CustomBodyCellContentRenderPlugin,
-
         usePluginWithParams(FilterRowPlugin, {
             visible: filterEnabled,
             store: gridFilter.store,
@@ -150,15 +149,12 @@ export const ContentManagerScene = () => {
             key: 'filter_row',
             filterColumns: gridFilter.filterDef
         }),
-
         usePluginWithParams(PaddingPluggin, {}),
-
         usePluginWithParams(ColumnSortPlugin, {
             order: contentManager.contentManagerSearch.state.order,
             orderBy: contentManager.contentManagerSearch.state.sortBy,
             onSort: contentManager.contentManagerSearch.handleSortChange
         }),
-
         usePluginWithParams(RowSelectionPlugin, {
             visible: selectionEnabled,
             onGetRowId: contentManagerIds.getId,
@@ -166,7 +162,6 @@ export const ContentManagerScene = () => {
             onDeselectOne: contentManagerSelection.handleDeselectOne,
             rowSelectionStore: useMemo(() => createRowSelectionStore<any>(), [])
         }),
-
 		usePluginWithParams(RowDetailPlugin, {
 			showExpanderButton: false,
 			onGetRowId: contentManagerIds.getId,
@@ -176,9 +171,7 @@ export const ContentManagerScene = () => {
 					<RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
 				</AbsoluteHeightContainer>), [showId, viewRelationStore])
 		}),
-
         ColumnsFillRowSpacePlugin,
-
         usePluginWithParams(RowActionsPlugin, {
             actions: actions
         }),
@@ -190,7 +183,7 @@ export const ContentManagerScene = () => {
             maxRowsWhenNotEmpty: 15
         }),
         usePluginWithParams(EmptyDataPlugin, {
-            content: <EmptyMessage />
+            content: useMemo(() =><EmptyMessage />, [])
         }),
     );
 

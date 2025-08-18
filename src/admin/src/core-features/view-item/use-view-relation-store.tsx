@@ -25,6 +25,7 @@ export const useViewRelationStore = () => {
 	const addEdge = useCallback((rootEntryId: string, entityName: string, edge: Edge, entryId: string, addAsFirst: boolean = false) => {
 
 		if (addAsFirst) {
+			detailsStore.clear();
 			detailsStore.setParams(rootEntryId, {
 				edges: [
 					{
@@ -82,8 +83,6 @@ export const useOneViewRelationStore = (rootEntryId: string, viewRelationStore: 
 	const detailStore = useRowDetails(viewRelationStore.detailsStore, rootEntryId);
 	
 	const edges = useMemo((): EdgeNode[] => {
-		//const edgeNodesInfo = detailStore.params; //.getExpansionInfo(rootEntryId);
-		//const edgeNodesInfo = viewRelationStore.detailsStore.getExpansionInfo(rootEntryId);
 		const params = detailStore.params ?? {};
 		const edges = params?.edges ?? [];
 		return edges;
