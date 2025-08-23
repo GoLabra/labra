@@ -189,7 +189,7 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 
 	const gridData = useMemo(() => {
 		if(!relationData.data){
-			return [];
+			return null;
 		}
 		if(Array.isArray(relationData.data)){
 			return relationData.data;

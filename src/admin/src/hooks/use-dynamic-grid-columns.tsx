@@ -1,15 +1,12 @@
-import dayjs from 'dayjs';
-import { MutableRefObject, ReactNode, useMemo, useRef } from 'react';
-import { ApiFieldTypes, FormFieldTypes } from '@/types/field-type-descriptor';
-import { localeConfig } from "@/config/locale-config"
-import CheckIcon from '@mui/icons-material/Check';
-import { ColumnDef, createResponsivePin, useRowExpansionStore } from 'mosaic-data-table';
+import { localeConfig } from "@/config/locale-config";
 import { Edge, Field, RelationType } from '@/lib/apollo/graphql.entities';
-import { Avatar, Box, Button, Chip, Stack, Typography } from '@mui/material';
+import { ApiFieldTypes } from '@/types/field-type-descriptor';
+import CheckIcon from '@mui/icons-material/Check';
+import { Button, Chip, Stack, Typography } from '@mui/material';
+import { ColumnDef } from 'mosaic-data-table';
+import { MutableRefObject, ReactNode, useMemo, useRef } from 'react';
 // import { stringAvatar } from '@/lib/utils/avatar';
 import { stringToDate, stringToDateTime, stringToTime } from '@/core-features/dynamic-form/value-convertor';
-import { InlineAvatar } from '@/shared/components/avatar';
-import { useViewRelationStore } from '@/core-features/view-item/use-view-relation-store';
 
 export type ColumnOptions = {
     hasSort?: boolean,
