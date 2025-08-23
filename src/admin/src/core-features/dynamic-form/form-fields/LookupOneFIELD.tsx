@@ -77,8 +77,6 @@ export function LookupOneFIELDFormComponent(props: RelationOneFIELDFormComponent
 		searchState: contentManagerSearch.state,
 	});
 
-	console.log(fullEntity, props.edge)
-
 	const search = useCallback((searchValue: string) => {
 		contentManagerSearch.handleQueryChange(searchValue);
 	}, [contentManagerSearch]);

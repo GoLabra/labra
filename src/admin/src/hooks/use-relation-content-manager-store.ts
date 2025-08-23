@@ -37,8 +37,6 @@ export const useEntityFiles = (props: UseEntityFilesParams) => {
 	});
 
 	const files = useMemo(() => {
-		console.log('edgeValueData.data', edgeValueData.data);
-
 		if(!edgeValueData.data){
 			return [];
 		}

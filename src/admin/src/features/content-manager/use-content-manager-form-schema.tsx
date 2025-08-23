@@ -547,7 +547,6 @@ const getUploadManyFile = (entityName: string, edge: Edge): FieldDetails => {
 					}))
 			})
 		}
-		console.log(result);
 		return result;
 	});
 
