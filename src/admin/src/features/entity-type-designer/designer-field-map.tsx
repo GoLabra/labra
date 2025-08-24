@@ -286,23 +286,11 @@ export const designerFieldsMap: Record<ApiFieldTypes, ChildTypeDescriptor> = des
 
 export const getIconForEntityChild = (child: Field | Edge): ReactNode => {
 
-    // const childType: ApiFieldTypes = 'type' in child ? child.type as ApiFieldTypes : 'Relation';
-    // const field = designerFieldsMap[childType]
-
 	const descriptor = getDescriptorByEntityChild(child);
     if (descriptor) {
         return descriptor.icon;
     }
     return <PiSpiral size={18} />;
-    //}
-
-    // if (child.__typename === 'Edge') {
-    //     const field = designerEdgeMap.Relation;
-    //     if (field) {
-    //         return field.icon;
-    //     }
-    //     return <PiSpiral size={18} />;
-    // }
 
     return <PiSpiral size={18} />;
 }

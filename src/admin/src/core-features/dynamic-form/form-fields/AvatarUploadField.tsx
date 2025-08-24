@@ -7,6 +7,7 @@ import { useLiteController } from '../lite-controller';
 import { useFormDynamicContext } from '@/core-features/dynamic-form2/dynamic-form';
 import { ReactNode } from 'react';
 import { UploadAvatar } from '@/shared/components/upload/upload-avatar';
+import { createGenericEvent } from '@/lib/utils/event';
 
 interface FormFieldProps {
     name: string;
@@ -32,7 +33,7 @@ export function AvatarUploadField(props: FormFieldProps) {
         <UploadAvatar
             value={formControllerHandler.value}
             onDrop={(acceptedFiles) => {
-                formControllerHandler.onChange({ target: { name: props.name, value: acceptedFiles[0] } })
+                formControllerHandler.onChange(createGenericEvent(props.name, acceptedFiles[0]))
             }}
             disabled={formControllerHandler.disabled}
             errors={formContext.formState.errors[props.name]?.message as string}

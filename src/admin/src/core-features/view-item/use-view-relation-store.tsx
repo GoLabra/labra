@@ -1,5 +1,5 @@
 import { Edge } from "@/lib/apollo/graphql.entities";
-import { useRowExpansionStore } from "mosaic-data-table";
+import { createRowDetailStore, createRowSelectionStore, RowDetailStore, useRowDetails } from "mosaic-data-table";
 import { useCallback, useMemo } from "react";
 
 export type EdgeNode = {
@@ -12,63 +12,33 @@ export type RelationViewState = {
 }
 
 export const useViewRelationStore = () => {
-	const expansionStore = useRowExpansionStore<RelationViewState>();
+	const detailsStore = useMemo(() => createRowDetailStore<any>(), [])
 
 	const close = useCallback((rootEntryId: string) => {
-		expansionStore.setParams({
-			rowId: rootEntryId,
-			params: {
-				edges: []
-			},
-			openImmediately: false
-		});
-	}, [expansionStore]);
+		detailsStore.clear(rootEntryId)
+	}, [detailsStore]);
 
 	const closeAll = useCallback(() => {
-		expansionStore.clear();
-	}, [expansionStore]);
+		detailsStore.clear();
+	}, [detailsStore]);
 
 	const addEdge = useCallback((rootEntryId: string, entityName: string, edge: Edge, entryId: string, addAsFirst: boolean = false) => {
 
 		if (addAsFirst) {
-			expansionStore.setParams({
-				rowId: rootEntryId,
-				params: {
-					edges: [
-						{
-							entityName,
-							edge,
-							entryId
-						}]
-				},
-				openImmediately: true
-			});
-
-			return;
-		}
-
-		const edgeNodesInfo = expansionStore.getExpansionInfo(rootEntryId);
-		const params = edgeNodesInfo.params ?? {};
-		const edges = params?.edges ?? [];
-
-		expansionStore.setParams({
-			rowId: rootEntryId,
-			params: {
+			detailsStore.clear();
+			detailsStore.setParams(rootEntryId, {
 				edges: [
-					...edges,
 					{
 						entityName,
 						edge,
 						entryId
 					}]
-			},
-			openImmediately: true
-		});
+			}, true);
 
-	}, [expansionStore]);
+			return;
+		}
 
-	const goBack = useCallback((rootEntryId: string) => {
-		const edgeNodesInfo = expansionStore.getExpansionInfo(rootEntryId);
+		const edgeNodesInfo = detailsStore.getExpansionInfo(rootEntryId);
 		const params = edgeNodesInfo.params ?? {};
 		const edges = params?.edges ?? [];
 		
@@ -77,35 +47,51 @@ export const useViewRelationStore = () => {
 			return;
 		}
 
-		expansionStore.setParams({
-			rowId: rootEntryId,
-			params: {
+		detailsStore.setParams(rootEntryId, {
+			edges: [
+				...edges,
+				{
+					entityName,
+					edge,
+					entryId
+				}]
+		}, true);
+
+	}, [detailsStore]);
+
+	const goBack = useCallback((rootEntryId: string) => {
+		const edgeNodesInfo = detailsStore.getExpansionInfo(rootEntryId);
+		const params = edgeNodesInfo.params ?? {};
+		const edges = params?.edges ?? [];
+
+		detailsStore.setParams(rootEntryId, {
 				edges: [
 					...edges.slice(0, -1)
 				]
 			},
-			openImmediately: true
-		});
-	}, [expansionStore]);
+			true
+		);
+	}, [detailsStore]);
 
 	return useMemo(() => ({
-		expansionStore,
+		detailsStore,
 		addEdge,
 		goBack,
 		close,
 		closeAll
-	}), [expansionStore, goBack, addEdge, close, closeAll]);
+	}), [detailsStore, goBack, addEdge, close, closeAll]);
 }
 
 
 export const useOneViewRelationStore = (rootEntryId: string, viewRelationStore: ReturnType<typeof useViewRelationStore>) => {
 
-	const edges = useMemo(() => {
-		const edgeNodesInfo = viewRelationStore.expansionStore.getExpansionInfo(rootEntryId);
-		const params = edgeNodesInfo.params ?? {};
+	const detailStore = useRowDetails(viewRelationStore.detailsStore, rootEntryId);
+	
+	const edges = useMemo((): EdgeNode[] => {
+		const params = detailStore.params ?? {};
 		const edges = params?.edges ?? [];
 		return edges;
-	}, [rootEntryId, viewRelationStore.expansionStore.getExpansionInfo]);
+	}, [rootEntryId, detailStore]);
 
 	const visibleEdge = useMemo(() => {
 		return edges.findLast(i => i);

@@ -6,13 +6,13 @@ import EnterIcon from "@/assets/icons/labra/enter";
 export const ShortcutViewerStyles = styled(Box)<BoxProps>(({ theme }) => ({
 	display: 'inline-block',
 	padding: '0 5px',
-	border: `1px solid color-mix(in srgb, var(--mui-palette-common-onBackground) 10%, #00000000 90%)`,
+	border: `1px solid color-mix(in srgb, var(--variant-containedColor, var(--mui-palette-common-onBackground)) 30%, #00000000)`,
 	minWidth: '20px',
 	fontSize: theme.typography.pxToRem(10),
 	borderRadius: '2px',
 	textAlign: 'center',
 	backgroundColor: `color-mix(in srgb, var(--mui-palette-common-onBackground) 5%, #00000000 95%)`,
-	textShadow: '0px 1px 1px #0000008c',
+	// textShadow: '0px 1px 1px #0000008c',
 	'svg': {
 		verticalAlign: 'middle'
 	},
@@ -44,7 +44,7 @@ export const ShortcutViewer = (props: ShortcutViewerProps) => {
 	return (
 		<ShortcutViewerStyles
 			sx={{
-				
+				fontWeight: 100,
 				...props.sx,
 			}}>
 

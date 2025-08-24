@@ -143,11 +143,12 @@ const PageContent = (props: PageContentProps) => {
 
                     <Stack
                         direction="row"
+						alignItems="center"
                         spacing={1}>
 
                         <ShortcutButton
 							shortcutKey={Key.n}
-
+							iconOpacity={true}
                             size="medium"
                             variant="contained"
                             startIcon={<SvgIcon fontSize="small"><PlusIcon /></SvgIcon>}

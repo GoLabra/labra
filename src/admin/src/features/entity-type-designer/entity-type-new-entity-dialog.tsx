@@ -18,6 +18,8 @@ import { ENTITY_SYSTEM_KEYWORDS } from "@/config/CONST";
 import { useEntitiesDesigner } from "./use-designer-entities";
 import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
+import { useAutoFocusFirstElementOnce } from "@/hooks/use-auto-focus-first-element-once";
+import { DialogContentWithAutofocus } from "@/core-features/dynamic-dialog/src/dialog-content-with-autofocus";
 
 export const getSchema = (entitiesDesigner: ReturnType<typeof useEntitiesDesigner>, editId?: string) =>
     z.object({
@@ -91,7 +93,8 @@ export const EntityTypeNewEntityDialog = forwardRef<ChainDialogContentRef, Entit
             {myDialogContext.openMode == FormOpenMode.New ? 'New Entity' : 'Edit Entity'}
         </DynamicDialogHeader>
 
-        <DialogContent sx={{ overflow: 'visible' }}>
+        <DialogContentWithAutofocus
+			sx={{ overflow: 'visible' }}>
 
             <Stack direction="row" justifyContent="center" sx={{
                 width: 'fit-content',
@@ -111,7 +114,7 @@ export const EntityTypeNewEntityDialog = forwardRef<ChainDialogContentRef, Entit
                 <TextShortFormField name="caption" label="Caption" required />
             </Form>
 
-        </DialogContent>
+        </DialogContentWithAutofocus>
         <DynamicDialogFooter>
 
 			<ShortcutButton

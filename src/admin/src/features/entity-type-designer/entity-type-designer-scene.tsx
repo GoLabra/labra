@@ -173,7 +173,6 @@ export default function EntityTypeDesignerScene(
         usePluginWithParams(HighlightRowPlugin, {
             isRowHighlighted: useCallback((row: any) => row.caption === entityDesigner.fullDesignerEntity.displayFieldCaption, [entityDesigner.fullDesignerEntity?.displayFieldCaption]),
         }),
-        PinnedColumnsPlugin,
         usePluginWithParams(SkeletonLoadingPlugin, {
             isLoading: entityDesigner.fullDesignerEntity?.loading || isEntityBusy,
             rowsWhenEmpty: Defaults.dataTable.skeletonRowsCount
@@ -185,8 +184,9 @@ export default function EntityTypeDesignerScene(
 
     return (<>
         <Card>
-            <CardContent>
+            <CardContent data-noxpadding="true">
                 <MosaicDataTable
+					className="lpadding"
                     plugins={gridPlugins}
                     caption="Entity fields and edges"
                     items={entityDesigner.fullDesignerEntity?.children.filter(i => i.designerStatus != 'deleted')}

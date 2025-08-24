@@ -163,7 +163,6 @@ const ChangesGrid = (props: ChangesGridProps) => {
         usePluginWithParams(RowActionsPlugin, {
             actions: todoActions
         }),
-        PinnedColumnsPlugin,
         HideHeaderPlugin,
         usePluginWithParams(EmptyDataPlugin, {
             content: <EmptyMessage />

@@ -6,6 +6,18 @@ import NextLink from 'next/link';
 import { paths } from "@/lib/paths";
 import { HiExternalLink } from "react-icons/hi";
 
+const MenuItemRoot = styled(Box)({
+	padding: '5px 0',
+	height: '100%',
+	borderWidth: '3px 0',
+	borderStyle: 'solid',
+	borderColor: 'transparent',
+
+	'&.active': {
+		borderBottomColor: 'var(--mui-palette-secondary-main)',
+	}
+});
+
 interface MenuItemProps {
 
     icon?: React.ReactNode;
@@ -36,25 +48,25 @@ export const MenuItem = (props: MenuItemProps) => {
         }
 
     return (
+		<MenuItemRoot 
+			className={active ? 'active' : ''}>
+
         <ButtonBase
             {...linkProps}
             sx={{
                 alignItems: 'center',
-                color: 'primary.light',
-                borderRadius: '3px',
-                display: 'flex',
+                color: 'text.primary',
+                borderRadius: '6px',
                 fontFamily: (theme) => theme.typography.fontFamily,
                 fontSize: 14,
                 fontWeight: 400,
-                justifyContent: 'flex-start',
-                p: '10px 15px',
-                my: '2px',
-                textAlign: 'left',
+                p: '5px',
+				height: '100%',
                 whiteSpace: 'nowrap',
-                width: '100%',
-                ...(!active && {
-                    color: 'text.primary'
-                }),
+				selfAlign: 'middle',
+				'&:hover': {
+					backgroundColor: (theme) => theme.palette.action.hover
+				},
                 '&:focus-visible': {
                     backgroundColor: (theme) => theme.palette.action.selected
                 },
@@ -64,7 +76,7 @@ export const MenuItem = (props: MenuItemProps) => {
                 <Box component="span"
                     sx={{
                         alignItems: 'center',
-
+						opacity: .5,
                         display: 'inline-flex',
                         flexGrow: 0,
                         flexShrink: 0,
@@ -85,6 +97,7 @@ export const MenuItem = (props: MenuItemProps) => {
             </Stack>
 
         </ButtonBase>
+		</MenuItemRoot>
     )
 }
 
@@ -97,7 +110,7 @@ export const Topnav = (props: TopnavProps) => {
     const pathname = usePathname();
 
     return (
-        <Box component="nav">
+        <Box component="nav" alignSelf="end">
 
             <Stack component="ul" margin={0} direction={direction ?? "row"} gap={1} px={0}>
                 <Box component="li" sx={{ listStyle: 'none' }}>

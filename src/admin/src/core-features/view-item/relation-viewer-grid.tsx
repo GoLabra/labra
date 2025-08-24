@@ -68,8 +68,7 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 			tabIndex={0}
 			sx={{
 				padding: '10px',
-				// backgroundImage: 'url(/rough-diagonal.png)',
-				background: 'url(/assets/img/relation-background.svg)',
+				backgroundColor: 'var(--mui-palette-background-default)',
 				'&:focus': {
 					outline: 'none'
 				}
@@ -79,62 +78,57 @@ export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 				position: 'relative',
 			}}>
 
-				<Stack gap={1}>
+				<Stack direction="row" gap={1} alignItems="center" justifyContent="space-between">
+					<Stack direction="row" gap={1} alignItems="center">
 
-					<RoundPanelPlaceholder sx={{
-						// backdropFilter: 'blur(100px)'
-					}}>
-						<Stack direction="row" gap={1} alignItems="center" justifyContent="space-between">
-							<Stack direction="row" gap={1} alignItems="center">
+						<ShortcutIconButton 
+							shortcutKey={Key.b}
+							shortcutTarget={hostRef}
+							tooltip="Back"
+							aria-label="back" size="medium" onClick={goBack}>
+							<ArrowBackIcon fontSize="inherit" />
+						</ShortcutIconButton>
+						
 
-								<ShortcutIconButton 
-									shortcutKey={Key.b}
-									shortcutTarget={hostRef}
-									tooltip="Back"
-									aria-label="back" size="medium" onClick={goBack}>
-									<ArrowBackIcon fontSize="inherit" />
-								</ShortcutIconButton>
-								
+						{hasHistory && (<Typography variant="h6">
+							{'.'.repeat(oneViewRelationStore.edges.length)} /
+						</Typography>)}
 
-								{hasHistory && (<Typography variant="h6">
-									{'.'.repeat(oneViewRelationStore.edges.length)} /
-								</Typography>)}
+						<Stack direction="row" gap={1} alignItems="center">
 
-								<Stack direction="row" gap={1} alignItems="center">
-
-									<Typography variant="h6">
-										{nameCaptionEntity?.caption}
-									</Typography>
-									➝
-									<Typography variant="h6" sx={{ fontStyle: 'italic' }}>
-										{visibleEdge.edge.caption}
-									</Typography>
-									➝
-									<Link component={NextLink} href={`/content-manager/${visibleEdge?.edge.relatedEntity.name}`} color="inherit" >
-										<Typography variant="h6">
-											{visibleEdge.edge.relatedEntity.caption}
-										</Typography>
-									</Link>
-
-								</Stack>
-
-							</Stack>
-
-							<ShortcutIconButton 
-								shortcutKey={Key.Escape}
-								shortcutTarget={hostRef}
-								tooltip="Back"
-								aria-label="close" size="medium" onClick={close}>
-								<CloseIcon fontSize="inherit" />
-							</ShortcutIconButton>
+							<Typography variant="h6">
+								{nameCaptionEntity?.caption}
+							</Typography>
+							➝
+							<Typography variant="h6" sx={{ fontStyle: 'italic' }}>
+								{visibleEdge.edge.caption}
+							</Typography>
+							➝
+							<Link component={NextLink} href={`/content-manager/${visibleEdge?.edge.relatedEntity.name}`} color="inherit" >
+								<Typography variant="h6">
+									{visibleEdge.edge.relatedEntity.caption}
+								</Typography>
+							</Link>
 
 						</Stack>
-					</RoundPanelPlaceholder>
 
-					<RoundPanelPlaceholder>
-						<RelationViewerGrid key={`${visibleEdge.entityName}-${visibleEdge.entryId}`} entityName={visibleEdge.entityName} entryId={visibleEdge.entryId} edge={visibleEdge.edge} showId={props.showId} openRelation={oneViewRelationStore.addEdge} />
-					</RoundPanelPlaceholder>
+					</Stack>
+
+					<ShortcutIconButton 
+						shortcutKey={Key.Escape}
+						shortcutTarget={hostRef}
+						tooltip="Close"
+						aria-label="close" size="medium" onClick={close}>
+						<CloseIcon fontSize="inherit" />
+					</ShortcutIconButton>
+
 				</Stack>
+				<br />
+					
+				<RoundPanelPlaceholder>
+					<RelationViewerGrid key={`${visibleEdge.entityName}-${visibleEdge.entryId}`} entityName={visibleEdge.entityName} entryId={visibleEdge.entryId} edge={visibleEdge.edge} showId={props.showId} openRelation={oneViewRelationStore.addEdge} />
+				</RoundPanelPlaceholder>
+				
 			</Box>
 		</Box>
 	)
@@ -195,7 +189,7 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 
 	const gridData = useMemo(() => {
 		if(!relationData.data){
-			return [];
+			return null;
 		}
 		if(Array.isArray(relationData.data)){
 			return relationData.data;
@@ -213,19 +207,6 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 		showId: props.showId
 	});
 
-	// Row Actions
-	const actions: Action<unknown>[] = [
-		{
-			id: 'goto',
-			render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => gotoEntry(field)}>
-				<ListItemIcon>
-					<DirectionsRunIcon />
-				</ListItemIcon>
-				Go To Entry
-			</MenuItem>)
-		},
-	];
-
 	const gotoEntry = useCallback((entry: any) => {
 		const path = `/content-manager/${props.edge.relatedEntity.name}`;
 
@@ -240,19 +221,30 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 		push(withFilters);
 	}, []);
 
+	// Row Actions
+	const actions: Action<unknown>[] = useMemo(() => [
+		{
+			id: 'goto',
+			render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => gotoEntry(field)}>
+				<ListItemIcon>
+					<DirectionsRunIcon />
+				</ListItemIcon>
+				Go To Entry
+			</MenuItem>)
+		},
+	], [gotoEntry]);
+
 	const gridPlugins = useGridPlugins(
 		CustomBodyCellContentRenderPlugin,
 		usePluginWithParams(PaddingPluggin, {}),
 		ColumnsFillRowSpacePlugin,
-		usePluginWithParams(HighlightColumnPlugin, {}),
-
 		usePluginWithParams(RowActionsPlugin, {
 			actions: actions
 		}),
 		usePluginWithParams(EmptyDataPlugin, {
-			content: <EmptyMessage />
+			content: useMemo(() =><EmptyMessage />, [])
 		}),
-		PinnedColumnsPlugin
+		usePluginWithParams(PinnedColumnsPlugin, {}),
 	)
 
 	return (<MosaicDataTable
@@ -260,5 +252,9 @@ const RelationViewerGrid = (props: RelationViewerGridProps) => {
 		caption={`${props.entityName} Entry Viewer`}
 		items={gridData}
 		headCells={headCells}
+		sx={{
+			'--mui-palette-MosaicDataTable-background': 'var(--mui-palette-background-default)',
+			'--mui-palette-MosaicDataTable-highlight': 'color-mix(in srgb, rgb(var(--mui-palette-primary-mainChannel)), transparent 99%)'
+		}}
 	/>)
 }

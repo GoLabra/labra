@@ -1,8 +1,9 @@
-import { Box, Card, CardContent, CardHeader, Divider, ListItemIcon, MenuItem, SvgIcon } from "@mui/material"
+import { Box, Card, CardContent, CardHeader, Divider, ListItemIcon, MenuItem, Stack, SvgIcon } from "@mui/material"
 import PlusCircleIcon from "@heroicons/react/24/outline/PlusCircleIcon"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+
 import { ContentManagerSearch } from "./content-manager-search"
 import { useSelection } from "@/hooks/use-selection";
 import { DynamicDialog, FinishResult } from "../../core-features/dynamic-dialog/src/dynamic-dialog"
@@ -11,7 +12,7 @@ import { useDialog } from "@/hooks/use-dialog"
 import { useContentManagerIds } from "./use-content-manger-ids"
 import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog"
 import { ContentManagerEntryDialogContent } from "./content-manager-entry-form"
-import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowExpansionPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, useRowExpansionStore, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer } from "mosaic-data-table";
+import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer, createRowSelectionStore, RowDetailPlugin, createFilterRowStore, createResponsivePin } from "mosaic-data-table";
 import { useContentManagerContext } from "./use-content-manager-context"
 import { ActionList } from "@/shared/components/action-list";
 import { ActionListItem } from "@/shared/components/action-list-item";
@@ -21,12 +22,14 @@ import { EmptyMessage } from "@/shared/components/empty-message";
 import { MuiCardFooter } from "@/shared/components/mui-card-footer";
 import { useDyamicGridFilter } from "./use-dyamic-grid-filter";
 import Defaults from "@/config/Defaults.json";
-import { useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
+import { ColumnSourceMeta, useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
 import { RelationViewerGridRoot } from "@/core-features/view-item/relation-viewer-grid";
 import { useViewRelationStore } from "@/core-features/view-item/use-view-relation-store";
 import { Edge } from "@/lib/apollo/graphql.entities";
 import { Key } from "@/shared/components/key-handler/types";
 import { ShortcutActionItem } from "@/shared/components/key-handler/with-label-shortcut";
+import { FilterEditor } from "@/shared/components/filter-editor";
+import { InlineAvatar } from "@/shared/components/avatar";
 
 export const ContentManagerScene = () => {
 
@@ -50,14 +53,39 @@ export const ContentManagerScene = () => {
         fields: contentManager.fullEntity?.fields,
         edges: contentManager.fullEntity?.edges,
         displayFieldName: contentManager.displayFieldName,
-        //expansionStore: viewRelationStore,
 		openRelation: useCallback((entityName: string, edge: Edge, entryId: string) => {
 			viewRelationStore.addEdge(entryId, entityName, edge, entryId, true);
 		}, [viewRelationStore]),
-        showId: showId
+        showId: showId,
+		transformColumn: useCallback((column: ColumnDef, meta: ColumnSourceMeta) => {
+
+			let newColumn = column;
+			if(column.id === contentManager.displayFieldName) {
+				newColumn = {
+					...newColumn,
+					pin: createResponsivePin(true,'sm', 'up'),
+					highlight: true
+				}
+			}
+
+			if (meta.kind == 'field' && meta.field.name == 'name' && meta.field.type == 'ShortText') {
+
+				newColumn = {
+					...newColumn,
+					cell: (row: any) => { 
+						const cellValue = row[meta.field.name];
+						return (<Stack direction="row" gap={1} alignItems="center">
+						<InlineAvatar name={cellValue} />
+						{column.cell?.(row) ?? undefined}
+					</Stack>)}
+				}
+			}
+			return newColumn;
+		}, [contentManager.displayFieldName])
     });
 
     const gridFilter = useDyamicGridFilter({
+		search: contentManager.contentManagerSearch,
         fields: contentManager.fullEntity?.fields
     })
 
@@ -79,7 +107,7 @@ export const ContentManagerScene = () => {
     }, [deleteConfirmationDialog, contentManager.contentManagerStore.deleteItem]);
 
     // Row Actions
-    const actions: Action<unknown>[] = [
+    const actions: Action<unknown>[] = useMemo(() => [
         {
             id: 'edit',
             render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => editEntry(field)}>
@@ -93,7 +121,7 @@ export const ContentManagerScene = () => {
             id: 'remove',
             render: (field: any) => (<MenuItem id='remove-menu-item' key={`remove-${field}`} onClick={() => deleteConfirmationDialog.handleOpen(field.id)}> <ListItemIcon><DeleteIcon /></ListItemIcon> Remove </MenuItem>)
         },
-    ];
+    ], [editEntry, deleteConfirmationDialog]);
 
     const finishDialog = useCallback((result: FinishResult) => {
 
@@ -114,15 +142,13 @@ export const ContentManagerScene = () => {
 
     const gridPlugins = useGridPlugins(
         CustomBodyCellContentRenderPlugin,
-
         usePluginWithParams(FilterRowPlugin, {
             visible: filterEnabled,
-            filter: contentManager.contentManagerSearch.state.filter,
+            store: gridFilter.store,
             filterChanged: contentManager.contentManagerSearch.handleFiltersApply,
             key: 'filter_row',
-            filterColumns: gridFilter
+            filterColumns: gridFilter.filterDef
         }),
-
         usePluginWithParams(PaddingPluggin, {}),
         usePluginWithParams(ColumnSortPlugin, {
             order: contentManager.contentManagerSearch.state.order,
@@ -134,69 +160,77 @@ export const ContentManagerScene = () => {
             onGetRowId: contentManagerIds.getId,
             onSelectOne: contentManagerSelection.handleSelectOne,
             onDeselectOne: contentManagerSelection.handleDeselectOne,
-            selectedIds: contentManagerSelection.selected
+            rowSelectionStore: useMemo(() => createRowSelectionStore<any>(), [])
         }),
-        usePluginWithParams(RowExpansionPlugin, {
-            showExpanderButton: false,
-            onGetRowId: contentManagerIds.getId,
-            expanstionStore: viewRelationStore.expansionStore,
-            getExpansionNode: useCallback((row: any, params: any) => (
-                <AbsoluteHeightContainer>
-                    <RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
-                </AbsoluteHeightContainer>), [showId, viewRelationStore])
-        }),
+		usePluginWithParams(RowDetailPlugin, {
+			showExpanderButton: false,
+			onGetRowId: contentManagerIds.getId,
+			rowDetailStore: viewRelationStore.detailsStore,
+			getExpansionNode: useCallback((row: any, params: any) => (
+				<AbsoluteHeightContainer>
+					<RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
+				</AbsoluteHeightContainer>), [showId, viewRelationStore])
+		}),
         ColumnsFillRowSpacePlugin,
         usePluginWithParams(RowActionsPlugin, {
             actions: actions
         }),
         usePluginWithParams(HighlightColumnPlugin, {}),
-        PinnedColumnsPlugin,
+        usePluginWithParams(PinnedColumnsPlugin, {}),
         usePluginWithParams(SkeletonLoadingPlugin, {
             isLoading: contentManager.contentManagerStore.state.dataLoading,
             rowsWhenEmpty: Defaults.dataTable.skeletonRowsCount,
             maxRowsWhenNotEmpty: 15
         }),
         usePluginWithParams(EmptyDataPlugin, {
-            content: <EmptyMessage />
+            content: useMemo(() =><EmptyMessage />, [])
         }),
     );
 
     return (
         <>
             <Card>
-                <CardHeader title={<ContentManagerSearch
-                    headCells={headCells}
-                    disabled={false}
-                    onRefresh={contentManager.contentManagerStore.refresh}
-                    onBulkDelete={() => bulkDeleteConfirmationDialog.handleOpen()}
-                    onQueryChange={contentManager.contentManagerSearch.handleQueryChange}
-                    query={contentManager.contentManagerSearch.state.query}
-                    selected={contentManagerSelection.selected}
+                <CardHeader title={(
+					<>
+						<ContentManagerSearch
+							disabled={false}
+							onRefresh={contentManager.contentManagerStore.refresh}
+							onBulkDelete={() => bulkDeleteConfirmationDialog.handleOpen()}
+							onQueryChange={contentManager.contentManagerSearch.handleQueryChange}
+							query={contentManager.contentManagerSearch.state.query}
+							selected={contentManagerSelection.selected}
 
-                    selectionEnabled={selectionEnabled}
-                    onSelectionEnabledChange={(value) => {
-                        setSelectionEnabled(value)
-                        if (!value) {
-                            contentManagerSelection.handleDeselectAll();
-                        }
-                    }}
+							selectionEnabled={selectionEnabled}
+							onSelectionEnabledChange={(value) => {
+								setSelectionEnabled(value)
+								if (!value) {
+									contentManagerSelection.handleDeselectAll();
+								}
+							}}
 
-                    filterEnabled={filterEnabled}
-                    onFilterEnabledChange={setFilterEnabled}
+							filterEnabled={filterEnabled}
+							onFilterEnabledChange={setFilterEnabled}
 
-                    contentManagerSearch={contentManager.contentManagerSearch}
-                    showId={showId}
-                    onShowIdChange={setShowId}
-                />
-                }>
+							contentManagerSearch={contentManager.contentManagerSearch}
+							showId={showId}
+							onShowIdChange={setShowId}
+						/>
 
+						<FilterEditor filter={contentManager.contentManagerSearch.state.filter} headCells={headCells} onRemove={(key) => {
+							gridFilter.store.clear(key);
+							contentManager.contentManagerSearch.handleFiltersApply(gridFilter.store.getSnapshot())
+						}} />
+
+					</>
+				)}>
                 </CardHeader>
 
                 <Divider />
 
-                <CardContent>
+                <CardContent data-noxpadding="true">
 
                     <MosaicDataTable
+						className="lpadding"
                         plugins={gridPlugins}
                         caption={`${contentManager.entityName} content`}
                         items={contentManager.contentManagerStore.state.data}

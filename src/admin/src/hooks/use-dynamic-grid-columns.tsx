@@ -1,20 +1,21 @@
-import dayjs from 'dayjs';
-import { MutableRefObject, ReactNode, useMemo, useRef } from 'react';
-import { ApiFieldTypes, FormFieldTypes } from '@/types/field-type-descriptor';
-import { localeConfig } from "@/config/locale-config"
-import CheckIcon from '@mui/icons-material/Check';
-import { ColumnDef, useResponsivePin, useRowExpansionStore } from 'mosaic-data-table';
+import { localeConfig } from "@/config/locale-config";
 import { Edge, Field, RelationType } from '@/lib/apollo/graphql.entities';
-import { Avatar, Button, Chip, Stack, Typography } from '@mui/material';
+import { ApiFieldTypes } from '@/types/field-type-descriptor';
+import CheckIcon from '@mui/icons-material/Check';
+import { Button, Chip, Stack, Typography } from '@mui/material';
+import { ColumnDef } from 'mosaic-data-table';
+import { MutableRefObject, ReactNode, useMemo, useRef } from 'react';
 // import { stringAvatar } from '@/lib/utils/avatar';
 import { stringToDate, stringToDateTime, stringToTime } from '@/core-features/dynamic-form/value-convertor';
-import { InlineAvatar } from '@/shared/components/avatar';
-import { useViewRelationStore } from '@/core-features/view-item/use-view-relation-store';
 
 export type ColumnOptions = {
     hasSort?: boolean,
     width?: number,
 }
+
+export type ColumnSourceMeta =
+    | { kind: 'field'; field: Field }
+    | { kind: 'edge'; edge: Edge };
 
 interface UseDynamicGridColumnsProps {
     entityName: string,
@@ -22,7 +23,8 @@ interface UseDynamicGridColumnsProps {
     edges?: Edge[],
     displayFieldName?: string,
 	openRelation: (entityName: string, edge: Edge, entryId: string) => void,
-    showId: boolean
+    showId: boolean,
+    transformColumn?: (column: ColumnDef, meta: ColumnSourceMeta) => ColumnDef | void,
 }
 export const useDynamicGridColumns = ({
     entityName,
@@ -30,52 +32,51 @@ export const useDynamicGridColumns = ({
     edges = [],
     displayFieldName,
     openRelation,
-    showId
+    showId,
+    transformColumn
 }: UseDynamicGridColumnsProps): ColumnDef[] => {
-
-    const displayFieldPin = useResponsivePin({ pin: 'left', breakpoint: 'sm', direction: 'up' });
 
     const expansionStoreRef = useRef(openRelation);
     expansionStoreRef.current = openRelation;
 
-    return useMemo(() => (
-        [
-            ...fields
-                .filter(i => showId ? true : i.name != 'id')
-                .filter(i => !i.private) // TODO: this should be hidden from BE
-                .filter(i => i.type != 'RichText') // TODO: set RichText based on configuration
-                .filter(i => i.type != 'Json') // TODO: set JSON based on configuration
-                .map(i => fieldToColumn(i))
-                .map(i => i.id === displayFieldName ? {
-                    ...i,
-                    pin: displayFieldPin,
-                    highlight: true
-                } : i),
-            ...edges.map(i => edgeToColumn(entityName, i, expansionStoreRef)),
-        ]
-    ), [displayFieldPin, showId, displayFieldName, fields, edges]);
+    return useMemo(() => {
+        const fieldColumns: ColumnDef[] = fields
+            .filter(i => showId ? true : i.name != 'id')
+            .filter(i => !i.private) // TODO: this should be hidden from BE
+            .filter(i => i.type != 'RichText')
+			.filter(i => i.type != 'LongText') 
+            .filter(i => i.type != 'Json')
+            .map(field => {
+                let col = fieldToColumn(field);
+                if (transformColumn) {
+                    col = transformColumn(col, { kind: 'field', field }) ?? col;
+                }
+                return col;
+            });
+
+        const edgeColumns: ColumnDef[] = edges.map(edge => {
+            let col = edgeToColumn(entityName, edge, expansionStoreRef);
+            if (transformColumn) {
+                col = transformColumn(col, { kind: 'edge', edge }) ?? col;
+            }
+            return col;
+        });
+
+        const builtColumns: ColumnDef[] = [
+            ...fieldColumns,
+            ...edgeColumns,
+        ];
+
+        return builtColumns;
+    }, [showId, displayFieldName, fields, edges, transformColumn, entityName]);
 }
 
 
 const fieldToColumn = (field: Field): ColumnDef<Field> => {
 
     // Add avatar for name column
-    if (field.name == 'name' && field.type == 'ShortText') {
-        return shortTextColumnDef(field.name, field.caption, (row: any) => {
-            const cellValue = row[field.name];
-            return (<Stack direction="row" gap={1} alignItems="center">
-                <InlineAvatar name={cellValue} />
-                {cellValue}
-            </Stack>)
-        }, {
-            width: 180,
-            hasSort: true
-        });
-    }
-
     switch (field.type as ApiFieldTypes) {
         case 'ShortText': return shortTextColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
-        case 'LongText': return longTextColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
         case 'RichText': return richTextColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
         case 'Integer': return integerColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
         case 'DateTime': return dateTimeColumnDef(field.name, field.caption, (row: any) => row[field.name], { hasSort: true });
@@ -118,16 +119,6 @@ const shortTextColumnDef = (name: string, caption: string, render: (row: any) =>
     };
 }
 
-const longTextColumnDef = (name: string, caption: string, render: (row: any) => string, options?: ColumnOptions): ColumnDef<any> => {
-    return {
-        id: name,
-        header: caption,
-        cell: (row: any) => render(row),
-        width: options?.width ?? 300,
-        hasSort: options?.hasSort ?? false
-    };
-}
-
 const richTextColumnDef = (name: string, caption: string, render: (row: any) => string, options?: ColumnOptions): ColumnDef<any> => {
     return {
         id: name,
@@ -159,6 +150,10 @@ const dateTimeColumnDef = (name: string, caption: string, render: (row: any) => 
                 return '';
             }
 
+			return (<>
+				<Typography variant="body2" component='span' color='var(--mui-palette-text-secondary)'>{stringToDateTime(value)?.format(localeConfig.date.displayFormat) ?? undefined}, </Typography>
+				<Typography variant="body2" component='span'>{stringToDateTime(value)?.format(localeConfig.time.displayFormat) ?? undefined}</Typography>
+			</>)
             return stringToDateTime(value)?.format(localeConfig.dateTime.displayFormat) ?? undefined;
 
         },

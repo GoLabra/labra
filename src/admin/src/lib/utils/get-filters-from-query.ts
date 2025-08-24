@@ -20,7 +20,7 @@ export const getFiltersFromQuery = (query: string, fields: Field[]): Filter => {
 const getStringQuery = (query: string, fields: Field[]): Filter => {
 
 	return fields.reduce((acc, field) => {
-		if (['ID', 'ShortText', 'LongText', 'RichText', 'Email', 'Json', 'SingleChoice'].includes(field.type)) {
+		if (['ID', 'ShortText', 'LongText', 'RichText', 'Email', 'SingleChoice'].includes(field.type)) {
 			acc[field.name] = {
 				operator: containsFoldOperator.name,
 				value: query
@@ -28,20 +28,6 @@ const getStringQuery = (query: string, fields: Field[]): Filter => {
 		}
 		return acc;
 	}, {} as Filter);
-
-	// return fields.filter(i => 
-	//     i.type == 'ID'
-	//     || i.type == 'ShortText'
-	//     || i.type == 'LongText'
-	//     || i.type == 'RichText'
-	//     || i.type == 'Email'
-	//     || i.type == 'Json'
-	//     || i.type == 'SingleChoice'
-	// ).map(i => ({
-	//     property: i.name,
-	//     operator: containsFoldOperator.name,
-	//     value: query
-	// }));
 }
 
 const getIntegerQuery = (query: string, fields: Field[]): Filter => {

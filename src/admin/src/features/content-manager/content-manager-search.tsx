@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import CachedIcon from '@mui/icons-material/Cached';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'; 
 import { Button, ButtonTypeMap, ExtendButtonBase, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, SvgIcon, Tooltip } from '@mui/material';
 import { FieldScalarTypes } from '@/types/field-type-descriptor';
 import { MenuButton } from '@/shared/components/menu/menu-button';
@@ -31,7 +32,6 @@ export type SearchField = {
 
 interface OrdersSearchProps {
     //fields: SearchField[];
-    headCells?: ColumnDef[];
     disabled?: boolean;
     onRefresh?: () => void;
 
@@ -53,7 +53,7 @@ interface OrdersSearchProps {
 }
 export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
-    const { headCells, disabled = false, onQueryChange, query = '', selected = [], onBulkDelete } = props;
+    const { disabled = false, onQueryChange, query = '', selected = [], onBulkDelete } = props;
     const hasSelection = selected.length > 0;
 
     return (
@@ -85,7 +85,7 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 							shortcutKey={Key.r}
 							tooltip="Refresh"
 
-							color="primary"
+							color="secondary"
 							onClick={() => props.onRefresh?.()}
 							size="medium">
 							<CachedIcon />
@@ -120,25 +120,20 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 								}
 							}}>
 
-                            <ShortcutResponsiveButton
+                            <ShortcutIconButton
 								shortcutKey={Key.c}
-
+								tooltip='Selection'
                                 disabled={disabled}
                                 onClick={() => props.onSelectionEnabledChange?.(!props.selectionEnabled)}
-                                size="medium"
-                                startIcon={(
-                                    <SvgIcon fontSize="small">
-                                        <ChecklistIcon />
-                                    </SvgIcon>
-                                )}
-                                variant={props.selectionEnabled ? 'contained' : 'text'}
-                                aria-haspopup="dialog"
+								size="medium"
+								color={props.selectionEnabled ? 'primary' : 'secondary'}
                             >
-                                <span className="button-text">Selection</span>
-                            </ShortcutResponsiveButton>
+                                 <ChecklistIcon />
+                            </ShortcutIconButton>
 
-                            <ShortcutResponsiveButton
+                            <ShortcutIconButton
 								shortcutKey={Key.f}
+								tooltip='Filter'
                                 disabled={disabled}
                                 onClick={() => {
                                     var newValue = !props.filterEnabled;
@@ -147,17 +142,12 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                                         props.contentManagerSearch.handleFiltersApply({});
                                     }
                                 }}
-                                size="medium"
-                                startIcon={(
-                                    <SvgIcon fontSize="small">
-                                        <FilterAltIcon />
-                                    </SvgIcon>
-                                )}
-                                variant={props.filterEnabled ? 'contained' : 'text'}
-                                aria-haspopup="dialog"
+    
+								size="medium"
+								color={props.filterEnabled ? 'primary' : 'secondary'}
                             >
-                                <span className="button-text">Filter</span>
-                            </ShortcutResponsiveButton>
+								<FilterAltIcon />
+                            </ShortcutIconButton>
 
                             <MenuButton
                                 text="Configure View"
@@ -203,7 +193,6 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
 
                     </Stack>
 
-                    {!!Object.keys(props.contentManagerSearch.state.filter).length && (<FilterEditor filter={props.contentManagerSearch.state.filter} onChange={props.contentManagerSearch.handleFiltersApply} headCells={headCells} />)}
                 </Stack>
             </div>
             {/* <FilterDialog
