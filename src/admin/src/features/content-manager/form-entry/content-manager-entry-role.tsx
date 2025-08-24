@@ -35,6 +35,7 @@ import { GplFilter, LGQuery } from "lg-query";
 import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
 import { DialogContentWithAutofocus } from "@/core-features/dynamic-dialog/src/dialog-content-with-autofocus";
+import { Counter } from "@/shared/components/counter";
 
 type PermissionItem = {
 	id: string;
@@ -309,7 +310,8 @@ const PermissionSection = (props: PermissionSectionProps) => {
 					</MenuButton>
 				}>
 				<Tooltip title={tooltipLabel} placement='bottom' arrow>
-					<Chip component="span" label={permissionsCount.length} color="secondary" variant="outlined" size="small" />
+					<Counter label={permissionsCount.length} fontSize="small" />
+					{/* <Chip component="span" label={permissionsCount.length} color="secondary" variant="outlined" size="small" /> */}
 				</Tooltip>
 
 

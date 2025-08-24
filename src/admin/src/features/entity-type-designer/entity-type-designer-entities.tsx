@@ -30,23 +30,16 @@ const iconStatus = {
     'unchanged': null
 }
 
-const newEntityBorderStyle = (theme: Theme) => {
-    return `2px dashed ${theme.palette.mode == 'dark' ? theme.palette!.background!.paper : theme.palette!.neutral[100]}`;
-}
-
 const TreeListItemButtonStyled = styled(TreeListItemButton)(({ theme }) => [
     {
-        color: 'text.secondary',
-        borderWidth: '2px',
-        borderStyle: 'dashed'
-    },
-    theme.applyStyles('light', {
-        borderColor: 'var(--mui-palette-neutral-100)',
-
-    }),
-    theme.applyStyles('dark', {
-        borderColor: 'var(--mui-palette-background-paper)',
-    }),
+		'--variant-containedColor': 'var(--mui-palette-primary-main)',
+        color: 'var(--mui-palette-primary-main)',
+		backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 3%, transparent)',
+        borderWidth: '1px',
+        borderStyle: 'dashed',
+		borderColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 50%, transparent)',
+		borderRadius: '6px'
+    }
 ]);
 
 const ShortcutTreeListItem = withLabelShortcut(TreeListItemButtonStyled);

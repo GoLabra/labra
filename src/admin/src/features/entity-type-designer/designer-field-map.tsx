@@ -310,11 +310,11 @@ export const getIconForEntityChild = (child: Field | Edge): ReactNode => {
 export const getChildTypeForEntityChild = (child: Field | Edge): string => {
 
     if (child.__typename === 'Field') {
-        return child.type.toUpperCase();
+        return child.type;
     }
 
     if (child.__typename === 'Edge') {
-        return child.relatedEntity.caption?.toUpperCase();
+        return child.relatedEntity.caption;
     }
 
     return '';

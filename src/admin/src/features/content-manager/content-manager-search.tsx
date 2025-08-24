@@ -160,15 +160,24 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                             </ShortcutResponsiveButton>
 
                             <MenuButton
-                                text="Configure"
-                                slotProps={{
-                                    buttonProps: {
-                                        startIcon: (
+                                text="Configure View"
+								slots={{
+									button: (<ResponsiveButton 
+										color="secondary"
+										mobileProps={{
+											endIcon: (
+												<SvgIcon style={{ fontSize: 18 }} >
+													<WrenchScrewdriverIcon />
+												</SvgIcon>)
+										}}
+                                        startIcon={(
                                             <SvgIcon style={{ fontSize: 18 }} >
-                                                <WrenchScrewdriverIcon />
-                                            </SvgIcon>)
-                                    }
-                                }}>
+                                                <ArrowDropDownIcon />
+                                            </SvgIcon>)} 
+										>
+											<span className="button-text">View</span>
+										</ResponsiveButton>)
+								}} >
 
                                 <MenuItem>
                                     <ListItemText>Show Id Column</ListItemText>

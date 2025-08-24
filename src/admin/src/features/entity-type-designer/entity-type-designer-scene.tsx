@@ -80,9 +80,7 @@ export default function EntityTypeDesignerScene(
         {
             id: "name",
             header: "Type",
-            cell: (child: DesignerField | DesignerEdge) =>
-                getChildTypeForEntityChild(child),
-
+            cell: (child: DesignerField | DesignerEdge) => getChildTypeForEntityChild(child),
         },
         {
             id: "defaultValue",

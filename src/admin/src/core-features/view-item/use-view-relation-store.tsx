@@ -71,6 +71,11 @@ export const useViewRelationStore = () => {
 		const edgeNodesInfo = expansionStore.getExpansionInfo(rootEntryId);
 		const params = edgeNodesInfo.params ?? {};
 		const edges = params?.edges ?? [];
+		
+		if (edges.length <= 1) {
+			detailsStore.clear(rootEntryId);
+			return;
+		}
 
 		expansionStore.setParams({
 			rowId: rootEntryId,
