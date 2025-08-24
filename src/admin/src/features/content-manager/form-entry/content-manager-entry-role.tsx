@@ -291,7 +291,6 @@ const PermissionSection = (props: PermissionSectionProps) => {
 				}>
 				<Tooltip title={tooltipLabel} placement='bottom' arrow>
 					<Counter label={permissionsCount.length} fontSize="small" />
-					{/* <Chip component="span" label={permissionsCount.length} color="secondary" variant="outlined" size="small" /> */}
 				</Tooltip>
 
 
