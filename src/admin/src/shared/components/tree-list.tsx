@@ -97,6 +97,8 @@ export const TreeListItemButton = (props: PropsWithChildren<TreeListItemButtonPr
     const { label, icon, children, ...other } = props;
 
     const ListItemButtonStyled = styled(ListItemButton)<ListItemButtonProps>(({ theme }) => ({
+		marginTop: '5px',
+        marginBottom: '5px',
         padding: '0 10px',
         borderRadius: 1
     }));
@@ -116,14 +118,9 @@ export const TreeListItemButton = (props: PropsWithChildren<TreeListItemButtonPr
                         }
                     }}
                 />
-
                 {icon}
-
             </ListItemButtonStyled>
-
             {children}
-
-
         </TreeListItem>)
 }
 
@@ -144,17 +141,8 @@ export const TreeListItemNavigation = (props: TreeListItemNavigationProps) => {
         padding: '2px 12px',
         borderRadius: '6px',
         ...(active && {
-            // color: 'primary.main',
-            // backgroundColor: alpha(theme.palette.primary.main, 0.1),
-
-
-
-			    border: '1px solid var(--mui-palette-divider)',
-				
-				// backgroundColor: 'var(--mui-palette-background-default)',
-				backgroundColor: 'var(--mui-palette-background-paper)'
-
-
+			border: '1px solid var(--mui-palette-divider)',
+			backgroundColor: 'var(--mui-palette-background-paper)'
         }),
     }));
 
@@ -182,10 +170,7 @@ export const TreeListItemNavigation = (props: TreeListItemNavigationProps) => {
                             typography: {
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                fontSize: '0.9rem',
-                                // ...(active && {
-                                //     color: 'var(--mui-palette-primary-main)'
-                                // }),
+                                fontSize: '0.9rem'
                             }
                         }
                     }}

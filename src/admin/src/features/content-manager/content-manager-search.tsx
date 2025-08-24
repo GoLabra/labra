@@ -150,7 +150,7 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                             </ShortcutIconButton>
 
                             <MenuButton
-                                text="Configure"
+                                text="Configure View"
 								slots={{
 									button: (<ResponsiveButton 
 										color="secondary"
@@ -165,7 +165,7 @@ export const ContentManagerSearch = (props: OrdersSearchProps) => {
                                                 <ArrowDropDownIcon />
                                             </SvgIcon>)} 
 										>
-											<span className="button-text">Configure</span>
+											<span className="button-text">View</span>
 										</ResponsiveButton>)
 								}} >
 

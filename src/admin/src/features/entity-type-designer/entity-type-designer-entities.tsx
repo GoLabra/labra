@@ -31,16 +31,14 @@ const iconStatus = {
     'unchanged': null
 }
 
-const newEntityBorderStyle = (theme: Theme) => {
-    return `2px dashed ${theme.palette.mode == 'dark' ? theme.palette!.background!.paper : theme.palette!.neutral[100]}`;
-}
-
 const TreeListItemButtonStyled = styled(TreeListItemButton)(({ theme }) => [
     {
+		'--variant-containedColor': 'var(--mui-palette-primary-main)',
         color: 'var(--mui-palette-primary-main)',
-        borderWidth: '2px',
+		backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 3%, transparent)',
+        borderWidth: '1px',
         borderStyle: 'dashed',
-		borderColor: 'var(--mui-palette-primary-main)',
+		borderColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 50%, transparent)',
 		borderRadius: '6px'
     }
 ]);
