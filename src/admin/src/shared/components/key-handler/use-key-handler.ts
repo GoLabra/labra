@@ -42,25 +42,33 @@ export const useKeyHandler = (props: useKeyHandlerProps) => {
 
 		if (isEditable && propRef.current.forceInEditable != true) return;
 
-		const modifier = propRef.current.modifiers ? Array.isArray(propRef.current.modifiers) ? propRef.current.modifiers : [propRef.current.modifiers] : null;
+		// Normalize required modifiers and compute currently pressed modifiers
+		const requiredModifiers = propRef.current.modifiers
+			? (Array.isArray(propRef.current.modifiers) ? propRef.current.modifiers : [propRef.current.modifiers]).map(m => m.toLowerCase())
+			: null;
 
-		const modifiersPressed = !modifier || modifier.every(modifier => {
-			switch (modifier.toLowerCase()) {
-				case 'ctrl':
-					return e.ctrlKey;
-				case 'shift':
-					return e.shiftKey;
-				case 'alt':
-					return e.altKey;
-				case 'meta':
-					return e.metaKey; // For Command key on Mac or Windows key
-				default:
-					return false;
+		const pressedModifiers = [
+			[e.ctrlKey, 'ctrl'],
+			[e.shiftKey, 'shift'],
+			[e.altKey, 'alt'],
+			[e.metaKey, 'meta'],
+		].filter(([pressed]) => pressed).map(([, name]) => name as string);
+
+		// Match logic:
+		// - If no modifiers are required, only trigger when none are pressed
+		// - If modifiers are required, trigger only when exactly those (no extras) are pressed
+		const modifiersMatch = (() => {
+			if (!requiredModifiers || requiredModifiers.length === 0) {
+				return pressedModifiers.length === 0;
 			}
-		});
+			return (
+				requiredModifiers.length === pressedModifiers.length &&
+				requiredModifiers.every(m => pressedModifiers.includes(m))
+			);
+		})();
 
 
-		if (modifiersPressed && e.key === propRef.current.keyToHandle) {
+		if (modifiersMatch && e.key === propRef.current.keyToHandle) {
 			propRef.current.onTriggered(e as unknown as React.KeyboardEvent<HTMLDivElement>);
 			e.preventDefault();
 			e.shortcutBubbleCancelled = true;

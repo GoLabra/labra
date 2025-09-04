@@ -37,9 +37,10 @@ interface WithShortcutProps {
 	shortcutModifiers?: Modifier | Modifier[];
 	shortcutTarget?: 'global' | HTMLElement | MutableRefObject<HTMLDivElement | null> | null;
 	shortcutForceInEditable?: boolean;
-	disabled?: boolean;
 	onClick?: (...args: any[]) => void;
+	disabled?: boolean;
 	tooltip?: string;
+	setRef?: (instance: HTMLElement | null) => void;
 }
 
 export function withClickShortcut<T>(
@@ -56,6 +57,7 @@ export function withClickShortcut<T>(
 			onClick,
 			tooltip,
 			children,
+			setRef,
 			...rest
 		} = props;
 
@@ -66,7 +68,7 @@ export function withClickShortcut<T>(
 			disabled: disabled,
 			forceInEditable: shortcutForceInEditable,
 			cancelledShortcutBubble: false,
-			onTriggered: () => onClick?.()
+			onTriggered: () => onClick?.(),
 		});
 
 		const restProps = rest as unknown as T;

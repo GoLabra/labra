@@ -128,7 +128,7 @@ export const useRelationContentManagerStore = <T = any>(props: UseRelationConten
 
 				// add edges	
 				include = edgeEntity!.edges.reduce((query: LGSelectInclude<any>, edge) => {
-					return include.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
+					return query.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
 				}, include);
 
 				return include;

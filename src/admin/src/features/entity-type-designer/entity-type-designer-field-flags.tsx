@@ -48,7 +48,7 @@ const getFlag = (show: boolean, flag: string, title: string) => {
     }
 
     return (
-        <Tooltip title="test">
+        <Tooltip title={title}>
             <Counter label={flag}></Counter>
         </Tooltip>
     );

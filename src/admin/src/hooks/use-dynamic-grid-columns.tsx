@@ -211,7 +211,7 @@ const booleanColumnDef = (name: string, caption: string, render: (row: any) => s
                 return '';
             }
 
-            return (<CheckIcon />)
+            return (<CheckIcon sx={{ verticalAlign: 'middle' }} />)
 
         },
         width: options?.width ?? 120,
