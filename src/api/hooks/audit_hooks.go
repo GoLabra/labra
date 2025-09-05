@@ -2,29 +2,169 @@ package hooks
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 
 	"github.com/GoLabra/labra/src/api/constants"
+	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
 	"github.com/GoLabra/labra/src/api/entgql/ent"
+	"github.com/GoLabra/labra/src/api/strcase"
 )
 
+// CreatedByUpdatedByHook automatically sets created_by and updated_by fields
 func CreatedByUpdatedByHook(next ent.Mutator) ent.Mutator {
-	var currentUserId string
 	return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-		currentUser, ok := ctx.Value(constants.UserContextValue).(*ent.User)
+		user, ok := ctx.Value(constants.UserContextValue).(*ent.User) // USER
 		if ok {
-			currentUserId = currentUser.ID
-		} else {
-			return next.Mutate(ctx, m) // TODO clear up operation without user
-		}
-		if m.Op().Is(ent.OpCreate) {
-			if ml, ok := m.(interface{ SetCreatedByID(string) }); ok {
-				ml.SetCreatedByID(currentUserId)
-			}
-		} else if m.Op().Is(ent.OpUpdateOne) || m.Op().Is(ent.OpUpdate) {
-			if ml, ok := m.(interface{ SetUpdatedByID(string) }); ok {
-				ml.SetUpdatedByID(currentUserId)
+			if m.Op().Is(ent.OpCreate) {
+				if ml, ok := m.(interface{ SetCreatedByID(string) }); ok {
+					ml.SetCreatedByID(user.ID)
+				}
+			} else if m.Op().Is(ent.OpUpdateOne) || m.Op().Is(ent.OpUpdate) {
+				if ml, ok := m.(interface{ SetUpdatedByID(string) }); ok {
+					ml.SetUpdatedByID(user.ID)
+				}
 			}
 		}
+
+		adminUser, ok := ctx.Value(constants.UserContextValue).(*ent.AdminUser) // ADMIN USER
+		if ok {
+			if m.Op().Is(ent.OpCreate) {
+				if ml, ok := m.(interface{ SetAdminCreatedByID(string) }); ok {
+					ml.SetAdminCreatedByID(adminUser.ID)
+				}
+			} else if m.Op().Is(ent.OpUpdateOne) || m.Op().Is(ent.OpUpdate) {
+				if ml, ok := m.(interface{ SetAdminUpdatedByID(string) }); ok {
+					ml.SetAdminUpdatedByID(adminUser.ID)
+				}
+			}
+		}
+
 		return next.Mutate(ctx, m)
 	})
+}
+
+// EntityMutatePermission checks if the current user has permission to perform mutation operations
+// This hook is applied to external API requests (GraphQL/REST) where isInternalOperationContextValue is not set
+func EntityMutatePermission(next ent.Mutator) ent.Mutator {
+	return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+		// Skip permission checks for internal operations
+		if ctx.Value(constants.IsInternalOperationContextValue) == true {
+			return next.Mutate(ctx, m)
+		}
+
+		t := m.Type()
+
+		service, ok := ctx.Value(constants.AdminServiceContextValue).(*svc.Service)
+		if !ok {
+			return nil, fmt.Errorf(svc.ErrServiceNotSetInContext)
+		}
+
+		role, ok := ctx.Value(constants.RoleContextValue).(*ent.Role)
+		if !ok {
+			return nil, fmt.Errorf("role not found in context")
+		}
+
+		if role.Name == string(constants.SuperAdmin) {
+			return next.Mutate(ctx, m)
+		}
+
+		entityName := strcase.NodeNameToGraphqlName(t)
+
+		var operationName string
+		switch m.Op() {
+		case ent.OpCreate:
+			operationName = "Create"
+		case ent.OpUpdate, ent.OpUpdateOne:
+			operationName = "Update"
+		case ent.OpDelete, ent.OpDeleteOne:
+			operationName = "Delete"
+		default:
+			return nil, fmt.Errorf("unknown operation")
+		}
+
+		// Use internal context for permission queries (bypasses permission checks)
+		iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+		permissions, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
+			HasRoleWith: []*ent.RoleWhereInput{
+				{
+					Name: &role.Name,
+				},
+			},
+			Entity:      &entityName,
+			OperationIn: []string{operationName, "Owner"},
+		}, nil, nil, nil, nil)
+
+		if err != nil || len(permissions) == 0 {
+			return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
+		}
+
+		return next.Mutate(ctx, m)
+	})
+}
+
+// EntityReadPermission creates an interceptor for read operations
+// This interceptor is applied to external API requests (GraphQL/REST) where isInternalOperationContextValue is not set
+func EntityReadPermission() ent.Interceptor {
+	return ent.InterceptFunc(func(next ent.Querier) ent.Querier {
+		return ent.QuerierFunc(func(ctx context.Context, q ent.Query) (ent.Value, error) {
+			// Skip permission checks for internal operations
+			if ctx.Value(constants.IsInternalOperationContextValue) == true {
+				return next.Query(ctx, q)
+			}
+
+			// Get entity name from the query type
+			entityName := getEntityNameFromQuery(q)
+
+			service, ok := ctx.Value(constants.AdminServiceContextValue).(*svc.Service)
+			if !ok {
+				return nil, fmt.Errorf("service not found in context")
+			}
+
+			role, ok := ctx.Value(constants.RoleContextValue).(*ent.Role)
+			if !ok {
+				return nil, fmt.Errorf("role not found in context")
+			}
+
+			if role.Name == string(constants.SuperAdmin) {
+				return next.Query(ctx, q)
+			}
+
+			operationName := "Read"
+			// Use internal context for permission queries (bypasses permission checks)
+			iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+			permissions, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
+				HasRoleWith: []*ent.RoleWhereInput{
+					{
+						Name: &role.Name,
+					},
+				},
+				Entity:    &entityName,
+				Operation: &operationName,
+			}, nil, nil, nil, nil)
+
+			if err != nil || len(permissions) == 0 {
+				return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
+			}
+
+			return next.Query(ctx, q)
+		})
+	})
+}
+
+// getEntityNameFromQuery extracts the entity name from a query
+func getEntityNameFromQuery(q ent.Query) string {
+	// Use reflection to get the concrete type name
+	t := reflect.TypeOf(q)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	// Remove "Query" suffix to get entity name
+	entityName := t.Name()
+	if len(entityName) > 5 && entityName[len(entityName)-5:] == "Query" {
+		entityName = entityName[:len(entityName)-5]
+	}
+
+	return entityName
 }

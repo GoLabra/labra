@@ -12,8 +12,8 @@ import { isJwtValid, getJwtSub } from '@/lib/utils/jwt';
 import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
 
 
-export const getMeDocument = gql`query getMe($where:UserWhereInput!) {
-    users(where:$where) {
+export const getMeDocument = gql`query getMe($where:AdminUserWhereInput!) {
+    users:adminUsers(where:$where) {
           id
           name
           firstName

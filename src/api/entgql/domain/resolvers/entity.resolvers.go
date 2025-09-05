@@ -174,13 +174,9 @@ func (r *Resolver) Edge() gqlgen.EdgeResolver { return &edgeResolver{r} }
 // Entity returns gqlgen.EntityResolver implementation.
 func (r *Resolver) Entity() gqlgen.EntityResolver { return &entityResolver{r} }
 
-// Mutation returns gqlgen.MutationResolver implementation.
-func (r *Resolver) Mutation() gqlgen.MutationResolver { return &mutationResolver{r} }
-
 // Subscription returns gqlgen.SubscriptionResolver implementation.
 func (r *Resolver) Subscription() gqlgen.SubscriptionResolver { return &subscriptionResolver{r} }
 
 type edgeResolver struct{ *Resolver }
 type entityResolver struct{ *Resolver }
-type mutationResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }

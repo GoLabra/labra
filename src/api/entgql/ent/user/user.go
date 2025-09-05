@@ -3,8 +3,6 @@
 package user
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -14,20 +12,10 @@ const (
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
-	// FieldFirstName holds the string denoting the first_name field in the database.
-	FieldFirstName = "first_name"
-	// FieldLastName holds the string denoting the last_name field in the database.
-	FieldLastName = "last_name"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
 	// EdgeRefCreatedBy holds the string denoting the ref_created_by edge name in mutations.
 	EdgeRefCreatedBy = "ref_created_by"
 	// EdgeCreatedBy holds the string denoting the created_by edge name in mutations.
@@ -36,6 +24,10 @@ const (
 	EdgeRefUpdatedBy = "ref_updated_by"
 	// EdgeUpdatedBy holds the string denoting the updated_by edge name in mutations.
 	EdgeUpdatedBy = "updated_by"
+	// EdgeAdminCreatedBy holds the string denoting the admin_created_by edge name in mutations.
+	EdgeAdminCreatedBy = "admin_created_by"
+	// EdgeAdminUpdatedBy holds the string denoting the admin_updated_by edge name in mutations.
+	EdgeAdminUpdatedBy = "admin_updated_by"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
 	EdgeRoles = "roles"
 	// EdgeDefaultRole holds the string denoting the default_role edge name in mutations.
@@ -58,11 +50,27 @@ const (
 	UpdatedByTable = "users"
 	// UpdatedByColumn is the table column denoting the updated_by relation/edge.
 	UpdatedByColumn = "user_updated_by"
-	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
-	RolesTable = "user_roles"
+	// AdminCreatedByTable is the table that holds the admin_created_by relation/edge.
+	AdminCreatedByTable = "users"
+	// AdminCreatedByInverseTable is the table name for the AdminUser entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
+	AdminCreatedByInverseTable = "admin_users"
+	// AdminCreatedByColumn is the table column denoting the admin_created_by relation/edge.
+	AdminCreatedByColumn = "user_admin_created_by"
+	// AdminUpdatedByTable is the table that holds the admin_updated_by relation/edge.
+	AdminUpdatedByTable = "users"
+	// AdminUpdatedByInverseTable is the table name for the AdminUser entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
+	AdminUpdatedByInverseTable = "admin_users"
+	// AdminUpdatedByColumn is the table column denoting the admin_updated_by relation/edge.
+	AdminUpdatedByColumn = "user_admin_updated_by"
+	// RolesTable is the table that holds the roles relation/edge.
+	RolesTable = "roles"
 	// RolesInverseTable is the table name for the Role entity.
 	// It exists in this package in order to avoid circular dependency with the "role" package.
 	RolesInverseTable = "roles"
+	// RolesColumn is the table column denoting the roles relation/edge.
+	RolesColumn = "user_roles"
 	// DefaultRoleTable is the table that holds the default_role relation/edge.
 	DefaultRoleTable = "users"
 	// DefaultRoleInverseTable is the table name for the Role entity.
@@ -75,13 +83,8 @@ const (
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
-	FieldName,
 	FieldEmail,
 	FieldPassword,
-	FieldFirstName,
-	FieldLastName,
-	FieldCreatedAt,
-	FieldUpdatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"
@@ -89,14 +92,10 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"user_created_by",
 	"user_updated_by",
+	"user_admin_created_by",
+	"user_admin_updated_by",
 	"user_default_role",
 }
-
-var (
-	// RolesPrimaryKey and RolesColumn2 are the table columns denoting the
-	// primary key for the roles relation (M2M).
-	RolesPrimaryKey = []string{"user_id", "role_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -118,16 +117,6 @@ var (
 	EmailValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
-	// FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
-	FirstNameValidator func(string) error
-	// LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
-	LastNameValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
@@ -140,11 +129,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
-}
-
 // ByEmail orders the results by the email field.
 func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmail, opts...).ToFunc()
@@ -153,26 +137,6 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByPassword orders the results by the password field.
 func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
-}
-
-// ByFirstName orders the results by the first_name field.
-func ByFirstName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFirstName, opts...).ToFunc()
-}
-
-// ByLastName orders the results by the last_name field.
-func ByLastName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLastName, opts...).ToFunc()
-}
-
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
 // ByRefCreatedByCount orders the results by ref_created_by count.
@@ -214,6 +178,20 @@ func ByRefUpdatedBy(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 func ByUpdatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newUpdatedByStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByAdminCreatedByField orders the results by admin_created_by field.
+func ByAdminCreatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAdminCreatedByStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByAdminUpdatedByField orders the results by admin_updated_by field.
+func ByAdminUpdatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAdminUpdatedByStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -265,11 +243,25 @@ func newUpdatedByStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, false, UpdatedByTable, UpdatedByColumn),
 	)
 }
+func newAdminCreatedByStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AdminCreatedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, AdminCreatedByTable, AdminCreatedByColumn),
+	)
+}
+func newAdminUpdatedByStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AdminUpdatedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, AdminUpdatedByTable, AdminUpdatedByColumn),
+	)
+}
 func newRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RolesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, RolesTable, RolesPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, RolesTable, RolesColumn),
 	)
 }
 func newDefaultRoleStep() *sqlgraph.Step {

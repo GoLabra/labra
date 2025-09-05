@@ -315,21 +315,21 @@ func OperationContainsFold(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldContainsFold(FieldOperation, v))
 }
 
-// HasCreatedBy applies the HasEdge predicate on the "created_by" edge.
-func HasCreatedBy() predicate.Permission {
+// HasAdminCreatedBy applies the HasEdge predicate on the "admin_created_by" edge.
+func HasAdminCreatedBy() predicate.Permission {
 	return predicate.Permission(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, CreatedByTable, CreatedByColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, AdminCreatedByTable, AdminCreatedByColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasCreatedByWith applies the HasEdge predicate on the "created_by" edge with a given conditions (other predicates).
-func HasCreatedByWith(preds ...predicate.User) predicate.Permission {
+// HasAdminCreatedByWith applies the HasEdge predicate on the "admin_created_by" edge with a given conditions (other predicates).
+func HasAdminCreatedByWith(preds ...predicate.AdminUser) predicate.Permission {
 	return predicate.Permission(func(s *sql.Selector) {
-		step := newCreatedByStep()
+		step := newAdminCreatedByStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -338,21 +338,21 @@ func HasCreatedByWith(preds ...predicate.User) predicate.Permission {
 	})
 }
 
-// HasUpdatedBy applies the HasEdge predicate on the "updated_by" edge.
-func HasUpdatedBy() predicate.Permission {
+// HasAdminUpdatedBy applies the HasEdge predicate on the "admin_updated_by" edge.
+func HasAdminUpdatedBy() predicate.Permission {
 	return predicate.Permission(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, UpdatedByTable, UpdatedByColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, AdminUpdatedByTable, AdminUpdatedByColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUpdatedByWith applies the HasEdge predicate on the "updated_by" edge with a given conditions (other predicates).
-func HasUpdatedByWith(preds ...predicate.User) predicate.Permission {
+// HasAdminUpdatedByWith applies the HasEdge predicate on the "admin_updated_by" edge with a given conditions (other predicates).
+func HasAdminUpdatedByWith(preds ...predicate.AdminUser) predicate.Permission {
 	return predicate.Permission(func(s *sql.Selector) {
-		step := newUpdatedByStep()
+		step := newAdminUpdatedByStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

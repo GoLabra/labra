@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
@@ -99,6 +100,446 @@ func paginateLimit(first, last *int) int {
 		limit = *last + 1
 	}
 	return limit
+}
+
+// AdminUserEdge is the edge representation of AdminUser.
+type AdminUserEdge struct {
+	Node   *AdminUser `json:"node"`
+	Cursor Cursor     `json:"cursor"`
+}
+
+// AdminUserConnection is the connection containing edges to AdminUser.
+type AdminUserConnection struct {
+	Edges      []*AdminUserEdge `json:"edges"`
+	PageInfo   PageInfo         `json:"pageInfo"`
+	TotalCount int              `json:"totalCount"`
+}
+
+func (c *AdminUserConnection) build(nodes []*AdminUser, pager *adminuserPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *AdminUser
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *AdminUser {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *AdminUser {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*AdminUserEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &AdminUserEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// AdminUserPaginateOption enables pagination customization.
+type AdminUserPaginateOption func(*adminuserPager) error
+
+// WithAdminUserOrder configures pagination ordering.
+func WithAdminUserOrder(order []*AdminUserOrder) AdminUserPaginateOption {
+	return func(pager *adminuserPager) error {
+		for _, o := range order {
+			if err := o.Direction.Validate(); err != nil {
+				return err
+			}
+		}
+		pager.order = append(pager.order, order...)
+		return nil
+	}
+}
+
+// WithAdminUserFilter configures pagination filter.
+func WithAdminUserFilter(filter func(*AdminUserQuery) (*AdminUserQuery, error)) AdminUserPaginateOption {
+	return func(pager *adminuserPager) error {
+		if filter == nil {
+			return errors.New("AdminUserQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type adminuserPager struct {
+	reverse bool
+	order   []*AdminUserOrder
+	filter  func(*AdminUserQuery) (*AdminUserQuery, error)
+}
+
+func newAdminUserPager(opts []AdminUserPaginateOption, reverse bool) (*adminuserPager, error) {
+	pager := &adminuserPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	for i, o := range pager.order {
+		if i > 0 && o.Field == pager.order[i-1].Field {
+			return nil, fmt.Errorf("duplicate order direction %q", o.Direction)
+		}
+	}
+	return pager, nil
+}
+
+func (p *adminuserPager) applyFilter(query *AdminUserQuery) (*AdminUserQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *adminuserPager) toCursor(au *AdminUser) Cursor {
+	cs_ := make([]any, 0, len(p.order))
+	for _, o_ := range p.order {
+		cs_ = append(cs_, o_.Field.toCursor(au).Value)
+	}
+	return Cursor{ID: au.ID, Value: cs_}
+}
+
+func (p *adminuserPager) applyCursors(query *AdminUserQuery, after, before *Cursor) (*AdminUserQuery, error) {
+	idDirection := entgql.OrderDirectionAsc
+	if p.reverse {
+		idDirection = entgql.OrderDirectionDesc
+	}
+	fields, directions := make([]string, 0, len(p.order)), make([]OrderDirection, 0, len(p.order))
+	for _, o := range p.order {
+		fields = append(fields, o.Field.column)
+		direction := o.Direction
+		if p.reverse {
+			direction = direction.Reverse()
+		}
+		directions = append(directions, direction)
+	}
+	predicates, err := entgql.MultiCursorsPredicate(after, before, &entgql.MultiCursorsOptions{
+		FieldID:     DefaultAdminUserOrder.Field.column,
+		DirectionID: idDirection,
+		Fields:      fields,
+		Directions:  directions,
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, predicate := range predicates {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *adminuserPager) applyOrder(query *AdminUserQuery) *AdminUserQuery {
+	var defaultOrdered bool
+	for _, o := range p.order {
+		direction := o.Direction
+		if p.reverse {
+			direction = direction.Reverse()
+		}
+		query = query.Order(o.Field.toTerm(direction.OrderTermOption()))
+		if o.Field.column == DefaultAdminUserOrder.Field.column {
+			defaultOrdered = true
+		}
+		if len(query.ctx.Fields) > 0 {
+			query.ctx.AppendFieldOnce(o.Field.column)
+		}
+	}
+	if !defaultOrdered {
+		direction := entgql.OrderDirectionAsc
+		if p.reverse {
+			direction = direction.Reverse()
+		}
+		query = query.Order(DefaultAdminUserOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	return query
+}
+
+func (p *adminuserPager) orderExpr(query *AdminUserQuery) sql.Querier {
+	if len(query.ctx.Fields) > 0 {
+		for _, o := range p.order {
+			query.ctx.AppendFieldOnce(o.Field.column)
+		}
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		for _, o := range p.order {
+			direction := o.Direction
+			if p.reverse {
+				direction = direction.Reverse()
+			}
+			b.Ident(o.Field.column).Pad().WriteString(string(direction))
+			b.Comma()
+		}
+		direction := entgql.OrderDirectionAsc
+		if p.reverse {
+			direction = direction.Reverse()
+		}
+		b.Ident(DefaultAdminUserOrder.Field.column).Pad().WriteString(string(direction))
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to AdminUser.
+func (au *AdminUserQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...AdminUserPaginateOption,
+) (*AdminUserConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newAdminUserPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if au, err = pager.applyFilter(au); err != nil {
+		return nil, err
+	}
+	conn := &AdminUserConnection{Edges: []*AdminUserEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := au.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if au, err = pager.applyCursors(au, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		au.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := au.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	au = pager.applyOrder(au)
+	nodes, err := au.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// AdminUserOrderFieldID orders AdminUser by id.
+	AdminUserOrderFieldID = &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.ID, nil
+		},
+		column: adminuser.FieldID,
+		toTerm: adminuser.ByID,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{
+				ID:    au.ID,
+				Value: au.ID,
+			}
+		},
+	}
+	// AdminUserOrderFieldName orders AdminUser by name.
+	AdminUserOrderFieldName = &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.Name, nil
+		},
+		column: adminuser.FieldName,
+		toTerm: adminuser.ByName,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{
+				ID:    au.ID,
+				Value: au.Name,
+			}
+		},
+	}
+	// AdminUserOrderFieldEmail orders AdminUser by email.
+	AdminUserOrderFieldEmail = &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.Email, nil
+		},
+		column: adminuser.FieldEmail,
+		toTerm: adminuser.ByEmail,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{
+				ID:    au.ID,
+				Value: au.Email,
+			}
+		},
+	}
+	// AdminUserOrderFieldFirstName orders AdminUser by first_name.
+	AdminUserOrderFieldFirstName = &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.FirstName, nil
+		},
+		column: adminuser.FieldFirstName,
+		toTerm: adminuser.ByFirstName,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{
+				ID:    au.ID,
+				Value: au.FirstName,
+			}
+		},
+	}
+	// AdminUserOrderFieldLastName orders AdminUser by last_name.
+	AdminUserOrderFieldLastName = &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.LastName, nil
+		},
+		column: adminuser.FieldLastName,
+		toTerm: adminuser.ByLastName,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{
+				ID:    au.ID,
+				Value: au.LastName,
+			}
+		},
+	}
+	// AdminUserOrderFieldCreatedAt orders AdminUser by created_at.
+	AdminUserOrderFieldCreatedAt = &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.CreatedAt, nil
+		},
+		column: adminuser.FieldCreatedAt,
+		toTerm: adminuser.ByCreatedAt,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{
+				ID:    au.ID,
+				Value: au.CreatedAt,
+			}
+		},
+	}
+	// AdminUserOrderFieldUpdatedAt orders AdminUser by updated_at.
+	AdminUserOrderFieldUpdatedAt = &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.UpdatedAt, nil
+		},
+		column: adminuser.FieldUpdatedAt,
+		toTerm: adminuser.ByUpdatedAt,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{
+				ID:    au.ID,
+				Value: au.UpdatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f AdminUserOrderField) String() string {
+	var str string
+	switch f.column {
+	case AdminUserOrderFieldID.column:
+		str = "id"
+	case AdminUserOrderFieldName.column:
+		str = "name"
+	case AdminUserOrderFieldEmail.column:
+		str = "email"
+	case AdminUserOrderFieldFirstName.column:
+		str = "firstName"
+	case AdminUserOrderFieldLastName.column:
+		str = "lastName"
+	case AdminUserOrderFieldCreatedAt.column:
+		str = "createdAt"
+	case AdminUserOrderFieldUpdatedAt.column:
+		str = "updatedAt"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f AdminUserOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *AdminUserOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("AdminUserOrderField %T must be a string", v)
+	}
+	switch str {
+	case "id":
+		*f = *AdminUserOrderFieldID
+	case "name":
+		*f = *AdminUserOrderFieldName
+	case "email":
+		*f = *AdminUserOrderFieldEmail
+	case "firstName":
+		*f = *AdminUserOrderFieldFirstName
+	case "lastName":
+		*f = *AdminUserOrderFieldLastName
+	case "createdAt":
+		*f = *AdminUserOrderFieldCreatedAt
+	case "updatedAt":
+		*f = *AdminUserOrderFieldUpdatedAt
+	default:
+		return fmt.Errorf("%s is not a valid AdminUserOrderField", str)
+	}
+	return nil
+}
+
+// AdminUserOrderField defines the ordering field of AdminUser.
+type AdminUserOrderField struct {
+	// Value extracts the ordering value from the given AdminUser.
+	Value    func(*AdminUser) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) adminuser.OrderOption
+	toCursor func(*AdminUser) Cursor
+}
+
+// AdminUserOrder defines the ordering of AdminUser.
+type AdminUserOrder struct {
+	Direction OrderDirection       `json:"direction"`
+	Field     *AdminUserOrderField `json:"field"`
+}
+
+// DefaultAdminUserOrder is the default ordering of AdminUser.
+var DefaultAdminUserOrder = &AdminUserOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &AdminUserOrderField{
+		Value: func(au *AdminUser) (ent.Value, error) {
+			return au.ID, nil
+		},
+		column: adminuser.FieldID,
+		toTerm: adminuser.ByID,
+		toCursor: func(au *AdminUser) Cursor {
+			return Cursor{ID: au.ID}
+		},
+	},
+}
+
+// ToEdge converts AdminUser into AdminUserEdge.
+func (au *AdminUser) ToEdge(order *AdminUserOrder) *AdminUserEdge {
+	if order == nil {
+		order = DefaultAdminUserOrder
+	}
+	return &AdminUserEdge{
+		Node:   au,
+		Cursor: order.Field.toCursor(au),
+	}
 }
 
 // FileEdge is the edge representation of File.
@@ -1572,20 +2013,6 @@ var (
 			}
 		},
 	}
-	// UserOrderFieldName orders User by name.
-	UserOrderFieldName = &UserOrderField{
-		Value: func(u *User) (ent.Value, error) {
-			return u.Name, nil
-		},
-		column: user.FieldName,
-		toTerm: user.ByName,
-		toCursor: func(u *User) Cursor {
-			return Cursor{
-				ID:    u.ID,
-				Value: u.Name,
-			}
-		},
-	}
 	// UserOrderFieldEmail orders User by email.
 	UserOrderFieldEmail = &UserOrderField{
 		Value: func(u *User) (ent.Value, error) {
@@ -1600,62 +2027,6 @@ var (
 			}
 		},
 	}
-	// UserOrderFieldFirstName orders User by first_name.
-	UserOrderFieldFirstName = &UserOrderField{
-		Value: func(u *User) (ent.Value, error) {
-			return u.FirstName, nil
-		},
-		column: user.FieldFirstName,
-		toTerm: user.ByFirstName,
-		toCursor: func(u *User) Cursor {
-			return Cursor{
-				ID:    u.ID,
-				Value: u.FirstName,
-			}
-		},
-	}
-	// UserOrderFieldLastName orders User by last_name.
-	UserOrderFieldLastName = &UserOrderField{
-		Value: func(u *User) (ent.Value, error) {
-			return u.LastName, nil
-		},
-		column: user.FieldLastName,
-		toTerm: user.ByLastName,
-		toCursor: func(u *User) Cursor {
-			return Cursor{
-				ID:    u.ID,
-				Value: u.LastName,
-			}
-		},
-	}
-	// UserOrderFieldCreatedAt orders User by created_at.
-	UserOrderFieldCreatedAt = &UserOrderField{
-		Value: func(u *User) (ent.Value, error) {
-			return u.CreatedAt, nil
-		},
-		column: user.FieldCreatedAt,
-		toTerm: user.ByCreatedAt,
-		toCursor: func(u *User) Cursor {
-			return Cursor{
-				ID:    u.ID,
-				Value: u.CreatedAt,
-			}
-		},
-	}
-	// UserOrderFieldUpdatedAt orders User by updated_at.
-	UserOrderFieldUpdatedAt = &UserOrderField{
-		Value: func(u *User) (ent.Value, error) {
-			return u.UpdatedAt, nil
-		},
-		column: user.FieldUpdatedAt,
-		toTerm: user.ByUpdatedAt,
-		toCursor: func(u *User) Cursor {
-			return Cursor{
-				ID:    u.ID,
-				Value: u.UpdatedAt,
-			}
-		},
-	}
 )
 
 // String implement fmt.Stringer interface.
@@ -1664,18 +2035,8 @@ func (f UserOrderField) String() string {
 	switch f.column {
 	case UserOrderFieldID.column:
 		str = "id"
-	case UserOrderFieldName.column:
-		str = "name"
 	case UserOrderFieldEmail.column:
 		str = "email"
-	case UserOrderFieldFirstName.column:
-		str = "firstName"
-	case UserOrderFieldLastName.column:
-		str = "lastName"
-	case UserOrderFieldCreatedAt.column:
-		str = "createdAt"
-	case UserOrderFieldUpdatedAt.column:
-		str = "updatedAt"
 	}
 	return str
 }
@@ -1694,18 +2055,8 @@ func (f *UserOrderField) UnmarshalGQL(v interface{}) error {
 	switch str {
 	case "id":
 		*f = *UserOrderFieldID
-	case "name":
-		*f = *UserOrderFieldName
 	case "email":
 		*f = *UserOrderFieldEmail
-	case "firstName":
-		*f = *UserOrderFieldFirstName
-	case "lastName":
-		*f = *UserOrderFieldLastName
-	case "createdAt":
-		*f = *UserOrderFieldCreatedAt
-	case "updatedAt":
-		*f = *UserOrderFieldUpdatedAt
 	default:
 		return fmt.Errorf("%s is not a valid UserOrderField", str)
 	}

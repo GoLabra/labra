@@ -11,6 +11,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
@@ -27,34 +28,1191 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeAdminUser  = "AdminUser"
 	TypeFile       = "File"
 	TypePermission = "Permission"
 	TypeRole       = "Role"
 	TypeUser       = "User"
 )
 
+// AdminUserMutation represents an operation that mutates the AdminUser nodes in the graph.
+type AdminUserMutation struct {
+	config
+	op                          Op
+	typ                         string
+	id                          *string
+	name                        *string
+	email                       *string
+	password                    *string
+	first_name                  *string
+	last_name                   *string
+	created_at                  *time.Time
+	updated_at                  *time.Time
+	clearedFields               map[string]struct{}
+	ref_admin_created_by        map[string]struct{}
+	removedref_admin_created_by map[string]struct{}
+	clearedref_admin_created_by bool
+	admin_created_by            *string
+	clearedadmin_created_by     bool
+	ref_admin_updated_by        map[string]struct{}
+	removedref_admin_updated_by map[string]struct{}
+	clearedref_admin_updated_by bool
+	admin_updated_by            *string
+	clearedadmin_updated_by     bool
+	roles                       map[string]struct{}
+	removedroles                map[string]struct{}
+	clearedroles                bool
+	default_role                *string
+	cleareddefault_role         bool
+	done                        bool
+	oldValue                    func(context.Context) (*AdminUser, error)
+	predicates                  []predicate.AdminUser
+}
+
+var _ ent.Mutation = (*AdminUserMutation)(nil)
+
+// adminuserOption allows management of the mutation configuration using functional options.
+type adminuserOption func(*AdminUserMutation)
+
+// newAdminUserMutation creates new mutation for the AdminUser entity.
+func newAdminUserMutation(c config, op Op, opts ...adminuserOption) *AdminUserMutation {
+	m := &AdminUserMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAdminUser,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAdminUserID sets the ID field of the mutation.
+func withAdminUserID(id string) adminuserOption {
+	return func(m *AdminUserMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AdminUser
+		)
+		m.oldValue = func(ctx context.Context) (*AdminUser, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AdminUser.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAdminUser sets the old AdminUser of the mutation.
+func withAdminUser(node *AdminUser) adminuserOption {
+	return func(m *AdminUserMutation) {
+		m.oldValue = func(context.Context) (*AdminUser, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AdminUserMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AdminUserMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AdminUser entities.
+func (m *AdminUserMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AdminUserMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AdminUserMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AdminUser.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *AdminUserMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *AdminUserMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *AdminUserMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[adminuser.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *AdminUserMutation) NameCleared() bool {
+	_, ok := m.clearedFields[adminuser.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *AdminUserMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, adminuser.FieldName)
+}
+
+// SetEmail sets the "email" field.
+func (m *AdminUserMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *AdminUserMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *AdminUserMutation) ResetEmail() {
+	m.email = nil
+}
+
+// SetPassword sets the "password" field.
+func (m *AdminUserMutation) SetPassword(s string) {
+	m.password = &s
+}
+
+// Password returns the value of the "password" field in the mutation.
+func (m *AdminUserMutation) Password() (r string, exists bool) {
+	v := m.password
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPassword returns the old "password" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldPassword(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPassword requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPassword: %w", err)
+	}
+	return oldValue.Password, nil
+}
+
+// ResetPassword resets all changes to the "password" field.
+func (m *AdminUserMutation) ResetPassword() {
+	m.password = nil
+}
+
+// SetFirstName sets the "first_name" field.
+func (m *AdminUserMutation) SetFirstName(s string) {
+	m.first_name = &s
+}
+
+// FirstName returns the value of the "first_name" field in the mutation.
+func (m *AdminUserMutation) FirstName() (r string, exists bool) {
+	v := m.first_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFirstName returns the old "first_name" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldFirstName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFirstName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFirstName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFirstName: %w", err)
+	}
+	return oldValue.FirstName, nil
+}
+
+// ResetFirstName resets all changes to the "first_name" field.
+func (m *AdminUserMutation) ResetFirstName() {
+	m.first_name = nil
+}
+
+// SetLastName sets the "last_name" field.
+func (m *AdminUserMutation) SetLastName(s string) {
+	m.last_name = &s
+}
+
+// LastName returns the value of the "last_name" field in the mutation.
+func (m *AdminUserMutation) LastName() (r string, exists bool) {
+	v := m.last_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastName returns the old "last_name" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldLastName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastName: %w", err)
+	}
+	return oldValue.LastName, nil
+}
+
+// ResetLastName resets all changes to the "last_name" field.
+func (m *AdminUserMutation) ResetLastName() {
+	m.last_name = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AdminUserMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AdminUserMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *AdminUserMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[adminuser.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *AdminUserMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[adminuser.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AdminUserMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, adminuser.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AdminUserMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AdminUserMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *AdminUserMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[adminuser.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *AdminUserMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[adminuser.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AdminUserMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, adminuser.FieldUpdatedAt)
+}
+
+// AddRefAdminCreatedByIDs adds the "ref_admin_created_by" edge to the AdminUser entity by ids.
+func (m *AdminUserMutation) AddRefAdminCreatedByIDs(ids ...string) {
+	if m.ref_admin_created_by == nil {
+		m.ref_admin_created_by = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.ref_admin_created_by[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRefAdminCreatedBy clears the "ref_admin_created_by" edge to the AdminUser entity.
+func (m *AdminUserMutation) ClearRefAdminCreatedBy() {
+	m.clearedref_admin_created_by = true
+}
+
+// RefAdminCreatedByCleared reports if the "ref_admin_created_by" edge to the AdminUser entity was cleared.
+func (m *AdminUserMutation) RefAdminCreatedByCleared() bool {
+	return m.clearedref_admin_created_by
+}
+
+// RemoveRefAdminCreatedByIDs removes the "ref_admin_created_by" edge to the AdminUser entity by IDs.
+func (m *AdminUserMutation) RemoveRefAdminCreatedByIDs(ids ...string) {
+	if m.removedref_admin_created_by == nil {
+		m.removedref_admin_created_by = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.ref_admin_created_by, ids[i])
+		m.removedref_admin_created_by[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRefAdminCreatedBy returns the removed IDs of the "ref_admin_created_by" edge to the AdminUser entity.
+func (m *AdminUserMutation) RemovedRefAdminCreatedByIDs() (ids []string) {
+	for id := range m.removedref_admin_created_by {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RefAdminCreatedByIDs returns the "ref_admin_created_by" edge IDs in the mutation.
+func (m *AdminUserMutation) RefAdminCreatedByIDs() (ids []string) {
+	for id := range m.ref_admin_created_by {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRefAdminCreatedBy resets all changes to the "ref_admin_created_by" edge.
+func (m *AdminUserMutation) ResetRefAdminCreatedBy() {
+	m.ref_admin_created_by = nil
+	m.clearedref_admin_created_by = false
+	m.removedref_admin_created_by = nil
+}
+
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by id.
+func (m *AdminUserMutation) SetAdminCreatedByID(id string) {
+	m.admin_created_by = &id
+}
+
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (m *AdminUserMutation) ClearAdminCreatedBy() {
+	m.clearedadmin_created_by = true
+}
+
+// AdminCreatedByCleared reports if the "admin_created_by" edge to the AdminUser entity was cleared.
+func (m *AdminUserMutation) AdminCreatedByCleared() bool {
+	return m.clearedadmin_created_by
+}
+
+// AdminCreatedByID returns the "admin_created_by" edge ID in the mutation.
+func (m *AdminUserMutation) AdminCreatedByID() (id string, exists bool) {
+	if m.admin_created_by != nil {
+		return *m.admin_created_by, true
+	}
+	return
+}
+
+// AdminCreatedByIDs returns the "admin_created_by" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AdminCreatedByID instead. It exists only for internal usage by the builders.
+func (m *AdminUserMutation) AdminCreatedByIDs() (ids []string) {
+	if id := m.admin_created_by; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAdminCreatedBy resets all changes to the "admin_created_by" edge.
+func (m *AdminUserMutation) ResetAdminCreatedBy() {
+	m.admin_created_by = nil
+	m.clearedadmin_created_by = false
+}
+
+// AddRefAdminUpdatedByIDs adds the "ref_admin_updated_by" edge to the AdminUser entity by ids.
+func (m *AdminUserMutation) AddRefAdminUpdatedByIDs(ids ...string) {
+	if m.ref_admin_updated_by == nil {
+		m.ref_admin_updated_by = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.ref_admin_updated_by[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRefAdminUpdatedBy clears the "ref_admin_updated_by" edge to the AdminUser entity.
+func (m *AdminUserMutation) ClearRefAdminUpdatedBy() {
+	m.clearedref_admin_updated_by = true
+}
+
+// RefAdminUpdatedByCleared reports if the "ref_admin_updated_by" edge to the AdminUser entity was cleared.
+func (m *AdminUserMutation) RefAdminUpdatedByCleared() bool {
+	return m.clearedref_admin_updated_by
+}
+
+// RemoveRefAdminUpdatedByIDs removes the "ref_admin_updated_by" edge to the AdminUser entity by IDs.
+func (m *AdminUserMutation) RemoveRefAdminUpdatedByIDs(ids ...string) {
+	if m.removedref_admin_updated_by == nil {
+		m.removedref_admin_updated_by = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.ref_admin_updated_by, ids[i])
+		m.removedref_admin_updated_by[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRefAdminUpdatedBy returns the removed IDs of the "ref_admin_updated_by" edge to the AdminUser entity.
+func (m *AdminUserMutation) RemovedRefAdminUpdatedByIDs() (ids []string) {
+	for id := range m.removedref_admin_updated_by {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RefAdminUpdatedByIDs returns the "ref_admin_updated_by" edge IDs in the mutation.
+func (m *AdminUserMutation) RefAdminUpdatedByIDs() (ids []string) {
+	for id := range m.ref_admin_updated_by {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRefAdminUpdatedBy resets all changes to the "ref_admin_updated_by" edge.
+func (m *AdminUserMutation) ResetRefAdminUpdatedBy() {
+	m.ref_admin_updated_by = nil
+	m.clearedref_admin_updated_by = false
+	m.removedref_admin_updated_by = nil
+}
+
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by id.
+func (m *AdminUserMutation) SetAdminUpdatedByID(id string) {
+	m.admin_updated_by = &id
+}
+
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (m *AdminUserMutation) ClearAdminUpdatedBy() {
+	m.clearedadmin_updated_by = true
+}
+
+// AdminUpdatedByCleared reports if the "admin_updated_by" edge to the AdminUser entity was cleared.
+func (m *AdminUserMutation) AdminUpdatedByCleared() bool {
+	return m.clearedadmin_updated_by
+}
+
+// AdminUpdatedByID returns the "admin_updated_by" edge ID in the mutation.
+func (m *AdminUserMutation) AdminUpdatedByID() (id string, exists bool) {
+	if m.admin_updated_by != nil {
+		return *m.admin_updated_by, true
+	}
+	return
+}
+
+// AdminUpdatedByIDs returns the "admin_updated_by" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AdminUpdatedByID instead. It exists only for internal usage by the builders.
+func (m *AdminUserMutation) AdminUpdatedByIDs() (ids []string) {
+	if id := m.admin_updated_by; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAdminUpdatedBy resets all changes to the "admin_updated_by" edge.
+func (m *AdminUserMutation) ResetAdminUpdatedBy() {
+	m.admin_updated_by = nil
+	m.clearedadmin_updated_by = false
+}
+
+// AddRoleIDs adds the "roles" edge to the Role entity by ids.
+func (m *AdminUserMutation) AddRoleIDs(ids ...string) {
+	if m.roles == nil {
+		m.roles = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.roles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRoles clears the "roles" edge to the Role entity.
+func (m *AdminUserMutation) ClearRoles() {
+	m.clearedroles = true
+}
+
+// RolesCleared reports if the "roles" edge to the Role entity was cleared.
+func (m *AdminUserMutation) RolesCleared() bool {
+	return m.clearedroles
+}
+
+// RemoveRoleIDs removes the "roles" edge to the Role entity by IDs.
+func (m *AdminUserMutation) RemoveRoleIDs(ids ...string) {
+	if m.removedroles == nil {
+		m.removedroles = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.roles, ids[i])
+		m.removedroles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRoles returns the removed IDs of the "roles" edge to the Role entity.
+func (m *AdminUserMutation) RemovedRolesIDs() (ids []string) {
+	for id := range m.removedroles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RolesIDs returns the "roles" edge IDs in the mutation.
+func (m *AdminUserMutation) RolesIDs() (ids []string) {
+	for id := range m.roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRoles resets all changes to the "roles" edge.
+func (m *AdminUserMutation) ResetRoles() {
+	m.roles = nil
+	m.clearedroles = false
+	m.removedroles = nil
+}
+
+// SetDefaultRoleID sets the "default_role" edge to the Role entity by id.
+func (m *AdminUserMutation) SetDefaultRoleID(id string) {
+	m.default_role = &id
+}
+
+// ClearDefaultRole clears the "default_role" edge to the Role entity.
+func (m *AdminUserMutation) ClearDefaultRole() {
+	m.cleareddefault_role = true
+}
+
+// DefaultRoleCleared reports if the "default_role" edge to the Role entity was cleared.
+func (m *AdminUserMutation) DefaultRoleCleared() bool {
+	return m.cleareddefault_role
+}
+
+// DefaultRoleID returns the "default_role" edge ID in the mutation.
+func (m *AdminUserMutation) DefaultRoleID() (id string, exists bool) {
+	if m.default_role != nil {
+		return *m.default_role, true
+	}
+	return
+}
+
+// DefaultRoleIDs returns the "default_role" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DefaultRoleID instead. It exists only for internal usage by the builders.
+func (m *AdminUserMutation) DefaultRoleIDs() (ids []string) {
+	if id := m.default_role; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDefaultRole resets all changes to the "default_role" edge.
+func (m *AdminUserMutation) ResetDefaultRole() {
+	m.default_role = nil
+	m.cleareddefault_role = false
+}
+
+// Where appends a list predicates to the AdminUserMutation builder.
+func (m *AdminUserMutation) Where(ps ...predicate.AdminUser) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AdminUserMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AdminUserMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AdminUser, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AdminUserMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AdminUserMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AdminUser).
+func (m *AdminUserMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AdminUserMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.name != nil {
+		fields = append(fields, adminuser.FieldName)
+	}
+	if m.email != nil {
+		fields = append(fields, adminuser.FieldEmail)
+	}
+	if m.password != nil {
+		fields = append(fields, adminuser.FieldPassword)
+	}
+	if m.first_name != nil {
+		fields = append(fields, adminuser.FieldFirstName)
+	}
+	if m.last_name != nil {
+		fields = append(fields, adminuser.FieldLastName)
+	}
+	if m.created_at != nil {
+		fields = append(fields, adminuser.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, adminuser.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AdminUserMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case adminuser.FieldName:
+		return m.Name()
+	case adminuser.FieldEmail:
+		return m.Email()
+	case adminuser.FieldPassword:
+		return m.Password()
+	case adminuser.FieldFirstName:
+		return m.FirstName()
+	case adminuser.FieldLastName:
+		return m.LastName()
+	case adminuser.FieldCreatedAt:
+		return m.CreatedAt()
+	case adminuser.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AdminUserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case adminuser.FieldName:
+		return m.OldName(ctx)
+	case adminuser.FieldEmail:
+		return m.OldEmail(ctx)
+	case adminuser.FieldPassword:
+		return m.OldPassword(ctx)
+	case adminuser.FieldFirstName:
+		return m.OldFirstName(ctx)
+	case adminuser.FieldLastName:
+		return m.OldLastName(ctx)
+	case adminuser.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case adminuser.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown AdminUser field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminUserMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case adminuser.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case adminuser.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
+	case adminuser.FieldPassword:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPassword(v)
+		return nil
+	case adminuser.FieldFirstName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFirstName(v)
+		return nil
+	case adminuser.FieldLastName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastName(v)
+		return nil
+	case adminuser.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case adminuser.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AdminUser field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AdminUserMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AdminUserMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminUserMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AdminUser numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AdminUserMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(adminuser.FieldName) {
+		fields = append(fields, adminuser.FieldName)
+	}
+	if m.FieldCleared(adminuser.FieldCreatedAt) {
+		fields = append(fields, adminuser.FieldCreatedAt)
+	}
+	if m.FieldCleared(adminuser.FieldUpdatedAt) {
+		fields = append(fields, adminuser.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AdminUserMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AdminUserMutation) ClearField(name string) error {
+	switch name {
+	case adminuser.FieldName:
+		m.ClearName()
+		return nil
+	case adminuser.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case adminuser.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminUser nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AdminUserMutation) ResetField(name string) error {
+	switch name {
+	case adminuser.FieldName:
+		m.ResetName()
+		return nil
+	case adminuser.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case adminuser.FieldPassword:
+		m.ResetPassword()
+		return nil
+	case adminuser.FieldFirstName:
+		m.ResetFirstName()
+		return nil
+	case adminuser.FieldLastName:
+		m.ResetLastName()
+		return nil
+	case adminuser.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case adminuser.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminUser field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AdminUserMutation) AddedEdges() []string {
+	edges := make([]string, 0, 6)
+	if m.ref_admin_created_by != nil {
+		edges = append(edges, adminuser.EdgeRefAdminCreatedBy)
+	}
+	if m.admin_created_by != nil {
+		edges = append(edges, adminuser.EdgeAdminCreatedBy)
+	}
+	if m.ref_admin_updated_by != nil {
+		edges = append(edges, adminuser.EdgeRefAdminUpdatedBy)
+	}
+	if m.admin_updated_by != nil {
+		edges = append(edges, adminuser.EdgeAdminUpdatedBy)
+	}
+	if m.roles != nil {
+		edges = append(edges, adminuser.EdgeRoles)
+	}
+	if m.default_role != nil {
+		edges = append(edges, adminuser.EdgeDefaultRole)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AdminUserMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case adminuser.EdgeRefAdminCreatedBy:
+		ids := make([]ent.Value, 0, len(m.ref_admin_created_by))
+		for id := range m.ref_admin_created_by {
+			ids = append(ids, id)
+		}
+		return ids
+	case adminuser.EdgeAdminCreatedBy:
+		if id := m.admin_created_by; id != nil {
+			return []ent.Value{*id}
+		}
+	case adminuser.EdgeRefAdminUpdatedBy:
+		ids := make([]ent.Value, 0, len(m.ref_admin_updated_by))
+		for id := range m.ref_admin_updated_by {
+			ids = append(ids, id)
+		}
+		return ids
+	case adminuser.EdgeAdminUpdatedBy:
+		if id := m.admin_updated_by; id != nil {
+			return []ent.Value{*id}
+		}
+	case adminuser.EdgeRoles:
+		ids := make([]ent.Value, 0, len(m.roles))
+		for id := range m.roles {
+			ids = append(ids, id)
+		}
+		return ids
+	case adminuser.EdgeDefaultRole:
+		if id := m.default_role; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AdminUserMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 6)
+	if m.removedref_admin_created_by != nil {
+		edges = append(edges, adminuser.EdgeRefAdminCreatedBy)
+	}
+	if m.removedref_admin_updated_by != nil {
+		edges = append(edges, adminuser.EdgeRefAdminUpdatedBy)
+	}
+	if m.removedroles != nil {
+		edges = append(edges, adminuser.EdgeRoles)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AdminUserMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case adminuser.EdgeRefAdminCreatedBy:
+		ids := make([]ent.Value, 0, len(m.removedref_admin_created_by))
+		for id := range m.removedref_admin_created_by {
+			ids = append(ids, id)
+		}
+		return ids
+	case adminuser.EdgeRefAdminUpdatedBy:
+		ids := make([]ent.Value, 0, len(m.removedref_admin_updated_by))
+		for id := range m.removedref_admin_updated_by {
+			ids = append(ids, id)
+		}
+		return ids
+	case adminuser.EdgeRoles:
+		ids := make([]ent.Value, 0, len(m.removedroles))
+		for id := range m.removedroles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AdminUserMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 6)
+	if m.clearedref_admin_created_by {
+		edges = append(edges, adminuser.EdgeRefAdminCreatedBy)
+	}
+	if m.clearedadmin_created_by {
+		edges = append(edges, adminuser.EdgeAdminCreatedBy)
+	}
+	if m.clearedref_admin_updated_by {
+		edges = append(edges, adminuser.EdgeRefAdminUpdatedBy)
+	}
+	if m.clearedadmin_updated_by {
+		edges = append(edges, adminuser.EdgeAdminUpdatedBy)
+	}
+	if m.clearedroles {
+		edges = append(edges, adminuser.EdgeRoles)
+	}
+	if m.cleareddefault_role {
+		edges = append(edges, adminuser.EdgeDefaultRole)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AdminUserMutation) EdgeCleared(name string) bool {
+	switch name {
+	case adminuser.EdgeRefAdminCreatedBy:
+		return m.clearedref_admin_created_by
+	case adminuser.EdgeAdminCreatedBy:
+		return m.clearedadmin_created_by
+	case adminuser.EdgeRefAdminUpdatedBy:
+		return m.clearedref_admin_updated_by
+	case adminuser.EdgeAdminUpdatedBy:
+		return m.clearedadmin_updated_by
+	case adminuser.EdgeRoles:
+		return m.clearedroles
+	case adminuser.EdgeDefaultRole:
+		return m.cleareddefault_role
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AdminUserMutation) ClearEdge(name string) error {
+	switch name {
+	case adminuser.EdgeAdminCreatedBy:
+		m.ClearAdminCreatedBy()
+		return nil
+	case adminuser.EdgeAdminUpdatedBy:
+		m.ClearAdminUpdatedBy()
+		return nil
+	case adminuser.EdgeDefaultRole:
+		m.ClearDefaultRole()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminUser unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AdminUserMutation) ResetEdge(name string) error {
+	switch name {
+	case adminuser.EdgeRefAdminCreatedBy:
+		m.ResetRefAdminCreatedBy()
+		return nil
+	case adminuser.EdgeAdminCreatedBy:
+		m.ResetAdminCreatedBy()
+		return nil
+	case adminuser.EdgeRefAdminUpdatedBy:
+		m.ResetRefAdminUpdatedBy()
+		return nil
+	case adminuser.EdgeAdminUpdatedBy:
+		m.ResetAdminUpdatedBy()
+		return nil
+	case adminuser.EdgeRoles:
+		m.ResetRoles()
+		return nil
+	case adminuser.EdgeDefaultRole:
+		m.ResetDefaultRole()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminUser edge %s", name)
+}
+
 // FileMutation represents an operation that mutates the File nodes in the graph.
 type FileMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *string
-	created_at        *time.Time
-	updated_at        *time.Time
-	caption           *string
-	name              *string
-	mime_type         *string
-	storage_file_name *string
-	size              *int64
-	addsize           *int64
-	clearedFields     map[string]struct{}
-	created_by        *string
-	clearedcreated_by bool
-	updated_by        *string
-	clearedupdated_by bool
-	done              bool
-	oldValue          func(context.Context) (*File, error)
-	predicates        []predicate.File
+	op                      Op
+	typ                     string
+	id                      *string
+	created_at              *time.Time
+	updated_at              *time.Time
+	caption                 *string
+	name                    *string
+	mime_type               *string
+	storage_file_name       *string
+	size                    *int64
+	addsize                 *int64
+	clearedFields           map[string]struct{}
+	admin_created_by        *string
+	clearedadmin_created_by bool
+	admin_updated_by        *string
+	clearedadmin_updated_by bool
+	created_by              *string
+	clearedcreated_by       bool
+	updated_by              *string
+	clearedupdated_by       bool
+	done                    bool
+	oldValue                func(context.Context) (*File, error)
+	predicates              []predicate.File
 }
 
 var _ ent.Mutation = (*FileMutation)(nil)
@@ -472,6 +1630,84 @@ func (m *FileMutation) ResetSize() {
 	m.addsize = nil
 }
 
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by id.
+func (m *FileMutation) SetAdminCreatedByID(id string) {
+	m.admin_created_by = &id
+}
+
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (m *FileMutation) ClearAdminCreatedBy() {
+	m.clearedadmin_created_by = true
+}
+
+// AdminCreatedByCleared reports if the "admin_created_by" edge to the AdminUser entity was cleared.
+func (m *FileMutation) AdminCreatedByCleared() bool {
+	return m.clearedadmin_created_by
+}
+
+// AdminCreatedByID returns the "admin_created_by" edge ID in the mutation.
+func (m *FileMutation) AdminCreatedByID() (id string, exists bool) {
+	if m.admin_created_by != nil {
+		return *m.admin_created_by, true
+	}
+	return
+}
+
+// AdminCreatedByIDs returns the "admin_created_by" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AdminCreatedByID instead. It exists only for internal usage by the builders.
+func (m *FileMutation) AdminCreatedByIDs() (ids []string) {
+	if id := m.admin_created_by; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAdminCreatedBy resets all changes to the "admin_created_by" edge.
+func (m *FileMutation) ResetAdminCreatedBy() {
+	m.admin_created_by = nil
+	m.clearedadmin_created_by = false
+}
+
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by id.
+func (m *FileMutation) SetAdminUpdatedByID(id string) {
+	m.admin_updated_by = &id
+}
+
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (m *FileMutation) ClearAdminUpdatedBy() {
+	m.clearedadmin_updated_by = true
+}
+
+// AdminUpdatedByCleared reports if the "admin_updated_by" edge to the AdminUser entity was cleared.
+func (m *FileMutation) AdminUpdatedByCleared() bool {
+	return m.clearedadmin_updated_by
+}
+
+// AdminUpdatedByID returns the "admin_updated_by" edge ID in the mutation.
+func (m *FileMutation) AdminUpdatedByID() (id string, exists bool) {
+	if m.admin_updated_by != nil {
+		return *m.admin_updated_by, true
+	}
+	return
+}
+
+// AdminUpdatedByIDs returns the "admin_updated_by" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AdminUpdatedByID instead. It exists only for internal usage by the builders.
+func (m *FileMutation) AdminUpdatedByIDs() (ids []string) {
+	if id := m.admin_updated_by; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAdminUpdatedBy resets all changes to the "admin_updated_by" edge.
+func (m *FileMutation) ResetAdminUpdatedBy() {
+	m.admin_updated_by = nil
+	m.clearedadmin_updated_by = false
+}
+
 // SetCreatedByID sets the "created_by" edge to the User entity by id.
 func (m *FileMutation) SetCreatedByID(id string) {
 	m.created_by = &id
@@ -821,7 +2057,13 @@ func (m *FileMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *FileMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
+	if m.admin_created_by != nil {
+		edges = append(edges, file.EdgeAdminCreatedBy)
+	}
+	if m.admin_updated_by != nil {
+		edges = append(edges, file.EdgeAdminUpdatedBy)
+	}
 	if m.created_by != nil {
 		edges = append(edges, file.EdgeCreatedBy)
 	}
@@ -835,6 +2077,14 @@ func (m *FileMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *FileMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case file.EdgeAdminCreatedBy:
+		if id := m.admin_created_by; id != nil {
+			return []ent.Value{*id}
+		}
+	case file.EdgeAdminUpdatedBy:
+		if id := m.admin_updated_by; id != nil {
+			return []ent.Value{*id}
+		}
 	case file.EdgeCreatedBy:
 		if id := m.created_by; id != nil {
 			return []ent.Value{*id}
@@ -849,7 +2099,7 @@ func (m *FileMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *FileMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	return edges
 }
 
@@ -861,7 +2111,13 @@ func (m *FileMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *FileMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
+	if m.clearedadmin_created_by {
+		edges = append(edges, file.EdgeAdminCreatedBy)
+	}
+	if m.clearedadmin_updated_by {
+		edges = append(edges, file.EdgeAdminUpdatedBy)
+	}
 	if m.clearedcreated_by {
 		edges = append(edges, file.EdgeCreatedBy)
 	}
@@ -875,6 +2131,10 @@ func (m *FileMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *FileMutation) EdgeCleared(name string) bool {
 	switch name {
+	case file.EdgeAdminCreatedBy:
+		return m.clearedadmin_created_by
+	case file.EdgeAdminUpdatedBy:
+		return m.clearedadmin_updated_by
 	case file.EdgeCreatedBy:
 		return m.clearedcreated_by
 	case file.EdgeUpdatedBy:
@@ -887,6 +2147,12 @@ func (m *FileMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *FileMutation) ClearEdge(name string) error {
 	switch name {
+	case file.EdgeAdminCreatedBy:
+		m.ClearAdminCreatedBy()
+		return nil
+	case file.EdgeAdminUpdatedBy:
+		m.ClearAdminUpdatedBy()
+		return nil
 	case file.EdgeCreatedBy:
 		m.ClearCreatedBy()
 		return nil
@@ -901,6 +2167,12 @@ func (m *FileMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *FileMutation) ResetEdge(name string) error {
 	switch name {
+	case file.EdgeAdminCreatedBy:
+		m.ResetAdminCreatedBy()
+		return nil
+	case file.EdgeAdminUpdatedBy:
+		m.ResetAdminUpdatedBy()
+		return nil
 	case file.EdgeCreatedBy:
 		m.ResetCreatedBy()
 		return nil
@@ -914,23 +2186,23 @@ func (m *FileMutation) ResetEdge(name string) error {
 // PermissionMutation represents an operation that mutates the Permission nodes in the graph.
 type PermissionMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *string
-	created_at        *time.Time
-	updated_at        *time.Time
-	entity            *string
-	operation         *string
-	clearedFields     map[string]struct{}
-	created_by        *string
-	clearedcreated_by bool
-	updated_by        *string
-	clearedupdated_by bool
-	role              *string
-	clearedrole       bool
-	done              bool
-	oldValue          func(context.Context) (*Permission, error)
-	predicates        []predicate.Permission
+	op                      Op
+	typ                     string
+	id                      *string
+	created_at              *time.Time
+	updated_at              *time.Time
+	entity                  *string
+	operation               *string
+	clearedFields           map[string]struct{}
+	admin_created_by        *string
+	clearedadmin_created_by bool
+	admin_updated_by        *string
+	clearedadmin_updated_by bool
+	role                    *string
+	clearedrole             bool
+	done                    bool
+	oldValue                func(context.Context) (*Permission, error)
+	predicates              []predicate.Permission
 }
 
 var _ ent.Mutation = (*PermissionMutation)(nil)
@@ -1207,82 +2479,82 @@ func (m *PermissionMutation) ResetOperation() {
 	m.operation = nil
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by id.
-func (m *PermissionMutation) SetCreatedByID(id string) {
-	m.created_by = &id
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by id.
+func (m *PermissionMutation) SetAdminCreatedByID(id string) {
+	m.admin_created_by = &id
 }
 
-// ClearCreatedBy clears the "created_by" edge to the User entity.
-func (m *PermissionMutation) ClearCreatedBy() {
-	m.clearedcreated_by = true
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (m *PermissionMutation) ClearAdminCreatedBy() {
+	m.clearedadmin_created_by = true
 }
 
-// CreatedByCleared reports if the "created_by" edge to the User entity was cleared.
-func (m *PermissionMutation) CreatedByCleared() bool {
-	return m.clearedcreated_by
+// AdminCreatedByCleared reports if the "admin_created_by" edge to the AdminUser entity was cleared.
+func (m *PermissionMutation) AdminCreatedByCleared() bool {
+	return m.clearedadmin_created_by
 }
 
-// CreatedByID returns the "created_by" edge ID in the mutation.
-func (m *PermissionMutation) CreatedByID() (id string, exists bool) {
-	if m.created_by != nil {
-		return *m.created_by, true
+// AdminCreatedByID returns the "admin_created_by" edge ID in the mutation.
+func (m *PermissionMutation) AdminCreatedByID() (id string, exists bool) {
+	if m.admin_created_by != nil {
+		return *m.admin_created_by, true
 	}
 	return
 }
 
-// CreatedByIDs returns the "created_by" edge IDs in the mutation.
+// AdminCreatedByIDs returns the "admin_created_by" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CreatedByID instead. It exists only for internal usage by the builders.
-func (m *PermissionMutation) CreatedByIDs() (ids []string) {
-	if id := m.created_by; id != nil {
+// AdminCreatedByID instead. It exists only for internal usage by the builders.
+func (m *PermissionMutation) AdminCreatedByIDs() (ids []string) {
+	if id := m.admin_created_by; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetCreatedBy resets all changes to the "created_by" edge.
-func (m *PermissionMutation) ResetCreatedBy() {
-	m.created_by = nil
-	m.clearedcreated_by = false
+// ResetAdminCreatedBy resets all changes to the "admin_created_by" edge.
+func (m *PermissionMutation) ResetAdminCreatedBy() {
+	m.admin_created_by = nil
+	m.clearedadmin_created_by = false
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by id.
-func (m *PermissionMutation) SetUpdatedByID(id string) {
-	m.updated_by = &id
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by id.
+func (m *PermissionMutation) SetAdminUpdatedByID(id string) {
+	m.admin_updated_by = &id
 }
 
-// ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (m *PermissionMutation) ClearUpdatedBy() {
-	m.clearedupdated_by = true
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (m *PermissionMutation) ClearAdminUpdatedBy() {
+	m.clearedadmin_updated_by = true
 }
 
-// UpdatedByCleared reports if the "updated_by" edge to the User entity was cleared.
-func (m *PermissionMutation) UpdatedByCleared() bool {
-	return m.clearedupdated_by
+// AdminUpdatedByCleared reports if the "admin_updated_by" edge to the AdminUser entity was cleared.
+func (m *PermissionMutation) AdminUpdatedByCleared() bool {
+	return m.clearedadmin_updated_by
 }
 
-// UpdatedByID returns the "updated_by" edge ID in the mutation.
-func (m *PermissionMutation) UpdatedByID() (id string, exists bool) {
-	if m.updated_by != nil {
-		return *m.updated_by, true
+// AdminUpdatedByID returns the "admin_updated_by" edge ID in the mutation.
+func (m *PermissionMutation) AdminUpdatedByID() (id string, exists bool) {
+	if m.admin_updated_by != nil {
+		return *m.admin_updated_by, true
 	}
 	return
 }
 
-// UpdatedByIDs returns the "updated_by" edge IDs in the mutation.
+// AdminUpdatedByIDs returns the "admin_updated_by" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdatedByID instead. It exists only for internal usage by the builders.
-func (m *PermissionMutation) UpdatedByIDs() (ids []string) {
-	if id := m.updated_by; id != nil {
+// AdminUpdatedByID instead. It exists only for internal usage by the builders.
+func (m *PermissionMutation) AdminUpdatedByIDs() (ids []string) {
+	if id := m.admin_updated_by; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpdatedBy resets all changes to the "updated_by" edge.
-func (m *PermissionMutation) ResetUpdatedBy() {
-	m.updated_by = nil
-	m.clearedupdated_by = false
+// ResetAdminUpdatedBy resets all changes to the "admin_updated_by" edge.
+func (m *PermissionMutation) ResetAdminUpdatedBy() {
+	m.admin_updated_by = nil
+	m.clearedadmin_updated_by = false
 }
 
 // SetRoleID sets the "role" edge to the Role entity by id.
@@ -1524,11 +2796,11 @@ func (m *PermissionMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PermissionMutation) AddedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.created_by != nil {
-		edges = append(edges, permission.EdgeCreatedBy)
+	if m.admin_created_by != nil {
+		edges = append(edges, permission.EdgeAdminCreatedBy)
 	}
-	if m.updated_by != nil {
-		edges = append(edges, permission.EdgeUpdatedBy)
+	if m.admin_updated_by != nil {
+		edges = append(edges, permission.EdgeAdminUpdatedBy)
 	}
 	if m.role != nil {
 		edges = append(edges, permission.EdgeRole)
@@ -1540,12 +2812,12 @@ func (m *PermissionMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *PermissionMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case permission.EdgeCreatedBy:
-		if id := m.created_by; id != nil {
+	case permission.EdgeAdminCreatedBy:
+		if id := m.admin_created_by; id != nil {
 			return []ent.Value{*id}
 		}
-	case permission.EdgeUpdatedBy:
-		if id := m.updated_by; id != nil {
+	case permission.EdgeAdminUpdatedBy:
+		if id := m.admin_updated_by; id != nil {
 			return []ent.Value{*id}
 		}
 	case permission.EdgeRole:
@@ -1571,11 +2843,11 @@ func (m *PermissionMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PermissionMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.clearedcreated_by {
-		edges = append(edges, permission.EdgeCreatedBy)
+	if m.clearedadmin_created_by {
+		edges = append(edges, permission.EdgeAdminCreatedBy)
 	}
-	if m.clearedupdated_by {
-		edges = append(edges, permission.EdgeUpdatedBy)
+	if m.clearedadmin_updated_by {
+		edges = append(edges, permission.EdgeAdminUpdatedBy)
 	}
 	if m.clearedrole {
 		edges = append(edges, permission.EdgeRole)
@@ -1587,10 +2859,10 @@ func (m *PermissionMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *PermissionMutation) EdgeCleared(name string) bool {
 	switch name {
-	case permission.EdgeCreatedBy:
-		return m.clearedcreated_by
-	case permission.EdgeUpdatedBy:
-		return m.clearedupdated_by
+	case permission.EdgeAdminCreatedBy:
+		return m.clearedadmin_created_by
+	case permission.EdgeAdminUpdatedBy:
+		return m.clearedadmin_updated_by
 	case permission.EdgeRole:
 		return m.clearedrole
 	}
@@ -1601,11 +2873,11 @@ func (m *PermissionMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *PermissionMutation) ClearEdge(name string) error {
 	switch name {
-	case permission.EdgeCreatedBy:
-		m.ClearCreatedBy()
+	case permission.EdgeAdminCreatedBy:
+		m.ClearAdminCreatedBy()
 		return nil
-	case permission.EdgeUpdatedBy:
-		m.ClearUpdatedBy()
+	case permission.EdgeAdminUpdatedBy:
+		m.ClearAdminUpdatedBy()
 		return nil
 	case permission.EdgeRole:
 		m.ClearRole()
@@ -1618,11 +2890,11 @@ func (m *PermissionMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *PermissionMutation) ResetEdge(name string) error {
 	switch name {
-	case permission.EdgeCreatedBy:
-		m.ResetCreatedBy()
+	case permission.EdgeAdminCreatedBy:
+		m.ResetAdminCreatedBy()
 		return nil
-	case permission.EdgeUpdatedBy:
-		m.ResetUpdatedBy()
+	case permission.EdgeAdminUpdatedBy:
+		m.ResetAdminUpdatedBy()
 		return nil
 	case permission.EdgeRole:
 		m.ResetRole()
@@ -1634,26 +2906,26 @@ func (m *PermissionMutation) ResetEdge(name string) error {
 // RoleMutation represents an operation that mutates the Role nodes in the graph.
 type RoleMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *string
-	name               *string
-	created_at         *time.Time
-	updated_at         *time.Time
-	clearedFields      map[string]struct{}
-	created_by         *string
-	clearedcreated_by  bool
-	updated_by         *string
-	clearedupdated_by  bool
-	user_roles         map[string]struct{}
-	removeduser_roles  map[string]struct{}
-	cleareduser_roles  bool
-	permissions        map[string]struct{}
-	removedpermissions map[string]struct{}
-	clearedpermissions bool
-	done               bool
-	oldValue           func(context.Context) (*Role, error)
-	predicates         []predicate.Role
+	op                      Op
+	typ                     string
+	id                      *string
+	name                    *string
+	created_at              *time.Time
+	updated_at              *time.Time
+	clearedFields           map[string]struct{}
+	admin_created_by        *string
+	clearedadmin_created_by bool
+	admin_updated_by        *string
+	clearedadmin_updated_by bool
+	user_roles              map[string]struct{}
+	removeduser_roles       map[string]struct{}
+	cleareduser_roles       bool
+	permissions             map[string]struct{}
+	removedpermissions      map[string]struct{}
+	clearedpermissions      bool
+	done                    bool
+	oldValue                func(context.Context) (*Role, error)
+	predicates              []predicate.Role
 }
 
 var _ ent.Mutation = (*RoleMutation)(nil)
@@ -1894,85 +3166,85 @@ func (m *RoleMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, role.FieldUpdatedAt)
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by id.
-func (m *RoleMutation) SetCreatedByID(id string) {
-	m.created_by = &id
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by id.
+func (m *RoleMutation) SetAdminCreatedByID(id string) {
+	m.admin_created_by = &id
 }
 
-// ClearCreatedBy clears the "created_by" edge to the User entity.
-func (m *RoleMutation) ClearCreatedBy() {
-	m.clearedcreated_by = true
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (m *RoleMutation) ClearAdminCreatedBy() {
+	m.clearedadmin_created_by = true
 }
 
-// CreatedByCleared reports if the "created_by" edge to the User entity was cleared.
-func (m *RoleMutation) CreatedByCleared() bool {
-	return m.clearedcreated_by
+// AdminCreatedByCleared reports if the "admin_created_by" edge to the AdminUser entity was cleared.
+func (m *RoleMutation) AdminCreatedByCleared() bool {
+	return m.clearedadmin_created_by
 }
 
-// CreatedByID returns the "created_by" edge ID in the mutation.
-func (m *RoleMutation) CreatedByID() (id string, exists bool) {
-	if m.created_by != nil {
-		return *m.created_by, true
+// AdminCreatedByID returns the "admin_created_by" edge ID in the mutation.
+func (m *RoleMutation) AdminCreatedByID() (id string, exists bool) {
+	if m.admin_created_by != nil {
+		return *m.admin_created_by, true
 	}
 	return
 }
 
-// CreatedByIDs returns the "created_by" edge IDs in the mutation.
+// AdminCreatedByIDs returns the "admin_created_by" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CreatedByID instead. It exists only for internal usage by the builders.
-func (m *RoleMutation) CreatedByIDs() (ids []string) {
-	if id := m.created_by; id != nil {
+// AdminCreatedByID instead. It exists only for internal usage by the builders.
+func (m *RoleMutation) AdminCreatedByIDs() (ids []string) {
+	if id := m.admin_created_by; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetCreatedBy resets all changes to the "created_by" edge.
-func (m *RoleMutation) ResetCreatedBy() {
-	m.created_by = nil
-	m.clearedcreated_by = false
+// ResetAdminCreatedBy resets all changes to the "admin_created_by" edge.
+func (m *RoleMutation) ResetAdminCreatedBy() {
+	m.admin_created_by = nil
+	m.clearedadmin_created_by = false
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by id.
-func (m *RoleMutation) SetUpdatedByID(id string) {
-	m.updated_by = &id
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by id.
+func (m *RoleMutation) SetAdminUpdatedByID(id string) {
+	m.admin_updated_by = &id
 }
 
-// ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (m *RoleMutation) ClearUpdatedBy() {
-	m.clearedupdated_by = true
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (m *RoleMutation) ClearAdminUpdatedBy() {
+	m.clearedadmin_updated_by = true
 }
 
-// UpdatedByCleared reports if the "updated_by" edge to the User entity was cleared.
-func (m *RoleMutation) UpdatedByCleared() bool {
-	return m.clearedupdated_by
+// AdminUpdatedByCleared reports if the "admin_updated_by" edge to the AdminUser entity was cleared.
+func (m *RoleMutation) AdminUpdatedByCleared() bool {
+	return m.clearedadmin_updated_by
 }
 
-// UpdatedByID returns the "updated_by" edge ID in the mutation.
-func (m *RoleMutation) UpdatedByID() (id string, exists bool) {
-	if m.updated_by != nil {
-		return *m.updated_by, true
+// AdminUpdatedByID returns the "admin_updated_by" edge ID in the mutation.
+func (m *RoleMutation) AdminUpdatedByID() (id string, exists bool) {
+	if m.admin_updated_by != nil {
+		return *m.admin_updated_by, true
 	}
 	return
 }
 
-// UpdatedByIDs returns the "updated_by" edge IDs in the mutation.
+// AdminUpdatedByIDs returns the "admin_updated_by" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdatedByID instead. It exists only for internal usage by the builders.
-func (m *RoleMutation) UpdatedByIDs() (ids []string) {
-	if id := m.updated_by; id != nil {
+// AdminUpdatedByID instead. It exists only for internal usage by the builders.
+func (m *RoleMutation) AdminUpdatedByIDs() (ids []string) {
+	if id := m.admin_updated_by; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpdatedBy resets all changes to the "updated_by" edge.
-func (m *RoleMutation) ResetUpdatedBy() {
-	m.updated_by = nil
-	m.clearedupdated_by = false
+// ResetAdminUpdatedBy resets all changes to the "admin_updated_by" edge.
+func (m *RoleMutation) ResetAdminUpdatedBy() {
+	m.admin_updated_by = nil
+	m.clearedadmin_updated_by = false
 }
 
-// AddUserRoleIDs adds the "user_roles" edge to the User entity by ids.
+// AddUserRoleIDs adds the "user_roles" edge to the AdminUser entity by ids.
 func (m *RoleMutation) AddUserRoleIDs(ids ...string) {
 	if m.user_roles == nil {
 		m.user_roles = make(map[string]struct{})
@@ -1982,17 +3254,17 @@ func (m *RoleMutation) AddUserRoleIDs(ids ...string) {
 	}
 }
 
-// ClearUserRoles clears the "user_roles" edge to the User entity.
+// ClearUserRoles clears the "user_roles" edge to the AdminUser entity.
 func (m *RoleMutation) ClearUserRoles() {
 	m.cleareduser_roles = true
 }
 
-// UserRolesCleared reports if the "user_roles" edge to the User entity was cleared.
+// UserRolesCleared reports if the "user_roles" edge to the AdminUser entity was cleared.
 func (m *RoleMutation) UserRolesCleared() bool {
 	return m.cleareduser_roles
 }
 
-// RemoveUserRoleIDs removes the "user_roles" edge to the User entity by IDs.
+// RemoveUserRoleIDs removes the "user_roles" edge to the AdminUser entity by IDs.
 func (m *RoleMutation) RemoveUserRoleIDs(ids ...string) {
 	if m.removeduser_roles == nil {
 		m.removeduser_roles = make(map[string]struct{})
@@ -2003,7 +3275,7 @@ func (m *RoleMutation) RemoveUserRoleIDs(ids ...string) {
 	}
 }
 
-// RemovedUserRoles returns the removed IDs of the "user_roles" edge to the User entity.
+// RemovedUserRoles returns the removed IDs of the "user_roles" edge to the AdminUser entity.
 func (m *RoleMutation) RemovedUserRolesIDs() (ids []string) {
 	for id := range m.removeduser_roles {
 		ids = append(ids, id)
@@ -2263,11 +3535,11 @@ func (m *RoleMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RoleMutation) AddedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.created_by != nil {
-		edges = append(edges, role.EdgeCreatedBy)
+	if m.admin_created_by != nil {
+		edges = append(edges, role.EdgeAdminCreatedBy)
 	}
-	if m.updated_by != nil {
-		edges = append(edges, role.EdgeUpdatedBy)
+	if m.admin_updated_by != nil {
+		edges = append(edges, role.EdgeAdminUpdatedBy)
 	}
 	if m.user_roles != nil {
 		edges = append(edges, role.EdgeUserRoles)
@@ -2282,12 +3554,12 @@ func (m *RoleMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *RoleMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case role.EdgeCreatedBy:
-		if id := m.created_by; id != nil {
+	case role.EdgeAdminCreatedBy:
+		if id := m.admin_created_by; id != nil {
 			return []ent.Value{*id}
 		}
-	case role.EdgeUpdatedBy:
-		if id := m.updated_by; id != nil {
+	case role.EdgeAdminUpdatedBy:
+		if id := m.admin_updated_by; id != nil {
 			return []ent.Value{*id}
 		}
 	case role.EdgeUserRoles:
@@ -2341,11 +3613,11 @@ func (m *RoleMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RoleMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.clearedcreated_by {
-		edges = append(edges, role.EdgeCreatedBy)
+	if m.clearedadmin_created_by {
+		edges = append(edges, role.EdgeAdminCreatedBy)
 	}
-	if m.clearedupdated_by {
-		edges = append(edges, role.EdgeUpdatedBy)
+	if m.clearedadmin_updated_by {
+		edges = append(edges, role.EdgeAdminUpdatedBy)
 	}
 	if m.cleareduser_roles {
 		edges = append(edges, role.EdgeUserRoles)
@@ -2360,10 +3632,10 @@ func (m *RoleMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *RoleMutation) EdgeCleared(name string) bool {
 	switch name {
-	case role.EdgeCreatedBy:
-		return m.clearedcreated_by
-	case role.EdgeUpdatedBy:
-		return m.clearedupdated_by
+	case role.EdgeAdminCreatedBy:
+		return m.clearedadmin_created_by
+	case role.EdgeAdminUpdatedBy:
+		return m.clearedadmin_updated_by
 	case role.EdgeUserRoles:
 		return m.cleareduser_roles
 	case role.EdgePermissions:
@@ -2376,11 +3648,11 @@ func (m *RoleMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *RoleMutation) ClearEdge(name string) error {
 	switch name {
-	case role.EdgeCreatedBy:
-		m.ClearCreatedBy()
+	case role.EdgeAdminCreatedBy:
+		m.ClearAdminCreatedBy()
 		return nil
-	case role.EdgeUpdatedBy:
-		m.ClearUpdatedBy()
+	case role.EdgeAdminUpdatedBy:
+		m.ClearAdminUpdatedBy()
 		return nil
 	}
 	return fmt.Errorf("unknown Role unique edge %s", name)
@@ -2390,11 +3662,11 @@ func (m *RoleMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *RoleMutation) ResetEdge(name string) error {
 	switch name {
-	case role.EdgeCreatedBy:
-		m.ResetCreatedBy()
+	case role.EdgeAdminCreatedBy:
+		m.ResetAdminCreatedBy()
 		return nil
-	case role.EdgeUpdatedBy:
-		m.ResetUpdatedBy()
+	case role.EdgeAdminUpdatedBy:
+		m.ResetAdminUpdatedBy()
 		return nil
 	case role.EdgeUserRoles:
 		m.ResetUserRoles()
@@ -2409,35 +3681,34 @@ func (m *RoleMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *string
-	name                  *string
-	email                 *string
-	password              *string
-	first_name            *string
-	last_name             *string
-	created_at            *time.Time
-	updated_at            *time.Time
-	clearedFields         map[string]struct{}
-	ref_created_by        map[string]struct{}
-	removedref_created_by map[string]struct{}
-	clearedref_created_by bool
-	created_by            *string
-	clearedcreated_by     bool
-	ref_updated_by        map[string]struct{}
-	removedref_updated_by map[string]struct{}
-	clearedref_updated_by bool
-	updated_by            *string
-	clearedupdated_by     bool
-	roles                 map[string]struct{}
-	removedroles          map[string]struct{}
-	clearedroles          bool
-	default_role          *string
-	cleareddefault_role   bool
-	done                  bool
-	oldValue              func(context.Context) (*User, error)
-	predicates            []predicate.User
+	op                      Op
+	typ                     string
+	id                      *string
+	email                   *string
+	password                *string
+	clearedFields           map[string]struct{}
+	ref_created_by          map[string]struct{}
+	removedref_created_by   map[string]struct{}
+	clearedref_created_by   bool
+	created_by              *string
+	clearedcreated_by       bool
+	ref_updated_by          map[string]struct{}
+	removedref_updated_by   map[string]struct{}
+	clearedref_updated_by   bool
+	updated_by              *string
+	clearedupdated_by       bool
+	admin_created_by        *string
+	clearedadmin_created_by bool
+	admin_updated_by        *string
+	clearedadmin_updated_by bool
+	roles                   map[string]struct{}
+	removedroles            map[string]struct{}
+	clearedroles            bool
+	default_role            *string
+	cleareddefault_role     bool
+	done                    bool
+	oldValue                func(context.Context) (*User, error)
+	predicates              []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -2544,55 +3815,6 @@ func (m *UserMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetName sets the "name" field.
-func (m *UserMutation) SetName(s string) {
-	m.name = &s
-}
-
-// Name returns the value of the "name" field in the mutation.
-func (m *UserMutation) Name() (r string, exists bool) {
-	v := m.name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldName returns the old "name" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
-	}
-	return oldValue.Name, nil
-}
-
-// ClearName clears the value of the "name" field.
-func (m *UserMutation) ClearName() {
-	m.name = nil
-	m.clearedFields[user.FieldName] = struct{}{}
-}
-
-// NameCleared returns if the "name" field was cleared in this mutation.
-func (m *UserMutation) NameCleared() bool {
-	_, ok := m.clearedFields[user.FieldName]
-	return ok
-}
-
-// ResetName resets all changes to the "name" field.
-func (m *UserMutation) ResetName() {
-	m.name = nil
-	delete(m.clearedFields, user.FieldName)
-}
-
 // SetEmail sets the "email" field.
 func (m *UserMutation) SetEmail(s string) {
 	m.email = &s
@@ -2663,176 +3885,6 @@ func (m *UserMutation) OldPassword(ctx context.Context) (v string, err error) {
 // ResetPassword resets all changes to the "password" field.
 func (m *UserMutation) ResetPassword() {
 	m.password = nil
-}
-
-// SetFirstName sets the "first_name" field.
-func (m *UserMutation) SetFirstName(s string) {
-	m.first_name = &s
-}
-
-// FirstName returns the value of the "first_name" field in the mutation.
-func (m *UserMutation) FirstName() (r string, exists bool) {
-	v := m.first_name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFirstName returns the old "first_name" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldFirstName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFirstName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFirstName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFirstName: %w", err)
-	}
-	return oldValue.FirstName, nil
-}
-
-// ResetFirstName resets all changes to the "first_name" field.
-func (m *UserMutation) ResetFirstName() {
-	m.first_name = nil
-}
-
-// SetLastName sets the "last_name" field.
-func (m *UserMutation) SetLastName(s string) {
-	m.last_name = &s
-}
-
-// LastName returns the value of the "last_name" field in the mutation.
-func (m *UserMutation) LastName() (r string, exists bool) {
-	v := m.last_name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLastName returns the old "last_name" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldLastName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLastName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLastName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLastName: %w", err)
-	}
-	return oldValue.LastName, nil
-}
-
-// ResetLastName resets all changes to the "last_name" field.
-func (m *UserMutation) ResetLastName() {
-	m.last_name = nil
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (m *UserMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *UserMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ClearCreatedAt clears the value of the "created_at" field.
-func (m *UserMutation) ClearCreatedAt() {
-	m.created_at = nil
-	m.clearedFields[user.FieldCreatedAt] = struct{}{}
-}
-
-// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
-func (m *UserMutation) CreatedAtCleared() bool {
-	_, ok := m.clearedFields[user.FieldCreatedAt]
-	return ok
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *UserMutation) ResetCreatedAt() {
-	m.created_at = nil
-	delete(m.clearedFields, user.FieldCreatedAt)
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *UserMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *UserMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (m *UserMutation) ClearUpdatedAt() {
-	m.updated_at = nil
-	m.clearedFields[user.FieldUpdatedAt] = struct{}{}
-}
-
-// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
-func (m *UserMutation) UpdatedAtCleared() bool {
-	_, ok := m.clearedFields[user.FieldUpdatedAt]
-	return ok
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *UserMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-	delete(m.clearedFields, user.FieldUpdatedAt)
 }
 
 // AddRefCreatedByIDs adds the "ref_created_by" edge to the User entity by ids.
@@ -3021,6 +4073,84 @@ func (m *UserMutation) ResetUpdatedBy() {
 	m.clearedupdated_by = false
 }
 
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by id.
+func (m *UserMutation) SetAdminCreatedByID(id string) {
+	m.admin_created_by = &id
+}
+
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (m *UserMutation) ClearAdminCreatedBy() {
+	m.clearedadmin_created_by = true
+}
+
+// AdminCreatedByCleared reports if the "admin_created_by" edge to the AdminUser entity was cleared.
+func (m *UserMutation) AdminCreatedByCleared() bool {
+	return m.clearedadmin_created_by
+}
+
+// AdminCreatedByID returns the "admin_created_by" edge ID in the mutation.
+func (m *UserMutation) AdminCreatedByID() (id string, exists bool) {
+	if m.admin_created_by != nil {
+		return *m.admin_created_by, true
+	}
+	return
+}
+
+// AdminCreatedByIDs returns the "admin_created_by" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AdminCreatedByID instead. It exists only for internal usage by the builders.
+func (m *UserMutation) AdminCreatedByIDs() (ids []string) {
+	if id := m.admin_created_by; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAdminCreatedBy resets all changes to the "admin_created_by" edge.
+func (m *UserMutation) ResetAdminCreatedBy() {
+	m.admin_created_by = nil
+	m.clearedadmin_created_by = false
+}
+
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by id.
+func (m *UserMutation) SetAdminUpdatedByID(id string) {
+	m.admin_updated_by = &id
+}
+
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (m *UserMutation) ClearAdminUpdatedBy() {
+	m.clearedadmin_updated_by = true
+}
+
+// AdminUpdatedByCleared reports if the "admin_updated_by" edge to the AdminUser entity was cleared.
+func (m *UserMutation) AdminUpdatedByCleared() bool {
+	return m.clearedadmin_updated_by
+}
+
+// AdminUpdatedByID returns the "admin_updated_by" edge ID in the mutation.
+func (m *UserMutation) AdminUpdatedByID() (id string, exists bool) {
+	if m.admin_updated_by != nil {
+		return *m.admin_updated_by, true
+	}
+	return
+}
+
+// AdminUpdatedByIDs returns the "admin_updated_by" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AdminUpdatedByID instead. It exists only for internal usage by the builders.
+func (m *UserMutation) AdminUpdatedByIDs() (ids []string) {
+	if id := m.admin_updated_by; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAdminUpdatedBy resets all changes to the "admin_updated_by" edge.
+func (m *UserMutation) ResetAdminUpdatedBy() {
+	m.admin_updated_by = nil
+	m.clearedadmin_updated_by = false
+}
+
 // AddRoleIDs adds the "roles" edge to the Role entity by ids.
 func (m *UserMutation) AddRoleIDs(ids ...string) {
 	if m.roles == nil {
@@ -3148,27 +4278,12 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 7)
-	if m.name != nil {
-		fields = append(fields, user.FieldName)
-	}
+	fields := make([]string, 0, 2)
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
 	}
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
-	}
-	if m.first_name != nil {
-		fields = append(fields, user.FieldFirstName)
-	}
-	if m.last_name != nil {
-		fields = append(fields, user.FieldLastName)
-	}
-	if m.created_at != nil {
-		fields = append(fields, user.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, user.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -3178,20 +4293,10 @@ func (m *UserMutation) Fields() []string {
 // schema.
 func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case user.FieldName:
-		return m.Name()
 	case user.FieldEmail:
 		return m.Email()
 	case user.FieldPassword:
 		return m.Password()
-	case user.FieldFirstName:
-		return m.FirstName()
-	case user.FieldLastName:
-		return m.LastName()
-	case user.FieldCreatedAt:
-		return m.CreatedAt()
-	case user.FieldUpdatedAt:
-		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -3201,20 +4306,10 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case user.FieldName:
-		return m.OldName(ctx)
 	case user.FieldEmail:
 		return m.OldEmail(ctx)
 	case user.FieldPassword:
 		return m.OldPassword(ctx)
-	case user.FieldFirstName:
-		return m.OldFirstName(ctx)
-	case user.FieldLastName:
-		return m.OldLastName(ctx)
-	case user.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case user.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -3224,13 +4319,6 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case user.FieldName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetName(v)
-		return nil
 	case user.FieldEmail:
 		v, ok := value.(string)
 		if !ok {
@@ -3244,34 +4332,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPassword(v)
-		return nil
-	case user.FieldFirstName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFirstName(v)
-		return nil
-	case user.FieldLastName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLastName(v)
-		return nil
-	case user.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case user.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -3302,17 +4362,7 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(user.FieldName) {
-		fields = append(fields, user.FieldName)
-	}
-	if m.FieldCleared(user.FieldCreatedAt) {
-		fields = append(fields, user.FieldCreatedAt)
-	}
-	if m.FieldCleared(user.FieldUpdatedAt) {
-		fields = append(fields, user.FieldUpdatedAt)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3325,17 +4375,6 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
-	switch name {
-	case user.FieldName:
-		m.ClearName()
-		return nil
-	case user.FieldCreatedAt:
-		m.ClearCreatedAt()
-		return nil
-	case user.FieldUpdatedAt:
-		m.ClearUpdatedAt()
-		return nil
-	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -3343,26 +4382,11 @@ func (m *UserMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserMutation) ResetField(name string) error {
 	switch name {
-	case user.FieldName:
-		m.ResetName()
-		return nil
 	case user.FieldEmail:
 		m.ResetEmail()
 		return nil
 	case user.FieldPassword:
 		m.ResetPassword()
-		return nil
-	case user.FieldFirstName:
-		m.ResetFirstName()
-		return nil
-	case user.FieldLastName:
-		m.ResetLastName()
-		return nil
-	case user.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case user.FieldUpdatedAt:
-		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -3370,7 +4394,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 8)
 	if m.ref_created_by != nil {
 		edges = append(edges, user.EdgeRefCreatedBy)
 	}
@@ -3382,6 +4406,12 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.updated_by != nil {
 		edges = append(edges, user.EdgeUpdatedBy)
+	}
+	if m.admin_created_by != nil {
+		edges = append(edges, user.EdgeAdminCreatedBy)
+	}
+	if m.admin_updated_by != nil {
+		edges = append(edges, user.EdgeAdminUpdatedBy)
 	}
 	if m.roles != nil {
 		edges = append(edges, user.EdgeRoles)
@@ -3416,6 +4446,14 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 		if id := m.updated_by; id != nil {
 			return []ent.Value{*id}
 		}
+	case user.EdgeAdminCreatedBy:
+		if id := m.admin_created_by; id != nil {
+			return []ent.Value{*id}
+		}
+	case user.EdgeAdminUpdatedBy:
+		if id := m.admin_updated_by; id != nil {
+			return []ent.Value{*id}
+		}
 	case user.EdgeRoles:
 		ids := make([]ent.Value, 0, len(m.roles))
 		for id := range m.roles {
@@ -3432,7 +4470,7 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 8)
 	if m.removedref_created_by != nil {
 		edges = append(edges, user.EdgeRefCreatedBy)
 	}
@@ -3473,7 +4511,7 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 8)
 	if m.clearedref_created_by {
 		edges = append(edges, user.EdgeRefCreatedBy)
 	}
@@ -3485,6 +4523,12 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedupdated_by {
 		edges = append(edges, user.EdgeUpdatedBy)
+	}
+	if m.clearedadmin_created_by {
+		edges = append(edges, user.EdgeAdminCreatedBy)
+	}
+	if m.clearedadmin_updated_by {
+		edges = append(edges, user.EdgeAdminUpdatedBy)
 	}
 	if m.clearedroles {
 		edges = append(edges, user.EdgeRoles)
@@ -3507,6 +4551,10 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedref_updated_by
 	case user.EdgeUpdatedBy:
 		return m.clearedupdated_by
+	case user.EdgeAdminCreatedBy:
+		return m.clearedadmin_created_by
+	case user.EdgeAdminUpdatedBy:
+		return m.clearedadmin_updated_by
 	case user.EdgeRoles:
 		return m.clearedroles
 	case user.EdgeDefaultRole:
@@ -3524,6 +4572,12 @@ func (m *UserMutation) ClearEdge(name string) error {
 		return nil
 	case user.EdgeUpdatedBy:
 		m.ClearUpdatedBy()
+		return nil
+	case user.EdgeAdminCreatedBy:
+		m.ClearAdminCreatedBy()
+		return nil
+	case user.EdgeAdminUpdatedBy:
+		m.ClearAdminUpdatedBy()
 		return nil
 	case user.EdgeDefaultRole:
 		m.ClearDefaultRole()
@@ -3547,6 +4601,12 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeUpdatedBy:
 		m.ResetUpdatedBy()
+		return nil
+	case user.EdgeAdminCreatedBy:
+		m.ResetAdminCreatedBy()
+		return nil
+	case user.EdgeAdminUpdatedBy:
+		m.ResetAdminUpdatedBy()
 		return nil
 	case user.EdgeRoles:
 		m.ResetRoles()

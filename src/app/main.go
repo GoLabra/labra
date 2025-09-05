@@ -77,7 +77,10 @@ func main() {
 
 	client.Use(
 		hooks.CreatedByUpdatedByHook,
+		hooks.EntityMutatePermission,
 	)
+
+	client.Intercept(hooks.EntityReadPermission())
 
 	if err := client.Schema.Create(
 		context.Background(),
@@ -221,12 +224,30 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 
 		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
 			m, ok := c.(*atlas.ModifyTable)
-			if ok && (m.T.Name == "users" || m.T.Name == "files") {
+			if ok && (m.T.Name == "admin_users" || m.T.Name == "files" || m.T.Name == "roles") {
 				return true
 			}
 			return false
 		})
-		
+
+		return changes, nil
+	})
+}
+func skipDiffOnUserEntities(next schema.Differ) schema.Differ {
+	return schema.DiffFunc(func(current, desired *atlas.Schema) ([]atlas.Change, error) {
+		changes, err := next.Diff(current, desired)
+		if err != nil {
+			return nil, err
+		}
+
+		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
+			m, ok := c.(*atlas.ModifyTable)
+			if ok && (m.T.Name == "users") {
+				return true
+			}
+			return false
+		})
+
 		return changes, nil
 	})
 }
@@ -238,12 +259,16 @@ func InitAdmin(drv *entsql.Driver) (*adminEnt.Client, *adminRepo.Repository, *ad
 
 	client.Use(
 		hooks.CreatedByUpdatedByHook,
+		hooks.EntityMutatePermission,
 	)
+
+	client.Intercept(hooks.EntityReadPermission())
 
 	if err := client.Schema.Create(
 		context.Background(),
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
+		schema.WithDiffHook(skipDiffOnUserEntities),
 	); err != nil {
 		panic(err)
 	}

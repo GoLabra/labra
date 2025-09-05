@@ -137,6 +137,24 @@ func (e *EntityTemplateData) AddDefaultEdges() {
 		Type:         "User",
 		// Required: &trueVal, // TODO will be required
 	})
+
+	e.Edges = append(e.Edges, entity.Edge{
+		Name:         "AdminCreatedBy",
+		EntName:      "admin_created_by",
+		Caption:      "Admin Created By",
+		RelationType: entity.RelationTypeOne,
+		Type:         "AdminUser",
+		// Required: &trueVal, // TODO will be required
+	})
+
+	e.Edges = append(e.Edges, entity.Edge{
+		Name:         "AdminUpdatedBy",
+		EntName:      "admin_updated_by",
+		Caption:      "Admin Updated By",
+		RelationType: entity.RelationTypeOne,
+		Type:         "AdminUser",
+		// Required: &trueVal, // TODO will be required
+	})
 }
 
 func InverseRelationType(relationType entity.RelationType) entity.RelationType {

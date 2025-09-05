@@ -5,17 +5,40 @@ package ent
 import (
 	"fmt"
 
-	
-	"github.com/GoLabra/labra/src/api/entgql/ent/role"
-	"github.com/GoLabra/labra/src/api/entgql/ent/user"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
+	"github.com/GoLabra/labra/src/api/entgql/ent/role"
+	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
+
+// SetEdge sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
+func (m *AdminUserMutation) SetEdge(name, value string) error {
+	switch name {
+	case adminuser.EdgeAdminCreatedBy:
+		m.SetAdminCreatedByID(value)
+		return nil
+	case adminuser.EdgeAdminUpdatedBy:
+		m.SetAdminUpdatedByID(value)
+		return nil
+	case adminuser.EdgeDefaultRole:
+		m.SetDefaultRoleID(value)
+		return nil
+	}
+	return fmt.Errorf("unknown AdminUser edge %s", name)
+}
 
 // SetEdge sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema
 func (m *FileMutation) SetEdge(name, value string) error {
 	switch name {
+	case file.EdgeAdminCreatedBy:
+		m.SetAdminCreatedByID(value)
+		return nil
+	case file.EdgeAdminUpdatedBy:
+		m.SetAdminUpdatedByID(value)
+		return nil
 	case file.EdgeCreatedBy:
 		m.SetCreatedByID(value)
 		return nil
@@ -30,11 +53,11 @@ func (m *FileMutation) SetEdge(name, value string) error {
 // the edge is not defined in the schema
 func (m *PermissionMutation) SetEdge(name, value string) error {
 	switch name {
-	case permission.EdgeCreatedBy:
-		m.SetCreatedByID(value)
+	case permission.EdgeAdminCreatedBy:
+		m.SetAdminCreatedByID(value)
 		return nil
-	case permission.EdgeUpdatedBy:
-		m.SetUpdatedByID(value)
+	case permission.EdgeAdminUpdatedBy:
+		m.SetAdminUpdatedByID(value)
 		return nil
 	case permission.EdgeRole:
 		m.SetRoleID(value)
@@ -47,11 +70,11 @@ func (m *PermissionMutation) SetEdge(name, value string) error {
 // the edge is not defined in the schema
 func (m *RoleMutation) SetEdge(name, value string) error {
 	switch name {
-	case role.EdgeCreatedBy:
-		m.SetCreatedByID(value)
+	case role.EdgeAdminCreatedBy:
+		m.SetAdminCreatedByID(value)
 		return nil
-	case role.EdgeUpdatedBy:
-		m.SetUpdatedByID(value)
+	case role.EdgeAdminUpdatedBy:
+		m.SetAdminUpdatedByID(value)
 		return nil
 	}
 	return fmt.Errorf("unknown Role edge %s", name)
@@ -66,6 +89,12 @@ func (m *UserMutation) SetEdge(name, value string) error {
 		return nil
 	case user.EdgeUpdatedBy:
 		m.SetUpdatedByID(value)
+		return nil
+	case user.EdgeAdminCreatedBy:
+		m.SetAdminCreatedByID(value)
+		return nil
+	case user.EdgeAdminUpdatedBy:
+		m.SetAdminUpdatedByID(value)
 		return nil
 	case user.EdgeDefaultRole:
 		m.SetDefaultRoleID(value)

@@ -88,26 +88,26 @@ func (Role) Fields() []ent.Field {
 // Edges of the Role.
 func (Role) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("created_by", User.Type).
+		edge.To("admin_created_by", AdminUser.Type).
 			Unique().
 			Annotations(
 				entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Edge{
-					Caption:      "Created By",
+					Caption:      "Admin Created By",
 					RelationType: entity.RelationTypeOne,
 				},
 			),
-		edge.To("updated_by", User.Type).
+		edge.To("admin_updated_by", AdminUser.Type).
 			Unique().
 			Annotations(
 				entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 				annotations.Edge{
-					Caption:      "Updated By",
+					Caption:      "Admin Updated By",
 					RelationType: entity.RelationTypeOne,
 				},
 			),
 
-		edge.From("user_roles", User.Type).
+		edge.From("user_roles", AdminUser.Type).
 			Ref("roles").
 			Annotations(
 				annotations.Edge{

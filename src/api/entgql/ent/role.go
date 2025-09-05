@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
-	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // Role is the model entity for the Role schema.
@@ -26,20 +26,21 @@ type Role struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RoleQuery when eager-loading is set.
-	Edges           RoleEdges `json:"edges"`
-	role_created_by *string
-	role_updated_by *string
-	selectValues    sql.SelectValues
+	Edges                 RoleEdges `json:"edges"`
+	role_admin_created_by *string
+	role_admin_updated_by *string
+	user_roles            *string
+	selectValues          sql.SelectValues
 }
 
 // RoleEdges holds the relations/edges for other nodes in the graph.
 type RoleEdges struct {
-	// CreatedBy holds the value of the created_by edge.
-	CreatedBy *User `json:"created_by,omitempty"`
-	// UpdatedBy holds the value of the updated_by edge.
-	UpdatedBy *User `json:"updated_by,omitempty"`
+	// AdminCreatedBy holds the value of the admin_created_by edge.
+	AdminCreatedBy *AdminUser `json:"admin_created_by,omitempty"`
+	// AdminUpdatedBy holds the value of the admin_updated_by edge.
+	AdminUpdatedBy *AdminUser `json:"admin_updated_by,omitempty"`
 	// UserRoles holds the value of the user_roles edge.
-	UserRoles []*User `json:"user_roles,omitempty"`
+	UserRoles []*AdminUser `json:"user_roles,omitempty"`
 	// Permissions holds the value of the permissions edge.
 	Permissions []*Permission `json:"permissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -48,35 +49,35 @@ type RoleEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [4]map[string]int
 
-	namedUserRoles   map[string][]*User
+	namedUserRoles   map[string][]*AdminUser
 	namedPermissions map[string][]*Permission
 }
 
-// CreatedByOrErr returns the CreatedBy value or an error if the edge
+// AdminCreatedByOrErr returns the AdminCreatedBy value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RoleEdges) CreatedByOrErr() (*User, error) {
-	if e.CreatedBy != nil {
-		return e.CreatedBy, nil
+func (e RoleEdges) AdminCreatedByOrErr() (*AdminUser, error) {
+	if e.AdminCreatedBy != nil {
+		return e.AdminCreatedBy, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: adminuser.Label}
 	}
-	return nil, &NotLoadedError{edge: "created_by"}
+	return nil, &NotLoadedError{edge: "admin_created_by"}
 }
 
-// UpdatedByOrErr returns the UpdatedBy value or an error if the edge
+// AdminUpdatedByOrErr returns the AdminUpdatedBy value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RoleEdges) UpdatedByOrErr() (*User, error) {
-	if e.UpdatedBy != nil {
-		return e.UpdatedBy, nil
+func (e RoleEdges) AdminUpdatedByOrErr() (*AdminUser, error) {
+	if e.AdminUpdatedBy != nil {
+		return e.AdminUpdatedBy, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: adminuser.Label}
 	}
-	return nil, &NotLoadedError{edge: "updated_by"}
+	return nil, &NotLoadedError{edge: "admin_updated_by"}
 }
 
 // UserRolesOrErr returns the UserRoles value or an error if the edge
 // was not loaded in eager-loading.
-func (e RoleEdges) UserRolesOrErr() ([]*User, error) {
+func (e RoleEdges) UserRolesOrErr() ([]*AdminUser, error) {
 	if e.loadedTypes[2] {
 		return e.UserRoles, nil
 	}
@@ -101,9 +102,11 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case role.FieldCreatedAt, role.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case role.ForeignKeys[0]: // role_created_by
+		case role.ForeignKeys[0]: // role_admin_created_by
 			values[i] = new(sql.NullString)
-		case role.ForeignKeys[1]: // role_updated_by
+		case role.ForeignKeys[1]: // role_admin_updated_by
+			values[i] = new(sql.NullString)
+		case role.ForeignKeys[2]: // user_roles
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -148,17 +151,24 @@ func (r *Role) assignValues(columns []string, values []any) error {
 			}
 		case role.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field role_created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field role_admin_created_by", values[i])
 			} else if value.Valid {
-				r.role_created_by = new(string)
-				*r.role_created_by = value.String
+				r.role_admin_created_by = new(string)
+				*r.role_admin_created_by = value.String
 			}
 		case role.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field role_updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field role_admin_updated_by", values[i])
 			} else if value.Valid {
-				r.role_updated_by = new(string)
-				*r.role_updated_by = value.String
+				r.role_admin_updated_by = new(string)
+				*r.role_admin_updated_by = value.String
+			}
+		case role.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user_roles", values[i])
+			} else if value.Valid {
+				r.user_roles = new(string)
+				*r.user_roles = value.String
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -173,18 +183,18 @@ func (r *Role) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
 }
 
-// QueryCreatedBy queries the "created_by" edge of the Role entity.
-func (r *Role) QueryCreatedBy() *UserQuery {
-	return NewRoleClient(r.config).QueryCreatedBy(r)
+// QueryAdminCreatedBy queries the "admin_created_by" edge of the Role entity.
+func (r *Role) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewRoleClient(r.config).QueryAdminCreatedBy(r)
 }
 
-// QueryUpdatedBy queries the "updated_by" edge of the Role entity.
-func (r *Role) QueryUpdatedBy() *UserQuery {
-	return NewRoleClient(r.config).QueryUpdatedBy(r)
+// QueryAdminUpdatedBy queries the "admin_updated_by" edge of the Role entity.
+func (r *Role) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewRoleClient(r.config).QueryAdminUpdatedBy(r)
 }
 
 // QueryUserRoles queries the "user_roles" edge of the Role entity.
-func (r *Role) QueryUserRoles() *UserQuery {
+func (r *Role) QueryUserRoles() *AdminUserQuery {
 	return NewRoleClient(r.config).QueryUserRoles(r)
 }
 
@@ -234,7 +244,7 @@ func (r *Role) String() string {
 
 // NamedUserRoles returns the UserRoles named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Role) NamedUserRoles(name string) ([]*User, error) {
+func (r *Role) NamedUserRoles(name string) ([]*AdminUser, error) {
 	if r.Edges.namedUserRoles == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
@@ -245,12 +255,12 @@ func (r *Role) NamedUserRoles(name string) ([]*User, error) {
 	return nodes, nil
 }
 
-func (r *Role) appendNamedUserRoles(name string, edges ...*User) {
+func (r *Role) appendNamedUserRoles(name string, edges ...*AdminUser) {
 	if r.Edges.namedUserRoles == nil {
-		r.Edges.namedUserRoles = make(map[string][]*User)
+		r.Edges.namedUserRoles = make(map[string][]*AdminUser)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedUserRoles[name] = []*User{}
+		r.Edges.namedUserRoles[name] = []*AdminUser{}
 	} else {
 		r.Edges.namedUserRoles[name] = append(r.Edges.namedUserRoles[name], edges...)
 	}

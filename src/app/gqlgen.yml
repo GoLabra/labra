@@ -88,4 +88,40 @@ models:
   AppStatus:
     model:
       - github.com/GoLabra/labra/src/api/subscription.AppStatus
+  User:
+    model:
+      - app/ent.User
+  UserWhereInput:
+    model:
+      - app/ent.UserWhereInput
+  UserWhereUniqueInput:
+    model:
+      - app/ent.UserWhereUniqueInput
+  CreateUserInput:
+    model:
+      - app/ent.CreateUserInput
+  UpdateUserInput:
+    model:
+      - app/ent.UpdateUserInput
+  UserOrder:
+    model:
+      - app/ent.UserOrder
+  UserConnection:
+    model:
+      - app/ent.UserConnection
+  UserEdge:
+    model:
+      - app/ent.UserEdge
+  CreateManyUserInput:
+    model:
+      - app/ent.CreateManyUserInput
+  CreateOneUserInput:
+    model:
+      - app/ent.CreateOneUserInput
+  UpdateManyUserInput:
+    model:
+      - app/ent.UpdateManyUserInput
+  UpdateOneUserInput:
+    model:
+      - app/ent.UpdateOneUserInput
 

@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
-	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // Permission is the model entity for the Permission schema.
@@ -29,19 +29,19 @@ type Permission struct {
 	Operation string `json:"operation,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PermissionQuery when eager-loading is set.
-	Edges                 PermissionEdges `json:"edges"`
-	permission_created_by *string
-	permission_updated_by *string
-	permission_role       *string
-	selectValues          sql.SelectValues
+	Edges                       PermissionEdges `json:"edges"`
+	permission_admin_created_by *string
+	permission_admin_updated_by *string
+	permission_role             *string
+	selectValues                sql.SelectValues
 }
 
 // PermissionEdges holds the relations/edges for other nodes in the graph.
 type PermissionEdges struct {
-	// CreatedBy holds the value of the created_by edge.
-	CreatedBy *User `json:"created_by,omitempty"`
-	// UpdatedBy holds the value of the updated_by edge.
-	UpdatedBy *User `json:"updated_by,omitempty"`
+	// AdminCreatedBy holds the value of the admin_created_by edge.
+	AdminCreatedBy *AdminUser `json:"admin_created_by,omitempty"`
+	// AdminUpdatedBy holds the value of the admin_updated_by edge.
+	AdminUpdatedBy *AdminUser `json:"admin_updated_by,omitempty"`
 	// Role holds the value of the role edge.
 	Role *Role `json:"role,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -51,26 +51,26 @@ type PermissionEdges struct {
 	totalCount [3]map[string]int
 }
 
-// CreatedByOrErr returns the CreatedBy value or an error if the edge
+// AdminCreatedByOrErr returns the AdminCreatedBy value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e PermissionEdges) CreatedByOrErr() (*User, error) {
-	if e.CreatedBy != nil {
-		return e.CreatedBy, nil
+func (e PermissionEdges) AdminCreatedByOrErr() (*AdminUser, error) {
+	if e.AdminCreatedBy != nil {
+		return e.AdminCreatedBy, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: adminuser.Label}
 	}
-	return nil, &NotLoadedError{edge: "created_by"}
+	return nil, &NotLoadedError{edge: "admin_created_by"}
 }
 
-// UpdatedByOrErr returns the UpdatedBy value or an error if the edge
+// AdminUpdatedByOrErr returns the AdminUpdatedBy value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e PermissionEdges) UpdatedByOrErr() (*User, error) {
-	if e.UpdatedBy != nil {
-		return e.UpdatedBy, nil
+func (e PermissionEdges) AdminUpdatedByOrErr() (*AdminUser, error) {
+	if e.AdminUpdatedBy != nil {
+		return e.AdminUpdatedBy, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: adminuser.Label}
 	}
-	return nil, &NotLoadedError{edge: "updated_by"}
+	return nil, &NotLoadedError{edge: "admin_updated_by"}
 }
 
 // RoleOrErr returns the Role value or an error if the edge
@@ -93,9 +93,9 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case permission.FieldCreatedAt, permission.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case permission.ForeignKeys[0]: // permission_created_by
+		case permission.ForeignKeys[0]: // permission_admin_created_by
 			values[i] = new(sql.NullString)
-		case permission.ForeignKeys[1]: // permission_updated_by
+		case permission.ForeignKeys[1]: // permission_admin_updated_by
 			values[i] = new(sql.NullString)
 		case permission.ForeignKeys[2]: // permission_role
 			values[i] = new(sql.NullString)
@@ -148,17 +148,17 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 			}
 		case permission.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field permission_created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field permission_admin_created_by", values[i])
 			} else if value.Valid {
-				pe.permission_created_by = new(string)
-				*pe.permission_created_by = value.String
+				pe.permission_admin_created_by = new(string)
+				*pe.permission_admin_created_by = value.String
 			}
 		case permission.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field permission_updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field permission_admin_updated_by", values[i])
 			} else if value.Valid {
-				pe.permission_updated_by = new(string)
-				*pe.permission_updated_by = value.String
+				pe.permission_admin_updated_by = new(string)
+				*pe.permission_admin_updated_by = value.String
 			}
 		case permission.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -180,14 +180,14 @@ func (pe *Permission) Value(name string) (ent.Value, error) {
 	return pe.selectValues.Get(name)
 }
 
-// QueryCreatedBy queries the "created_by" edge of the Permission entity.
-func (pe *Permission) QueryCreatedBy() *UserQuery {
-	return NewPermissionClient(pe.config).QueryCreatedBy(pe)
+// QueryAdminCreatedBy queries the "admin_created_by" edge of the Permission entity.
+func (pe *Permission) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewPermissionClient(pe.config).QueryAdminCreatedBy(pe)
 }
 
-// QueryUpdatedBy queries the "updated_by" edge of the Permission entity.
-func (pe *Permission) QueryUpdatedBy() *UserQuery {
-	return NewPermissionClient(pe.config).QueryUpdatedBy(pe)
+// QueryAdminUpdatedBy queries the "admin_updated_by" edge of the Permission entity.
+func (pe *Permission) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewPermissionClient(pe.config).QueryAdminUpdatedBy(pe)
 }
 
 // QueryRole queries the "role" edge of the Permission entity.

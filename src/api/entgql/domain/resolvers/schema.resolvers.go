@@ -26,3 +26,36 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, e
 func (r *Resolver) Query() gqlgen.QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *Resolver) CreateAdminUserInput() gqlgen.CreateAdminUserInputResolver {
+	return &createAdminUserInputResolver{r}
+}
+func (r *Resolver) CreatePermissionInput() gqlgen.CreatePermissionInputResolver {
+	return &createPermissionInputResolver{r}
+}
+func (r *Resolver) CreateRoleInput() gqlgen.CreateRoleInputResolver {
+	return &createRoleInputResolver{r}
+}
+func (r *Resolver) UpdateAdminUserInput() gqlgen.UpdateAdminUserInputResolver {
+	return &updateAdminUserInputResolver{r}
+}
+func (r *Resolver) UpdatePermissionInput() gqlgen.UpdatePermissionInputResolver {
+	return &updatePermissionInputResolver{r}
+}
+func (r *Resolver) UpdateRoleInput() gqlgen.UpdateRoleInputResolver {
+	return &updateRoleInputResolver{r}
+}
+type createAdminUserInputResolver struct{ *Resolver }
+type createPermissionInputResolver struct{ *Resolver }
+type createRoleInputResolver struct{ *Resolver }
+type updateAdminUserInputResolver struct{ *Resolver }
+type updatePermissionInputResolver struct{ *Resolver }
+type updateRoleInputResolver struct{ *Resolver }
+*/

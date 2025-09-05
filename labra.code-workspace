@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../go/pkg/mod/entgo.io"
+		},
+		{
+			"path": "../labraf/src/admin"
+		}
+	],
+	"settings": {}
+}

@@ -510,6 +510,52 @@ func SizeLTE(v int64) predicate.File {
 	return predicate.File(sql.FieldLTE(FieldSize, v))
 }
 
+// HasAdminCreatedBy applies the HasEdge predicate on the "admin_created_by" edge.
+func HasAdminCreatedBy() predicate.File {
+	return predicate.File(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, AdminCreatedByTable, AdminCreatedByColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAdminCreatedByWith applies the HasEdge predicate on the "admin_created_by" edge with a given conditions (other predicates).
+func HasAdminCreatedByWith(preds ...predicate.AdminUser) predicate.File {
+	return predicate.File(func(s *sql.Selector) {
+		step := newAdminCreatedByStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAdminUpdatedBy applies the HasEdge predicate on the "admin_updated_by" edge.
+func HasAdminUpdatedBy() predicate.File {
+	return predicate.File(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, AdminUpdatedByTable, AdminUpdatedByColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAdminUpdatedByWith applies the HasEdge predicate on the "admin_updated_by" edge with a given conditions (other predicates).
+func HasAdminUpdatedByWith(preds ...predicate.AdminUser) predicate.File {
+	return predicate.File(func(s *sql.Selector) {
+		step := newAdminUpdatedByStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasCreatedBy applies the HasEdge predicate on the "created_by" edge.
 func HasCreatedBy() predicate.File {
 	return predicate.File(func(s *sql.Selector) {

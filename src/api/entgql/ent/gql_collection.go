@@ -7,11 +7,196 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (au *AdminUserQuery) CollectFields(ctx context.Context, satisfies ...string) (*AdminUserQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return au, nil
+	}
+	if err := au.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return au, nil
+}
+
+func (au *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(adminuser.Columns))
+		selectedFields = []string{adminuser.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "adminCreatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: au.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			au.withAdminCreatedBy = query
+
+		case "refAdminUpdatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: au.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			au.WithNamedRefAdminUpdatedBy(alias, func(wq *AdminUserQuery) {
+				*wq = *query
+			})
+
+		case "adminUpdatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: au.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			au.withAdminUpdatedBy = query
+
+		case "roles":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RoleClient{config: au.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
+				return err
+			}
+			au.WithNamedRoles(alias, func(wq *RoleQuery) {
+				*wq = *query
+			})
+
+		case "defaultRole":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RoleClient{config: au.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
+				return err
+			}
+			au.withDefaultRole = query
+		case "name":
+			if _, ok := fieldSeen[adminuser.FieldName]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldName)
+				fieldSeen[adminuser.FieldName] = struct{}{}
+			}
+		case "email":
+			if _, ok := fieldSeen[adminuser.FieldEmail]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldEmail)
+				fieldSeen[adminuser.FieldEmail] = struct{}{}
+			}
+		case "password":
+			if _, ok := fieldSeen[adminuser.FieldPassword]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldPassword)
+				fieldSeen[adminuser.FieldPassword] = struct{}{}
+			}
+		case "firstName":
+			if _, ok := fieldSeen[adminuser.FieldFirstName]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldFirstName)
+				fieldSeen[adminuser.FieldFirstName] = struct{}{}
+			}
+		case "lastName":
+			if _, ok := fieldSeen[adminuser.FieldLastName]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldLastName)
+				fieldSeen[adminuser.FieldLastName] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[adminuser.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldCreatedAt)
+				fieldSeen[adminuser.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[adminuser.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldUpdatedAt)
+				fieldSeen[adminuser.FieldUpdatedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		au.Select(selectedFields...)
+	}
+	return nil
+}
+
+type adminuserPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []AdminUserPaginateOption
+}
+
+func newAdminUserPaginateArgs(rv map[string]any) *adminuserPaginateArgs {
+	args := &adminuserPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case []*AdminUserOrder:
+			args.opts = append(args.opts, WithAdminUserOrder(v))
+		case []any:
+			var orders []*AdminUserOrder
+			for i := range v {
+				mv, ok := v[i].(map[string]any)
+				if !ok {
+					continue
+				}
+				var (
+					err1, err2 error
+					order      = &AdminUserOrder{Field: &AdminUserOrderField{}, Direction: entgql.OrderDirectionAsc}
+				)
+				if d, ok := mv[directionField]; ok {
+					err1 = order.Direction.UnmarshalGQL(d)
+				}
+				if f, ok := mv[fieldField]; ok {
+					err2 = order.Field.UnmarshalGQL(f)
+				}
+				if err1 == nil && err2 == nil {
+					orders = append(orders, order)
+				}
+			}
+			args.opts = append(args.opts, WithAdminUserOrder(orders))
+		}
+	}
+	if v, ok := rv[whereField].(*AdminUserWhereInput); ok {
+		args.opts = append(args.opts, WithAdminUserFilter(v.Filter))
+	}
+	return args
+}
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (f *FileQuery) CollectFields(ctx context.Context, satisfies ...string) (*FileQuery, error) {
@@ -34,6 +219,28 @@ func (f *FileQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+
+		case "adminCreatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: f.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			f.withAdminCreatedBy = query
+
+		case "adminUpdatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: f.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			f.withAdminUpdatedBy = query
 
 		case "createdBy":
 			var (
@@ -182,27 +389,27 @@ func (pe *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
 
-		case "createdBy":
+		case "adminCreatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: pe.config}).Query()
+				query = (&AdminUserClient{config: pe.config}).Query()
 			)
-			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			pe.withCreatedBy = query
+			pe.withAdminCreatedBy = query
 
-		case "updatedBy":
+		case "adminUpdatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: pe.config}).Query()
+				query = (&AdminUserClient{config: pe.config}).Query()
 			)
-			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			pe.withUpdatedBy = query
+			pe.withAdminUpdatedBy = query
 
 		case "role":
 			var (
@@ -325,38 +532,38 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
 
-		case "createdBy":
+		case "adminCreatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: r.config}).Query()
+				query = (&AdminUserClient{config: r.config}).Query()
 			)
-			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			r.withCreatedBy = query
+			r.withAdminCreatedBy = query
 
-		case "updatedBy":
+		case "adminUpdatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: r.config}).Query()
+				query = (&AdminUserClient{config: r.config}).Query()
 			)
-			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			r.withUpdatedBy = query
+			r.withAdminUpdatedBy = query
 
 		case "userRoles":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: r.config}).Query()
+				query = (&AdminUserClient{config: r.config}).Query()
 			)
-			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			r.WithNamedUserRoles(alias, func(wq *UserQuery) {
+			r.WithNamedUserRoles(alias, func(wq *AdminUserQuery) {
 				*wq = *query
 			})
 
@@ -500,6 +707,28 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			}
 			u.withUpdatedBy = query
 
+		case "adminCreatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: u.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			u.withAdminCreatedBy = query
+
+		case "adminUpdatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: u.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			u.withAdminUpdatedBy = query
+
 		case "roles":
 			var (
 				alias = field.Alias
@@ -523,11 +752,6 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 				return err
 			}
 			u.withDefaultRole = query
-		case "name":
-			if _, ok := fieldSeen[user.FieldName]; !ok {
-				selectedFields = append(selectedFields, user.FieldName)
-				fieldSeen[user.FieldName] = struct{}{}
-			}
 		case "email":
 			if _, ok := fieldSeen[user.FieldEmail]; !ok {
 				selectedFields = append(selectedFields, user.FieldEmail)
@@ -537,26 +761,6 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			if _, ok := fieldSeen[user.FieldPassword]; !ok {
 				selectedFields = append(selectedFields, user.FieldPassword)
 				fieldSeen[user.FieldPassword] = struct{}{}
-			}
-		case "firstName":
-			if _, ok := fieldSeen[user.FieldFirstName]; !ok {
-				selectedFields = append(selectedFields, user.FieldFirstName)
-				fieldSeen[user.FieldFirstName] = struct{}{}
-			}
-		case "lastName":
-			if _, ok := fieldSeen[user.FieldLastName]; !ok {
-				selectedFields = append(selectedFields, user.FieldLastName)
-				fieldSeen[user.FieldLastName] = struct{}{}
-			}
-		case "createdAt":
-			if _, ok := fieldSeen[user.FieldCreatedAt]; !ok {
-				selectedFields = append(selectedFields, user.FieldCreatedAt)
-				fieldSeen[user.FieldCreatedAt] = struct{}{}
-			}
-		case "updatedAt":
-			if _, ok := fieldSeen[user.FieldUpdatedAt]; !ok {
-				selectedFields = append(selectedFields, user.FieldUpdatedAt)
-				fieldSeen[user.FieldUpdatedAt] = struct{}{}
 			}
 		case "id":
 		case "__typename":

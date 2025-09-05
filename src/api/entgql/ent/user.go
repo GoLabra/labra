@@ -5,10 +5,10 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
@@ -18,27 +18,19 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
-	// FirstName holds the value of the "first_name" field.
-	FirstName string `json:"first_name,omitempty"`
-	// LastName holds the value of the "last_name" field.
-	LastName string `json:"last_name,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges             UserEdges `json:"edges"`
-	user_created_by   *string
-	user_updated_by   *string
-	user_default_role *string
-	selectValues      sql.SelectValues
+	Edges                 UserEdges `json:"edges"`
+	user_created_by       *string
+	user_updated_by       *string
+	user_admin_created_by *string
+	user_admin_updated_by *string
+	user_default_role     *string
+	selectValues          sql.SelectValues
 }
 
 // UserEdges holds the relations/edges for other nodes in the graph.
@@ -51,15 +43,19 @@ type UserEdges struct {
 	RefUpdatedBy []*User `json:"ref_updated_by,omitempty"`
 	// UpdatedBy holds the value of the updated_by edge.
 	UpdatedBy *User `json:"updated_by,omitempty"`
+	// AdminCreatedBy holds the value of the admin_created_by edge.
+	AdminCreatedBy *AdminUser `json:"admin_created_by,omitempty"`
+	// AdminUpdatedBy holds the value of the admin_updated_by edge.
+	AdminUpdatedBy *AdminUser `json:"admin_updated_by,omitempty"`
 	// Roles holds the value of the roles edge.
 	Roles []*Role `json:"roles,omitempty"`
 	// DefaultRole holds the value of the default_role edge.
 	DefaultRole *Role `json:"default_role,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [8]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [6]map[string]int
 
 	namedRefCreatedBy map[string][]*User
 	namedRefUpdatedBy map[string][]*User
@@ -106,10 +102,32 @@ func (e UserEdges) UpdatedByOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "updated_by"}
 }
 
+// AdminCreatedByOrErr returns the AdminCreatedBy value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) AdminCreatedByOrErr() (*AdminUser, error) {
+	if e.AdminCreatedBy != nil {
+		return e.AdminCreatedBy, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: adminuser.Label}
+	}
+	return nil, &NotLoadedError{edge: "admin_created_by"}
+}
+
+// AdminUpdatedByOrErr returns the AdminUpdatedBy value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) AdminUpdatedByOrErr() (*AdminUser, error) {
+	if e.AdminUpdatedBy != nil {
+		return e.AdminUpdatedBy, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: adminuser.Label}
+	}
+	return nil, &NotLoadedError{edge: "admin_updated_by"}
+}
+
 // RolesOrErr returns the Roles value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) RolesOrErr() ([]*Role, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[6] {
 		return e.Roles, nil
 	}
 	return nil, &NotLoadedError{edge: "roles"}
@@ -120,7 +138,7 @@ func (e UserEdges) RolesOrErr() ([]*Role, error) {
 func (e UserEdges) DefaultRoleOrErr() (*Role, error) {
 	if e.DefaultRole != nil {
 		return e.DefaultRole, nil
-	} else if e.loadedTypes[5] {
+	} else if e.loadedTypes[7] {
 		return nil, &NotFoundError{label: role.Label}
 	}
 	return nil, &NotLoadedError{edge: "default_role"}
@@ -131,15 +149,17 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldFirstName, user.FieldLastName:
+		case user.FieldID, user.FieldEmail, user.FieldPassword:
 			values[i] = new(sql.NullString)
-		case user.FieldCreatedAt, user.FieldUpdatedAt:
-			values[i] = new(sql.NullTime)
 		case user.ForeignKeys[0]: // user_created_by
 			values[i] = new(sql.NullString)
 		case user.ForeignKeys[1]: // user_updated_by
 			values[i] = new(sql.NullString)
-		case user.ForeignKeys[2]: // user_default_role
+		case user.ForeignKeys[2]: // user_admin_created_by
+			values[i] = new(sql.NullString)
+		case user.ForeignKeys[3]: // user_admin_updated_by
+			values[i] = new(sql.NullString)
+		case user.ForeignKeys[4]: // user_default_role
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -162,12 +182,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.ID = value.String
 			}
-		case user.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
-			} else if value.Valid {
-				u.Name = value.String
-			}
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
@@ -179,32 +193,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				u.Password = value.String
-			}
-		case user.FieldFirstName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field first_name", values[i])
-			} else if value.Valid {
-				u.FirstName = value.String
-			}
-		case user.FieldLastName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field last_name", values[i])
-			} else if value.Valid {
-				u.LastName = value.String
-			}
-		case user.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				u.CreatedAt = new(time.Time)
-				*u.CreatedAt = value.Time
-			}
-		case user.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				u.UpdatedAt = new(time.Time)
-				*u.UpdatedAt = value.Time
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -221,6 +209,20 @@ func (u *User) assignValues(columns []string, values []any) error {
 				*u.user_updated_by = value.String
 			}
 		case user.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user_admin_created_by", values[i])
+			} else if value.Valid {
+				u.user_admin_created_by = new(string)
+				*u.user_admin_created_by = value.String
+			}
+		case user.ForeignKeys[3]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user_admin_updated_by", values[i])
+			} else if value.Valid {
+				u.user_admin_updated_by = new(string)
+				*u.user_admin_updated_by = value.String
+			}
+		case user.ForeignKeys[4]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_default_role", values[i])
 			} else if value.Valid {
@@ -260,6 +262,16 @@ func (u *User) QueryUpdatedBy() *UserQuery {
 	return NewUserClient(u.config).QueryUpdatedBy(u)
 }
 
+// QueryAdminCreatedBy queries the "admin_created_by" edge of the User entity.
+func (u *User) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewUserClient(u.config).QueryAdminCreatedBy(u)
+}
+
+// QueryAdminUpdatedBy queries the "admin_updated_by" edge of the User entity.
+func (u *User) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewUserClient(u.config).QueryAdminUpdatedBy(u)
+}
+
 // QueryRoles queries the "roles" edge of the User entity.
 func (u *User) QueryRoles() *RoleQuery {
 	return NewUserClient(u.config).QueryRoles(u)
@@ -293,30 +305,11 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
-	builder.WriteString("name=")
-	builder.WriteString(u.Name)
-	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(u.Email)
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(u.Password)
-	builder.WriteString(", ")
-	builder.WriteString("first_name=")
-	builder.WriteString(u.FirstName)
-	builder.WriteString(", ")
-	builder.WriteString("last_name=")
-	builder.WriteString(u.LastName)
-	builder.WriteString(", ")
-	if v := u.CreatedAt; v != nil {
-		builder.WriteString("created_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
-	builder.WriteString(", ")
-	if v := u.UpdatedAt; v != nil {
-		builder.WriteString("updated_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
 	builder.WriteByte(')')
 	return builder.String()
 }

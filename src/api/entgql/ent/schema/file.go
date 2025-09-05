@@ -170,6 +170,23 @@ func (File) Fields() []ent.Field {
 // Edges of the File.
 func (File) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("admin_created_by", AdminUser.Type).
+			Unique().
+			Annotations(
+				annotations.Edge{
+					Caption:      "Admin Created By",
+					RelationType: entity.RelationTypeOne,
+				},
+			),
+
+		edge.To("admin_updated_by", AdminUser.Type).
+			Unique().
+			Annotations(
+				annotations.Edge{
+					Caption:      "Admin Updated By",
+					RelationType: entity.RelationTypeOne,
+				},
+			),
 		edge.To("created_by", User.Type).
 			Unique().
 			Annotations(

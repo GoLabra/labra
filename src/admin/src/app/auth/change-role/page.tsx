@@ -20,8 +20,8 @@ import { Avatar } from "@/shared/components/avatar";
 import { ADMIN_CONTEXT } from "@/lib/apollo/apolloWrapper";
 
 
-const getMeRoles = gql`query getMeRoles($where:UserWhereInput!) {
-    users(where:$where) {
+const getMeRoles = gql`query getMeRoles($where:AdminUserWhereInput!) {
+    adminUsers(where:$where) {
           roles {
               id
               name

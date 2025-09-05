@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
@@ -24,20 +24,6 @@ type UserCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetName sets the "name" field.
-func (uc *UserCreate) SetName(s string) *UserCreate {
-	uc.mutation.SetName(s)
-	return uc
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (uc *UserCreate) SetNillableName(s *string) *UserCreate {
-	if s != nil {
-		uc.SetName(*s)
-	}
-	return uc
-}
-
 // SetEmail sets the "email" field.
 func (uc *UserCreate) SetEmail(s string) *UserCreate {
 	uc.mutation.SetEmail(s)
@@ -47,46 +33,6 @@ func (uc *UserCreate) SetEmail(s string) *UserCreate {
 // SetPassword sets the "password" field.
 func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	uc.mutation.SetPassword(s)
-	return uc
-}
-
-// SetFirstName sets the "first_name" field.
-func (uc *UserCreate) SetFirstName(s string) *UserCreate {
-	uc.mutation.SetFirstName(s)
-	return uc
-}
-
-// SetLastName sets the "last_name" field.
-func (uc *UserCreate) SetLastName(s string) *UserCreate {
-	uc.mutation.SetLastName(s)
-	return uc
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
-	uc.mutation.SetCreatedAt(t)
-	return uc
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
-	if t != nil {
-		uc.SetCreatedAt(*t)
-	}
-	return uc
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (uc *UserCreate) SetUpdatedAt(t time.Time) *UserCreate {
-	uc.mutation.SetUpdatedAt(t)
-	return uc
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
-	if t != nil {
-		uc.SetUpdatedAt(*t)
-	}
 	return uc
 }
 
@@ -172,6 +118,44 @@ func (uc *UserCreate) SetUpdatedBy(u *User) *UserCreate {
 	return uc.SetUpdatedByID(u.ID)
 }
 
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (uc *UserCreate) SetAdminCreatedByID(id string) *UserCreate {
+	uc.mutation.SetAdminCreatedByID(id)
+	return uc
+}
+
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableAdminCreatedByID(id *string) *UserCreate {
+	if id != nil {
+		uc = uc.SetAdminCreatedByID(*id)
+	}
+	return uc
+}
+
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (uc *UserCreate) SetAdminCreatedBy(a *AdminUser) *UserCreate {
+	return uc.SetAdminCreatedByID(a.ID)
+}
+
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (uc *UserCreate) SetAdminUpdatedByID(id string) *UserCreate {
+	uc.mutation.SetAdminUpdatedByID(id)
+	return uc
+}
+
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableAdminUpdatedByID(id *string) *UserCreate {
+	if id != nil {
+		uc = uc.SetAdminUpdatedByID(*id)
+	}
+	return uc
+}
+
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (uc *UserCreate) SetAdminUpdatedBy(a *AdminUser) *UserCreate {
+	return uc.SetAdminUpdatedByID(a.ID)
+}
+
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
 func (uc *UserCreate) AddRoleIDs(ids ...string) *UserCreate {
 	uc.mutation.AddRoleIDs(ids...)
@@ -241,14 +225,6 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *UserCreate) defaults() {
-	if _, ok := uc.mutation.CreatedAt(); !ok {
-		v := user.DefaultCreatedAt()
-		uc.mutation.SetCreatedAt(v)
-	}
-	if _, ok := uc.mutation.UpdatedAt(); !ok {
-		v := user.DefaultUpdatedAt()
-		uc.mutation.SetUpdatedAt(v)
-	}
 	if _, ok := uc.mutation.ID(); !ok {
 		v := user.DefaultID()
 		uc.mutation.SetID(v)
@@ -271,22 +247,6 @@ func (uc *UserCreate) check() error {
 	if v, ok := uc.mutation.Password(); ok {
 		if err := user.PasswordValidator(v); err != nil {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
-		}
-	}
-	if _, ok := uc.mutation.FirstName(); !ok {
-		return &ValidationError{Name: "first_name", err: errors.New(`ent: missing required field "User.first_name"`)}
-	}
-	if v, ok := uc.mutation.FirstName(); ok {
-		if err := user.FirstNameValidator(v); err != nil {
-			return &ValidationError{Name: "first_name", err: fmt.Errorf(`ent: validator failed for field "User.first_name": %w`, err)}
-		}
-	}
-	if _, ok := uc.mutation.LastName(); !ok {
-		return &ValidationError{Name: "last_name", err: errors.New(`ent: missing required field "User.last_name"`)}
-	}
-	if v, ok := uc.mutation.LastName(); ok {
-		if err := user.LastNameValidator(v); err != nil {
-			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "User.last_name": %w`, err)}
 		}
 	}
 	return nil
@@ -325,10 +285,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := uc.mutation.Name(); ok {
-		_spec.SetField(user.FieldName, field.TypeString, value)
-		_node.Name = value
-	}
 	if value, ok := uc.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
 		_node.Email = value
@@ -336,22 +292,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
-	}
-	if value, ok := uc.mutation.FirstName(); ok {
-		_spec.SetField(user.FieldFirstName, field.TypeString, value)
-		_node.FirstName = value
-	}
-	if value, ok := uc.mutation.LastName(); ok {
-		_spec.SetField(user.FieldLastName, field.TypeString, value)
-		_node.LastName = value
-	}
-	if value, ok := uc.mutation.CreatedAt(); ok {
-		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = &value
-	}
-	if value, ok := uc.mutation.UpdatedAt(); ok {
-		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = &value
 	}
 	if nodes := uc.mutation.RefCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -419,12 +359,46 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.user_updated_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := uc.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   user.AdminCreatedByTable,
+			Columns: []string{user.AdminCreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_admin_created_by = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   user.AdminUpdatedByTable,
+			Columns: []string{user.AdminUpdatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_admin_updated_by = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := uc.mutation.RolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   user.RolesTable,
-			Columns: user.RolesPrimaryKey,
+			Columns: []string{user.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
@@ -459,7 +433,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.User.Create().
-//		SetName(v).
+//		SetEmail(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -468,7 +442,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.UserUpsert) {
-//			SetName(v+v).
+//			SetEmail(v+v).
 //		}).
 //		Exec(ctx)
 func (uc *UserCreate) OnConflict(opts ...sql.ConflictOption) *UserUpsertOne {
@@ -504,24 +478,6 @@ type (
 	}
 )
 
-// SetName sets the "name" field.
-func (u *UserUpsert) SetName(v string) *UserUpsert {
-	u.Set(user.FieldName, v)
-	return u
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *UserUpsert) UpdateName() *UserUpsert {
-	u.SetExcluded(user.FieldName)
-	return u
-}
-
-// ClearName clears the value of the "name" field.
-func (u *UserUpsert) ClearName() *UserUpsert {
-	u.SetNull(user.FieldName)
-	return u
-}
-
 // SetEmail sets the "email" field.
 func (u *UserUpsert) SetEmail(v string) *UserUpsert {
 	u.Set(user.FieldEmail, v)
@@ -546,48 +502,6 @@ func (u *UserUpsert) UpdatePassword() *UserUpsert {
 	return u
 }
 
-// SetFirstName sets the "first_name" field.
-func (u *UserUpsert) SetFirstName(v string) *UserUpsert {
-	u.Set(user.FieldFirstName, v)
-	return u
-}
-
-// UpdateFirstName sets the "first_name" field to the value that was provided on create.
-func (u *UserUpsert) UpdateFirstName() *UserUpsert {
-	u.SetExcluded(user.FieldFirstName)
-	return u
-}
-
-// SetLastName sets the "last_name" field.
-func (u *UserUpsert) SetLastName(v string) *UserUpsert {
-	u.Set(user.FieldLastName, v)
-	return u
-}
-
-// UpdateLastName sets the "last_name" field to the value that was provided on create.
-func (u *UserUpsert) UpdateLastName() *UserUpsert {
-	u.SetExcluded(user.FieldLastName)
-	return u
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (u *UserUpsert) SetUpdatedAt(v time.Time) *UserUpsert {
-	u.Set(user.FieldUpdatedAt, v)
-	return u
-}
-
-// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
-func (u *UserUpsert) UpdateUpdatedAt() *UserUpsert {
-	u.SetExcluded(user.FieldUpdatedAt)
-	return u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (u *UserUpsert) ClearUpdatedAt() *UserUpsert {
-	u.SetNull(user.FieldUpdatedAt)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -604,9 +518,6 @@ func (u *UserUpsertOne) UpdateNewValues() *UserUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(user.FieldID)
-		}
-		if _, exists := u.create.mutation.CreatedAt(); exists {
-			s.SetIgnore(user.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -639,27 +550,6 @@ func (u *UserUpsertOne) Update(set func(*UserUpsert)) *UserUpsertOne {
 	return u
 }
 
-// SetName sets the "name" field.
-func (u *UserUpsertOne) SetName(v string) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.SetName(v)
-	})
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateName() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateName()
-	})
-}
-
-// ClearName clears the value of the "name" field.
-func (u *UserUpsertOne) ClearName() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearName()
-	})
-}
-
 // SetEmail sets the "email" field.
 func (u *UserUpsertOne) SetEmail(v string) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
@@ -685,55 +575,6 @@ func (u *UserUpsertOne) SetPassword(v string) *UserUpsertOne {
 func (u *UserUpsertOne) UpdatePassword() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdatePassword()
-	})
-}
-
-// SetFirstName sets the "first_name" field.
-func (u *UserUpsertOne) SetFirstName(v string) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.SetFirstName(v)
-	})
-}
-
-// UpdateFirstName sets the "first_name" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateFirstName() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateFirstName()
-	})
-}
-
-// SetLastName sets the "last_name" field.
-func (u *UserUpsertOne) SetLastName(v string) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.SetLastName(v)
-	})
-}
-
-// UpdateLastName sets the "last_name" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateLastName() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateLastName()
-	})
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (u *UserUpsertOne) SetUpdatedAt(v time.Time) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.SetUpdatedAt(v)
-	})
-}
-
-// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateUpdatedAt() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateUpdatedAt()
-	})
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (u *UserUpsertOne) ClearUpdatedAt() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearUpdatedAt()
 	})
 }
 
@@ -873,7 +714,7 @@ func (ucb *UserCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.UserUpsert) {
-//			SetName(v+v).
+//			SetEmail(v+v).
 //		}).
 //		Exec(ctx)
 func (ucb *UserCreateBulk) OnConflict(opts ...sql.ConflictOption) *UserUpsertBulk {
@@ -920,9 +761,6 @@ func (u *UserUpsertBulk) UpdateNewValues() *UserUpsertBulk {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(user.FieldID)
 			}
-			if _, exists := b.mutation.CreatedAt(); exists {
-				s.SetIgnore(user.FieldCreatedAt)
-			}
 		}
 	}))
 	return u
@@ -955,27 +793,6 @@ func (u *UserUpsertBulk) Update(set func(*UserUpsert)) *UserUpsertBulk {
 	return u
 }
 
-// SetName sets the "name" field.
-func (u *UserUpsertBulk) SetName(v string) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.SetName(v)
-	})
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateName() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateName()
-	})
-}
-
-// ClearName clears the value of the "name" field.
-func (u *UserUpsertBulk) ClearName() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearName()
-	})
-}
-
 // SetEmail sets the "email" field.
 func (u *UserUpsertBulk) SetEmail(v string) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
@@ -1001,55 +818,6 @@ func (u *UserUpsertBulk) SetPassword(v string) *UserUpsertBulk {
 func (u *UserUpsertBulk) UpdatePassword() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdatePassword()
-	})
-}
-
-// SetFirstName sets the "first_name" field.
-func (u *UserUpsertBulk) SetFirstName(v string) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.SetFirstName(v)
-	})
-}
-
-// UpdateFirstName sets the "first_name" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateFirstName() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateFirstName()
-	})
-}
-
-// SetLastName sets the "last_name" field.
-func (u *UserUpsertBulk) SetLastName(v string) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.SetLastName(v)
-	})
-}
-
-// UpdateLastName sets the "last_name" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateLastName() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateLastName()
-	})
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (u *UserUpsertBulk) SetUpdatedAt(v time.Time) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.SetUpdatedAt(v)
-	})
-}
-
-// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateUpdatedAt() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateUpdatedAt()
-	})
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (u *UserUpsertBulk) ClearUpdatedAt() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearUpdatedAt()
 	})
 }
 

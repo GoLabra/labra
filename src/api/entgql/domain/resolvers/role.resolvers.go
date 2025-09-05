@@ -67,3 +67,24 @@ func (r *queryResolver) Roles(ctx context.Context, where *ent.RoleWhereInput, or
 func (r *queryResolver) RolesConnection(ctx context.Context, where *ent.RoleWhereInput, orderBy *ent.RoleOrder, skip *int, first *int, last *int) (*ent.RoleConnection, error) {
 	return r.Service.Role.Connection(ctx, where, orderBy, skip, first, last)
 }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *createRoleInputResolver) CreatedBy(ctx context.Context, obj *ent.CreateRoleInput, data *ent.CreateOneUserInput) error {
+	panic(fmt.Errorf("not implemented: CreatedBy - createdBy"))
+}
+func (r *createRoleInputResolver) UpdatedBy(ctx context.Context, obj *ent.CreateRoleInput, data *ent.CreateOneUserInput) error {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updatedBy"))
+}
+func (r *updateRoleInputResolver) CreatedBy(ctx context.Context, obj *ent.UpdateRoleInput, data *ent.UpdateOneUserInput) error {
+	panic(fmt.Errorf("not implemented: CreatedBy - createdBy"))
+}
+func (r *updateRoleInputResolver) UpdatedBy(ctx context.Context, obj *ent.UpdateRoleInput, data *ent.UpdateOneUserInput) error {
+	panic(fmt.Errorf("not implemented: UpdatedBy - updatedBy"))
+}
+*/

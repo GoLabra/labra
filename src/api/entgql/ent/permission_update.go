@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
-	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // PermissionUpdate is the builder for updating Permission entities.
@@ -90,42 +90,42 @@ func (pu *PermissionUpdate) SetNillableOperation(s *string) *PermissionUpdate {
 	return pu
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (pu *PermissionUpdate) SetCreatedByID(id string) *PermissionUpdate {
-	pu.mutation.SetCreatedByID(id)
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (pu *PermissionUpdate) SetAdminCreatedByID(id string) *PermissionUpdate {
+	pu.mutation.SetAdminCreatedByID(id)
 	return pu
 }
 
-// SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableCreatedByID(id *string) *PermissionUpdate {
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (pu *PermissionUpdate) SetNillableAdminCreatedByID(id *string) *PermissionUpdate {
 	if id != nil {
-		pu = pu.SetCreatedByID(*id)
+		pu = pu.SetAdminCreatedByID(*id)
 	}
 	return pu
 }
 
-// SetCreatedBy sets the "created_by" edge to the User entity.
-func (pu *PermissionUpdate) SetCreatedBy(u *User) *PermissionUpdate {
-	return pu.SetCreatedByID(u.ID)
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (pu *PermissionUpdate) SetAdminCreatedBy(a *AdminUser) *PermissionUpdate {
+	return pu.SetAdminCreatedByID(a.ID)
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (pu *PermissionUpdate) SetUpdatedByID(id string) *PermissionUpdate {
-	pu.mutation.SetUpdatedByID(id)
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (pu *PermissionUpdate) SetAdminUpdatedByID(id string) *PermissionUpdate {
+	pu.mutation.SetAdminUpdatedByID(id)
 	return pu
 }
 
-// SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableUpdatedByID(id *string) *PermissionUpdate {
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (pu *PermissionUpdate) SetNillableAdminUpdatedByID(id *string) *PermissionUpdate {
 	if id != nil {
-		pu = pu.SetUpdatedByID(*id)
+		pu = pu.SetAdminUpdatedByID(*id)
 	}
 	return pu
 }
 
-// SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (pu *PermissionUpdate) SetUpdatedBy(u *User) *PermissionUpdate {
-	return pu.SetUpdatedByID(u.ID)
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (pu *PermissionUpdate) SetAdminUpdatedBy(a *AdminUser) *PermissionUpdate {
+	return pu.SetAdminUpdatedByID(a.ID)
 }
 
 // SetRoleID sets the "role" edge to the Role entity by ID.
@@ -152,15 +152,15 @@ func (pu *PermissionUpdate) Mutation() *PermissionMutation {
 	return pu.mutation
 }
 
-// ClearCreatedBy clears the "created_by" edge to the User entity.
-func (pu *PermissionUpdate) ClearCreatedBy() *PermissionUpdate {
-	pu.mutation.ClearCreatedBy()
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (pu *PermissionUpdate) ClearAdminCreatedBy() *PermissionUpdate {
+	pu.mutation.ClearAdminCreatedBy()
 	return pu
 }
 
-// ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (pu *PermissionUpdate) ClearUpdatedBy() *PermissionUpdate {
-	pu.mutation.ClearUpdatedBy()
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (pu *PermissionUpdate) ClearAdminUpdatedBy() *PermissionUpdate {
+	pu.mutation.ClearAdminUpdatedBy()
 	return pu
 }
 
@@ -246,28 +246,28 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Operation(); ok {
 		_spec.SetField(permission.FieldOperation, field.TypeString, value)
 	}
-	if pu.mutation.CreatedByCleared() {
+	if pu.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.CreatedByTable,
-			Columns: []string{permission.CreatedByColumn},
+			Table:   permission.AdminCreatedByTable,
+			Columns: []string{permission.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.CreatedByTable,
-			Columns: []string{permission.CreatedByColumn},
+			Table:   permission.AdminCreatedByTable,
+			Columns: []string{permission.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -275,28 +275,28 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.UpdatedByCleared() {
+	if pu.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.UpdatedByTable,
-			Columns: []string{permission.UpdatedByColumn},
+			Table:   permission.AdminUpdatedByTable,
+			Columns: []string{permission.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.UpdatedByTable,
-			Columns: []string{permission.UpdatedByColumn},
+			Table:   permission.AdminUpdatedByTable,
+			Columns: []string{permission.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -413,42 +413,42 @@ func (puo *PermissionUpdateOne) SetNillableOperation(s *string) *PermissionUpdat
 	return puo
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (puo *PermissionUpdateOne) SetCreatedByID(id string) *PermissionUpdateOne {
-	puo.mutation.SetCreatedByID(id)
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (puo *PermissionUpdateOne) SetAdminCreatedByID(id string) *PermissionUpdateOne {
+	puo.mutation.SetAdminCreatedByID(id)
 	return puo
 }
 
-// SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableCreatedByID(id *string) *PermissionUpdateOne {
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (puo *PermissionUpdateOne) SetNillableAdminCreatedByID(id *string) *PermissionUpdateOne {
 	if id != nil {
-		puo = puo.SetCreatedByID(*id)
+		puo = puo.SetAdminCreatedByID(*id)
 	}
 	return puo
 }
 
-// SetCreatedBy sets the "created_by" edge to the User entity.
-func (puo *PermissionUpdateOne) SetCreatedBy(u *User) *PermissionUpdateOne {
-	return puo.SetCreatedByID(u.ID)
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (puo *PermissionUpdateOne) SetAdminCreatedBy(a *AdminUser) *PermissionUpdateOne {
+	return puo.SetAdminCreatedByID(a.ID)
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (puo *PermissionUpdateOne) SetUpdatedByID(id string) *PermissionUpdateOne {
-	puo.mutation.SetUpdatedByID(id)
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (puo *PermissionUpdateOne) SetAdminUpdatedByID(id string) *PermissionUpdateOne {
+	puo.mutation.SetAdminUpdatedByID(id)
 	return puo
 }
 
-// SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableUpdatedByID(id *string) *PermissionUpdateOne {
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (puo *PermissionUpdateOne) SetNillableAdminUpdatedByID(id *string) *PermissionUpdateOne {
 	if id != nil {
-		puo = puo.SetUpdatedByID(*id)
+		puo = puo.SetAdminUpdatedByID(*id)
 	}
 	return puo
 }
 
-// SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (puo *PermissionUpdateOne) SetUpdatedBy(u *User) *PermissionUpdateOne {
-	return puo.SetUpdatedByID(u.ID)
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (puo *PermissionUpdateOne) SetAdminUpdatedBy(a *AdminUser) *PermissionUpdateOne {
+	return puo.SetAdminUpdatedByID(a.ID)
 }
 
 // SetRoleID sets the "role" edge to the Role entity by ID.
@@ -475,15 +475,15 @@ func (puo *PermissionUpdateOne) Mutation() *PermissionMutation {
 	return puo.mutation
 }
 
-// ClearCreatedBy clears the "created_by" edge to the User entity.
-func (puo *PermissionUpdateOne) ClearCreatedBy() *PermissionUpdateOne {
-	puo.mutation.ClearCreatedBy()
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (puo *PermissionUpdateOne) ClearAdminCreatedBy() *PermissionUpdateOne {
+	puo.mutation.ClearAdminCreatedBy()
 	return puo
 }
 
-// ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (puo *PermissionUpdateOne) ClearUpdatedBy() *PermissionUpdateOne {
-	puo.mutation.ClearUpdatedBy()
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (puo *PermissionUpdateOne) ClearAdminUpdatedBy() *PermissionUpdateOne {
+	puo.mutation.ClearAdminUpdatedBy()
 	return puo
 }
 
@@ -599,28 +599,28 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 	if value, ok := puo.mutation.Operation(); ok {
 		_spec.SetField(permission.FieldOperation, field.TypeString, value)
 	}
-	if puo.mutation.CreatedByCleared() {
+	if puo.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.CreatedByTable,
-			Columns: []string{permission.CreatedByColumn},
+			Table:   permission.AdminCreatedByTable,
+			Columns: []string{permission.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.CreatedByTable,
-			Columns: []string{permission.CreatedByColumn},
+			Table:   permission.AdminCreatedByTable,
+			Columns: []string{permission.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -628,28 +628,28 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.UpdatedByCleared() {
+	if puo.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.UpdatedByTable,
-			Columns: []string{permission.UpdatedByColumn},
+			Table:   permission.AdminUpdatedByTable,
+			Columns: []string{permission.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.UpdatedByTable,
-			Columns: []string{permission.UpdatedByColumn},
+			Table:   permission.AdminUpdatedByTable,
+			Columns: []string{permission.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

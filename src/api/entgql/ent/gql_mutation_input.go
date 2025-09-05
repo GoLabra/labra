@@ -75,6 +75,7 @@ type UpdateOneRoleInput struct {
 	Unset   *bool                 `json:"unset,omitempty"`
 	Delete  *bool                 `json:"delete,omitempty"`
 }
+
 type CreateManyUserInput struct {
 	Create  []*CreateUserInput      `json:"create,omitempty"`
 	Connect []*UserWhereUniqueInput `json:"connect,omitempty"`
@@ -99,20 +100,214 @@ type UpdateOneUserInput struct {
 	Delete  *bool                 `json:"delete,omitempty"`
 }
 
+type CreateManyAdminUserInput struct {
+	Create  []*CreateAdminUserInput      `json:"create,omitempty"`
+	Connect []*AdminUserWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type CreateOneAdminUserInput struct {
+	Create  *CreateAdminUserInput      `json:"create,omitempty"`
+	Connect *AdminUserWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyAdminUserInput struct {
+	Create     []*CreateAdminUserInput      `json:"create,omitempty"`
+	Connect    []*AdminUserWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*AdminUserWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*AdminUserWhereUniqueInput `json:"delete,omitempty"`
+}
+
+type UpdateOneAdminUserInput struct {
+	Create  *CreateAdminUserInput      `json:"create,omitempty"`
+	Connect *AdminUserWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                      `json:"unset,omitempty"`
+	Delete  *bool                      `json:"delete,omitempty"`
+}
+
+// CreateAdminUserInput represents a mutation input for creating adminusers.
+type CreateAdminUserInput struct {
+	Name                 *string
+	Email                string
+	Password             string
+	FirstName            string
+	LastName             string
+	RefAdminCreatedBy    *CreateManyAdminUserInput
+	RefAdminCreatedByIDs []string
+	AdminCreatedBy       *CreateOneAdminUserInput
+	AdminCreatedByID     *string
+	RefAdminUpdatedBy    *CreateManyAdminUserInput
+	RefAdminUpdatedByIDs []string
+	AdminUpdatedBy       *CreateOneAdminUserInput
+	AdminUpdatedByID     *string
+	Roles                *CreateManyRoleInput
+	RoleIDs              []string
+	DefaultRole          *CreateOneRoleInput
+	DefaultRoleID        *string
+}
+
+// Mutate applies the CreateAdminUserInput on the AdminUserMutation builder.
+func (i *CreateAdminUserInput) Mutate(m *AdminUserMutation) {
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	m.SetEmail(i.Email)
+	m.SetPassword(i.Password)
+	m.SetFirstName(i.FirstName)
+	m.SetLastName(i.LastName)
+	if v := i.RefAdminCreatedByIDs; len(v) > 0 {
+		m.AddRefAdminCreatedByIDs(v...)
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if v := i.RefAdminUpdatedByIDs; len(v) > 0 {
+		m.AddRefAdminUpdatedByIDs(v...)
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+	if v := i.RoleIDs; len(v) > 0 {
+		m.AddRoleIDs(v...)
+	}
+	if v := i.DefaultRoleID; v != nil {
+		m.SetDefaultRoleID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateAdminUserInput on the AdminUserCreate builder.
+func (c *AdminUserCreate) SetInput(i CreateAdminUserInput) *AdminUserCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateAdminUserInput represents a mutation input for updating adminusers.
+type UpdateAdminUserInput struct {
+	ClearName                  bool
+	Name                       *string
+	Email                      *string
+	Password                   *string
+	FirstName                  *string
+	LastName                   *string
+	ClearRefAdminCreatedBy     bool
+	RefAdminCreatedBy          *UpdateManyAdminUserInput
+	AddRefAdminCreatedByIDs    []string
+	RemoveRefAdminCreatedByIDs []string
+	ClearAdminCreatedBy        bool
+	AdminCreatedBy             *UpdateOneAdminUserInput
+	AdminCreatedByID           *string
+	ClearRefAdminUpdatedBy     bool
+	RefAdminUpdatedBy          *UpdateManyAdminUserInput
+	AddRefAdminUpdatedByIDs    []string
+	RemoveRefAdminUpdatedByIDs []string
+	ClearAdminUpdatedBy        bool
+	AdminUpdatedBy             *UpdateOneAdminUserInput
+	AdminUpdatedByID           *string
+	ClearRoles                 bool
+	Roles                      *UpdateManyRoleInput
+	AddRoleIDs                 []string
+	RemoveRoleIDs              []string
+	ClearDefaultRole           bool
+	DefaultRole                *UpdateOneRoleInput
+	DefaultRoleID              *string
+}
+
+// Mutate applies the UpdateAdminUserInput on the AdminUserMutation builder.
+func (i *UpdateAdminUserInput) Mutate(m *AdminUserMutation) {
+	if i.ClearName {
+		m.ClearName()
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Email; v != nil {
+		m.SetEmail(*v)
+	}
+	if v := i.Password; v != nil {
+		m.SetPassword(*v)
+	}
+	if v := i.FirstName; v != nil {
+		m.SetFirstName(*v)
+	}
+	if v := i.LastName; v != nil {
+		m.SetLastName(*v)
+	}
+	if i.ClearRefAdminCreatedBy {
+		m.ClearRefAdminCreatedBy()
+	}
+	if v := i.AddRefAdminCreatedByIDs; len(v) > 0 {
+		m.AddRefAdminCreatedByIDs(v...)
+	}
+	if v := i.RemoveRefAdminCreatedByIDs; len(v) > 0 {
+		m.RemoveRefAdminCreatedByIDs(v...)
+	}
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if i.ClearRefAdminUpdatedBy {
+		m.ClearRefAdminUpdatedBy()
+	}
+	if v := i.AddRefAdminUpdatedByIDs; len(v) > 0 {
+		m.AddRefAdminUpdatedByIDs(v...)
+	}
+	if v := i.RemoveRefAdminUpdatedByIDs; len(v) > 0 {
+		m.RemoveRefAdminUpdatedByIDs(v...)
+	}
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+	if i.ClearRoles {
+		m.ClearRoles()
+	}
+	if v := i.AddRoleIDs; len(v) > 0 {
+		m.AddRoleIDs(v...)
+	}
+	if v := i.RemoveRoleIDs; len(v) > 0 {
+		m.RemoveRoleIDs(v...)
+	}
+	if i.ClearDefaultRole {
+		m.ClearDefaultRole()
+	}
+	if v := i.DefaultRoleID; v != nil {
+		m.SetDefaultRoleID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateAdminUserInput on the AdminUserUpdate builder.
+func (c *AdminUserUpdate) SetInput(i UpdateAdminUserInput) *AdminUserUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateAdminUserInput on the AdminUserUpdateOne builder.
+func (c *AdminUserUpdateOne) SetInput(i UpdateAdminUserInput) *AdminUserUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
 // CreateFileInput represents a mutation input for creating files.
 type CreateFileInput struct {
-	CreatedAt       *time.Time
-	UpdatedAt       *time.Time
-	Caption         *string
-	Name            string
-	MimeType        string
-	StorageFileName string
-	Size            int64
-	CreatedBy       *CreateOneUserInput
-	CreatedByID     *string
-	UpdatedBy       *CreateOneUserInput
-	UpdatedByID     *string
-	Content         string `json:"content,omitempty"`
+	CreatedAt        *time.Time
+	UpdatedAt        *time.Time
+	Caption          *string
+	Name             string
+	MimeType         string
+	StorageFileName  string
+	Size             int64
+	AdminCreatedBy   *CreateOneAdminUserInput
+	AdminCreatedByID *string
+	AdminUpdatedBy   *CreateOneAdminUserInput
+	AdminUpdatedByID *string
+	CreatedBy        *CreateOneUserInput
+	CreatedByID      *string
+	UpdatedBy        *CreateOneUserInput
+	UpdatedByID      *string
+	Content          string `json:"content,omitempty"`
 }
 
 // Mutate applies the CreateFileInput on the FileMutation builder.
@@ -130,6 +325,12 @@ func (i *CreateFileInput) Mutate(m *FileMutation) {
 	m.SetMimeType(i.MimeType)
 	m.SetStorageFileName(i.StorageFileName)
 	m.SetSize(i.Size)
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
 	if v := i.CreatedByID; v != nil {
 		m.SetCreatedByID(*v)
 	}
@@ -146,23 +347,29 @@ func (c *FileCreate) SetInput(i CreateFileInput) *FileCreate {
 
 // UpdateFileInput represents a mutation input for updating files.
 type UpdateFileInput struct {
-	ClearCreatedAt  bool
-	CreatedAt       *time.Time
-	ClearUpdatedAt  bool
-	UpdatedAt       *time.Time
-	ClearCaption    bool
-	Caption         *string
-	Name            *string
-	MimeType        *string
-	StorageFileName *string
-	Size            *int64
-	ClearCreatedBy  bool
-	CreatedBy       *UpdateOneUserInput
-	CreatedByID     *string
-	ClearUpdatedBy  bool
-	UpdatedBy       *UpdateOneUserInput
-	UpdatedByID     *string
-	Content         string `json:"content,omitempty"`
+	ClearCreatedAt      bool
+	CreatedAt           *time.Time
+	ClearUpdatedAt      bool
+	UpdatedAt           *time.Time
+	ClearCaption        bool
+	Caption             *string
+	Name                *string
+	MimeType            *string
+	StorageFileName     *string
+	Size                *int64
+	ClearAdminCreatedBy bool
+	AdminCreatedBy      *UpdateOneAdminUserInput
+	AdminCreatedByID    *string
+	ClearAdminUpdatedBy bool
+	AdminUpdatedBy      *UpdateOneAdminUserInput
+	AdminUpdatedByID    *string
+	ClearCreatedBy      bool
+	CreatedBy           *UpdateOneUserInput
+	CreatedByID         *string
+	ClearUpdatedBy      bool
+	UpdatedBy           *UpdateOneUserInput
+	UpdatedByID         *string
+	Content             string `json:"content,omitempty"`
 }
 
 // Mutate applies the UpdateFileInput on the FileMutation builder.
@@ -197,6 +404,18 @@ func (i *UpdateFileInput) Mutate(m *FileMutation) {
 	if v := i.Size; v != nil {
 		m.SetSize(*v)
 	}
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
 	if i.ClearCreatedBy {
 		m.ClearCreatedBy()
 	}
@@ -225,16 +444,16 @@ func (c *FileUpdateOne) SetInput(i UpdateFileInput) *FileUpdateOne {
 
 // CreatePermissionInput represents a mutation input for creating permissions.
 type CreatePermissionInput struct {
-	CreatedAt   *time.Time
-	UpdatedAt   *time.Time
-	Entity      string
-	Operation   *string
-	CreatedBy   *CreateOneUserInput
-	CreatedByID *string
-	UpdatedBy   *CreateOneUserInput
-	UpdatedByID *string
-	Role        *CreateOneRoleInput
-	RoleID      *string
+	CreatedAt        *time.Time
+	UpdatedAt        *time.Time
+	Entity           string
+	Operation        *string
+	AdminCreatedBy   *CreateOneAdminUserInput
+	AdminCreatedByID *string
+	AdminUpdatedBy   *CreateOneAdminUserInput
+	AdminUpdatedByID *string
+	Role             *CreateOneRoleInput
+	RoleID           *string
 }
 
 // Mutate applies the CreatePermissionInput on the PermissionMutation builder.
@@ -249,11 +468,11 @@ func (i *CreatePermissionInput) Mutate(m *PermissionMutation) {
 	if v := i.Operation; v != nil {
 		m.SetOperation(*v)
 	}
-	if v := i.CreatedByID; v != nil {
-		m.SetCreatedByID(*v)
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
 	}
-	if v := i.UpdatedByID; v != nil {
-		m.SetUpdatedByID(*v)
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
 	}
 	if v := i.RoleID; v != nil {
 		m.SetRoleID(*v)
@@ -268,21 +487,21 @@ func (c *PermissionCreate) SetInput(i CreatePermissionInput) *PermissionCreate {
 
 // UpdatePermissionInput represents a mutation input for updating permissions.
 type UpdatePermissionInput struct {
-	ClearCreatedAt bool
-	CreatedAt      *time.Time
-	ClearUpdatedAt bool
-	UpdatedAt      *time.Time
-	Entity         *string
-	Operation      *string
-	ClearCreatedBy bool
-	CreatedBy      *UpdateOneUserInput
-	CreatedByID    *string
-	ClearUpdatedBy bool
-	UpdatedBy      *UpdateOneUserInput
-	UpdatedByID    *string
-	ClearRole      bool
-	Role           *UpdateOneRoleInput
-	RoleID         *string
+	ClearCreatedAt      bool
+	CreatedAt           *time.Time
+	ClearUpdatedAt      bool
+	UpdatedAt           *time.Time
+	Entity              *string
+	Operation           *string
+	ClearAdminCreatedBy bool
+	AdminCreatedBy      *UpdateOneAdminUserInput
+	AdminCreatedByID    *string
+	ClearAdminUpdatedBy bool
+	AdminUpdatedBy      *UpdateOneAdminUserInput
+	AdminUpdatedByID    *string
+	ClearRole           bool
+	Role                *UpdateOneRoleInput
+	RoleID              *string
 }
 
 // Mutate applies the UpdatePermissionInput on the PermissionMutation builder.
@@ -305,17 +524,17 @@ func (i *UpdatePermissionInput) Mutate(m *PermissionMutation) {
 	if v := i.Operation; v != nil {
 		m.SetOperation(*v)
 	}
-	if i.ClearCreatedBy {
-		m.ClearCreatedBy()
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
 	}
-	if v := i.CreatedByID; v != nil {
-		m.SetCreatedByID(*v)
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
 	}
-	if i.ClearUpdatedBy {
-		m.ClearUpdatedBy()
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
 	}
-	if v := i.UpdatedByID; v != nil {
-		m.SetUpdatedByID(*v)
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
 	}
 	if i.ClearRole {
 		m.ClearRole()
@@ -339,25 +558,25 @@ func (c *PermissionUpdateOne) SetInput(i UpdatePermissionInput) *PermissionUpdat
 
 // CreateRoleInput represents a mutation input for creating roles.
 type CreateRoleInput struct {
-	Name          string
-	CreatedBy     *CreateOneUserInput
-	CreatedByID   *string
-	UpdatedBy     *CreateOneUserInput
-	UpdatedByID   *string
-	UserRoles     *CreateManyUserInput
-	UserRoleIDs   []string
-	Permissions   *CreateManyPermissionInput
-	PermissionIDs []string
+	Name             string
+	AdminCreatedBy   *CreateOneAdminUserInput
+	AdminCreatedByID *string
+	AdminUpdatedBy   *CreateOneAdminUserInput
+	AdminUpdatedByID *string
+	UserRoles        *CreateManyAdminUserInput
+	UserRoleIDs      []string
+	Permissions      *CreateManyPermissionInput
+	PermissionIDs    []string
 }
 
 // Mutate applies the CreateRoleInput on the RoleMutation builder.
 func (i *CreateRoleInput) Mutate(m *RoleMutation) {
 	m.SetName(i.Name)
-	if v := i.CreatedByID; v != nil {
-		m.SetCreatedByID(*v)
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
 	}
-	if v := i.UpdatedByID; v != nil {
-		m.SetUpdatedByID(*v)
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
 	}
 	if v := i.UserRoleIDs; len(v) > 0 {
 		m.AddUserRoleIDs(v...)
@@ -376,14 +595,14 @@ func (c *RoleCreate) SetInput(i CreateRoleInput) *RoleCreate {
 // UpdateRoleInput represents a mutation input for updating roles.
 type UpdateRoleInput struct {
 	Name                *string
-	ClearCreatedBy      bool
-	CreatedBy           *UpdateOneUserInput
-	CreatedByID         *string
-	ClearUpdatedBy      bool
-	UpdatedBy           *UpdateOneUserInput
-	UpdatedByID         *string
+	ClearAdminCreatedBy bool
+	AdminCreatedBy      *UpdateOneAdminUserInput
+	AdminCreatedByID    *string
+	ClearAdminUpdatedBy bool
+	AdminUpdatedBy      *UpdateOneAdminUserInput
+	AdminUpdatedByID    *string
 	ClearUserRoles      bool
-	UserRoles           *UpdateManyUserInput
+	UserRoles           *UpdateManyAdminUserInput
 	AddUserRoleIDs      []string
 	RemoveUserRoleIDs   []string
 	ClearPermissions    bool
@@ -397,17 +616,17 @@ func (i *UpdateRoleInput) Mutate(m *RoleMutation) {
 	if v := i.Name; v != nil {
 		m.SetName(*v)
 	}
-	if i.ClearCreatedBy {
-		m.ClearCreatedBy()
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
 	}
-	if v := i.CreatedByID; v != nil {
-		m.SetCreatedByID(*v)
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
 	}
-	if i.ClearUpdatedBy {
-		m.ClearUpdatedBy()
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
 	}
-	if v := i.UpdatedByID; v != nil {
-		m.SetUpdatedByID(*v)
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
 	}
 	if i.ClearUserRoles {
 		m.ClearUserRoles()
@@ -443,34 +662,30 @@ func (c *RoleUpdateOne) SetInput(i UpdateRoleInput) *RoleUpdateOne {
 
 // CreateUserInput represents a mutation input for creating users.
 type CreateUserInput struct {
-	Name            *string
-	Email           string
-	Password        string
-	FirstName       string
-	LastName        string
-	RefCreatedBy    *CreateManyUserInput
-	RefCreatedByIDs []string
-	CreatedBy       *CreateOneUserInput
-	CreatedByID     *string
-	RefUpdatedBy    *CreateManyUserInput
-	RefUpdatedByIDs []string
-	UpdatedBy       *CreateOneUserInput
-	UpdatedByID     *string
-	Roles           *CreateManyRoleInput
-	RoleIDs         []string
-	DefaultRole     *CreateOneRoleInput
-	DefaultRoleID   *string
+	Email            string
+	Password         string
+	RefCreatedBy     *CreateManyUserInput
+	RefCreatedByIDs  []string
+	CreatedBy        *CreateOneUserInput
+	CreatedByID      *string
+	RefUpdatedBy     *CreateManyUserInput
+	RefUpdatedByIDs  []string
+	UpdatedBy        *CreateOneUserInput
+	UpdatedByID      *string
+	AdminCreatedBy   *CreateOneAdminUserInput
+	AdminCreatedByID *string
+	AdminUpdatedBy   *CreateOneAdminUserInput
+	AdminUpdatedByID *string
+	Roles            *CreateManyRoleInput
+	RoleIDs          []string
+	DefaultRole      *CreateOneRoleInput
+	DefaultRoleID    *string
 }
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
 func (i *CreateUserInput) Mutate(m *UserMutation) {
-	if v := i.Name; v != nil {
-		m.SetName(*v)
-	}
 	m.SetEmail(i.Email)
 	m.SetPassword(i.Password)
-	m.SetFirstName(i.FirstName)
-	m.SetLastName(i.LastName)
 	if v := i.RefCreatedByIDs; len(v) > 0 {
 		m.AddRefCreatedByIDs(v...)
 	}
@@ -482,6 +697,12 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 	}
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
 	}
 	if v := i.RoleIDs; len(v) > 0 {
 		m.AddRoleIDs(v...)
@@ -499,12 +720,8 @@ func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
 
 // UpdateUserInput represents a mutation input for updating users.
 type UpdateUserInput struct {
-	ClearName             bool
-	Name                  *string
 	Email                 *string
 	Password              *string
-	FirstName             *string
-	LastName              *string
 	ClearRefCreatedBy     bool
 	RefCreatedBy          *UpdateManyUserInput
 	AddRefCreatedByIDs    []string
@@ -519,6 +736,12 @@ type UpdateUserInput struct {
 	ClearUpdatedBy        bool
 	UpdatedBy             *UpdateOneUserInput
 	UpdatedByID           *string
+	ClearAdminCreatedBy   bool
+	AdminCreatedBy        *UpdateOneAdminUserInput
+	AdminCreatedByID      *string
+	ClearAdminUpdatedBy   bool
+	AdminUpdatedBy        *UpdateOneAdminUserInput
+	AdminUpdatedByID      *string
 	ClearRoles            bool
 	Roles                 *UpdateManyRoleInput
 	AddRoleIDs            []string
@@ -530,23 +753,11 @@ type UpdateUserInput struct {
 
 // Mutate applies the UpdateUserInput on the UserMutation builder.
 func (i *UpdateUserInput) Mutate(m *UserMutation) {
-	if i.ClearName {
-		m.ClearName()
-	}
-	if v := i.Name; v != nil {
-		m.SetName(*v)
-	}
 	if v := i.Email; v != nil {
 		m.SetEmail(*v)
 	}
 	if v := i.Password; v != nil {
 		m.SetPassword(*v)
-	}
-	if v := i.FirstName; v != nil {
-		m.SetFirstName(*v)
-	}
-	if v := i.LastName; v != nil {
-		m.SetLastName(*v)
 	}
 	if i.ClearRefCreatedBy {
 		m.ClearRefCreatedBy()
@@ -577,6 +788,18 @@ func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	}
 	if v := i.UpdatedByID; v != nil {
 		m.SetUpdatedByID(*v)
+	}
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
 	}
 	if i.ClearRoles {
 		m.ClearRoles()

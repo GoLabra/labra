@@ -7,22 +7,22 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type User struct {
+type AdminUser struct {
 	ent.Schema
 }
 
-func (User) IsExternal() bool {
+func (AdminUser) IsExternal() bool {
 	return true
 }
 
-func (User) Annotations() []schema.Annotation {
+func (AdminUser) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		// entsql.Skip(),
 		entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 	}
 }
 
-func (User) Fields() []ent.Field {
+func (AdminUser) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").
 			Annotations(
@@ -57,4 +57,27 @@ func (File) Fields() []ent.Field {
 
 func (File) Edges() []ent.Edge {
 	return additionalFileEdges
+}
+
+type Role struct {
+	ent.Schema
+}
+
+func (Role) IsExternal() bool {
+	return true
+}
+
+func (Role) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
+	}
+}
+
+func (Role) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("id").
+			Annotations(
+				entgql.Type("ID"),
+			),
+	}
 }
