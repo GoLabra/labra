@@ -1,0 +1,122 @@
+name: Deploy LabraGo To Kubernetes
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "src/admin/**"
+      - "src/api/**"
+      - "src/app/**"
+      - "src/cli/**"
+      - ".github/workflows/**"
+
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Manual trigger or secret update"
+        required: false
+jobs:
+  folder-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.filter.outputs.frontend }}
+      backend_changed: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check which folders changed
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'src/admin/**'
+            backend:
+              - 'src/api/**'
+              - 'src/app/**'
+              - 'src/cli/**'
+
+  build-and-push-frontend:
+    if: github.event_name == 'workflow_dispatch' || needs.folder-changes.outputs.frontend_changed == 'true'
+    needs: folder-changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to DigitalOcean Container Registry
+        run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
+
+      - name: Build and Push Frontend Image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_BRAND_PRODUCT_NAME=${{ vars.NEXT_PUBLIC_BRAND_PRODUCT_NAME }} \
+            --build-arg NEXT_PUBLIC_BRAND_COLOR=${{ vars.NEXT_PUBLIC_BRAND_COLOR }} \
+            --build-arg NEXT_PUBLIC_GRAPHQL_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_API_URL }} \
+            --build-arg NEXT_PUBLIC_GRAPHQL_QUERY_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_QUERY_API_URL }} \
+            --build-arg NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL }} \
+            --build-arg NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL }} \
+            --build-arg NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL }} \
+            --build-arg NEXT_PUBLIC_CENTRIFUGO_URL=${{ vars.NEXT_PUBLIC_CENTRIFUGO_URL }} \
+            -t registry.digitalocean.com/labrago/frontend:v1.1 \
+            -f ./src/admin/Dockerfile ./src/admin
+
+          docker push registry.digitalocean.com/labrago/frontend:v1.1
+
+  build-and-push-backend:
+    if: github.event_name == 'workflow_dispatch' || needs.folder-changes.outputs.backend_changed == 'true'
+    needs: folder-changes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to DigitalOcean Container Registry
+        run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build \
+            --build-arg DSN=${{ secrets.DSN }} \
+            --build-arg DB_DIALECT=${{ secrets.DB_DIALECT }} \
+            --build-arg SERVER_PORT=${{ secrets.SERVER_PORT }} \
+            --build-arg ENT_SCHEMA_PATH=${{ secrets.ENT_SCHEMA_PATH }} \
+            --build-arg SECRET_KEY=${{ secrets.SECRET_KEY }} \
+            --build-arg CENTRIFUGO_API_ADDRESS=${{ secrets.CENTRIFUGO_API_ADDRESS }} \
+            --build-arg CENTRIFUGO_API_KEY=${{ secrets.CENTRIFUGO_API_KEY }} \
+            --build-arg FILE_STORAGE_PROVIDER=${{ secrets.FILE_STORAGE_PROVIDER }} \
+            --build-arg FILE_STORAGE_PATH=${{ secrets.FILE_STORAGE_PATH }} \
+            -t registry.digitalocean.com/labrago/backend:v1.1 \
+            -f ./src/Dockerfile ./src
+
+          docker push registry.digitalocean.com/labrago/backend:v1.1
+
+  deploy:
+    needs: [build-and-push-frontend, build-and-push-backend]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install doctl
+        run: |
+          sudo apt update
+          sudo apt install -y snapd
+          sudo snap install doctl
+          sudo snap connect doctl:kube-config
+
+      - name: Authenticate with DigitalOcean
+        run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
+
+      - name: Trigger DO Registry Cleanup
+        run: doctl registry garbage-collection start --include-untagged-manifests --force labrago
+
+      - name: Set Kubeconfig
+        run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
+
+      - name: Restart Frontend Deployment
+        run: kubectl rollout restart deployment frontend-deploy
+
+      - name: Restart Backend Deployment
+        run: kubectl rollout restart deployment backend-deploy
