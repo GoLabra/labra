@@ -2,8 +2,11 @@ package schema
 
 import (
 	"entgo.io/ent"
-{{- if gt (len $) 0 }}
+{{- range $edge := $ }}
+{{- if eq $edge.Type.Name "File" }}
 	"entgo.io/ent/schema/edge"
+    {{- break }}
+{{- end }}
 {{- end }}
 )
 
