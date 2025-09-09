@@ -166,5 +166,5 @@ func getEntityNameFromQuery(q ent.Query) string {
 		entityName = entityName[:len(entityName)-5]
 	}
 
-	return entityName
+	return strcase.LowerFirstLetter(entityName)
 }

@@ -90,33 +90,54 @@ func Authenticator(next http.Handler) http.Handler {
 		// Use internal context for authentication operations (bypasses permission checks)
 		iCtx := context.WithValue(r.Context(), constants.IsInternalOperationContextValue, true)
 		user, err := service.User.GetOne(iCtx, ent.UserWhereUniqueInput{Email: &userEmail})
+		if err != nil && !ent.IsNotFound(err) {
+			w.WriteHeader(http.StatusUnauthorized)
+			log.Printf("error getting user by email: %v", err)
+			return
+		}
+
+		if user != nil {
+			roleName := claims["role"].(string)
+			role, err := adminService.Role.GetOne(iCtx, adminEnt.RoleWhereUniqueInput{Name: &roleName})
+			if err != nil {
+				log.Printf("role not found: %v", err)
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, constants.UserContextValue, user)
+			ctx = context.WithValue(ctx, constants.RoleContextValue, role)
+
+			r = r.WithContext(ctx)
+			next.ServeHTTP(w, r)
+		}
+
+		adminUser, err := adminService.AdminUser.GetOne(iCtx, adminEnt.AdminUserWhereUniqueInput{Email: &userEmail})
 		if err != nil && !adminEnt.IsNotFound(err) {
 			w.WriteHeader(http.StatusUnauthorized)
 			log.Printf("error getting user by email: %v", err)
 			return
 		}
 
-		if user == nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			log.Println("user not found")
-			return
+		if adminUser != nil {
+			roleName := claims["role"].(string)
+			role, err := adminService.Role.GetOne(iCtx, adminEnt.RoleWhereUniqueInput{Name: &roleName})
+			if err != nil {
+				log.Printf("role not found: %v", err)
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, constants.UserContextValue, adminUser)
+			ctx = context.WithValue(ctx, constants.RoleContextValue, role)
+
+			r = r.WithContext(ctx)
+			next.ServeHTTP(w, r)
 		}
 
-		roleName := claims["role"].(string)
-		role, err := adminService.Role.GetOne(iCtx, adminEnt.RoleWhereUniqueInput{Name: &roleName})
-		if err != nil {
-			log.Printf("role not found: %v", err)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		// TODO validate if the user has these roles
-
-		ctx := r.Context()
-		ctx = context.WithValue(ctx, constants.UserContextValue, user)
-		ctx = context.WithValue(ctx, constants.RoleContextValue, role)
-
-		r = r.WithContext(ctx)
-		next.ServeHTTP(w, r)
+		w.WriteHeader(http.StatusUnauthorized)
+		log.Println("user not found")
 	})
 }

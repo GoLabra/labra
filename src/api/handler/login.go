@@ -55,7 +55,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Use internal context for user lookup (bypasses permission checks)
 	iCtx := context.WithValue(r.Context(), constants.IsInternalOperationContextValue, true)
 
-	user, err := service.User.GetOne(iCtx, ent.UserWhereUniqueInput{
+	user, err := service.AdminUser.GetOne(iCtx, ent.AdminUserWhereUniqueInput{
 		Email: &loginFormData.Email,
 	})
 
@@ -65,17 +65,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	adminUser, err := service.AdminUser.GetOne(iCtx, ent.AdminUserWhereUniqueInput{
-		Email: &loginFormData.Email,
-	})
-
-	if err != nil && !ent.IsNotFound(err) {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("error getting admin user: %v", err)
-		return
-	}
-
-	if user == nil && adminUser == nil {
+	if user == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		log.Println("user not found")
 		return

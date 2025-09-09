@@ -37,6 +37,7 @@ src/app/ent
 src/app/schema/_user
 src/app/schema/_user_backup
 src/app/schema/_admin_backup
+src/app/schema/_schema_logs
 
 src/app/interfaces
 

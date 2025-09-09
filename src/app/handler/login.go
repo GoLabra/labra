@@ -15,7 +15,6 @@ import (
 	adminSvc "github.com/GoLabra/labra/src/api/entgql/domain/svc"
 	adminEnt "github.com/GoLabra/labra/src/api/entgql/ent"
 	"github.com/golang-jwt/jwt"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginFormData struct {
@@ -80,9 +79,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginFormData.Password))
-	if err != nil {
-		log.Printf("error comparing password: %v", err)
+	if user.Password != loginFormData.Password { // THIS IS A BASIC EXAMPLE. DO NOT STORE PASSWORDS IN PLAIN TEXT
+		log.Printf("passwords do not match: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

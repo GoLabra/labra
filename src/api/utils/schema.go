@@ -108,6 +108,9 @@ func LoadSchema(config *config.Config) {
 		edges := []entity.Edge{}
 		for _, edge := range node.Edges {
 			var edgeAnnotations annotations.Edge
+			if edge.Name == "ref_created_by" || edge.Name == "ref_updated_by" || edge.Name == "ref_admin_created_by" || edge.Name == "ref_admin_updated_by" {
+				continue
+			}
 			err := mapstructure.Decode(edge.Annotations["Edge"], &edgeAnnotations)
 			if err != nil {
 				panic(err)
