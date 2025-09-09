@@ -15,6 +15,7 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
+	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // RoleCreate is the builder for creating a Role entity.
@@ -111,17 +112,32 @@ func (rc *RoleCreate) SetAdminUpdatedBy(a *AdminUser) *RoleCreate {
 	return rc.SetAdminUpdatedByID(a.ID)
 }
 
-// AddUserRoleIDs adds the "user_roles" edge to the AdminUser entity by IDs.
+// AddAdminUserRoleIDs adds the "admin_user_roles" edge to the AdminUser entity by IDs.
+func (rc *RoleCreate) AddAdminUserRoleIDs(ids ...string) *RoleCreate {
+	rc.mutation.AddAdminUserRoleIDs(ids...)
+	return rc
+}
+
+// AddAdminUserRoles adds the "admin_user_roles" edges to the AdminUser entity.
+func (rc *RoleCreate) AddAdminUserRoles(a ...*AdminUser) *RoleCreate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return rc.AddAdminUserRoleIDs(ids...)
+}
+
+// AddUserRoleIDs adds the "user_roles" edge to the User entity by IDs.
 func (rc *RoleCreate) AddUserRoleIDs(ids ...string) *RoleCreate {
 	rc.mutation.AddUserRoleIDs(ids...)
 	return rc
 }
 
-// AddUserRoles adds the "user_roles" edges to the AdminUser entity.
-func (rc *RoleCreate) AddUserRoles(a ...*AdminUser) *RoleCreate {
-	ids := make([]string, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddUserRoles adds the "user_roles" edges to the User entity.
+func (rc *RoleCreate) AddUserRoles(u ...*User) *RoleCreate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return rc.AddUserRoleIDs(ids...)
 }
@@ -282,6 +298,22 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_node.role_admin_updated_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := rc.mutation.AdminUserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := rc.mutation.UserRolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -290,7 +322,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Columns: role.UserRolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -29,7 +29,6 @@ type Role struct {
 	Edges                 RoleEdges `json:"edges"`
 	role_admin_created_by *string
 	role_admin_updated_by *string
-	user_roles            *string
 	selectValues          sql.SelectValues
 }
 
@@ -39,18 +38,21 @@ type RoleEdges struct {
 	AdminCreatedBy *AdminUser `json:"admin_created_by,omitempty"`
 	// AdminUpdatedBy holds the value of the admin_updated_by edge.
 	AdminUpdatedBy *AdminUser `json:"admin_updated_by,omitempty"`
+	// AdminUserRoles holds the value of the admin_user_roles edge.
+	AdminUserRoles []*AdminUser `json:"admin_user_roles,omitempty"`
 	// UserRoles holds the value of the user_roles edge.
-	UserRoles []*AdminUser `json:"user_roles,omitempty"`
+	UserRoles []*User `json:"user_roles,omitempty"`
 	// Permissions holds the value of the permissions edge.
 	Permissions []*Permission `json:"permissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [5]map[string]int
 
-	namedUserRoles   map[string][]*AdminUser
-	namedPermissions map[string][]*Permission
+	namedAdminUserRoles map[string][]*AdminUser
+	namedUserRoles      map[string][]*User
+	namedPermissions    map[string][]*Permission
 }
 
 // AdminCreatedByOrErr returns the AdminCreatedBy value or an error if the edge
@@ -75,10 +77,19 @@ func (e RoleEdges) AdminUpdatedByOrErr() (*AdminUser, error) {
 	return nil, &NotLoadedError{edge: "admin_updated_by"}
 }
 
+// AdminUserRolesOrErr returns the AdminUserRoles value or an error if the edge
+// was not loaded in eager-loading.
+func (e RoleEdges) AdminUserRolesOrErr() ([]*AdminUser, error) {
+	if e.loadedTypes[2] {
+		return e.AdminUserRoles, nil
+	}
+	return nil, &NotLoadedError{edge: "admin_user_roles"}
+}
+
 // UserRolesOrErr returns the UserRoles value or an error if the edge
 // was not loaded in eager-loading.
-func (e RoleEdges) UserRolesOrErr() ([]*AdminUser, error) {
-	if e.loadedTypes[2] {
+func (e RoleEdges) UserRolesOrErr() ([]*User, error) {
+	if e.loadedTypes[3] {
 		return e.UserRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "user_roles"}
@@ -87,7 +98,7 @@ func (e RoleEdges) UserRolesOrErr() ([]*AdminUser, error) {
 // PermissionsOrErr returns the Permissions value or an error if the edge
 // was not loaded in eager-loading.
 func (e RoleEdges) PermissionsOrErr() ([]*Permission, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Permissions, nil
 	}
 	return nil, &NotLoadedError{edge: "permissions"}
@@ -105,8 +116,6 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 		case role.ForeignKeys[0]: // role_admin_created_by
 			values[i] = new(sql.NullString)
 		case role.ForeignKeys[1]: // role_admin_updated_by
-			values[i] = new(sql.NullString)
-		case role.ForeignKeys[2]: // user_roles
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -163,13 +172,6 @@ func (r *Role) assignValues(columns []string, values []any) error {
 				r.role_admin_updated_by = new(string)
 				*r.role_admin_updated_by = value.String
 			}
-		case role.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user_roles", values[i])
-			} else if value.Valid {
-				r.user_roles = new(string)
-				*r.user_roles = value.String
-			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
 		}
@@ -193,8 +195,13 @@ func (r *Role) QueryAdminUpdatedBy() *AdminUserQuery {
 	return NewRoleClient(r.config).QueryAdminUpdatedBy(r)
 }
 
+// QueryAdminUserRoles queries the "admin_user_roles" edge of the Role entity.
+func (r *Role) QueryAdminUserRoles() *AdminUserQuery {
+	return NewRoleClient(r.config).QueryAdminUserRoles(r)
+}
+
 // QueryUserRoles queries the "user_roles" edge of the Role entity.
-func (r *Role) QueryUserRoles() *AdminUserQuery {
+func (r *Role) QueryUserRoles() *UserQuery {
 	return NewRoleClient(r.config).QueryUserRoles(r)
 }
 
@@ -242,9 +249,33 @@ func (r *Role) String() string {
 	return builder.String()
 }
 
+// NamedAdminUserRoles returns the AdminUserRoles named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Role) NamedAdminUserRoles(name string) ([]*AdminUser, error) {
+	if r.Edges.namedAdminUserRoles == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedAdminUserRoles[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Role) appendNamedAdminUserRoles(name string, edges ...*AdminUser) {
+	if r.Edges.namedAdminUserRoles == nil {
+		r.Edges.namedAdminUserRoles = make(map[string][]*AdminUser)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedAdminUserRoles[name] = []*AdminUser{}
+	} else {
+		r.Edges.namedAdminUserRoles[name] = append(r.Edges.namedAdminUserRoles[name], edges...)
+	}
+}
+
 // NamedUserRoles returns the UserRoles named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Role) NamedUserRoles(name string) ([]*AdminUser, error) {
+func (r *Role) NamedUserRoles(name string) ([]*User, error) {
 	if r.Edges.namedUserRoles == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
@@ -255,12 +286,12 @@ func (r *Role) NamedUserRoles(name string) ([]*AdminUser, error) {
 	return nodes, nil
 }
 
-func (r *Role) appendNamedUserRoles(name string, edges ...*AdminUser) {
+func (r *Role) appendNamedUserRoles(name string, edges ...*User) {
 	if r.Edges.namedUserRoles == nil {
-		r.Edges.namedUserRoles = make(map[string][]*AdminUser)
+		r.Edges.namedUserRoles = make(map[string][]*User)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedUserRoles[name] = []*AdminUser{}
+		r.Edges.namedUserRoles[name] = []*User{}
 	} else {
 		r.Edges.namedUserRoles[name] = append(r.Edges.namedUserRoles[name], edges...)
 	}

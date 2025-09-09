@@ -64,13 +64,11 @@ const (
 	AdminUpdatedByInverseTable = "admin_users"
 	// AdminUpdatedByColumn is the table column denoting the admin_updated_by relation/edge.
 	AdminUpdatedByColumn = "user_admin_updated_by"
-	// RolesTable is the table that holds the roles relation/edge.
-	RolesTable = "roles"
+	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
+	RolesTable = "user_roles"
 	// RolesInverseTable is the table name for the Role entity.
 	// It exists in this package in order to avoid circular dependency with the "role" package.
 	RolesInverseTable = "roles"
-	// RolesColumn is the table column denoting the roles relation/edge.
-	RolesColumn = "user_roles"
 	// DefaultRoleTable is the table that holds the default_role relation/edge.
 	DefaultRoleTable = "users"
 	// DefaultRoleInverseTable is the table name for the Role entity.
@@ -96,6 +94,12 @@ var ForeignKeys = []string{
 	"user_admin_updated_by",
 	"user_default_role",
 }
+
+var (
+	// RolesPrimaryKey and RolesColumn2 are the table columns denoting the
+	// primary key for the roles relation (M2M).
+	RolesPrimaryKey = []string{"user_id", "role_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -261,7 +265,7 @@ func newRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RolesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RolesTable, RolesColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, RolesTable, RolesPrimaryKey...),
 	)
 }
 func newDefaultRoleStep() *sqlgraph.Step {

@@ -107,7 +107,16 @@ func (Role) Edges() []ent.Edge {
 				},
 			),
 
-		edge.From("user_roles", AdminUser.Type).
+		edge.From("admin_user_roles", AdminUser.Type).
+			Ref("roles").
+			Annotations(
+				annotations.Edge{
+					Caption:      "Role Admin Users",
+					RelationType: entity.RelationTypeM2M,
+				},
+			),
+
+		edge.From("user_roles", User.Type).
 			Ref("roles").
 			Annotations(
 				annotations.Edge{

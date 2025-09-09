@@ -4,7 +4,10 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/annotations"
+	"github.com/GoLabra/labra/src/api/entgql/entity"
 )
 
 type AdminUser struct {
@@ -78,6 +81,29 @@ func (Role) Fields() []ent.Field {
 		field.String("id").
 			Annotations(
 				entgql.Type("ID"),
+			),
+		field.String("name").
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("name"),
+				annotations.Field{
+					Caption: "Name",
+					Type:    entity.FieldTypeShortText,
+				},
+			),
+	}
+}
+
+func (Role) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("user_roles", User.Type).
+			Ref("roles").
+			Annotations(
+				annotations.Edge{
+					Caption:      "Role Users",
+					RelationType: entity.RelationTypeM2M,
+				},
 			),
 	}
 }

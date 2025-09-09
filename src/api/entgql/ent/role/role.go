@@ -24,6 +24,8 @@ const (
 	EdgeAdminCreatedBy = "admin_created_by"
 	// EdgeAdminUpdatedBy holds the string denoting the admin_updated_by edge name in mutations.
 	EdgeAdminUpdatedBy = "admin_updated_by"
+	// EdgeAdminUserRoles holds the string denoting the admin_user_roles edge name in mutations.
+	EdgeAdminUserRoles = "admin_user_roles"
 	// EdgeUserRoles holds the string denoting the user_roles edge name in mutations.
 	EdgeUserRoles = "user_roles"
 	// EdgePermissions holds the string denoting the permissions edge name in mutations.
@@ -44,11 +46,16 @@ const (
 	AdminUpdatedByInverseTable = "admin_users"
 	// AdminUpdatedByColumn is the table column denoting the admin_updated_by relation/edge.
 	AdminUpdatedByColumn = "role_admin_updated_by"
-	// UserRolesTable is the table that holds the user_roles relation/edge. The primary key declared below.
-	UserRolesTable = "admin_user_roles"
-	// UserRolesInverseTable is the table name for the AdminUser entity.
+	// AdminUserRolesTable is the table that holds the admin_user_roles relation/edge. The primary key declared below.
+	AdminUserRolesTable = "admin_user_roles"
+	// AdminUserRolesInverseTable is the table name for the AdminUser entity.
 	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
-	UserRolesInverseTable = "admin_users"
+	AdminUserRolesInverseTable = "admin_users"
+	// UserRolesTable is the table that holds the user_roles relation/edge. The primary key declared below.
+	UserRolesTable = "user_roles"
+	// UserRolesInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserRolesInverseTable = "users"
 	// PermissionsTable is the table that holds the permissions relation/edge.
 	PermissionsTable = "permissions"
 	// PermissionsInverseTable is the table name for the Permission entity.
@@ -71,13 +78,15 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"role_admin_created_by",
 	"role_admin_updated_by",
-	"user_roles",
 }
 
 var (
+	// AdminUserRolesPrimaryKey and AdminUserRolesColumn2 are the table columns denoting the
+	// primary key for the admin_user_roles relation (M2M).
+	AdminUserRolesPrimaryKey = []string{"admin_user_id", "role_id"}
 	// UserRolesPrimaryKey and UserRolesColumn2 are the table columns denoting the
 	// primary key for the user_roles relation (M2M).
-	UserRolesPrimaryKey = []string{"admin_user_id", "role_id"}
+	UserRolesPrimaryKey = []string{"user_id", "role_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -145,6 +154,20 @@ func ByAdminUpdatedByField(field string, opts ...sql.OrderTermOption) OrderOptio
 	}
 }
 
+// ByAdminUserRolesCount orders the results by admin_user_roles count.
+func ByAdminUserRolesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAdminUserRolesStep(), opts...)
+	}
+}
+
+// ByAdminUserRoles orders the results by admin_user_roles terms.
+func ByAdminUserRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAdminUserRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByUserRolesCount orders the results by user_roles count.
 func ByUserRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -184,6 +207,13 @@ func newAdminUpdatedByStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AdminUpdatedByInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, AdminUpdatedByTable, AdminUpdatedByColumn),
+	)
+}
+func newAdminUserRolesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AdminUserRolesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, AdminUserRolesTable, AdminUserRolesPrimaryKey...),
 	)
 }
 func newUserRolesStep() *sqlgraph.Step {

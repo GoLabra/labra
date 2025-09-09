@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"app/domain/svc"
+	"app/ent"
 	"context"
 	"encoding/json"
 	"io"
@@ -10,8 +12,8 @@ import (
 
 	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
-	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
-	"github.com/GoLabra/labra/src/api/entgql/ent"
+	adminSvc "github.com/GoLabra/labra/src/api/entgql/domain/svc"
+	adminEnt "github.com/GoLabra/labra/src/api/entgql/ent"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,11 +23,6 @@ type LoginFormData struct {
 	Password string `json:"password"`
 }
 
-type User interface {
-	DefaultRole(ctx context.Context) (*ent.Role, error)
-}
-
-// TODO: 1. sanitize error messages; 2. move to api; 3. add logs;
 func Login(w http.ResponseWriter, r *http.Request) {
 	var (
 		loginFormData LoginFormData
@@ -45,53 +42,41 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
+	service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(svc.ErrServiceNotSetInContext)
+		log.Println(adminSvc.ErrServiceNotSetInContext)
 		return
 	}
 
-	// Use internal context for user lookup (bypasses permission checks)
 	iCtx := context.WithValue(r.Context(), constants.IsInternalOperationContextValue, true)
 
 	user, err := service.User.GetOne(iCtx, ent.UserWhereUniqueInput{
 		Email: &loginFormData.Email,
 	})
 
-	if err != nil && !ent.IsNotFound(err) {
+	if err != nil && !adminEnt.IsNotFound(err) {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("error getting user: %v", err)
 		return
 	}
 
-	adminUser, err := service.AdminUser.GetOne(iCtx, ent.AdminUserWhereUniqueInput{
-		Email: &loginFormData.Email,
-	})
-
-	if err != nil && !ent.IsNotFound(err) {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("error getting admin user: %v", err)
-		return
-	}
-
-	if user == nil && adminUser == nil {
+	if user == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		log.Println("user not found")
 		return
 	}
 
 	role, err := user.DefaultRole(iCtx)
-
 	if err != nil && !ent.IsNotFound(err) {
-		log.Println("error getting role")
+		log.Printf("error getting role: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	if role == nil {
-		log.Println("user default role not found")
 		w.WriteHeader(http.StatusUnauthorized)
+		log.Println("user default role not found")
 		return
 	}
 

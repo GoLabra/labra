@@ -16,6 +16,7 @@ import (
 	"app/ent"
 	"app/ent/migrate"
 	"app/generated"
+	"app/handler"
 
 	atlas "ariga.io/atlas/sql/schema"
 	"entgo.io/ent/dialect"
@@ -28,7 +29,7 @@ import (
 	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
 	"github.com/GoLabra/labra/src/api/entgql/generator"
-	"github.com/GoLabra/labra/src/api/handler"
+	adminHandler "github.com/GoLabra/labra/src/api/handler"
 	"github.com/GoLabra/labra/src/api/hooks"
 	"github.com/GoLabra/labra/src/api/subscription"
 	"github.com/GoLabra/labra/src/api/utils"
@@ -40,7 +41,7 @@ import (
 	"github.com/rs/cors"
 
 	adminRepo "github.com/GoLabra/labra/src/api/entgql/domain/repo"
-	adminResolver "github.com/GoLabra/labra/src/api/entgql/domain/resolvers"
+	adminResolvers "github.com/GoLabra/labra/src/api/entgql/domain/resolvers"
 	adminSvc "github.com/GoLabra/labra/src/api/entgql/domain/svc"
 	adminEnt "github.com/GoLabra/labra/src/api/entgql/ent"
 	adminGenerated "github.com/GoLabra/labra/src/api/entgql/generated"
@@ -71,6 +72,135 @@ func main() {
 
 	drv := entsql.OpenDB(dialect.Postgres, db)
 
+	cache.NewEntityCache(1 * time.Hour)
+	cache.NewEdgeCache(1 * time.Hour)
+	cache.NewFieldCache(1 * time.Hour)
+
+	utils.LoadSchema(conf)
+
+	adminClient, adminRepository, adminService, adminResolver := InitAdmin(drv)
+	_, repository, service, resolver := InitApp(drv, adminClient, adminRepository, adminService)
+
+	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
+
+	gocentClient := gocent.New(gocent.Config{
+		Addr: conf.CentrifugoApiAddress,
+		Key:  conf.CentrifugoKey,
+	})
+
+	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
+
+	// Configure CORS
+	corsMiddleware := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+	})
+	router := chi.NewRouter()
+	router.Use(corsMiddleware.Handler)
+
+	router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var ctx = r.Context()
+			ctx = context.WithValue(ctx, constants.AdminServiceContextValue, adminService)
+			ctx = context.WithValue(ctx, constants.AdminRepositoryContextValue, adminRepository)
+			ctx = context.WithValue(ctx, constants.ServiceContextValue, service)
+			ctx = context.WithValue(ctx, constants.RepositoryContextValue, repository)
+			ctx = context.WithValue(ctx, constants.CentrifugeClientContextValue, gocentClient)
+			ctx = context.WithValue(ctx, "config", conf)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	})
+
+	// APP routes
+	router.Group(func(router chi.Router) {
+		srv := gqlHandler.New(generated.NewExecutableSchema(
+			generated.Config{
+				Resolvers: resolver,
+			},
+		))
+
+		srv.AddTransport(transport.POST{})
+		srv.AddTransport(transport.GET{})
+		srv.AddTransport(transport.Options{})
+		// AV: Please review this
+		srv.AddTransport(&transport.Websocket{
+			Upgrader: websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool { return true }, // Allow all origins
+			},
+		})
+		srv.Use(extension.Introspection{})
+
+		router.Use(jwtauth.Verifier(tokenAuth))
+		router.Use(handler.Authenticator)
+
+		router.Handle("/query", srv)
+	})
+	router.Group(func(router chi.Router) {
+		router.Use(jwtauth.Verifier(tokenAuth))
+		router.Use(handler.Authenticator)
+
+		router.Post("/change-session-role", adminHandler.ChangeSessionRole)
+	})
+	router.Group(func(router chi.Router) {
+		router.Post("/login", handler.Login)
+		router.Handle("/playground", adminHandler.Playground("GraphQL playground", "/query"))
+	})
+
+	// ADMIN routes
+	router.Group(func(router chi.Router) {
+		adminSrv := gqlHandler.New(adminGenerated.NewExecutableSchema(
+			adminGenerated.Config{
+				Resolvers: adminResolver,
+			},
+		))
+
+		adminSrv.AddTransport(transport.POST{})
+		adminSrv.AddTransport(transport.GET{})
+		adminSrv.AddTransport(transport.Options{})
+		// AV: Please review this
+		adminSrv.AddTransport(&transport.Websocket{
+			Upgrader: websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool { return true }, // Allow all origins
+			},
+		})
+		adminSrv.Use(extension.Introspection{})
+
+		router.Use(jwtauth.Verifier(tokenAuth))
+		router.Use(adminHandler.Authenticator)
+
+		router.Handle("/admin/query", adminSrv)
+	})
+	router.Group(func(router chi.Router) {
+		router.Use(jwtauth.Verifier(tokenAuth))
+		router.Use(adminHandler.Authenticator)
+
+		router.Post("/admin/change-session-role", adminHandler.ChangeSessionRole)
+	})
+	router.Group(func(router chi.Router) {
+		router.Post("/admin/login", adminHandler.Login)
+		router.Post("/admin/signup", adminHandler.Signup)
+		router.Handle("/admin/playground", adminHandler.Playground("GraphQL playground", "/admin/query"))
+	})
+
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%s", conf.ServerPort),
+		Handler: router,
+	}
+
+	log.Printf("Server starting on port %s\n", conf.ServerPort)
+
+	graphqlSubscriptionClient.PublishAppStatusMessage(subscription.AppStatusUp)
+
+	err = server.ListenAndServe()
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func InitApp(drv *entsql.Driver, adminClient *adminEnt.Client, adminRepository *adminRepo.Repository, adminService *adminSvc.Service) (*ent.Client, *repo.Repository, *svc.Service, *resolvers.Resolver) {
 	client := ent.NewClient(ent.Driver(drv))
 
 	client = client.Debug()
@@ -91,128 +221,13 @@ func main() {
 		panic(err)
 	}
 
-	cache.NewEntityCache(1 * time.Hour)
-	cache.NewEdgeCache(1 * time.Hour)
-	cache.NewFieldCache(1 * time.Hour)
-
-	utils.LoadSchema(conf)
-
-	adminClient, adminRepository, adminService, adminResolver := InitAdmin(drv)
-
 	repository := repo.New(client, adminClient)
-
-	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
-
 	service := svc.New(repository, adminRepository)
-
-	gocentClient := gocent.New(gocent.Config{
-		Addr: conf.CentrifugoApiAddress,
-		Key:  conf.CentrifugoKey,
-	})
-
 	resolver := &resolvers.Resolver{
 		Service: service,
 	}
 
-	router := chi.NewRouter()
-	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
-
-	// Configure CORS
-	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowCredentials: true,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-	})
-	router.Use(corsMiddleware.Handler)
-
-	router.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var ctx = r.Context()
-			ctx = context.WithValue(ctx, constants.AdminServiceContextValue, adminService)
-			ctx = context.WithValue(ctx, constants.AdminRepositoryContextValue, adminRepository)
-			ctx = context.WithValue(ctx, constants.ServiceContextValue, service)
-			ctx = context.WithValue(ctx, constants.RepositoryContextValue, repository)
-			ctx = context.WithValue(ctx, constants.CentrifugeClientContextValue, gocentClient)
-			ctx = context.WithValue(ctx, "config", conf)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	})
-
-	router.Group(func(router chi.Router) {
-		srv := gqlHandler.New(generated.NewExecutableSchema(
-			generated.Config{
-				Resolvers: resolver,
-			},
-		))
-		adminSrv := gqlHandler.New(adminGenerated.NewExecutableSchema(
-			adminGenerated.Config{
-				Resolvers: adminResolver,
-			},
-		))
-
-		srv.AddTransport(transport.POST{})
-		srv.AddTransport(transport.GET{})
-		srv.AddTransport(transport.Options{})
-		// AV: Please review this
-		srv.AddTransport(&transport.Websocket{
-			Upgrader: websocket.Upgrader{
-				CheckOrigin: func(r *http.Request) bool { return true }, // Allow all origins
-			},
-		})
-		srv.Use(extension.Introspection{})
-
-		adminSrv.AddTransport(transport.POST{})
-		adminSrv.AddTransport(transport.GET{})
-		adminSrv.AddTransport(transport.Options{})
-		// AV: Please review this
-		adminSrv.AddTransport(&transport.Websocket{
-			Upgrader: websocket.Upgrader{
-				CheckOrigin: func(r *http.Request) bool { return true }, // Allow all origins
-			},
-		})
-		adminSrv.Use(extension.Introspection{})
-
-		router.Use(jwtauth.Verifier(tokenAuth))
-		router.Use(handler.Authenticator)
-
-		router.Handle("/query", srv)
-		router.Handle("/admin", adminSrv)
-	})
-
-	router.Handle("/playground", handler.Playground("GraphQL playground", "/query"))
-	router.Handle("/aplayground", handler.Playground("GraphQL playground", "/admin"))
-
-	router.Group(func(router chi.Router) {
-		router.Use(jwtauth.Verifier(tokenAuth))
-		router.Use(handler.Authenticator)
-
-		router.Post("/change-session-role", handler.ChangeSessionRole)
-	})
-
-	router.Group(func(router chi.Router) {
-		router.Post("/login", handler.Login)
-		router.Post("/signup", handler.Signup)
-	})
-
-	server := &http.Server{
-		Addr:    fmt.Sprintf(":%s", conf.ServerPort),
-		Handler: router,
-	}
-
-	log.Printf("Server starting on port %s\n", conf.ServerPort)
-
-	graphqlSubscriptionClient.PublishAppStatusMessage(subscription.AppStatusUp)
-
-	err = server.ListenAndServe()
-
-	if err != nil {
-		panic(err)
-	}
-}
-
-func InitApp() {
-
+	return client, repository, service, resolver
 }
 
 func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
@@ -233,26 +248,8 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 		return changes, nil
 	})
 }
-func skipDiffOnUserEntities(next schema.Differ) schema.Differ {
-	return schema.DiffFunc(func(current, desired *atlas.Schema) ([]atlas.Change, error) {
-		changes, err := next.Diff(current, desired)
-		if err != nil {
-			return nil, err
-		}
 
-		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
-			m, ok := c.(*atlas.ModifyTable)
-			if ok && (m.T.Name == "users") {
-				return true
-			}
-			return false
-		})
-
-		return changes, nil
-	})
-}
-
-func InitAdmin(drv *entsql.Driver) (*adminEnt.Client, *adminRepo.Repository, *adminSvc.Service, *adminResolver.Resolver) {
+func InitAdmin(drv *entsql.Driver) (*adminEnt.Client, *adminRepo.Repository, *adminSvc.Service, *adminResolvers.Resolver) {
 	client := adminEnt.NewClient(adminEnt.Driver(drv))
 
 	client = client.Debug()
@@ -283,10 +280,29 @@ func InitAdmin(drv *entsql.Driver) (*adminEnt.Client, *adminRepo.Repository, *ad
 
 	service := adminSvc.New(repository, schemaManager)
 
-	adminResolver := &adminResolver.Resolver{
+	adminResolver := &adminResolvers.Resolver{
 		Service:            service,
 		SubscriptionClient: graphqlSubscriptionClient,
 	}
 
 	return client, repository, service, adminResolver
+}
+
+func skipDiffOnUserEntities(next schema.Differ) schema.Differ {
+	return schema.DiffFunc(func(current, desired *atlas.Schema) ([]atlas.Change, error) {
+		changes, err := next.Diff(current, desired)
+		if err != nil {
+			return nil, err
+		}
+
+		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
+			m, ok := c.(*atlas.ModifyTable)
+			if ok && (m.T.Name == "users") {
+				return true
+			}
+			return false
+		})
+
+		return changes, nil
+	})
 }

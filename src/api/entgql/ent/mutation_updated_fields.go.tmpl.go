@@ -131,6 +131,9 @@ func (m *RoleMutation) UpdatedFields() map[string]Value {
 	if m.admin_updated_by != nil {
 		updatedFields["admin_updated_by"] = m.admin_updated_by
 	}
+	if m.admin_user_roles != nil {
+		updatedFields["admin_user_roles"] = m.admin_user_roles
+	}
 	if m.user_roles != nil {
 		updatedFields["user_roles"] = m.user_roles
 	}

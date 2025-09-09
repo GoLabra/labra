@@ -291,6 +291,29 @@ func HasAdminUpdatedByWith(preds ...predicate.AdminUser) predicate.Role {
 	})
 }
 
+// HasAdminUserRoles applies the HasEdge predicate on the "admin_user_roles" edge.
+func HasAdminUserRoles() predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, AdminUserRolesTable, AdminUserRolesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAdminUserRolesWith applies the HasEdge predicate on the "admin_user_roles" edge with a given conditions (other predicates).
+func HasAdminUserRolesWith(preds ...predicate.AdminUser) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		step := newAdminUserRolesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasUserRoles applies the HasEdge predicate on the "user_roles" edge.
 func HasUserRoles() predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {
@@ -303,7 +326,7 @@ func HasUserRoles() predicate.Role {
 }
 
 // HasUserRolesWith applies the HasEdge predicate on the "user_roles" edge with a given conditions (other predicates).
-func HasUserRolesWith(preds ...predicate.AdminUser) predicate.Role {
+func HasUserRolesWith(preds ...predicate.User) predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {
 		step := newUserRolesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

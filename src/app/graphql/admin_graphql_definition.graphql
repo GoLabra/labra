@@ -96,7 +96,6 @@ extend type File {
 }
 
 extend type Role {
-  name: String!
   createdAt: Time
   updatedAt: Time
   createdBy: AdminUser

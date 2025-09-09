@@ -1637,9 +1637,13 @@ type RoleWhereInput struct {
 	HasAdminUpdatedBy     *bool                  `json:"hasAdminUpdatedBy,omitempty"`
 	HasAdminUpdatedByWith []*AdminUserWhereInput `json:"hasAdminUpdatedByWith,omitempty"`
 
+	// "admin_user_roles" edge predicates.
+	HasAdminUserRoles     *bool                  `json:"hasAdminUserRoles,omitempty"`
+	HasAdminUserRolesWith []*AdminUserWhereInput `json:"hasAdminUserRolesWith,omitempty"`
+
 	// "user_roles" edge predicates.
-	HasUserRoles     *bool                  `json:"hasUserRoles,omitempty"`
-	HasUserRolesWith []*AdminUserWhereInput `json:"hasUserRolesWith,omitempty"`
+	HasUserRoles     *bool             `json:"hasUserRoles,omitempty"`
+	HasUserRolesWith []*UserWhereInput `json:"hasUserRolesWith,omitempty"`
 
 	// "permissions" edge predicates.
 	HasPermissions     *bool                   `json:"hasPermissions,omitempty"`
@@ -1883,6 +1887,24 @@ func (i *RoleWhereInput) P() (predicate.Role, error) {
 		}
 		predicates = append(predicates, role.HasAdminUpdatedByWith(with...))
 	}
+	if i.HasAdminUserRoles != nil {
+		p := role.HasAdminUserRoles()
+		if !*i.HasAdminUserRoles {
+			p = role.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAdminUserRolesWith) > 0 {
+		with := make([]predicate.AdminUser, 0, len(i.HasAdminUserRolesWith))
+		for _, w := range i.HasAdminUserRolesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAdminUserRolesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, role.HasAdminUserRolesWith(with...))
+	}
 	if i.HasUserRoles != nil {
 		p := role.HasUserRoles()
 		if !*i.HasUserRoles {
@@ -1891,7 +1913,7 @@ func (i *RoleWhereInput) P() (predicate.Role, error) {
 		predicates = append(predicates, p)
 	}
 	if len(i.HasUserRolesWith) > 0 {
-		with := make([]predicate.AdminUser, 0, len(i.HasUserRolesWith))
+		with := make([]predicate.User, 0, len(i.HasUserRolesWith))
 		for _, w := range i.HasUserRolesWith {
 			p, err := w.P()
 			if err != nil {

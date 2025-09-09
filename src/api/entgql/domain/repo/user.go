@@ -648,15 +648,16 @@ func (r *User) Upsert(ctx context.Context, data ent.CreateUserInput) (upsertedUs
 		if err != nil {
 			return nil, fmt.Errorf("error decoding where condition: %v", err)
 		}
-		err = r.client.User.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+		user, err := r.GetOne(ctx, where)
+		if user != nil {
+			updateInput := ent.UpdateUserInput{}
+			err = mapstructure.Decode(data, &updateInput)
+			upsertedUser, err = r.client.User.UpdateOne(user).SetInput(updateInput).Save(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("error upserting item: %v", err)
+			}
+			return upsertedUser, nil
 		}
-		upsertedUser, err = r.GetOne(ctx, where)
-		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
-		}
-		return upsertedUser, nil
 	}
 	upsertedUser, err = r.client.User.Create().SetInput(data).Save(ctx)
 	if err != nil {

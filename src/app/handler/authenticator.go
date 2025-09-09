@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"app/domain/svc"
+	"app/ent"
 	"context"
 	"log"
 	"net/http"
@@ -8,8 +10,8 @@ import (
 
 	"github.com/GoLabra/labra/src/api/config"
 	"github.com/GoLabra/labra/src/api/constants"
-	"github.com/GoLabra/labra/src/api/entgql/domain/svc"
-	"github.com/GoLabra/labra/src/api/entgql/ent"
+	adminSvc "github.com/GoLabra/labra/src/api/entgql/domain/svc"
+	adminEnt "github.com/GoLabra/labra/src/api/entgql/ent"
 	jwt_hs "github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
@@ -24,10 +26,17 @@ func Authenticator(next http.Handler) http.Handler {
 			return
 		}
 
-		service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
+		adminService, ok := r.Context().Value(constants.AdminServiceContextValue).(*adminSvc.Service)
 		if !ok {
 			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(svc.ErrServiceNotSetInContext)
+			log.Println(adminSvc.ErrServiceNotSetInContext)
+			return
+		}
+
+		service, ok := r.Context().Value(constants.ServiceContextValue).(*svc.Service)
+		if !ok {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(adminSvc.ErrServiceNotSetInContext)
 			return
 		}
 
@@ -80,11 +89,10 @@ func Authenticator(next http.Handler) http.Handler {
 
 		// Use internal context for authentication operations (bypasses permission checks)
 		iCtx := context.WithValue(r.Context(), constants.IsInternalOperationContextValue, true)
-
-		user, err := service.AdminUser.GetOne(iCtx, ent.AdminUserWhereUniqueInput{Email: &userEmail})
-		if err != nil && !ent.IsNotFound(err) {
+		user, err := service.User.GetOne(iCtx, ent.UserWhereUniqueInput{Email: &userEmail})
+		if err != nil && !adminEnt.IsNotFound(err) {
 			w.WriteHeader(http.StatusUnauthorized)
-			log.Printf("admin user not found: %v", err)
+			log.Printf("error getting user by email: %v", err)
 			return
 		}
 
@@ -95,7 +103,7 @@ func Authenticator(next http.Handler) http.Handler {
 		}
 
 		roleName := claims["role"].(string)
-		role, err := service.Role.GetOne(iCtx, ent.RoleWhereUniqueInput{Name: &roleName})
+		role, err := adminService.Role.GetOne(iCtx, adminEnt.RoleWhereUniqueInput{Name: &roleName})
 		if err != nil {
 			log.Printf("role not found: %v", err)
 			w.WriteHeader(http.StatusUnauthorized)
@@ -105,7 +113,6 @@ func Authenticator(next http.Handler) http.Handler {
 		// TODO validate if the user has these roles
 
 		ctx := r.Context()
-
 		ctx = context.WithValue(ctx, constants.UserContextValue, user)
 		ctx = context.WithValue(ctx, constants.RoleContextValue, role)
 

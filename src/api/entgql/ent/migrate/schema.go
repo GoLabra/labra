@@ -140,7 +140,6 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "role_admin_created_by", Type: field.TypeString, Nullable: true},
 		{Name: "role_admin_updated_by", Type: field.TypeString, Nullable: true},
-		{Name: "user_roles", Type: field.TypeString, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{
@@ -158,12 +157,6 @@ var (
 				Symbol:     "roles_admin_users_admin_updated_by",
 				Columns:    []*schema.Column{RolesColumns[5]},
 				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "roles_users_roles",
-				Columns:    []*schema.Column{RolesColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -242,6 +235,31 @@ var (
 			},
 		},
 	}
+	// UserRolesColumns holds the columns for the "user_roles" table.
+	UserRolesColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeString},
+		{Name: "role_id", Type: field.TypeString},
+	}
+	// UserRolesTable holds the schema information for the "user_roles" table.
+	UserRolesTable = &schema.Table{
+		Name:       "user_roles",
+		Columns:    UserRolesColumns,
+		PrimaryKey: []*schema.Column{UserRolesColumns[0], UserRolesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_roles_user_id",
+				Columns:    []*schema.Column{UserRolesColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_roles_role_id",
+				Columns:    []*schema.Column{UserRolesColumns[1]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AdminUsersTable,
@@ -250,6 +268,7 @@ var (
 		RolesTable,
 		UsersTable,
 		AdminUserRolesTable,
+		UserRolesTable,
 	}
 )
 
@@ -266,7 +285,6 @@ func init() {
 	PermissionsTable.ForeignKeys[2].RefTable = RolesTable
 	RolesTable.ForeignKeys[0].RefTable = AdminUsersTable
 	RolesTable.ForeignKeys[1].RefTable = AdminUsersTable
-	RolesTable.ForeignKeys[2].RefTable = UsersTable
 	UsersTable.ForeignKeys[0].RefTable = UsersTable
 	UsersTable.ForeignKeys[1].RefTable = UsersTable
 	UsersTable.ForeignKeys[2].RefTable = AdminUsersTable
@@ -274,4 +292,6 @@ func init() {
 	UsersTable.ForeignKeys[4].RefTable = RolesTable
 	AdminUserRolesTable.ForeignKeys[0].RefTable = AdminUsersTable
 	AdminUserRolesTable.ForeignKeys[1].RefTable = RolesTable
+	UserRolesTable.ForeignKeys[0].RefTable = UsersTable
+	UserRolesTable.ForeignKeys[1].RefTable = RolesTable
 }

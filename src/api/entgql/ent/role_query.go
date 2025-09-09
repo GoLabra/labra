@@ -16,24 +16,27 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
+	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // RoleQuery is the builder for querying Role entities.
 type RoleQuery struct {
 	config
-	ctx                  *QueryContext
-	order                []role.OrderOption
-	inters               []Interceptor
-	predicates           []predicate.Role
-	withAdminCreatedBy   *AdminUserQuery
-	withAdminUpdatedBy   *AdminUserQuery
-	withUserRoles        *AdminUserQuery
-	withPermissions      *PermissionQuery
-	withFKs              bool
-	modifiers            []func(*sql.Selector)
-	loadTotal            []func(context.Context, []*Role) error
-	withNamedUserRoles   map[string]*AdminUserQuery
-	withNamedPermissions map[string]*PermissionQuery
+	ctx                     *QueryContext
+	order                   []role.OrderOption
+	inters                  []Interceptor
+	predicates              []predicate.Role
+	withAdminCreatedBy      *AdminUserQuery
+	withAdminUpdatedBy      *AdminUserQuery
+	withAdminUserRoles      *AdminUserQuery
+	withUserRoles           *UserQuery
+	withPermissions         *PermissionQuery
+	withFKs                 bool
+	modifiers               []func(*sql.Selector)
+	loadTotal               []func(context.Context, []*Role) error
+	withNamedAdminUserRoles map[string]*AdminUserQuery
+	withNamedUserRoles      map[string]*UserQuery
+	withNamedPermissions    map[string]*PermissionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -114,8 +117,8 @@ func (rq *RoleQuery) QueryAdminUpdatedBy() *AdminUserQuery {
 	return query
 }
 
-// QueryUserRoles chains the current query on the "user_roles" edge.
-func (rq *RoleQuery) QueryUserRoles() *AdminUserQuery {
+// QueryAdminUserRoles chains the current query on the "admin_user_roles" edge.
+func (rq *RoleQuery) QueryAdminUserRoles() *AdminUserQuery {
 	query := (&AdminUserClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
@@ -128,6 +131,28 @@ func (rq *RoleQuery) QueryUserRoles() *AdminUserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, selector),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, role.AdminUserRolesTable, role.AdminUserRolesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserRoles chains the current query on the "user_roles" edge.
+func (rq *RoleQuery) QueryUserRoles() *UserQuery {
+	query := (&UserClient{config: rq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(role.Table, role.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, role.UserRolesTable, role.UserRolesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
@@ -352,6 +377,7 @@ func (rq *RoleQuery) Clone() *RoleQuery {
 		predicates:         append([]predicate.Role{}, rq.predicates...),
 		withAdminCreatedBy: rq.withAdminCreatedBy.Clone(),
 		withAdminUpdatedBy: rq.withAdminUpdatedBy.Clone(),
+		withAdminUserRoles: rq.withAdminUserRoles.Clone(),
 		withUserRoles:      rq.withUserRoles.Clone(),
 		withPermissions:    rq.withPermissions.Clone(),
 		// clone intermediate query.
@@ -382,10 +408,21 @@ func (rq *RoleQuery) WithAdminUpdatedBy(opts ...func(*AdminUserQuery)) *RoleQuer
 	return rq
 }
 
+// WithAdminUserRoles tells the query-builder to eager-load the nodes that are connected to
+// the "admin_user_roles" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RoleQuery) WithAdminUserRoles(opts ...func(*AdminUserQuery)) *RoleQuery {
+	query := (&AdminUserClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withAdminUserRoles = query
+	return rq
+}
+
 // WithUserRoles tells the query-builder to eager-load the nodes that are connected to
 // the "user_roles" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RoleQuery) WithUserRoles(opts ...func(*AdminUserQuery)) *RoleQuery {
-	query := (&AdminUserClient{config: rq.config}).Query()
+func (rq *RoleQuery) WithUserRoles(opts ...func(*UserQuery)) *RoleQuery {
+	query := (&UserClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -483,9 +520,10 @@ func (rq *RoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Role, e
 		nodes       = []*Role{}
 		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			rq.withAdminCreatedBy != nil,
 			rq.withAdminUpdatedBy != nil,
+			rq.withAdminUserRoles != nil,
 			rq.withUserRoles != nil,
 			rq.withPermissions != nil,
 		}
@@ -529,10 +567,17 @@ func (rq *RoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Role, e
 			return nil, err
 		}
 	}
+	if query := rq.withAdminUserRoles; query != nil {
+		if err := rq.loadAdminUserRoles(ctx, query, nodes,
+			func(n *Role) { n.Edges.AdminUserRoles = []*AdminUser{} },
+			func(n *Role, e *AdminUser) { n.Edges.AdminUserRoles = append(n.Edges.AdminUserRoles, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := rq.withUserRoles; query != nil {
 		if err := rq.loadUserRoles(ctx, query, nodes,
-			func(n *Role) { n.Edges.UserRoles = []*AdminUser{} },
-			func(n *Role, e *AdminUser) { n.Edges.UserRoles = append(n.Edges.UserRoles, e) }); err != nil {
+			func(n *Role) { n.Edges.UserRoles = []*User{} },
+			func(n *Role, e *User) { n.Edges.UserRoles = append(n.Edges.UserRoles, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -543,10 +588,17 @@ func (rq *RoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Role, e
 			return nil, err
 		}
 	}
+	for name, query := range rq.withNamedAdminUserRoles {
+		if err := rq.loadAdminUserRoles(ctx, query, nodes,
+			func(n *Role) { n.appendNamedAdminUserRoles(name) },
+			func(n *Role, e *AdminUser) { n.appendNamedAdminUserRoles(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range rq.withNamedUserRoles {
 		if err := rq.loadUserRoles(ctx, query, nodes,
 			func(n *Role) { n.appendNamedUserRoles(name) },
-			func(n *Role, e *AdminUser) { n.appendNamedUserRoles(name, e) }); err != nil {
+			func(n *Role, e *User) { n.appendNamedUserRoles(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -629,7 +681,68 @@ func (rq *RoleQuery) loadAdminUpdatedBy(ctx context.Context, query *AdminUserQue
 	}
 	return nil
 }
-func (rq *RoleQuery) loadUserRoles(ctx context.Context, query *AdminUserQuery, nodes []*Role, init func(*Role), assign func(*Role, *AdminUser)) error {
+func (rq *RoleQuery) loadAdminUserRoles(ctx context.Context, query *AdminUserQuery, nodes []*Role, init func(*Role), assign func(*Role, *AdminUser)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[string]*Role)
+	nids := make(map[string]map[*Role]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(role.AdminUserRolesTable)
+		s.Join(joinT).On(s.C(adminuser.FieldID), joinT.C(role.AdminUserRolesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(role.AdminUserRolesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(role.AdminUserRolesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullString)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Role]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*AdminUser](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "admin_user_roles" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (rq *RoleQuery) loadUserRoles(ctx context.Context, query *UserQuery, nodes []*Role, init func(*Role), assign func(*Role, *User)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[string]*Role)
 	nids := make(map[string]map[*Role]struct{})
@@ -642,7 +755,7 @@ func (rq *RoleQuery) loadUserRoles(ctx context.Context, query *AdminUserQuery, n
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(role.UserRolesTable)
-		s.Join(joinT).On(s.C(adminuser.FieldID), joinT.C(role.UserRolesPrimaryKey[0]))
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(role.UserRolesPrimaryKey[0]))
 		s.Where(sql.InValues(joinT.C(role.UserRolesPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
 		s.Select(joinT.C(role.UserRolesPrimaryKey[1]))
@@ -675,7 +788,7 @@ func (rq *RoleQuery) loadUserRoles(ctx context.Context, query *AdminUserQuery, n
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*AdminUser](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
@@ -806,15 +919,29 @@ func (rq *RoleQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedUserRoles tells the query-builder to eager-load the nodes that are connected to the "user_roles"
+// WithNamedAdminUserRoles tells the query-builder to eager-load the nodes that are connected to the "admin_user_roles"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (rq *RoleQuery) WithNamedUserRoles(name string, opts ...func(*AdminUserQuery)) *RoleQuery {
+func (rq *RoleQuery) WithNamedAdminUserRoles(name string, opts ...func(*AdminUserQuery)) *RoleQuery {
 	query := (&AdminUserClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
+	if rq.withNamedAdminUserRoles == nil {
+		rq.withNamedAdminUserRoles = make(map[string]*AdminUserQuery)
+	}
+	rq.withNamedAdminUserRoles[name] = query
+	return rq
+}
+
+// WithNamedUserRoles tells the query-builder to eager-load the nodes that are connected to the "user_roles"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (rq *RoleQuery) WithNamedUserRoles(name string, opts ...func(*UserQuery)) *RoleQuery {
+	query := (&UserClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
 	if rq.withNamedUserRoles == nil {
-		rq.withNamedUserRoles = make(map[string]*AdminUserQuery)
+		rq.withNamedUserRoles = make(map[string]*UserQuery)
 	}
 	rq.withNamedUserRoles[name] = query
 	return rq

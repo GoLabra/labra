@@ -128,7 +128,19 @@ func (r *Role) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
 	return result, MaskNotFound(err)
 }
 
-func (r *Role) UserRoles(ctx context.Context) (result []*AdminUser, err error) {
+func (r *Role) AdminUserRoles(ctx context.Context) (result []*AdminUser, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedAdminUserRoles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.AdminUserRolesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryAdminUserRoles().All(ctx)
+	}
+	return result, err
+}
+
+func (r *Role) UserRoles(ctx context.Context) (result []*User, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = r.NamedUserRoles(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {

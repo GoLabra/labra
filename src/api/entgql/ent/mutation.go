@@ -2917,6 +2917,9 @@ type RoleMutation struct {
 	clearedadmin_created_by bool
 	admin_updated_by        *string
 	clearedadmin_updated_by bool
+	admin_user_roles        map[string]struct{}
+	removedadmin_user_roles map[string]struct{}
+	clearedadmin_user_roles bool
 	user_roles              map[string]struct{}
 	removeduser_roles       map[string]struct{}
 	cleareduser_roles       bool
@@ -3244,7 +3247,61 @@ func (m *RoleMutation) ResetAdminUpdatedBy() {
 	m.clearedadmin_updated_by = false
 }
 
-// AddUserRoleIDs adds the "user_roles" edge to the AdminUser entity by ids.
+// AddAdminUserRoleIDs adds the "admin_user_roles" edge to the AdminUser entity by ids.
+func (m *RoleMutation) AddAdminUserRoleIDs(ids ...string) {
+	if m.admin_user_roles == nil {
+		m.admin_user_roles = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.admin_user_roles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAdminUserRoles clears the "admin_user_roles" edge to the AdminUser entity.
+func (m *RoleMutation) ClearAdminUserRoles() {
+	m.clearedadmin_user_roles = true
+}
+
+// AdminUserRolesCleared reports if the "admin_user_roles" edge to the AdminUser entity was cleared.
+func (m *RoleMutation) AdminUserRolesCleared() bool {
+	return m.clearedadmin_user_roles
+}
+
+// RemoveAdminUserRoleIDs removes the "admin_user_roles" edge to the AdminUser entity by IDs.
+func (m *RoleMutation) RemoveAdminUserRoleIDs(ids ...string) {
+	if m.removedadmin_user_roles == nil {
+		m.removedadmin_user_roles = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.admin_user_roles, ids[i])
+		m.removedadmin_user_roles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAdminUserRoles returns the removed IDs of the "admin_user_roles" edge to the AdminUser entity.
+func (m *RoleMutation) RemovedAdminUserRolesIDs() (ids []string) {
+	for id := range m.removedadmin_user_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AdminUserRolesIDs returns the "admin_user_roles" edge IDs in the mutation.
+func (m *RoleMutation) AdminUserRolesIDs() (ids []string) {
+	for id := range m.admin_user_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAdminUserRoles resets all changes to the "admin_user_roles" edge.
+func (m *RoleMutation) ResetAdminUserRoles() {
+	m.admin_user_roles = nil
+	m.clearedadmin_user_roles = false
+	m.removedadmin_user_roles = nil
+}
+
+// AddUserRoleIDs adds the "user_roles" edge to the User entity by ids.
 func (m *RoleMutation) AddUserRoleIDs(ids ...string) {
 	if m.user_roles == nil {
 		m.user_roles = make(map[string]struct{})
@@ -3254,17 +3311,17 @@ func (m *RoleMutation) AddUserRoleIDs(ids ...string) {
 	}
 }
 
-// ClearUserRoles clears the "user_roles" edge to the AdminUser entity.
+// ClearUserRoles clears the "user_roles" edge to the User entity.
 func (m *RoleMutation) ClearUserRoles() {
 	m.cleareduser_roles = true
 }
 
-// UserRolesCleared reports if the "user_roles" edge to the AdminUser entity was cleared.
+// UserRolesCleared reports if the "user_roles" edge to the User entity was cleared.
 func (m *RoleMutation) UserRolesCleared() bool {
 	return m.cleareduser_roles
 }
 
-// RemoveUserRoleIDs removes the "user_roles" edge to the AdminUser entity by IDs.
+// RemoveUserRoleIDs removes the "user_roles" edge to the User entity by IDs.
 func (m *RoleMutation) RemoveUserRoleIDs(ids ...string) {
 	if m.removeduser_roles == nil {
 		m.removeduser_roles = make(map[string]struct{})
@@ -3275,7 +3332,7 @@ func (m *RoleMutation) RemoveUserRoleIDs(ids ...string) {
 	}
 }
 
-// RemovedUserRoles returns the removed IDs of the "user_roles" edge to the AdminUser entity.
+// RemovedUserRoles returns the removed IDs of the "user_roles" edge to the User entity.
 func (m *RoleMutation) RemovedUserRolesIDs() (ids []string) {
 	for id := range m.removeduser_roles {
 		ids = append(ids, id)
@@ -3534,12 +3591,15 @@ func (m *RoleMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RoleMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.admin_created_by != nil {
 		edges = append(edges, role.EdgeAdminCreatedBy)
 	}
 	if m.admin_updated_by != nil {
 		edges = append(edges, role.EdgeAdminUpdatedBy)
+	}
+	if m.admin_user_roles != nil {
+		edges = append(edges, role.EdgeAdminUserRoles)
 	}
 	if m.user_roles != nil {
 		edges = append(edges, role.EdgeUserRoles)
@@ -3562,6 +3622,12 @@ func (m *RoleMutation) AddedIDs(name string) []ent.Value {
 		if id := m.admin_updated_by; id != nil {
 			return []ent.Value{*id}
 		}
+	case role.EdgeAdminUserRoles:
+		ids := make([]ent.Value, 0, len(m.admin_user_roles))
+		for id := range m.admin_user_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	case role.EdgeUserRoles:
 		ids := make([]ent.Value, 0, len(m.user_roles))
 		for id := range m.user_roles {
@@ -3580,7 +3646,10 @@ func (m *RoleMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RoleMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
+	if m.removedadmin_user_roles != nil {
+		edges = append(edges, role.EdgeAdminUserRoles)
+	}
 	if m.removeduser_roles != nil {
 		edges = append(edges, role.EdgeUserRoles)
 	}
@@ -3594,6 +3663,12 @@ func (m *RoleMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *RoleMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case role.EdgeAdminUserRoles:
+		ids := make([]ent.Value, 0, len(m.removedadmin_user_roles))
+		for id := range m.removedadmin_user_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	case role.EdgeUserRoles:
 		ids := make([]ent.Value, 0, len(m.removeduser_roles))
 		for id := range m.removeduser_roles {
@@ -3612,12 +3687,15 @@ func (m *RoleMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RoleMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedadmin_created_by {
 		edges = append(edges, role.EdgeAdminCreatedBy)
 	}
 	if m.clearedadmin_updated_by {
 		edges = append(edges, role.EdgeAdminUpdatedBy)
+	}
+	if m.clearedadmin_user_roles {
+		edges = append(edges, role.EdgeAdminUserRoles)
 	}
 	if m.cleareduser_roles {
 		edges = append(edges, role.EdgeUserRoles)
@@ -3636,6 +3714,8 @@ func (m *RoleMutation) EdgeCleared(name string) bool {
 		return m.clearedadmin_created_by
 	case role.EdgeAdminUpdatedBy:
 		return m.clearedadmin_updated_by
+	case role.EdgeAdminUserRoles:
+		return m.clearedadmin_user_roles
 	case role.EdgeUserRoles:
 		return m.cleareduser_roles
 	case role.EdgePermissions:
@@ -3667,6 +3747,9 @@ func (m *RoleMutation) ResetEdge(name string) error {
 		return nil
 	case role.EdgeAdminUpdatedBy:
 		m.ResetAdminUpdatedBy()
+		return nil
+	case role.EdgeAdminUserRoles:
+		m.ResetAdminUserRoles()
 		return nil
 	case role.EdgeUserRoles:
 		m.ResetUserRoles()

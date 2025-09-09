@@ -22,40 +22,39 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, e
 	panic(fmt.Errorf("not implemented: Nodes - nodes"))
 }
 
+// AdminUserRoleIDs is the resolver for the adminUserRoleIDs field.
+func (r *createRoleInputResolver) AdminUserRoleIDs(ctx context.Context, obj *ent.CreateRoleInput, data []string) error {
+	panic(fmt.Errorf("not implemented: AdminUserRoleIDs - adminUserRoleIDs"))
+}
+
+// AddAdminUserRoleIDs is the resolver for the addAdminUserRoleIDs field.
+func (r *updateRoleInputResolver) AddAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error {
+	panic(fmt.Errorf("not implemented: AddAdminUserRoleIDs - addAdminUserRoleIDs"))
+}
+
+// RemoveAdminUserRoleIDs is the resolver for the removeAdminUserRoleIDs field.
+func (r *updateRoleInputResolver) RemoveAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error {
+	panic(fmt.Errorf("not implemented: RemoveAdminUserRoleIDs - removeAdminUserRoleIDs"))
+}
+
+// ClearAdminUserRoles is the resolver for the clearAdminUserRoles field.
+func (r *updateRoleInputResolver) ClearAdminUserRoles(ctx context.Context, obj *ent.UpdateRoleInput, data *bool) error {
+	panic(fmt.Errorf("not implemented: ClearAdminUserRoles - clearAdminUserRoles"))
+}
+
 // Query returns gqlgen.QueryResolver implementation.
 func (r *Resolver) Query() gqlgen.QueryResolver { return &queryResolver{r} }
 
-type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *Resolver) CreateAdminUserInput() gqlgen.CreateAdminUserInputResolver {
-	return &createAdminUserInputResolver{r}
-}
-func (r *Resolver) CreatePermissionInput() gqlgen.CreatePermissionInputResolver {
-	return &createPermissionInputResolver{r}
-}
+// CreateRoleInput returns gqlgen.CreateRoleInputResolver implementation.
 func (r *Resolver) CreateRoleInput() gqlgen.CreateRoleInputResolver {
 	return &createRoleInputResolver{r}
 }
-func (r *Resolver) UpdateAdminUserInput() gqlgen.UpdateAdminUserInputResolver {
-	return &updateAdminUserInputResolver{r}
-}
-func (r *Resolver) UpdatePermissionInput() gqlgen.UpdatePermissionInputResolver {
-	return &updatePermissionInputResolver{r}
-}
+
+// UpdateRoleInput returns gqlgen.UpdateRoleInputResolver implementation.
 func (r *Resolver) UpdateRoleInput() gqlgen.UpdateRoleInputResolver {
 	return &updateRoleInputResolver{r}
 }
-type createAdminUserInputResolver struct{ *Resolver }
-type createPermissionInputResolver struct{ *Resolver }
+
+type queryResolver struct{ *Resolver }
 type createRoleInputResolver struct{ *Resolver }
-type updateAdminUserInputResolver struct{ *Resolver }
-type updatePermissionInputResolver struct{ *Resolver }
 type updateRoleInputResolver struct{ *Resolver }
-*/

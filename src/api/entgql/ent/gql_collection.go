@@ -554,7 +554,7 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			}
 			r.withAdminUpdatedBy = query
 
-		case "userRoles":
+		case "adminUserRoles":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -563,7 +563,20 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			r.WithNamedUserRoles(alias, func(wq *AdminUserQuery) {
+			r.WithNamedAdminUserRoles(alias, func(wq *AdminUserQuery) {
+				*wq = *query
+			})
+
+		case "userRoles":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			r.WithNamedUserRoles(alias, func(wq *UserQuery) {
 				*wq = *query
 			})
 

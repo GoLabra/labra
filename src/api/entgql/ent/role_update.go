@@ -15,6 +15,7 @@ import (
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
+	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // RoleUpdate is the builder for updating Role entities.
@@ -94,17 +95,32 @@ func (ru *RoleUpdate) SetAdminUpdatedBy(a *AdminUser) *RoleUpdate {
 	return ru.SetAdminUpdatedByID(a.ID)
 }
 
-// AddUserRoleIDs adds the "user_roles" edge to the AdminUser entity by IDs.
+// AddAdminUserRoleIDs adds the "admin_user_roles" edge to the AdminUser entity by IDs.
+func (ru *RoleUpdate) AddAdminUserRoleIDs(ids ...string) *RoleUpdate {
+	ru.mutation.AddAdminUserRoleIDs(ids...)
+	return ru
+}
+
+// AddAdminUserRoles adds the "admin_user_roles" edges to the AdminUser entity.
+func (ru *RoleUpdate) AddAdminUserRoles(a ...*AdminUser) *RoleUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ru.AddAdminUserRoleIDs(ids...)
+}
+
+// AddUserRoleIDs adds the "user_roles" edge to the User entity by IDs.
 func (ru *RoleUpdate) AddUserRoleIDs(ids ...string) *RoleUpdate {
 	ru.mutation.AddUserRoleIDs(ids...)
 	return ru
 }
 
-// AddUserRoles adds the "user_roles" edges to the AdminUser entity.
-func (ru *RoleUpdate) AddUserRoles(a ...*AdminUser) *RoleUpdate {
-	ids := make([]string, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddUserRoles adds the "user_roles" edges to the User entity.
+func (ru *RoleUpdate) AddUserRoles(u ...*User) *RoleUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ru.AddUserRoleIDs(ids...)
 }
@@ -141,23 +157,44 @@ func (ru *RoleUpdate) ClearAdminUpdatedBy() *RoleUpdate {
 	return ru
 }
 
-// ClearUserRoles clears all "user_roles" edges to the AdminUser entity.
+// ClearAdminUserRoles clears all "admin_user_roles" edges to the AdminUser entity.
+func (ru *RoleUpdate) ClearAdminUserRoles() *RoleUpdate {
+	ru.mutation.ClearAdminUserRoles()
+	return ru
+}
+
+// RemoveAdminUserRoleIDs removes the "admin_user_roles" edge to AdminUser entities by IDs.
+func (ru *RoleUpdate) RemoveAdminUserRoleIDs(ids ...string) *RoleUpdate {
+	ru.mutation.RemoveAdminUserRoleIDs(ids...)
+	return ru
+}
+
+// RemoveAdminUserRoles removes "admin_user_roles" edges to AdminUser entities.
+func (ru *RoleUpdate) RemoveAdminUserRoles(a ...*AdminUser) *RoleUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ru.RemoveAdminUserRoleIDs(ids...)
+}
+
+// ClearUserRoles clears all "user_roles" edges to the User entity.
 func (ru *RoleUpdate) ClearUserRoles() *RoleUpdate {
 	ru.mutation.ClearUserRoles()
 	return ru
 }
 
-// RemoveUserRoleIDs removes the "user_roles" edge to AdminUser entities by IDs.
+// RemoveUserRoleIDs removes the "user_roles" edge to User entities by IDs.
 func (ru *RoleUpdate) RemoveUserRoleIDs(ids ...string) *RoleUpdate {
 	ru.mutation.RemoveUserRoleIDs(ids...)
 	return ru
 }
 
-// RemoveUserRoles removes "user_roles" edges to AdminUser entities.
-func (ru *RoleUpdate) RemoveUserRoles(a ...*AdminUser) *RoleUpdate {
-	ids := make([]string, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemoveUserRoles removes "user_roles" edges to User entities.
+func (ru *RoleUpdate) RemoveUserRoles(u ...*User) *RoleUpdate {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ru.RemoveUserRoleIDs(ids...)
 }
@@ -311,6 +348,51 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ru.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedAdminUserRolesIDs(); len(nodes) > 0 && !ru.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.AdminUserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if ru.mutation.UserRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -319,7 +401,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: role.UserRolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -332,7 +414,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: role.UserRolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -348,7 +430,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: role.UserRolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -485,17 +567,32 @@ func (ruo *RoleUpdateOne) SetAdminUpdatedBy(a *AdminUser) *RoleUpdateOne {
 	return ruo.SetAdminUpdatedByID(a.ID)
 }
 
-// AddUserRoleIDs adds the "user_roles" edge to the AdminUser entity by IDs.
+// AddAdminUserRoleIDs adds the "admin_user_roles" edge to the AdminUser entity by IDs.
+func (ruo *RoleUpdateOne) AddAdminUserRoleIDs(ids ...string) *RoleUpdateOne {
+	ruo.mutation.AddAdminUserRoleIDs(ids...)
+	return ruo
+}
+
+// AddAdminUserRoles adds the "admin_user_roles" edges to the AdminUser entity.
+func (ruo *RoleUpdateOne) AddAdminUserRoles(a ...*AdminUser) *RoleUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ruo.AddAdminUserRoleIDs(ids...)
+}
+
+// AddUserRoleIDs adds the "user_roles" edge to the User entity by IDs.
 func (ruo *RoleUpdateOne) AddUserRoleIDs(ids ...string) *RoleUpdateOne {
 	ruo.mutation.AddUserRoleIDs(ids...)
 	return ruo
 }
 
-// AddUserRoles adds the "user_roles" edges to the AdminUser entity.
-func (ruo *RoleUpdateOne) AddUserRoles(a ...*AdminUser) *RoleUpdateOne {
-	ids := make([]string, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddUserRoles adds the "user_roles" edges to the User entity.
+func (ruo *RoleUpdateOne) AddUserRoles(u ...*User) *RoleUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ruo.AddUserRoleIDs(ids...)
 }
@@ -532,23 +629,44 @@ func (ruo *RoleUpdateOne) ClearAdminUpdatedBy() *RoleUpdateOne {
 	return ruo
 }
 
-// ClearUserRoles clears all "user_roles" edges to the AdminUser entity.
+// ClearAdminUserRoles clears all "admin_user_roles" edges to the AdminUser entity.
+func (ruo *RoleUpdateOne) ClearAdminUserRoles() *RoleUpdateOne {
+	ruo.mutation.ClearAdminUserRoles()
+	return ruo
+}
+
+// RemoveAdminUserRoleIDs removes the "admin_user_roles" edge to AdminUser entities by IDs.
+func (ruo *RoleUpdateOne) RemoveAdminUserRoleIDs(ids ...string) *RoleUpdateOne {
+	ruo.mutation.RemoveAdminUserRoleIDs(ids...)
+	return ruo
+}
+
+// RemoveAdminUserRoles removes "admin_user_roles" edges to AdminUser entities.
+func (ruo *RoleUpdateOne) RemoveAdminUserRoles(a ...*AdminUser) *RoleUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ruo.RemoveAdminUserRoleIDs(ids...)
+}
+
+// ClearUserRoles clears all "user_roles" edges to the User entity.
 func (ruo *RoleUpdateOne) ClearUserRoles() *RoleUpdateOne {
 	ruo.mutation.ClearUserRoles()
 	return ruo
 }
 
-// RemoveUserRoleIDs removes the "user_roles" edge to AdminUser entities by IDs.
+// RemoveUserRoleIDs removes the "user_roles" edge to User entities by IDs.
 func (ruo *RoleUpdateOne) RemoveUserRoleIDs(ids ...string) *RoleUpdateOne {
 	ruo.mutation.RemoveUserRoleIDs(ids...)
 	return ruo
 }
 
-// RemoveUserRoles removes "user_roles" edges to AdminUser entities.
-func (ruo *RoleUpdateOne) RemoveUserRoles(a ...*AdminUser) *RoleUpdateOne {
-	ids := make([]string, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemoveUserRoles removes "user_roles" edges to User entities.
+func (ruo *RoleUpdateOne) RemoveUserRoles(u ...*User) *RoleUpdateOne {
+	ids := make([]string, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return ruo.RemoveUserRoleIDs(ids...)
 }
@@ -732,6 +850,51 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ruo.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedAdminUserRolesIDs(); len(nodes) > 0 && !ruo.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.AdminUserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if ruo.mutation.UserRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -740,7 +903,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Columns: role.UserRolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -753,7 +916,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Columns: role.UserRolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -769,7 +932,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Columns: role.UserRolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
