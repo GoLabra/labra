@@ -52,7 +52,6 @@ jobs:
       - name: Build and Push Frontend Image
         run: |
           docker build \
-            --quiet \
             --build-arg NEXT_PUBLIC_BRAND_PRODUCT_NAME=${{ vars.NEXT_PUBLIC_BRAND_PRODUCT_NAME }} \
             --build-arg NEXT_PUBLIC_BRAND_COLOR=${{ vars.NEXT_PUBLIC_BRAND_COLOR }} \
             --build-arg NEXT_PUBLIC_GRAPHQL_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_API_URL }} \
@@ -80,7 +79,7 @@ jobs:
 
       - name: Build and Push Backend Image
         run: |
-          docker build \
+          docker build --quiet \
             --build-arg DSN=${{ secrets.DSN }} \
             --build-arg DB_DIALECT=${{ secrets.DB_DIALECT }} \
             --build-arg SERVER_PORT=${{ secrets.SERVER_PORT }} \
