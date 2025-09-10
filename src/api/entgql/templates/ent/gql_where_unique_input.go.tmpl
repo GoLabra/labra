@@ -63,7 +63,7 @@ func (i *{{$n.Name}}WhereUniqueInput) P() (predicate.{{$n.Name}}, error) {
 	{{- range $f := $n.Fields}}
     {{- if $f.Unique }}
 	if i.{{$f.Name | Camel | ToTitle}} != nil {
-		predicates = append(predicates, {{$n.Name | ToLower}}.{{$f.Name| Camel | ToTitle}}EQ(*i.{{$f.Name | Camel | ToTitle}}))
+		predicates = append(predicates, {{$n.Name | ToLower}}.{{$f.Name| ToCamel}}EQ(*i.{{$f.Name | ToCamel | ToTitle}}))
 	}
 	{{- end}}
 	{{- end}}

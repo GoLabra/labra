@@ -10,7 +10,7 @@ import (
 	
 	{{- if not (ShouldSkip $ "mutation_create_input") }}
 	"github.com/GoLabra/labra/src/api/constants"
-	"github.com/mitchellh/mapstructure"
+	"github.com/GoLabra/labra/src/api/ext/mapstructure"
 	{{- end }}
 	
     {{- range $e := $.Edges}}
@@ -385,14 +385,29 @@ func (r *{{$.Name}}) Upsert(ctx context.Context, data ent.Create{{$.Name}}Input)
 		if err != nil {
 			return nil, fmt.Errorf("error decoding where condition: %v", err)
 		}
-		err = r.client.{{$.Name}}.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
-		}
+
 		upserted{{$.Name}}, err = r.GetOne(ctx, where)
 		if err != nil {
 			return nil, fmt.Errorf("error getting upserted item: %v", err)
 		}
+		if upserted{{$.Name}} != nil {
+			update{{$.Name}}Input := ent.Update{{$.Name}}Input{}
+			err = mapstructure.Decode(data, &update{{$.Name}}Input)
+			if err != nil {
+				return nil, fmt.Errorf("error upserting item: %v", err)
+			}
+			upserted{{$.Name}}, err = r.client.{{$.Name}}.UpdateOne(upserted{{$.Name}}).SetInput(update{{$.Name}}Input).Save(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("error upserting item: %v", err)
+			}
+			return upserted{{$.Name}}, nil
+		}
+
+		err = r.client.{{$.Name}}.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("error upserting item: %v", err)
+		}
+		
 		return upserted{{$.Name}}, nil
 	}
 	upserted{{$.Name}}, err = r.client.{{$.Name}}.Create().SetInput(data).Save(ctx)
@@ -403,22 +418,28 @@ func (r *{{$.Name}}) Upsert(ctx context.Context, data ent.Create{{$.Name}}Input)
 }
 
 func (r *{{$.Name}}) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.Create{{$.Name}}Input) (upserted{{$.Name}} *ent.{{$.Name}}, err error) {
-	if CompareUniqueInput(data, ent.{{$.Name}}WhereUniqueInput{}) {
-		var where ent.{{$.Name}}WhereUniqueInput
+	var where ent.{{$.Name}}WhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
 			return nil, fmt.Errorf("error decoding where condition: %v", err)
 		}
-		err = tx.{{$.Name}}.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
-		}
+
 		upserted{{$.Name}}, err = r.GetOne(ctx, where)
 		if err != nil {
 			return nil, fmt.Errorf("error getting upserted item: %v", err)
 		}
-		return upserted{{$.Name}}, nil
-	}
+		if upserted{{$.Name}} != nil {
+			update{{$.Name}}Input := ent.Update{{$.Name}}Input{}
+			err = mapstructure.Decode(data, &update{{$.Name}}Input)
+			if err != nil {
+				return nil, fmt.Errorf("error upserting item: %v", err)
+			}
+			upserted{{$.Name}}, err = tx.{{$.Name}}.UpdateOne(upserted{{$.Name}}).SetInput(update{{$.Name}}Input).Save(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("error upserting item: %v", err)
+			}
+			return upserted{{$.Name}}, nil
+		}
 	upserted{{$.Name}}, err = tx.{{$.Name}}.Create().SetInput(data).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error upserting item: %v", err)
