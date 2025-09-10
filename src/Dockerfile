@@ -33,10 +33,9 @@ COPY . .
 # Change to the app directory and run Go commands
 WORKDIR /app/app
 
-RUN sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
-
 # Run the required commands in one shell execution
-RUN go generate && \
+RUN sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod \
+    go generate && \
     go mod tidy
 
 WORKDIR /app
