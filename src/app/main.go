@@ -226,7 +226,7 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 			}
 			return false
 		})
-		
+
 		return changes, nil
 	})
 }

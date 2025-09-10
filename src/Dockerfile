@@ -7,10 +7,25 @@ RUN apk add --no-cache git bash openssh-client
 # Set the working directory inside the container
 WORKDIR /app
 
-ARG GH_PAT
+ARG DSN
+ARG DB_DIALECT
+ARG SERVER_PORT
+ARG ENT_SCHEMA_PATH
+ARG SECRET_KEY
+ARG CENTRIFUGO_API_ADDRESS
+ARG CENTRIFUGO_API_KEY
+ARG FILE_STORAGE_PROVIDER
+ARG FILE_STORAGE_PATH
 
-# Authenticate Git with GitHub Token (avoids interactive login)
-RUN git config --global url."https://${GH_PAT}@github.com/".insteadOf "https://github.com/"
+ENV DSN=$DSN
+ENV DB_DIALECT=$DB_DIALECT
+ENV SERVER_PORT=$SERVER_PORT
+ENV ENT_SCHEMA_PATH=$ENT_SCHEMA_PATH
+ENV SECRET_KEY=$SECRET_KEY
+ENV CENTRIFUGO_API_ADDRESS=$CENTRIFUGO_API_ADDRESS
+ENV CENTRIFUGO_API_KEY=$CENTRIFUGO_API_KEY
+ENV FILE_STORAGE_PROVIDER=$FILE_STORAGE_PROVIDER
+ENV FILE_STORAGE_PATH=$FILE_STORAGE_PATH
 
 # Copy the entire project
 COPY . .
@@ -18,16 +33,19 @@ COPY . .
 # Change to the app directory and run Go commands
 WORKDIR /app/app
 
+RUN sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
+
 # Run the required commands in one shell execution
-RUN export GOPRIVATE=github.com/GoLabra/labrago && \
-    go generate && \
+RUN go generate && \
     go mod tidy
 
-# Expose the server port
+WORKDIR /app
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Expose port
 EXPOSE 4000
 
-# Set the working directory to the CLI
-WORKDIR /app/cli
-
-# Command to run the application
-CMD ["go", "run", "main.go", "start"]
+# Start the app using our script
+ENTRYPOINT ["/entrypoint.sh"]
