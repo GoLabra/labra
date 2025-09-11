@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Topnav } from "./header/Topnav/top-nav";
 import { usePinNav } from "@/lib/pinNav";
 import { Container, ContentLayout, LeftSidePanel } from "./rootLayout";
+import { Box } from "@mui/material";
 
 
 interface Props {
@@ -26,7 +27,7 @@ export default function AppLayout(props: Props) {
         <LeftSidePanel
             mobileNavOpen={mobileNavOpen}
             setMobileNavOpen={setMobileNavOpen}
-            mobileNav={<Topnav direction="column" />}>
+            mobileNav={<Box p={1}><Topnav direction="column" /></Box>}>
 
             {props.sideChildren}
         </LeftSidePanel>

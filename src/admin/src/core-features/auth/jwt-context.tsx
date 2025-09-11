@@ -13,7 +13,7 @@ import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
 
 
 export const getMeDocument = gql`query getMe($where:AdminUserWhereInput!) {
-    users:adminUsers(where:$where) {
+    adminUsers(where:$where) {
           id
           name
           firstName
@@ -145,7 +145,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                         type: ActionType.INITIALIZE,
                         payload: {
                             isAuthenticated: true,
-                            user: meResponse.data.users[0]
+                            user: meResponse.data.adminUsers[0]
                         }
                     });
                 } else {
@@ -188,7 +188,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
             localStorage.setItem(STORAGE_KEY, accessToken);
 
             const meResponse = await me({ variables: { where: { email: getJwtSub(accessToken) } } });
-            const {roles, ...user} = meResponse.data.users[0];
+            const {roles, ...user} = meResponse.data.adminUsers[0];
 
             dispatch({
                 type: ActionType.SIGN_IN,

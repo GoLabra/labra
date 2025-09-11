@@ -21,7 +21,7 @@ export const changeRoleQuery = gql`
     }
 
     mutation SignIn($input: ChangeRolePayload!) {
-        changeRole( input: $input) @rest(type: "User", method: "POST", path: "/change-session-role") {
+        changeRole( input: $input) @rest(type: "User", method: "POST", path: "/admin/change-session-role") {
             token
         }
     }
