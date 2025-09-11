@@ -141,7 +141,7 @@ func main() {
 		router.Use(jwtauth.Verifier(tokenAuth))
 		router.Use(handler.Authenticator)
 
-		router.Post("/change-session-role", adminHandler.ChangeSessionRole)
+		router.Post("/change-session-role", handler.ChangeSessionRole)
 	})
 	router.Group(func(router chi.Router) {
 		router.Post("/login", handler.Login)
