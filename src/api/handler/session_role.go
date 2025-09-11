@@ -17,7 +17,7 @@ type ChangeSessionRoleRequest struct {
 
 func ChangeSessionRole(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	user, ok := ctx.Value(constants.UserContextValue).(*ent.User)
+	user, ok := ctx.Value(constants.UserContextValue).(*ent.AdminUser)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
