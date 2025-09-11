@@ -1,4 +1,6 @@
-schema: "http://localhost:4000/query"
+schema: "http://localhost:4000/admin/query"
+headers:
+  Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTc2ODczOTYsInJvbGUiOiJTdXBlckFkbWluIiwic3ViIjoiYWRtaW5AbGFicmFnby5ldSJ9.mr8mBTf-e8c3hsd-3vfie70ojBJ5eEuwN8B-YFMKs8Q"
 documents:
 #  - "src/app/**/*.{ts,tsx}"
 #  - "src/components/**/*.{ts,tsx}"

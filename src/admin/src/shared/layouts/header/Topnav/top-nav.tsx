@@ -110,7 +110,7 @@ export const Topnav = (props: TopnavProps) => {
     const pathname = usePathname();
 
     return (
-        <Box component="nav" alignSelf="end">
+        <Box component="nav" alignSelf="start">
 
             <Stack component="ul" margin={0} direction={direction ?? "row"} gap={1} px={0}>
                 <Box component="li" sx={{ listStyle: 'none' }}>

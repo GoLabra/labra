@@ -49,10 +49,10 @@ export default function AuthPage() {
 
     const currentRole = useMemo(() => getJwtRole(globalThis.localStorage.getItem("accessToken")), []);
 
-    const roleOptions = useMemo(() => roles.data?.users[0].roles?.map((i:any) => ({
+    const roleOptions = useMemo(() => roles.data?.adminUsers[0].roles?.map((i:any) => ({
         label: i.name,
         value: i.name
-    })) ?? [], [roles.data?.users[0].roles]);
+    })) ?? [], [roles.data?.adminUsers[0].roles]);
 
     const methods = useForm({
         resolver: zodResolver(schema),

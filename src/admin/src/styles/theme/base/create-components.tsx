@@ -600,7 +600,7 @@ export const createComponents = (): Components => {
 							'.MuiTableRow-root': {
 								'th:nth-child(1)': {
 									'.MosaicDataTable-headcell-data': {
-										'padding-left': 'var(--mosaic-first-column-padding)'
+										'paddingLeft': 'var(--mosaic-first-column-padding)'
 									}
 								}
 							}
@@ -609,7 +609,7 @@ export const createComponents = (): Components => {
 							'.MuiTableRow-root': {
 								'td:nth-child(1)': {
 									'.MosaicDataTable-cell-data': {
-										'padding-left': 'var(--mosaic-first-column-padding)'
+										'paddingLeft': 'var(--mosaic-first-column-padding)'
 									}
 								}
 							}
