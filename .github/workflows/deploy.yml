@@ -3,7 +3,7 @@ name: Deploy LabraGo To Kubernetes
 on:
   push:
     branches:
-      - develop
+      - feature/test-branch
     paths:
       - "src/admin/**"
       - "src/api/**"
