@@ -102,10 +102,11 @@ jobs:
       - name: Install doctl (tarball, not snap)
         run: |
           set -euo pipefail
-          VER="v1.141.0"
-          curl -sL "https://github.com/digitalocean/doctl/releases/download/${VER}/doctl-${VER}-linux-amd64.tar.gz" \
-          | tar -xz
-          sudo mv doctl /usr/local/bin/
+          VER="1.141.0"  # note: no leading 'v' here
+          curl -fsSL "https://github.com/digitalocean/doctl/releases/download/v${VER}/doctl-${VER}-linux-amd64.tar.gz" -o doctl.tgz
+          tar -tzf doctl.tgz > /dev/null
+          tar -xzf doctl.tgz
+          sudo install -m 0755 doctl /usr/local/bin/doctl
           doctl version
 
       - name: Authenticate with DigitalOcean
