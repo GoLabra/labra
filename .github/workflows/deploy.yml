@@ -114,6 +114,7 @@ jobs:
       - name: Help (new command family)
         run: doctl registries garbage-collection start --help
 
+      # Make sure you’re using the plural commands: `registries`
       - name: Check active GC (new endpoint)
         run: |
           set -e
@@ -127,14 +128,45 @@ jobs:
       - name: Start GC (non-interactive, traced)
         run: |
           set -euo pipefail
-          # Use the new 'registries' group, and keep -f
           doctl --trace registries garbage-collection start labrago \
             --include-untagged-manifests \
             -f
 
-      - name: Confirm GC active
-        run: doctl registries garbage-collection get-active labrago -o json || true
+      # Optional: wait until GC finishes (prints status every 10s)
+      - name: Wait for GC to finish
+        run: |
+          set -euo pipefail
+          sudo apt-get update >/dev/null && sudo apt-get install -y jq >/dev/null
+          for i in {1..90}; do
+            resp="$(doctl registries garbage-collection get-active labrago -o json || true)"
+            if [ -z "$resp" ] || [ "$resp" = "[]" ] || [ "$resp" = "null" ]; then
+              echo "No active GC (done)."
+              break
+            fi
+            status="$(echo "$resp" | jq -r '.[0].status')"
+            echo "GC status: $status"
+            case "$status" in
+              requested|queued|scanning|in_progress)
+                sleep 10
+                ;;
+              succeeded)
+                echo "$resp" | jq -r '.[0] | "Blobs deleted: \(.blobs_deleted) | Freed bytes: \(.freed_bytes)"'
+                break
+                ;;
+              failed|canceled)
+                echo "GC ended with status: $status"
+                echo "$resp"
+                exit 1
+                ;;
+              *)
+                echo "Unknown status: $status"
+                echo "$resp"
+                exit 1
+                ;;
+            esac
+          done
 
+      # Show recent history (nice to have)
       - name: List past GCs
         run: doctl registries garbage-collection list labrago -o json
 
