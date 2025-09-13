@@ -109,8 +109,13 @@ jobs:
       - name: Authenticate with DigitalOcean
         run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
 
+      - name: Set up doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_ACCESS_TOKEN }}
+
       - name: Trigger DO Registry Cleanup
-        run: yes | doctl registry garbage-collection start labrago --include-untagged-manifests
+        run: doctl registry garbage-collection start labrago --include-untagged-manifests --force
 
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
