@@ -105,7 +105,7 @@ jobs:
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-      # Show version (sanity)
+      # (Sanity) show doctl version
       - name: doctl info
         run: |
           which doctl
@@ -132,18 +132,24 @@ jobs:
             -f \
             -o json)"
           echo "$out"
-          # Extract UUID from either response shape
-          uuid="$(echo "$out" | jq -r '.garbage_collection.uuid // .uuid // empty')"
+
+          # Extract UUID robustly: handles array OR object OR "garbage_collection" wrapper
+          uuid="$(echo "$out" | jq -r '
+            if type=="array" then .[0].uuid
+            elif has("garbage_collection") then .garbage_collection.uuid
+            else .uuid end
+          ')"
+          echo "Started GC UUID: $uuid"
           echo "uuid=$uuid" >> "$GITHUB_OUTPUT"
 
-      # Wait for GC to finish (handles object OR array JSON)
+      # Wait for GC to finish (handles object OR array shape from get-active)
       - name: Wait for GC to finish
         run: |
           set -euo pipefail
           sudo apt-get update >/dev/null && sudo apt-get install -y jq >/dev/null
 
           normalize_obj() {
-            # Read stdin; if array -> first element; else pass object through
+            # stdin -> if array, take first elem; if object, pass through
             jq 'if type=="array" then .[0] else . end'
           }
 
@@ -179,7 +185,7 @@ jobs:
             esac
           done
 
-      # Show recent history (proof)
+      # Show recent history (proof it ran)
       - name: List past GCs
         run: doctl registries garbage-collection list labrago -o json
 
