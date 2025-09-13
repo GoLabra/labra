@@ -22,10 +22,14 @@ ENV NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL=$NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL
 ENV NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL=$NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL
 ENV NEXT_PUBLIC_CENTRIFUGO_URL=$NEXT_PUBLIC_CENTRIFUGO_URL
 
-
 # Install dependencies
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+
+# 👇 Added lines
+RUN corepack enable
+RUN corepack prepare yarn@4.9.4 --activate
+
+RUN yarn install --immutable
 
 # Copy the rest of the app
 COPY . .
