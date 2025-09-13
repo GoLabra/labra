@@ -23,18 +23,12 @@ ENV NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL=$NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROU
 ENV NEXT_PUBLIC_CENTRIFUGO_URL=$NEXT_PUBLIC_CENTRIFUGO_URL
 
 
-# Copy manifest files
+# Install dependencies
 COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-# Enable Corepack and activate Yarn 4
-RUN corepack enable
-RUN corepack prepare yarn@4.9.4 --activate
-
-# Copy the rest of the app (this used to wipe Yarn’s state)
+# Copy the rest of the app
 COPY . .
-
-# Install deps (run AFTER copying everything)
-RUN yarn install --immutable
 
 # Set production mode
 ENV NODE_ENV=production
@@ -43,13 +37,9 @@ ENV NODE_ENV=production
 RUN yarn run build
 
 # Runtime stage
-# Runtime stage
 FROM node:22-alpine3.20 AS runner
-WORKDIR /app
 
-# ✅ Add these two lines so `yarn start` uses Yarn 4
-RUN corepack enable
-RUN corepack prepare yarn@4.9.4 --activate
+WORKDIR /app
 
 # Copy built files and dependencies
 COPY --from=builder /app/.next .next
@@ -57,7 +47,8 @@ COPY --from=builder /app/node_modules node_modules
 COPY --from=builder /app/public public
 COPY --from=builder /app/package.json package.json
 
+# Expose port
 EXPOSE 3000
 
+# Start the application
 CMD ["yarn", "start"]
-
