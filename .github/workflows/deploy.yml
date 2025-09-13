@@ -109,10 +109,20 @@ jobs:
       - name: Authenticate with DigitalOcean
         run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
 
-      - name: Trigger DO Registry Cleanup (force yes via TTY)
+      - name: Install expect
+        run: sudo apt-get update && sudo apt-get install -y expect
+
+      - name: Trigger DO Registry Cleanup (force yes with expect)
         run: |
-          yes | script -q -e -c \
-            "doctl registry garbage-collection start labrago --include-untagged-manifests --force" /dev/null
+          expect - <<'EOF'
+          log_user 1
+          spawn doctl registry garbage-collection start labrago --include-untagged-manifests --force
+          expect {
+            -re {Are you sure.*} { send "yes\r" }
+            timeout { }
+          }
+          expect eof
+          EOF
 
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
