@@ -36,16 +36,16 @@ ENV NODE_ENV=production
 # Build the app
 RUN yarn run build
 
-# Runtime stage
-FROM node:22-alpine3.20 AS runner
+# # Runtime stage
+# FROM node:22-alpine3.20 AS runner
 
-WORKDIR /app
+# WORKDIR /app
 
-# Copy built files and dependencies
-COPY --from=builder /app/.next .next
-COPY --from=builder /app/node_modules node_modules
-COPY --from=builder /app/public public
-COPY --from=builder /app/package.json package.json
+# # Copy built files and dependencies
+# COPY --from=builder /app/.next .next
+# COPY --from=builder /app/node_modules node_modules
+# COPY --from=builder /app/public public
+# COPY --from=builder /app/package.json package.json
 
 # Expose port
 EXPOSE 3000
