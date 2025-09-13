@@ -94,44 +94,44 @@ jobs:
 
           docker push registry.digitalocean.com/labrago/backend:v1.1
 
-deploy:
-  needs: [build-and-push-frontend, build-and-push-backend]
-  if: ${{ always() }}
-  runs-on: ubuntu-latest
-  steps:
-    - name: Install doctl (tarball, not snap)
-      run: |
-        set -euo pipefail
-        VER="v1.141.0"
-        curl -sL "https://github.com/digitalocean/doctl/releases/download/${VER}/doctl-${VER}-linux-amd64.tar.gz" \
-        | tar -xz
-        sudo mv doctl /usr/local/bin/
-        doctl version
+  deploy:
+    needs: [build-and-push-frontend, build-and-push-backend]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install doctl (tarball, not snap)
+        run: |
+          set -euo pipefail
+          VER="v1.141.0"
+          curl -sL "https://github.com/digitalocean/doctl/releases/download/${VER}/doctl-${VER}-linux-amd64.tar.gz" \
+          | tar -xz
+          sudo mv doctl /usr/local/bin/
+          doctl version
 
-    - name: Authenticate with DigitalOcean
-      run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
+      - name: Authenticate with DigitalOcean
+        run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
 
-    - name: Trigger DO Registry Cleanup (positional arg first)
-      run: |
-        set -euo pipefail
-        # Preferred ordering: start <registry> [flags]
-        if ! doctl registry garbage-collection start labrago --include-untagged-manifests --force; then
-          echo "GC start failed once, checking if another GC is active and falling back to non-interactive 'yes'…"
-          doctl registry garbage-collection get-active || true
-          yes | doctl registry garbage-collection start labrago --include-untagged-manifests || true
-        fi
+      - name: Trigger DO Registry Cleanup (positional arg first)
+        run: |
+          set -euo pipefail
+          # Preferred ordering: start <registry> [flags]
+          if ! doctl registry garbage-collection start labrago --include-untagged-manifests --force; then
+            echo "GC start failed once, checking if another GC is active and falling back to non-interactive 'yes'…"
+            doctl registry garbage-collection get-active || true
+            yes | doctl registry garbage-collection start labrago --include-untagged-manifests || true
+          fi
 
-    - name: Install kubectl
-      run: |
-        set -euo pipefail
-        sudo apt-get update -y
-        sudo apt-get install -y kubectl
+      - name: Install kubectl
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          sudo apt-get install -y kubectl
 
-    - name: Set Kubeconfig
-      run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
+      - name: Set Kubeconfig
+        run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
 
-    - name: Restart Frontend Deployment
-      run: kubectl rollout restart deployment frontend-deploy
+      - name: Restart Frontend Deployment
+        run: kubectl rollout restart deployment frontend-deploy
 
-    - name: Restart Backend Deployment
-      run: kubectl rollout restart deployment backend-deploy
+      - name: Restart Backend Deployment
+        run: kubectl rollout restart deployment backend-deploy
