@@ -36,7 +36,7 @@ ENV NODE_ENV=production
 # Build the app
 RUN yarn run build
 
-# Runtime stage
+## Runtime stage
 FROM node:22-alpine3.20 AS runner
 
 WORKDIR /app
