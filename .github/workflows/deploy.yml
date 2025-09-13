@@ -105,48 +105,38 @@ jobs:
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-      # 🧪 Show doctl binary + version so we know which one is running
-      - name: doctl info
+      # Replace just your GC bits with this
+      - name: Show doctl version
         run: |
           which doctl
           doctl version
-          doctl auth list
 
-      # 🧪 Show what the CLI expects for this command (helps verify flags)
-      - name: Show GC help
-        run: doctl registry garbage-collection start --help
+      - name: Help (new command family)
+        run: doctl registries garbage-collection start --help
 
-      # 🧪 Confirm the registry is visible to this token
-      - name: Registry check
-        run: |
-          doctl registries list -o json
-          # Or, if you prefer legacy group:
-          doctl registry get -o json || true
-
-      # 🧪 See if a GC is already running (only 1 allowed per registry)
-      - name: Check active GC
+      - name: Check active GC (new endpoint)
         run: |
           set -e
-          if doctl registry garbage-collection get-active labrago -o json; then
+          if doctl registries garbage-collection get-active labrago -o json; then
             echo "GC already active — skipping start."
             exit 0
           else
             echo "No active GC — proceeding."
           fi
 
-      # 🚀 Start GC with non-interactive + trace so it **cannot** prompt
-      - name: Trigger DO Registry Cleanup (non-interactive, traced)
+      - name: Start GC (non-interactive, traced)
         run: |
           set -euo pipefail
-          doctl --trace registry garbage-collection start labrago \
+          # Use the new 'registries' group, and keep -f
+          doctl --trace registries garbage-collection start labrago \
             --include-untagged-manifests \
-            --force \
-            --interactive=false \
-            -o json
+            -f
 
-      # 🧪 Show GC now active (proof)
       - name: Confirm GC active
-        run: doctl registry garbage-collection get-active labrago -o json || true
+        run: doctl registries garbage-collection get-active labrago -o json || true
+
+      - name: List past GCs
+        run: doctl registries garbage-collection list labrago -o json
 
       # (Your k8s steps)
       - name: Set Kubeconfig
