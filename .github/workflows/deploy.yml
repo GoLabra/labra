@@ -99,34 +99,18 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - name: Install doctl (tarball, not snap)
+      - name: Install doctl
         run: |
-          set -euo pipefail
-          VER="1.141.0"  # note: no leading 'v' here
-          curl -fsSL "https://github.com/digitalocean/doctl/releases/download/v${VER}/doctl-${VER}-linux-amd64.tar.gz" -o doctl.tgz
-          tar -tzf doctl.tgz > /dev/null
-          tar -xzf doctl.tgz
-          sudo install -m 0755 doctl /usr/local/bin/doctl
-          doctl version
+          sudo apt update
+          sudo apt install -y snapd
+          sudo snap install doctl
+          sudo snap connect doctl:kube-config
 
       - name: Authenticate with DigitalOcean
         run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
 
-      - name: Trigger DO Registry Cleanup (positional arg first)
-        run: |
-          set -euo pipefail
-          # Preferred ordering: start <registry> [flags]
-          if ! doctl registry garbage-collection start labrago --include-untagged-manifests --force; then
-            echo "GC start failed once, checking if another GC is active and falling back to non-interactive 'yes'…"
-            doctl registry garbage-collection get-active || true
-            yes | doctl registry garbage-collection start labrago --include-untagged-manifests || true
-          fi
-
-      - name: Install kubectl
-        run: |
-          set -euo pipefail
-          sudo apt-get update -y
-          sudo apt-get install -y kubectl
+      - name: Trigger DO Registry Cleanup
+        run: yes | doctl registry garbage-collection start labrago --include-untagged-manifests
 
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
