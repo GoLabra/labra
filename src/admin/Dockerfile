@@ -23,12 +23,18 @@ ENV NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL=$NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROU
 ENV NEXT_PUBLIC_CENTRIFUGO_URL=$NEXT_PUBLIC_CENTRIFUGO_URL
 
 
-# Install dependencies
+# Copy manifest files
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
 
-# Copy the rest of the app
+# Enable Corepack and activate Yarn 4
+RUN corepack enable
+RUN corepack prepare yarn@4.9.4 --activate
+
+# Copy the rest of the app (this used to wipe Yarn’s state)
 COPY . .
+
+# Install deps (run AFTER copying everything)
+RUN yarn install --immutable
 
 # Set production mode
 ENV NODE_ENV=production
