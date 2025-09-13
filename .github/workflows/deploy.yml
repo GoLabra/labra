@@ -109,11 +109,18 @@ jobs:
           which doctl
           doctl version
 
-      - name: Log in to DigitalOcean Container Registry
-        run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
+      - name: Trigger DO Registry Cleanup (non-interactive)
+        run: |
+          # Skip if a GC is already active (only one can run)
+          if doctl registry garbage-collection get-active labrago >/dev/null 2>&1; then
+            echo "GC already active — skipping"
+            exit 0
+          fi
 
-      - name: Trigger DO Registry Cleanup
-        run: doctl registry garbage-collection start --include-untagged-manifests --force labrago
+          doctl registry garbage-collection start labrago \
+            --include-untagged-manifests \
+            --force \
+            --interactive=false
 
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
