@@ -109,18 +109,12 @@ jobs:
           which doctl
           doctl version
 
-      - name: Trigger DO Registry Cleanup (non-interactive)
+      - name: Start DOCR GC via API
         run: |
-          # Skip if a GC is already active (only one can run)
-          if doctl registry garbage-collection get-active labrago >/dev/null 2>&1; then
-            echo "GC already active — skipping"
-            exit 0
-          fi
-
-          doctl registry garbage-collection start labrago \
-            --include-untagged-manifests \
-            --force \
-            --interactive=false
+          curl -sS -X POST "https://api.digitalocean.com/v2/registry/labrago/garbage-collection" \
+            -H "Authorization: Bearer ${{ secrets.DO_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"include_untagged_manifests": true}'
 
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
