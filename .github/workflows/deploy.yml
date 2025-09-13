@@ -99,24 +99,44 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - name: Install doctl
+      - name: Checkout (needed for kubectl context later if you template anything)
+        uses: actions/checkout@v4
+
+      # Install doctl from tarball (avoid Snap quirks)
+      - name: Install doctl (tarball)
         run: |
-          sudo apt update
-          sudo apt install -y snapd
-          sudo snap install doctl
-          sudo snap connect doctl:kube-config
+          set -euo pipefail
+          DOCTL_VERSION="v1.111.0"
+          curl -fsSL "https://github.com/digitalocean/doctl/releases/download/${DOCTL_VERSION}/doctl-1.111.0-linux-amd64.tar.gz" \
+            | tar -xz
+          sudo mv doctl /usr/local/bin/doctl
+          doctl version
 
       - name: Authenticate with DigitalOcean
         run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
 
-      - name: Trigger DO Registry Cleanup
-        run: >
-          doctl registry garbage-collection start labrago
-          --include-untagged-manifests --force --interactive=false
+      # Use containerized doctl for GC to avoid any TTY/interactive funkiness
+      - name: Trigger DO Registry Cleanup (non-interactive)
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -e DIGITALOCEAN_ACCESS_TOKEN="${{ secrets.DO_ACCESS_TOKEN }}" \
+            digitalocean/doctl:latest \
+            registry garbage-collection start labrago \
+            --include-untagged-manifests \
+            --force \
+            --interactive=false
 
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
 
+      # (Optional) Show contexts to be sure we're on the right one
+      - name: kubectl context check
+        run: |
+          kubectl config get-contexts
+          kubectl config current-context
+
+      # Restart deployments (add --namespace if not default)
       - name: Restart Frontend Deployment
         run: kubectl rollout restart deployment frontend-deploy
 
