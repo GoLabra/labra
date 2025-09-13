@@ -99,16 +99,6 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - name: Install doctl
-        run: |
-          sudo apt update
-          sudo apt install -y snapd
-          sudo snap install doctl
-          sudo snap connect doctl:kube-config
-
-      - name: Authenticate with DigitalOcean
-        run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
-
       - name: Set up doctl
         uses: digitalocean/action-doctl@v2
         with:
