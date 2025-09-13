@@ -105,68 +105,81 @@ jobs:
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-      # Replace just your GC bits with this
-      - name: Show doctl version
+      # Show version (sanity)
+      - name: doctl info
         run: |
           which doctl
           doctl version
 
-      - name: Help (new command family)
-        run: doctl registries garbage-collection start --help
-
-      # Make sure you’re using the plural commands: `registries`
-      - name: Check active GC (new endpoint)
+      # Skip if a GC is already active
+      - name: Check active GC
         run: |
           set -e
-          if doctl registries garbage-collection get-active labrago -o json; then
+          if doctl registries garbage-collection get-active labrago -o json >/dev/null 2>&1; then
             echo "GC already active — skipping start."
             exit 0
           else
             echo "No active GC — proceeding."
           fi
 
-      - name: Start GC (non-interactive, traced)
+      # Start GC (plural 'registries'), non-interactive, JSON output
+      - name: Start GC (trace + JSON)
+        id: start_gc
         run: |
           set -euo pipefail
-          doctl --trace registries garbage-collection start labrago \
+          out="$(doctl --trace registries garbage-collection start labrago \
             --include-untagged-manifests \
-            -f
+            -f \
+            -o json)"
+          echo "$out"
+          # Extract UUID from either response shape
+          uuid="$(echo "$out" | jq -r '.garbage_collection.uuid // .uuid // empty')"
+          echo "uuid=$uuid" >> "$GITHUB_OUTPUT"
 
-      # Optional: wait until GC finishes (prints status every 10s)
+      # Wait for GC to finish (handles object OR array JSON)
       - name: Wait for GC to finish
         run: |
           set -euo pipefail
           sudo apt-get update >/dev/null && sudo apt-get install -y jq >/dev/null
+
+          normalize_obj() {
+            # Read stdin; if array -> first element; else pass object through
+            jq 'if type=="array" then .[0] else . end'
+          }
+
           for i in {1..90}; do
-            resp="$(doctl registries garbage-collection get-active labrago -o json || true)"
+            resp="$(doctl registries garbage-collection get-active labrago -o json 2>/dev/null || true)"
+
             if [ -z "$resp" ] || [ "$resp" = "[]" ] || [ "$resp" = "null" ]; then
               echo "No active GC (done)."
               break
             fi
-            status="$(echo "$resp" | jq -r '.[0].status')"
-            echo "GC status: $status"
+
+            obj="$(echo "$resp" | normalize_obj)"
+            status="$(echo "$obj" | jq -r '.status')"
+            uuid="$(echo "$obj"  | jq -r '.uuid')"
+            echo "GC $uuid status: $status"
+
             case "$status" in
-              requested|queued|scanning|in_progress)
-                sleep 10
-                ;;
+              requested|queued|scanning|in_progress) sleep 10 ;;
               succeeded)
-                echo "$resp" | jq -r '.[0] | "Blobs deleted: \(.blobs_deleted) | Freed bytes: \(.freed_bytes)"'
+                echo "$obj" | jq -r '"Blobs deleted: \(.blobs_deleted) | Freed bytes: \(.freed_bytes)"'
                 break
                 ;;
               failed|canceled)
                 echo "GC ended with status: $status"
-                echo "$resp"
+                echo "$obj"
                 exit 1
                 ;;
               *)
                 echo "Unknown status: $status"
-                echo "$resp"
+                echo "$obj"
                 exit 1
                 ;;
             esac
           done
 
-      # Show recent history (nice to have)
+      # Show recent history (proof)
       - name: List past GCs
         run: doctl registries garbage-collection list labrago -o json
 
