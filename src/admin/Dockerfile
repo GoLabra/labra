@@ -43,9 +43,13 @@ ENV NODE_ENV=production
 RUN yarn run build
 
 # Runtime stage
+# Runtime stage
 FROM node:22-alpine3.20 AS runner
-
 WORKDIR /app
+
+# ✅ Add these two lines so `yarn start` uses Yarn 4
+RUN corepack enable
+RUN corepack prepare yarn@4.9.4 --activate
 
 # Copy built files and dependencies
 COPY --from=builder /app/.next .next
@@ -53,8 +57,7 @@ COPY --from=builder /app/node_modules node_modules
 COPY --from=builder /app/public public
 COPY --from=builder /app/package.json package.json
 
-# Expose port
 EXPOSE 3000
 
-# Start the application
 CMD ["yarn", "start"]
+
