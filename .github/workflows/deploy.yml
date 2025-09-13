@@ -99,23 +99,56 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
+      # ✅ Use the official action (fresh doctl, no snap weirdness)
       - name: Set up doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
 
-      - name: Show doctl info (debug)
+      # 🧪 Show doctl binary + version so we know which one is running
+      - name: doctl info
         run: |
           which doctl
           doctl version
+          doctl auth list
 
-      - name: Start DOCR GC via API
+      # 🧪 Show what the CLI expects for this command (helps verify flags)
+      - name: Show GC help
+        run: doctl registry garbage-collection start --help
+
+      # 🧪 Confirm the registry is visible to this token
+      - name: Registry check
         run: |
-          curl -sS -X POST "https://api.digitalocean.com/v2/registry/labrago/garbage-collection" \
-            -H "Authorization: Bearer ${{ secrets.DO_ACCESS_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{"include_untagged_manifests": true}'
+          doctl registries list -o json
+          # Or, if you prefer legacy group:
+          doctl registry get -o json || true
 
+      # 🧪 See if a GC is already running (only 1 allowed per registry)
+      - name: Check active GC
+        run: |
+          set -e
+          if doctl registry garbage-collection get-active labrago -o json; then
+            echo "GC already active — skipping start."
+            exit 0
+          else
+            echo "No active GC — proceeding."
+          fi
+
+      # 🚀 Start GC with non-interactive + trace so it **cannot** prompt
+      - name: Trigger DO Registry Cleanup (non-interactive, traced)
+        run: |
+          set -euo pipefail
+          doctl --trace registry garbage-collection start labrago \
+            --include-untagged-manifests \
+            --force \
+            --interactive=false \
+            -o json
+
+      # 🧪 Show GC now active (proof)
+      - name: Confirm GC active
+        run: doctl registry garbage-collection get-active labrago -o json || true
+
+      # (Your k8s steps)
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
 
