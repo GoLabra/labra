@@ -104,6 +104,11 @@ jobs:
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
 
+      - name: Show doctl info (debug)
+        run: |
+          which doctl
+          doctl version
+
       - name: Trigger DO Registry Cleanup
         run: doctl registry garbage-collection start labrago --include-untagged-manifests --force
 
