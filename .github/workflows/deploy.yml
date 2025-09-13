@@ -99,97 +99,19 @@ jobs:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      # ✅ Use the official action (fresh doctl, no snap weirdness)
-      - name: Set up doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DO_ACCESS_TOKEN }}
-
-      # (Sanity) show doctl version
-      - name: doctl info
+      - name: Install doctl
         run: |
-          which doctl
-          doctl version
+          sudo apt update
+          sudo apt install -y snapd
+          sudo snap install doctl
+          sudo snap connect doctl:kube-config
 
-      # Skip if a GC is already active
-      - name: Check active GC
-        run: |
-          set -e
-          if doctl registries garbage-collection get-active labrago -o json >/dev/null 2>&1; then
-            echo "GC already active — skipping start."
-            exit 0
-          else
-            echo "No active GC — proceeding."
-          fi
+      - name: Authenticate with DigitalOcean
+        run: doctl auth init --access-token "${{ secrets.DO_ACCESS_TOKEN }}"
 
-      # Start GC (plural 'registries'), non-interactive, JSON output
-      - name: Start GC (trace + JSON)
-        id: start_gc
-        run: |
-          set -euo pipefail
-          out="$(doctl --trace registries garbage-collection start labrago \
-            --include-untagged-manifests \
-            -f \
-            -o json)"
-          echo "$out"
+      - name: Trigger DO Registry Cleanup
+        run: doctl registry garbage-collection start labrago --include-untagged-manifests --force
 
-          # Extract UUID robustly: handles array OR object OR "garbage_collection" wrapper
-          uuid="$(echo "$out" | jq -r '
-            if type=="array" then .[0].uuid
-            elif has("garbage_collection") then .garbage_collection.uuid
-            else .uuid end
-          ')"
-          echo "Started GC UUID: $uuid"
-          echo "uuid=$uuid" >> "$GITHUB_OUTPUT"
-
-      # Wait for GC to finish (handles object OR array shape from get-active)
-      - name: Wait for GC to finish
-        run: |
-          set -euo pipefail
-          sudo apt-get update >/dev/null && sudo apt-get install -y jq >/dev/null
-
-          normalize_obj() {
-            # stdin -> if array, take first elem; if object, pass through
-            jq 'if type=="array" then .[0] else . end'
-          }
-
-          for i in {1..90}; do
-            resp="$(doctl registries garbage-collection get-active labrago -o json 2>/dev/null || true)"
-
-            if [ -z "$resp" ] || [ "$resp" = "[]" ] || [ "$resp" = "null" ]; then
-              echo "No active GC (done)."
-              break
-            fi
-
-            obj="$(echo "$resp" | normalize_obj)"
-            status="$(echo "$obj" | jq -r '.status')"
-            uuid="$(echo "$obj"  | jq -r '.uuid')"
-            echo "GC $uuid status: $status"
-
-            case "$status" in
-              requested|queued|scanning|in_progress) sleep 10 ;;
-              succeeded)
-                echo "$obj" | jq -r '"Blobs deleted: \(.blobs_deleted) | Freed bytes: \(.freed_bytes)"'
-                break
-                ;;
-              failed|canceled)
-                echo "GC ended with status: $status"
-                echo "$obj"
-                exit 1
-                ;;
-              *)
-                echo "Unknown status: $status"
-                echo "$obj"
-                exit 1
-                ;;
-            esac
-          done
-
-      # Show recent history (proof it ran)
-      - name: List past GCs
-        run: doctl registries garbage-collection list labrago -o json
-
-      # (Your k8s steps)
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save k8s-1-32-1-do-0-fra1-1739148952991
 
