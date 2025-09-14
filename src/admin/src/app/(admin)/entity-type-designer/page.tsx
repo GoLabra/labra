@@ -30,7 +30,7 @@ export default function EntityTypeDesigner() {
             </Typography>
 
             <Typography color="text.primary" variant="body2">
-              Once you have created or selected an entity, you can use the
+              1Once you have created or selected an entity, you can use the
               various tools provided to manage your content effectively. The
               management tools are designed to give you full control over your
               content, ensuring it is accurate and presented in the best
