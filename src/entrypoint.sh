@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 echo "⏳ Waiting briefly to ensure volumes are mounted..."
 sleep 1
@@ -10,11 +9,10 @@ if [ ! -d "/app/app/schema" ]; then
   exit 1
 fi
 
-echo "⚙️ Running go generate..."
+echo "📦 Running go generate..."
 cd /app/app
+sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
 go generate
-
-echo "📦 Running go mod tidy..."
 go mod tidy
 
 echo "🚀 Starting Go application..."
