@@ -80,6 +80,15 @@ jobs:
       - name: Build and Push Backend Image
         run: |
           docker build \
+            --build-arg DSN=${{ secrets.DSN }} \
+            --build-arg DB_DIALECT=${{ secrets.DB_DIALECT }} \
+            --build-arg SERVER_PORT=${{ secrets.SERVER_PORT }} \
+            --build-arg ENT_SCHEMA_PATH=${{ secrets.ENT_SCHEMA_PATH }} \
+            --build-arg SECRET_KEY=${{ secrets.SECRET_KEY }} \
+            --build-arg CENTRIFUGO_API_ADDRESS=${{ secrets.CENTRIFUGO_API_ADDRESS }} \
+            --build-arg CENTRIFUGO_API_KEY=${{ secrets.CENTRIFUGO_API_KEY }} \
+            --build-arg FILE_STORAGE_PROVIDER=${{ secrets.FILE_STORAGE_PROVIDER }} \
+            --build-arg FILE_STORAGE_PATH=${{ secrets.FILE_STORAGE_PATH }} \
             -t registry.digitalocean.com/labrago/backend:v1.1 \
             -f ./src/Dockerfile ./src
 

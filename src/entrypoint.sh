@@ -9,12 +9,6 @@ if [ ! -d "/app/app/schema" ]; then
   exit 1
 fi
 
-echo "📦 Running go generate..."
-cd /app/app
-sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
-go generate
-go mod tidy
-
 echo "🚀 Starting Go application..."
 cd /app/cli
 exec go run main.go start
