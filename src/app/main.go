@@ -197,7 +197,7 @@ func main() {
 		Handler: router,
 	}
 
-	log.Printf("Server starting on port %s\n", conf.ServerPort)
+	log.Printf("Server starting on port... %s\n", conf.ServerPort)
 
 	graphqlSubscriptionClient.PublishAppStatusMessage(subscription.AppStatusUp)
 
