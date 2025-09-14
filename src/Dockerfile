@@ -10,12 +10,6 @@ WORKDIR /app
 # Copy the entire project
 COPY . .
 
-# Change to the app directory and run Go commands
-WORKDIR /app/app
-
-# Copy the entire project
-COPY . .
-
 # Copy and set up entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
