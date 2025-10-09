@@ -9,11 +9,12 @@ import (
 )
 
 type store struct {
-	MutationInput         *gen.Template
-	MutationSetEdge       *gen.Template
-	MutationAddEdges      *gen.Template
-	MutationUpdatedFields *gen.Template
-	AdditionalFields      *gen.Template
+	MutationInput      *gen.Template
+	MutationSetEdge    *gen.Template
+	MutationAddEdges   *gen.Template
+	MutationOldValues  *gen.Template
+	AdditionalFields   *gen.Template
+	OwnerFilterMethods *gen.Template
 }
 
 var (
@@ -34,7 +35,7 @@ func Load(templateFuncMap template.FuncMap) (store, error) {
 		return templateStore, err
 	}
 
-	templateStore.MutationUpdatedFields, err = loadT("mutation_updated_fields", "entgql/mutation_updated_fields.go.tmpl", templateFuncMap)
+	templateStore.MutationOldValues, err = loadT("mutation_old_values", "entgql/mutation_old_values.go.tmpl", templateFuncMap)
 	if err != nil {
 		log.Fatalf("cannot parse mutation set edge template: %v", err)
 		return templateStore, err
@@ -55,6 +56,12 @@ func Load(templateFuncMap template.FuncMap) (store, error) {
 	templateStore.AdditionalFields, err = loadT("additional_fields.go.tmpl", "entgql/additional_fields.go.tmpl", templateFuncMap)
 	if err != nil {
 		log.Fatalf("cannot parse additional fields template: %v", err)
+		return templateStore, err
+	}
+
+	templateStore.OwnerFilterMethods, err = loadT("owner_filter_methods.go.tmpl", "ent/owner_filter_methods.go.tmpl", templateFuncMap)
+	if err != nil {
+		log.Fatalf("cannot parse owner filter methods template: %v", err)
 		return templateStore, err
 	}
 

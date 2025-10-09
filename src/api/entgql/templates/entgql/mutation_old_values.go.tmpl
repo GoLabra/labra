@@ -2,7 +2,19 @@
 
 package ent
 
+type Auditor interface {
+	AdminCreatedBy(context.Context) (*AdminUser, error)
+	CreatedBy(context.Context) (*User, error)
+}
+
 {{- range $n := $.Nodes }}
+
+// OldAudit returns the old audit values of a node
+func (m *{{$n.Name}}Mutation) OldAudit(ctx context.Context) (Auditor, error) {
+	return m.Client().{{$n.Name}}.Get(ctx, *m.id)
+}
+
+
 // UpdatedFields returns all fields and edges that were changed during this mutation.
 func (m *{{$n.Name}}Mutation) UpdatedFields() map[string]Value {
     var updatedFields = make(map[string]Value)
