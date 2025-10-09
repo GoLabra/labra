@@ -170,13 +170,13 @@ go run main.go start
 In `/app/go.mod`:
 
 ```go
-replace github.com/GoLabra/labra/src/api => ../api
+replace github.com/GoLabra/labra => ../api
 ```
 
 or run:
 
 ```bash
-sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra\/src\/api => ../api" go.mod
+sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra => ..\/..\/." go.mod
 ```
 
 ---

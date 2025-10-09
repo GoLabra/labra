@@ -30,6 +30,7 @@ go.work.sum
 .vscode
 __debug*
 launch.json
+*.code-workspace
 
 # generated code
 src/app/generated

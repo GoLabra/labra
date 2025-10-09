@@ -1,0 +1,45 @@
+package svc
+
+import (
+	"app/domain/repo"
+    {{- range $n := $.Nodes }}
+	{{- if eq $n.Annotations.Entity.Owner "User" }}
+	"app/interfaces/svc"
+	{{- break }}
+	{{- end }}
+    {{- end }}
+
+	adminRepo "github.com/GoLabra/labra/entgql/domain/repo"
+	adminSvc "github.com/GoLabra/labra/entgql/domain/svc"
+	adminInterfaces "github.com/GoLabra/labra/entgql/interfaces/svc"
+)
+
+var (
+	ErrServiceNotSetInContext = "service is not set in context"
+)
+
+type Service struct {
+	// Node                  svc.Node
+    {{- range $n := $.Nodes }}
+	{{- if ne $n.Annotations.Entity.Owner "User" }}
+	{{$n.Name}}              adminInterfaces.{{$n.Name}}
+	{{- else }}
+	{{$n.Name}}              svc.{{$n.Name}}
+	{{- end }}
+    {{- end }}
+}
+
+func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service {
+	return &Service{
+		// Node:                  NewNode(repository),
+        {{- range $n := $.Nodes }}
+		//  {{ $n.Annotations.Entity.Owner }}
+		//  {{ $n.Annotations.Entity }}
+		{{- if ne $n.Annotations.Entity.Owner "User" }}
+        {{$n.Name}}:              adminSvc.New{{$n.Name}}(adminRepo),
+		{{- else }}
+		{{$n.Name}}:              New{{$n.Name}}(repository),
+		{{- end }}
+        {{- end }}
+	}
+}
