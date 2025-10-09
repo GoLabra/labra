@@ -20,6 +20,8 @@ func NewUUIDV7() string {
 }
 
 func LoadSchema(config *config.Config) {
+	LoadSystemEntities()
+
 	graph, err := entc.LoadGraph(config.EntSchemaPath, &gen.Config{})
 	if err != nil {
 		panic(err)
@@ -28,13 +30,6 @@ func LoadSchema(config *config.Config) {
 	nodes := slices.DeleteFunc(graph.Nodes, func(node *gen.Type) bool {
 		return node.Annotations["Entity"] == nil || node.Annotations["Entity"].(map[string]any)["Owner"] != "User"
 	})
-
-	graph, err = entc.LoadGraph("../../entgql/ent/schema", &gen.Config{}) // TODO this is not correct
-	if err != nil {
-		panic(err)
-	}
-
-	nodes = append(nodes, graph.Nodes...)
 
 	for _, node := range nodes {
 		var entityAnnotations annotations.Entity

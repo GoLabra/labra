@@ -11,7 +11,7 @@ require (
 	entgo.io/contrib v0.6.0
 	entgo.io/ent v0.14.4
 	github.com/99designs/gqlgen v0.17.73
-	github.com/GoLabra/labra v0.0.0-00010101000000-000000000000
+	github.com/GoLabra/labra v0.1.2
 	github.com/centrifugal/gocent/v3 v3.3.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/jwtauth/v5 v5.3.3
