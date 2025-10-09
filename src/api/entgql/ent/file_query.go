@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
@@ -19,15 +20,17 @@ import (
 // FileQuery is the builder for querying File entities.
 type FileQuery struct {
 	config
-	ctx           *QueryContext
-	order         []file.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.File
-	withCreatedBy *UserQuery
-	withUpdatedBy *UserQuery
-	withFKs       bool
-	modifiers     []func(*sql.Selector)
-	loadTotal     []func(context.Context, []*File) error
+	ctx                *QueryContext
+	order              []file.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.File
+	withAdminCreatedBy *AdminUserQuery
+	withAdminUpdatedBy *AdminUserQuery
+	withCreatedBy      *UserQuery
+	withUpdatedBy      *UserQuery
+	withFKs            bool
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*File) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,6 +65,50 @@ func (fq *FileQuery) Unique(unique bool) *FileQuery {
 func (fq *FileQuery) Order(o ...file.OrderOption) *FileQuery {
 	fq.order = append(fq.order, o...)
 	return fq
+}
+
+// QueryAdminCreatedBy chains the current query on the "admin_created_by" edge.
+func (fq *FileQuery) QueryAdminCreatedBy() *AdminUserQuery {
+	query := (&AdminUserClient{config: fq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := fq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := fq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(file.Table, file.FieldID, selector),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, file.AdminCreatedByTable, file.AdminCreatedByColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAdminUpdatedBy chains the current query on the "admin_updated_by" edge.
+func (fq *FileQuery) QueryAdminUpdatedBy() *AdminUserQuery {
+	query := (&AdminUserClient{config: fq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := fq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := fq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(file.Table, file.FieldID, selector),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, file.AdminUpdatedByTable, file.AdminUpdatedByColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryCreatedBy chains the current query on the "created_by" edge.
@@ -295,17 +342,41 @@ func (fq *FileQuery) Clone() *FileQuery {
 		return nil
 	}
 	return &FileQuery{
-		config:        fq.config,
-		ctx:           fq.ctx.Clone(),
-		order:         append([]file.OrderOption{}, fq.order...),
-		inters:        append([]Interceptor{}, fq.inters...),
-		predicates:    append([]predicate.File{}, fq.predicates...),
-		withCreatedBy: fq.withCreatedBy.Clone(),
-		withUpdatedBy: fq.withUpdatedBy.Clone(),
+		config:             fq.config,
+		ctx:                fq.ctx.Clone(),
+		order:              append([]file.OrderOption{}, fq.order...),
+		inters:             append([]Interceptor{}, fq.inters...),
+		predicates:         append([]predicate.File{}, fq.predicates...),
+		withAdminCreatedBy: fq.withAdminCreatedBy.Clone(),
+		withAdminUpdatedBy: fq.withAdminUpdatedBy.Clone(),
+		withCreatedBy:      fq.withCreatedBy.Clone(),
+		withUpdatedBy:      fq.withUpdatedBy.Clone(),
 		// clone intermediate query.
 		sql:  fq.sql.Clone(),
 		path: fq.path,
 	}
+}
+
+// WithAdminCreatedBy tells the query-builder to eager-load the nodes that are connected to
+// the "admin_created_by" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *FileQuery) WithAdminCreatedBy(opts ...func(*AdminUserQuery)) *FileQuery {
+	query := (&AdminUserClient{config: fq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	fq.withAdminCreatedBy = query
+	return fq
+}
+
+// WithAdminUpdatedBy tells the query-builder to eager-load the nodes that are connected to
+// the "admin_updated_by" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *FileQuery) WithAdminUpdatedBy(opts ...func(*AdminUserQuery)) *FileQuery {
+	query := (&AdminUserClient{config: fq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	fq.withAdminUpdatedBy = query
+	return fq
 }
 
 // WithCreatedBy tells the query-builder to eager-load the nodes that are connected to
@@ -409,12 +480,14 @@ func (fq *FileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*File, e
 		nodes       = []*File{}
 		withFKs     = fq.withFKs
 		_spec       = fq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [4]bool{
+			fq.withAdminCreatedBy != nil,
+			fq.withAdminUpdatedBy != nil,
 			fq.withCreatedBy != nil,
 			fq.withUpdatedBy != nil,
 		}
 	)
-	if fq.withCreatedBy != nil || fq.withUpdatedBy != nil {
+	if fq.withAdminCreatedBy != nil || fq.withAdminUpdatedBy != nil || fq.withCreatedBy != nil || fq.withUpdatedBy != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -441,6 +514,18 @@ func (fq *FileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*File, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := fq.withAdminCreatedBy; query != nil {
+		if err := fq.loadAdminCreatedBy(ctx, query, nodes, nil,
+			func(n *File, e *AdminUser) { n.Edges.AdminCreatedBy = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := fq.withAdminUpdatedBy; query != nil {
+		if err := fq.loadAdminUpdatedBy(ctx, query, nodes, nil,
+			func(n *File, e *AdminUser) { n.Edges.AdminUpdatedBy = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := fq.withCreatedBy; query != nil {
 		if err := fq.loadCreatedBy(ctx, query, nodes, nil,
 			func(n *File, e *User) { n.Edges.CreatedBy = e }); err != nil {
@@ -461,6 +546,70 @@ func (fq *FileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*File, e
 	return nodes, nil
 }
 
+func (fq *FileQuery) loadAdminCreatedBy(ctx context.Context, query *AdminUserQuery, nodes []*File, init func(*File), assign func(*File, *AdminUser)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*File)
+	for i := range nodes {
+		if nodes[i].file_admin_created_by == nil {
+			continue
+		}
+		fk := *nodes[i].file_admin_created_by
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(adminuser.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "file_admin_created_by" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (fq *FileQuery) loadAdminUpdatedBy(ctx context.Context, query *AdminUserQuery, nodes []*File, init func(*File), assign func(*File, *AdminUser)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*File)
+	for i := range nodes {
+		if nodes[i].file_admin_updated_by == nil {
+			continue
+		}
+		fk := *nodes[i].file_admin_updated_by
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(adminuser.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "file_admin_updated_by" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (fq *FileQuery) loadCreatedBy(ctx context.Context, query *UserQuery, nodes []*File, init func(*File), assign func(*File, *User)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*File)

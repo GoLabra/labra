@@ -7,7 +7,7 @@ export const signInQuery = gql`
     }
 
     mutation SignIn($input: SignInPayload!) {
-        signIn( input: $input) @rest(type: "User", method: "POST", path: "/login") {
+        signIn( input: $input) @rest(type: "User", method: "POST", path: "/admin/login") {
             token
         }
     }
@@ -21,7 +21,7 @@ export const changeRoleQuery = gql`
     }
 
     mutation SignIn($input: ChangeRolePayload!) {
-        changeRole( input: $input) @rest(type: "User", method: "POST", path: "/change-session-role") {
+        changeRole( input: $input) @rest(type: "User", method: "POST", path: "/admin/change-session-role") {
             token
         }
     }
@@ -34,7 +34,7 @@ export const superUserSignUpQuery = gql`
     }
 
     mutation SuperuserSignUp($input: SignUpPayload!) {
-        superuserSignUp( input: $input) @rest(type: "User", method: "POST", path: "/signup") {
+        superuserSignUp( input: $input) @rest(type: "User", method: "POST", path: "/admin/signup") {
             name
         }
     }

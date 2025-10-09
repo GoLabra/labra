@@ -28,12 +28,30 @@ const (
 	FieldStorageFileName = "storage_file_name"
 	// FieldSize holds the string denoting the size field in the database.
 	FieldSize = "size"
+	// EdgeAdminCreatedBy holds the string denoting the admin_created_by edge name in mutations.
+	EdgeAdminCreatedBy = "admin_created_by"
+	// EdgeAdminUpdatedBy holds the string denoting the admin_updated_by edge name in mutations.
+	EdgeAdminUpdatedBy = "admin_updated_by"
 	// EdgeCreatedBy holds the string denoting the created_by edge name in mutations.
 	EdgeCreatedBy = "created_by"
 	// EdgeUpdatedBy holds the string denoting the updated_by edge name in mutations.
 	EdgeUpdatedBy = "updated_by"
 	// Table holds the table name of the file in the database.
 	Table = "files"
+	// AdminCreatedByTable is the table that holds the admin_created_by relation/edge.
+	AdminCreatedByTable = "files"
+	// AdminCreatedByInverseTable is the table name for the AdminUser entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
+	AdminCreatedByInverseTable = "admin_users"
+	// AdminCreatedByColumn is the table column denoting the admin_created_by relation/edge.
+	AdminCreatedByColumn = "file_admin_created_by"
+	// AdminUpdatedByTable is the table that holds the admin_updated_by relation/edge.
+	AdminUpdatedByTable = "files"
+	// AdminUpdatedByInverseTable is the table name for the AdminUser entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
+	AdminUpdatedByInverseTable = "admin_users"
+	// AdminUpdatedByColumn is the table column denoting the admin_updated_by relation/edge.
+	AdminUpdatedByColumn = "file_admin_updated_by"
 	// CreatedByTable is the table that holds the created_by relation/edge.
 	CreatedByTable = "files"
 	// CreatedByInverseTable is the table name for the User entity.
@@ -65,6 +83,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "files"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"file_admin_created_by",
+	"file_admin_updated_by",
 	"file_created_by",
 	"file_updated_by",
 }
@@ -138,6 +158,20 @@ func BySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSize, opts...).ToFunc()
 }
 
+// ByAdminCreatedByField orders the results by admin_created_by field.
+func ByAdminCreatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAdminCreatedByStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByAdminUpdatedByField orders the results by admin_updated_by field.
+func ByAdminUpdatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAdminUpdatedByStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByCreatedByField orders the results by created_by field.
 func ByCreatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -150,6 +184,20 @@ func ByUpdatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newUpdatedByStep(), sql.OrderByField(field, opts...))
 	}
+}
+func newAdminCreatedByStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AdminCreatedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, AdminCreatedByTable, AdminCreatedByColumn),
+	)
+}
+func newAdminUpdatedByStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AdminUpdatedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, AdminUpdatedByTable, AdminUpdatedByColumn),
+	)
 }
 func newCreatedByStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

@@ -3,6 +3,7 @@ package ent
 import (
 	"errors"
 
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
@@ -183,5 +184,50 @@ func (i *UserWhereUniqueInput) P() (predicate.User, error) {
 		return predicates[0], nil
 	default:
 		return user.And(predicates...), nil
+	}
+}
+
+var ErrEmptyAdminUserWhereUniqueInput = errors.New("empty predicate AdminUserWhereUniqueInput")
+
+// UserWhereUniqueInput represents a where input for filtering User queries.
+type AdminUserWhereUniqueInput struct {
+	Predicates []predicate.AdminUser `json:"-"`
+
+	ID    *string `json:"id,omitempty"`
+	Email *string `json:"email,omitempty"`
+}
+
+func (i *AdminUserWhereUniqueInput) AddPredicates(predicates ...predicate.AdminUser) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+func (i *AdminUserWhereUniqueInput) Filter(q *AdminUserQuery) (*AdminUserQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+func (i *AdminUserWhereUniqueInput) P() (predicate.AdminUser, error) {
+	var predicates []predicate.AdminUser
+
+	if i.ID != nil {
+		predicates = append(predicates, adminuser.IDEQ(*i.ID))
+	}
+	if i.Email != nil {
+		predicates = append(predicates, adminuser.EmailEQ(*i.Email))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyAdminUserWhereUniqueInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return adminuser.And(predicates...), nil
 	}
 }

@@ -22,7 +22,39 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, e
 	panic(fmt.Errorf("not implemented: Nodes - nodes"))
 }
 
+// AdminUserRoleIDs is the resolver for the adminUserRoleIDs field.
+func (r *createRoleInputResolver) AdminUserRoleIDs(ctx context.Context, obj *ent.CreateRoleInput, data []string) error {
+	panic(fmt.Errorf("not implemented: AdminUserRoleIDs - adminUserRoleIDs"))
+}
+
+// AddAdminUserRoleIDs is the resolver for the addAdminUserRoleIDs field.
+func (r *updateRoleInputResolver) AddAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error {
+	panic(fmt.Errorf("not implemented: AddAdminUserRoleIDs - addAdminUserRoleIDs"))
+}
+
+// RemoveAdminUserRoleIDs is the resolver for the removeAdminUserRoleIDs field.
+func (r *updateRoleInputResolver) RemoveAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error {
+	panic(fmt.Errorf("not implemented: RemoveAdminUserRoleIDs - removeAdminUserRoleIDs"))
+}
+
+// ClearAdminUserRoles is the resolver for the clearAdminUserRoles field.
+func (r *updateRoleInputResolver) ClearAdminUserRoles(ctx context.Context, obj *ent.UpdateRoleInput, data *bool) error {
+	panic(fmt.Errorf("not implemented: ClearAdminUserRoles - clearAdminUserRoles"))
+}
+
 // Query returns gqlgen.QueryResolver implementation.
 func (r *Resolver) Query() gqlgen.QueryResolver { return &queryResolver{r} }
 
+// CreateRoleInput returns gqlgen.CreateRoleInputResolver implementation.
+func (r *Resolver) CreateRoleInput() gqlgen.CreateRoleInputResolver {
+	return &createRoleInputResolver{r}
+}
+
+// UpdateRoleInput returns gqlgen.UpdateRoleInputResolver implementation.
+func (r *Resolver) UpdateRoleInput() gqlgen.UpdateRoleInputResolver {
+	return &updateRoleInputResolver{r}
+}
+
 type queryResolver struct{ *Resolver }
+type createRoleInputResolver struct{ *Resolver }
+type updateRoleInputResolver struct{ *Resolver }

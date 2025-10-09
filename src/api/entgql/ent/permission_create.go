@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
-	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // PermissionCreate is the builder for creating a Permission entity.
@@ -87,42 +87,42 @@ func (pc *PermissionCreate) SetNillableID(s *string) *PermissionCreate {
 	return pc
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (pc *PermissionCreate) SetCreatedByID(id string) *PermissionCreate {
-	pc.mutation.SetCreatedByID(id)
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (pc *PermissionCreate) SetAdminCreatedByID(id string) *PermissionCreate {
+	pc.mutation.SetAdminCreatedByID(id)
 	return pc
 }
 
-// SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (pc *PermissionCreate) SetNillableCreatedByID(id *string) *PermissionCreate {
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (pc *PermissionCreate) SetNillableAdminCreatedByID(id *string) *PermissionCreate {
 	if id != nil {
-		pc = pc.SetCreatedByID(*id)
+		pc = pc.SetAdminCreatedByID(*id)
 	}
 	return pc
 }
 
-// SetCreatedBy sets the "created_by" edge to the User entity.
-func (pc *PermissionCreate) SetCreatedBy(u *User) *PermissionCreate {
-	return pc.SetCreatedByID(u.ID)
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (pc *PermissionCreate) SetAdminCreatedBy(a *AdminUser) *PermissionCreate {
+	return pc.SetAdminCreatedByID(a.ID)
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (pc *PermissionCreate) SetUpdatedByID(id string) *PermissionCreate {
-	pc.mutation.SetUpdatedByID(id)
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (pc *PermissionCreate) SetAdminUpdatedByID(id string) *PermissionCreate {
+	pc.mutation.SetAdminUpdatedByID(id)
 	return pc
 }
 
-// SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (pc *PermissionCreate) SetNillableUpdatedByID(id *string) *PermissionCreate {
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (pc *PermissionCreate) SetNillableAdminUpdatedByID(id *string) *PermissionCreate {
 	if id != nil {
-		pc = pc.SetUpdatedByID(*id)
+		pc = pc.SetAdminUpdatedByID(*id)
 	}
 	return pc
 }
 
-// SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (pc *PermissionCreate) SetUpdatedBy(u *User) *PermissionCreate {
-	return pc.SetUpdatedByID(u.ID)
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (pc *PermissionCreate) SetAdminUpdatedBy(a *AdminUser) *PermissionCreate {
+	return pc.SetAdminUpdatedByID(a.ID)
 }
 
 // SetRoleID sets the "role" edge to the Role entity by ID.
@@ -262,38 +262,38 @@ func (pc *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 		_spec.SetField(permission.FieldOperation, field.TypeString, value)
 		_node.Operation = value
 	}
-	if nodes := pc.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.CreatedByTable,
-			Columns: []string{permission.CreatedByColumn},
+			Table:   permission.AdminCreatedByTable,
+			Columns: []string{permission.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.permission_created_by = &nodes[0]
+		_node.permission_admin_created_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   permission.UpdatedByTable,
-			Columns: []string{permission.UpdatedByColumn},
+			Table:   permission.AdminUpdatedByTable,
+			Columns: []string{permission.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.permission_updated_by = &nodes[0]
+		_node.permission_admin_updated_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.RoleIDs(); len(nodes) > 0 {

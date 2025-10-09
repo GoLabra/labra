@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -19,6 +21,10 @@ type LoginFormData struct {
 	Password string `json:"password"`
 }
 
+type User interface {
+	DefaultRole(ctx context.Context) (*ent.Role, error)
+}
+
 // TODO: 1. sanitize error messages; 2. move to api; 3. add logs;
 func Login(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -28,43 +34,60 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("error reading body: %v", err)
 		return
 	}
 	defer r.Body.Close()
 	err = json.Unmarshal(body, &loginFormData)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("error unmarshaling body: %v", err)
 		return
 	}
 
 	service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(svc.ErrServiceNotSetInContext)
 		return
 	}
 
-	user, err := service.User.GetOne(r.Context(), ent.UserWhereUniqueInput{
+	// Use internal context for user lookup (bypasses permission checks)
+	iCtx := context.WithValue(r.Context(), constants.IsInternalOperationContextValue, true)
+
+	user, err := service.AdminUser.GetOne(iCtx, ent.AdminUserWhereUniqueInput{
 		Email: &loginFormData.Email,
 	})
 
 	if err != nil && !ent.IsNotFound(err) {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("error getting user: %v", err)
 		return
 	}
 
 	if user == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		log.Println("user not found")
+		return
+	}
+
+	role, err := user.DefaultRole(iCtx)
+
+	if err != nil && !ent.IsNotFound(err) {
+		log.Println("error getting role")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if role == nil {
+		log.Println("user default role not found")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginFormData.Password))
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	role, err := user.DefaultRole(r.Context())
-	if err != nil || role == nil {
+		log.Printf("error comparing password: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

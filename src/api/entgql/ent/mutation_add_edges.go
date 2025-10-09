@@ -5,9 +5,27 @@ package ent
 import (
 	"fmt"
 
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
+
+// AddEdges sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
+func (m *AdminUserMutation) AddEdges(name string, values []string) error {
+	switch name {
+	case adminuser.EdgeRefAdminCreatedBy:
+		m.AddRefAdminCreatedByIDs(values...)
+		return nil
+	case adminuser.EdgeRefAdminUpdatedBy:
+		m.AddRefAdminUpdatedByIDs(values...)
+		return nil
+	case adminuser.EdgeRoles:
+		m.AddRoleIDs(values...)
+		return nil
+	}
+	return fmt.Errorf("unknown AdminUser edge %s", name)
+}
 
 // AddEdges sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema

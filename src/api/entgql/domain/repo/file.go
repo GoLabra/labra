@@ -211,6 +211,32 @@ func (r *File) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateFileInpu
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
+
+	if data.AdminCreatedBy != nil {
+
+		if data.AdminCreatedBy.Connect != nil {
+			toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *data.AdminCreatedBy.Connect)
+
+			if err != nil {
+				return nil, err
+			}
+
+			data.AdminCreatedByID = &toConnect.ID
+		}
+	}
+	if data.AdminUpdatedBy != nil {
+
+		if data.AdminUpdatedBy.Connect != nil {
+			toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *data.AdminUpdatedBy.Connect)
+
+			if err != nil {
+				return nil, err
+			}
+
+			data.AdminUpdatedByID = &toConnect.ID
+		}
+	}
+
 	if data.CreatedBy != nil {
 
 		if data.CreatedBy.Connect != nil {

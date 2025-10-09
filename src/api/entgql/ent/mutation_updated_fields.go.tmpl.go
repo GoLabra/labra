@@ -3,6 +3,51 @@
 package ent
 
 // UpdatedFields returns all fields and edges that were changed during this mutation.
+func (m *AdminUserMutation) UpdatedFields() map[string]Value {
+	var updatedFields = make(map[string]Value)
+	if m.name != nil {
+		updatedFields["name"] = m.name
+	}
+	if m.email != nil {
+		updatedFields["email"] = m.email
+	}
+	if m.password != nil {
+		updatedFields["password"] = m.password
+	}
+	if m.first_name != nil {
+		updatedFields["first_name"] = m.first_name
+	}
+	if m.last_name != nil {
+		updatedFields["last_name"] = m.last_name
+	}
+	if m.created_at != nil {
+		updatedFields["created_at"] = m.created_at
+	}
+	if m.updated_at != nil {
+		updatedFields["updated_at"] = m.updated_at
+	}
+	if m.ref_admin_created_by != nil {
+		updatedFields["ref_admin_created_by"] = m.ref_admin_created_by
+	}
+	if m.admin_created_by != nil {
+		updatedFields["admin_created_by"] = m.admin_created_by
+	}
+	if m.ref_admin_updated_by != nil {
+		updatedFields["ref_admin_updated_by"] = m.ref_admin_updated_by
+	}
+	if m.admin_updated_by != nil {
+		updatedFields["admin_updated_by"] = m.admin_updated_by
+	}
+	if m.roles != nil {
+		updatedFields["roles"] = m.roles
+	}
+	if m.default_role != nil {
+		updatedFields["default_role"] = m.default_role
+	}
+	return updatedFields
+}
+
+// UpdatedFields returns all fields and edges that were changed during this mutation.
 func (m *FileMutation) UpdatedFields() map[string]Value {
 	var updatedFields = make(map[string]Value)
 	if m.created_at != nil {
@@ -25,6 +70,12 @@ func (m *FileMutation) UpdatedFields() map[string]Value {
 	}
 	if m.size != nil {
 		updatedFields["size"] = m.size
+	}
+	if m.admin_created_by != nil {
+		updatedFields["admin_created_by"] = m.admin_created_by
+	}
+	if m.admin_updated_by != nil {
+		updatedFields["admin_updated_by"] = m.admin_updated_by
 	}
 	if m.created_by != nil {
 		updatedFields["created_by"] = m.created_by
@@ -50,11 +101,11 @@ func (m *PermissionMutation) UpdatedFields() map[string]Value {
 	if m.operation != nil {
 		updatedFields["operation"] = m.operation
 	}
-	if m.created_by != nil {
-		updatedFields["created_by"] = m.created_by
+	if m.admin_created_by != nil {
+		updatedFields["admin_created_by"] = m.admin_created_by
 	}
-	if m.updated_by != nil {
-		updatedFields["updated_by"] = m.updated_by
+	if m.admin_updated_by != nil {
+		updatedFields["admin_updated_by"] = m.admin_updated_by
 	}
 	if m.role != nil {
 		updatedFields["role"] = m.role
@@ -74,11 +125,14 @@ func (m *RoleMutation) UpdatedFields() map[string]Value {
 	if m.updated_at != nil {
 		updatedFields["updated_at"] = m.updated_at
 	}
-	if m.created_by != nil {
-		updatedFields["created_by"] = m.created_by
+	if m.admin_created_by != nil {
+		updatedFields["admin_created_by"] = m.admin_created_by
 	}
-	if m.updated_by != nil {
-		updatedFields["updated_by"] = m.updated_by
+	if m.admin_updated_by != nil {
+		updatedFields["admin_updated_by"] = m.admin_updated_by
+	}
+	if m.admin_user_roles != nil {
+		updatedFields["admin_user_roles"] = m.admin_user_roles
 	}
 	if m.user_roles != nil {
 		updatedFields["user_roles"] = m.user_roles
@@ -92,26 +146,11 @@ func (m *RoleMutation) UpdatedFields() map[string]Value {
 // UpdatedFields returns all fields and edges that were changed during this mutation.
 func (m *UserMutation) UpdatedFields() map[string]Value {
 	var updatedFields = make(map[string]Value)
-	if m.name != nil {
-		updatedFields["name"] = m.name
-	}
 	if m.email != nil {
 		updatedFields["email"] = m.email
 	}
 	if m.password != nil {
 		updatedFields["password"] = m.password
-	}
-	if m.first_name != nil {
-		updatedFields["first_name"] = m.first_name
-	}
-	if m.last_name != nil {
-		updatedFields["last_name"] = m.last_name
-	}
-	if m.created_at != nil {
-		updatedFields["created_at"] = m.created_at
-	}
-	if m.updated_at != nil {
-		updatedFields["updated_at"] = m.updated_at
 	}
 	if m.ref_created_by != nil {
 		updatedFields["ref_created_by"] = m.ref_created_by
@@ -124,6 +163,12 @@ func (m *UserMutation) UpdatedFields() map[string]Value {
 	}
 	if m.updated_by != nil {
 		updatedFields["updated_by"] = m.updated_by
+	}
+	if m.admin_created_by != nil {
+		updatedFields["admin_created_by"] = m.admin_created_by
+	}
+	if m.admin_updated_by != nil {
+		updatedFields["admin_updated_by"] = m.admin_updated_by
 	}
 	if m.roles != nil {
 		updatedFields["roles"] = m.roles

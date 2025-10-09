@@ -11,25 +11,25 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
-	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
 
 // PermissionQuery is the builder for querying Permission entities.
 type PermissionQuery struct {
 	config
-	ctx           *QueryContext
-	order         []permission.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Permission
-	withCreatedBy *UserQuery
-	withUpdatedBy *UserQuery
-	withRole      *RoleQuery
-	withFKs       bool
-	modifiers     []func(*sql.Selector)
-	loadTotal     []func(context.Context, []*Permission) error
+	ctx                *QueryContext
+	order              []permission.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Permission
+	withAdminCreatedBy *AdminUserQuery
+	withAdminUpdatedBy *AdminUserQuery
+	withRole           *RoleQuery
+	withFKs            bool
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Permission) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,9 +66,9 @@ func (pq *PermissionQuery) Order(o ...permission.OrderOption) *PermissionQuery {
 	return pq
 }
 
-// QueryCreatedBy chains the current query on the "created_by" edge.
-func (pq *PermissionQuery) QueryCreatedBy() *UserQuery {
-	query := (&UserClient{config: pq.config}).Query()
+// QueryAdminCreatedBy chains the current query on the "admin_created_by" edge.
+func (pq *PermissionQuery) QueryAdminCreatedBy() *AdminUserQuery {
+	query := (&AdminUserClient{config: pq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -79,8 +79,8 @@ func (pq *PermissionQuery) QueryCreatedBy() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, permission.CreatedByTable, permission.CreatedByColumn),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, permission.AdminCreatedByTable, permission.AdminCreatedByColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -88,9 +88,9 @@ func (pq *PermissionQuery) QueryCreatedBy() *UserQuery {
 	return query
 }
 
-// QueryUpdatedBy chains the current query on the "updated_by" edge.
-func (pq *PermissionQuery) QueryUpdatedBy() *UserQuery {
-	query := (&UserClient{config: pq.config}).Query()
+// QueryAdminUpdatedBy chains the current query on the "admin_updated_by" edge.
+func (pq *PermissionQuery) QueryAdminUpdatedBy() *AdminUserQuery {
+	query := (&AdminUserClient{config: pq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -101,8 +101,8 @@ func (pq *PermissionQuery) QueryUpdatedBy() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, permission.UpdatedByTable, permission.UpdatedByColumn),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, permission.AdminUpdatedByTable, permission.AdminUpdatedByColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -319,39 +319,39 @@ func (pq *PermissionQuery) Clone() *PermissionQuery {
 		return nil
 	}
 	return &PermissionQuery{
-		config:        pq.config,
-		ctx:           pq.ctx.Clone(),
-		order:         append([]permission.OrderOption{}, pq.order...),
-		inters:        append([]Interceptor{}, pq.inters...),
-		predicates:    append([]predicate.Permission{}, pq.predicates...),
-		withCreatedBy: pq.withCreatedBy.Clone(),
-		withUpdatedBy: pq.withUpdatedBy.Clone(),
-		withRole:      pq.withRole.Clone(),
+		config:             pq.config,
+		ctx:                pq.ctx.Clone(),
+		order:              append([]permission.OrderOption{}, pq.order...),
+		inters:             append([]Interceptor{}, pq.inters...),
+		predicates:         append([]predicate.Permission{}, pq.predicates...),
+		withAdminCreatedBy: pq.withAdminCreatedBy.Clone(),
+		withAdminUpdatedBy: pq.withAdminUpdatedBy.Clone(),
+		withRole:           pq.withRole.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
 	}
 }
 
-// WithCreatedBy tells the query-builder to eager-load the nodes that are connected to
-// the "created_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *PermissionQuery) WithCreatedBy(opts ...func(*UserQuery)) *PermissionQuery {
-	query := (&UserClient{config: pq.config}).Query()
+// WithAdminCreatedBy tells the query-builder to eager-load the nodes that are connected to
+// the "admin_created_by" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PermissionQuery) WithAdminCreatedBy(opts ...func(*AdminUserQuery)) *PermissionQuery {
+	query := (&AdminUserClient{config: pq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withCreatedBy = query
+	pq.withAdminCreatedBy = query
 	return pq
 }
 
-// WithUpdatedBy tells the query-builder to eager-load the nodes that are connected to
-// the "updated_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *PermissionQuery) WithUpdatedBy(opts ...func(*UserQuery)) *PermissionQuery {
-	query := (&UserClient{config: pq.config}).Query()
+// WithAdminUpdatedBy tells the query-builder to eager-load the nodes that are connected to
+// the "admin_updated_by" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PermissionQuery) WithAdminUpdatedBy(opts ...func(*AdminUserQuery)) *PermissionQuery {
+	query := (&AdminUserClient{config: pq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withUpdatedBy = query
+	pq.withAdminUpdatedBy = query
 	return pq
 }
 
@@ -446,12 +446,12 @@ func (pq *PermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*P
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
 		loadedTypes = [3]bool{
-			pq.withCreatedBy != nil,
-			pq.withUpdatedBy != nil,
+			pq.withAdminCreatedBy != nil,
+			pq.withAdminUpdatedBy != nil,
 			pq.withRole != nil,
 		}
 	)
-	if pq.withCreatedBy != nil || pq.withUpdatedBy != nil || pq.withRole != nil {
+	if pq.withAdminCreatedBy != nil || pq.withAdminUpdatedBy != nil || pq.withRole != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -478,15 +478,15 @@ func (pq *PermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*P
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := pq.withCreatedBy; query != nil {
-		if err := pq.loadCreatedBy(ctx, query, nodes, nil,
-			func(n *Permission, e *User) { n.Edges.CreatedBy = e }); err != nil {
+	if query := pq.withAdminCreatedBy; query != nil {
+		if err := pq.loadAdminCreatedBy(ctx, query, nodes, nil,
+			func(n *Permission, e *AdminUser) { n.Edges.AdminCreatedBy = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := pq.withUpdatedBy; query != nil {
-		if err := pq.loadUpdatedBy(ctx, query, nodes, nil,
-			func(n *Permission, e *User) { n.Edges.UpdatedBy = e }); err != nil {
+	if query := pq.withAdminUpdatedBy; query != nil {
+		if err := pq.loadAdminUpdatedBy(ctx, query, nodes, nil,
+			func(n *Permission, e *AdminUser) { n.Edges.AdminUpdatedBy = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -504,14 +504,14 @@ func (pq *PermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*P
 	return nodes, nil
 }
 
-func (pq *PermissionQuery) loadCreatedBy(ctx context.Context, query *UserQuery, nodes []*Permission, init func(*Permission), assign func(*Permission, *User)) error {
+func (pq *PermissionQuery) loadAdminCreatedBy(ctx context.Context, query *AdminUserQuery, nodes []*Permission, init func(*Permission), assign func(*Permission, *AdminUser)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Permission)
 	for i := range nodes {
-		if nodes[i].permission_created_by == nil {
+		if nodes[i].permission_admin_created_by == nil {
 			continue
 		}
-		fk := *nodes[i].permission_created_by
+		fk := *nodes[i].permission_admin_created_by
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -520,7 +520,7 @@ func (pq *PermissionQuery) loadCreatedBy(ctx context.Context, query *UserQuery, 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(adminuser.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -528,7 +528,7 @@ func (pq *PermissionQuery) loadCreatedBy(ctx context.Context, query *UserQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "permission_created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "permission_admin_created_by" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -536,14 +536,14 @@ func (pq *PermissionQuery) loadCreatedBy(ctx context.Context, query *UserQuery, 
 	}
 	return nil
 }
-func (pq *PermissionQuery) loadUpdatedBy(ctx context.Context, query *UserQuery, nodes []*Permission, init func(*Permission), assign func(*Permission, *User)) error {
+func (pq *PermissionQuery) loadAdminUpdatedBy(ctx context.Context, query *AdminUserQuery, nodes []*Permission, init func(*Permission), assign func(*Permission, *AdminUser)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Permission)
 	for i := range nodes {
-		if nodes[i].permission_updated_by == nil {
+		if nodes[i].permission_admin_updated_by == nil {
 			continue
 		}
-		fk := *nodes[i].permission_updated_by
+		fk := *nodes[i].permission_admin_updated_by
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -552,7 +552,7 @@ func (pq *PermissionQuery) loadUpdatedBy(ctx context.Context, query *UserQuery, 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(adminuser.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -560,7 +560,7 @@ func (pq *PermissionQuery) loadUpdatedBy(ctx context.Context, query *UserQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "permission_updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "permission_admin_updated_by" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

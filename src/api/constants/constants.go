@@ -1,6 +1,7 @@
 package constants
 
 import (
+	"context"
 	"time"
 
 	"github.com/MakeNowJust/heredoc"
@@ -50,18 +51,25 @@ const (
 	DefaultPluginFolderPath    = "goplugin"
 	DefaultRpcPluginFolderPath = "rpc"
 
-	RepositoryContextValue       ContextKey = "repository"
-	ServiceContextValue          ContextKey = "service"
-	AdminRepositoryContextValue  ContextKey = "adminRepository"
-	AdminServiceContextValue     ContextKey = "adminService"
-	CentrifugeClientContextValue ContextKey = "centrifugeClient"
-	UserContextValue             ContextKey = "user"
-	RoleContextValue             ContextKey = "role"
+	RepositoryContextValue          ContextKey = "repository"
+	ServiceContextValue             ContextKey = "service"
+	AdminRepositoryContextValue     ContextKey = "adminRepository"
+	AdminServiceContextValue        ContextKey = "adminService"
+	CentrifugeClientContextValue    ContextKey = "centrifugeClient"
+	UserContextValue                ContextKey = "user"
+	RoleContextValue                ContextKey = "role"
+	IsInternalOperationContextValue ContextKey = "isInternalOperation"
 
 	Local Environment = "local"
 	Dev   Environment = "dev"
 	Prod  Environment = "prod"
 )
+
+// WithInternalOperation creates a context that bypasses permission checks for internal operations
+// Use this for backend operations like permission queries, internal user queries, etc.
+func WithInternalOperation(ctx context.Context) context.Context {
+	return context.WithValue(ctx, IsInternalOperationContextValue, true)
+}
 
 func (s Status) String() string {
 	switch s {

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -48,13 +49,15 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	superAdminRole, err = service.Role.GetOne(r.Context(), ent.RoleWhereUniqueInput{Name: &superAdmin})
+	// Use internal context for role lookup (bypasses permission checks)
+	iCtx := context.WithValue(r.Context(), constants.IsInternalOperationContextValue, true)
+	superAdminRole, err = service.Role.GetOne(iCtx, ent.RoleWhereUniqueInput{Name: &superAdmin})
 	if err != nil && !ent.IsNotFound(err) {
 		fmt.Printf("error getting super admin role: %v", err)
 		writeErrorResponse(w, "unable to get super admin role", http.StatusInternalServerError)
 		return
 	} else if err != nil && ent.IsNotFound(err) {
-		superAdminRole, err = service.Role.Create(r.Context(), ent.CreateRoleInput{
+		superAdminRole, err = service.Role.Create(iCtx, ent.CreateRoleInput{
 			Name: superAdmin,
 		})
 		if err != nil {
@@ -64,7 +67,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	user, err := service.User.Create(r.Context(), ent.CreateUserInput{
+	user, err := service.AdminUser.Create(iCtx, ent.CreateAdminUserInput{
 		Email:     signupFormData.Email,
 		Password:  signupFormData.Password,
 		FirstName: signupFormData.FirstName,

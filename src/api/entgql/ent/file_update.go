@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
@@ -144,6 +145,44 @@ func (fu *FileUpdate) AddSize(i int64) *FileUpdate {
 	return fu
 }
 
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (fu *FileUpdate) SetAdminCreatedByID(id string) *FileUpdate {
+	fu.mutation.SetAdminCreatedByID(id)
+	return fu
+}
+
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (fu *FileUpdate) SetNillableAdminCreatedByID(id *string) *FileUpdate {
+	if id != nil {
+		fu = fu.SetAdminCreatedByID(*id)
+	}
+	return fu
+}
+
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (fu *FileUpdate) SetAdminCreatedBy(a *AdminUser) *FileUpdate {
+	return fu.SetAdminCreatedByID(a.ID)
+}
+
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (fu *FileUpdate) SetAdminUpdatedByID(id string) *FileUpdate {
+	fu.mutation.SetAdminUpdatedByID(id)
+	return fu
+}
+
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (fu *FileUpdate) SetNillableAdminUpdatedByID(id *string) *FileUpdate {
+	if id != nil {
+		fu = fu.SetAdminUpdatedByID(*id)
+	}
+	return fu
+}
+
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (fu *FileUpdate) SetAdminUpdatedBy(a *AdminUser) *FileUpdate {
+	return fu.SetAdminUpdatedByID(a.ID)
+}
+
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
 func (fu *FileUpdate) SetCreatedByID(id string) *FileUpdate {
 	fu.mutation.SetCreatedByID(id)
@@ -185,6 +224,18 @@ func (fu *FileUpdate) SetUpdatedBy(u *User) *FileUpdate {
 // Mutation returns the FileMutation object of the builder.
 func (fu *FileUpdate) Mutation() *FileMutation {
 	return fu.mutation
+}
+
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (fu *FileUpdate) ClearAdminCreatedBy() *FileUpdate {
+	fu.mutation.ClearAdminCreatedBy()
+	return fu
+}
+
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (fu *FileUpdate) ClearAdminUpdatedBy() *FileUpdate {
+	fu.mutation.ClearAdminUpdatedBy()
+	return fu
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
@@ -276,6 +327,64 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := fu.mutation.AddedSize(); ok {
 		_spec.AddField(file.FieldSize, field.TypeInt64, value)
+	}
+	if fu.mutation.AdminCreatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminCreatedByTable,
+			Columns: []string{file.AdminCreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminCreatedByTable,
+			Columns: []string{file.AdminCreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if fu.mutation.AdminUpdatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminUpdatedByTable,
+			Columns: []string{file.AdminUpdatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminUpdatedByTable,
+			Columns: []string{file.AdminUpdatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if fu.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -470,6 +579,44 @@ func (fuo *FileUpdateOne) AddSize(i int64) *FileUpdateOne {
 	return fuo
 }
 
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (fuo *FileUpdateOne) SetAdminCreatedByID(id string) *FileUpdateOne {
+	fuo.mutation.SetAdminCreatedByID(id)
+	return fuo
+}
+
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableAdminCreatedByID(id *string) *FileUpdateOne {
+	if id != nil {
+		fuo = fuo.SetAdminCreatedByID(*id)
+	}
+	return fuo
+}
+
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (fuo *FileUpdateOne) SetAdminCreatedBy(a *AdminUser) *FileUpdateOne {
+	return fuo.SetAdminCreatedByID(a.ID)
+}
+
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (fuo *FileUpdateOne) SetAdminUpdatedByID(id string) *FileUpdateOne {
+	fuo.mutation.SetAdminUpdatedByID(id)
+	return fuo
+}
+
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (fuo *FileUpdateOne) SetNillableAdminUpdatedByID(id *string) *FileUpdateOne {
+	if id != nil {
+		fuo = fuo.SetAdminUpdatedByID(*id)
+	}
+	return fuo
+}
+
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (fuo *FileUpdateOne) SetAdminUpdatedBy(a *AdminUser) *FileUpdateOne {
+	return fuo.SetAdminUpdatedByID(a.ID)
+}
+
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
 func (fuo *FileUpdateOne) SetCreatedByID(id string) *FileUpdateOne {
 	fuo.mutation.SetCreatedByID(id)
@@ -511,6 +658,18 @@ func (fuo *FileUpdateOne) SetUpdatedBy(u *User) *FileUpdateOne {
 // Mutation returns the FileMutation object of the builder.
 func (fuo *FileUpdateOne) Mutation() *FileMutation {
 	return fuo.mutation
+}
+
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (fuo *FileUpdateOne) ClearAdminCreatedBy() *FileUpdateOne {
+	fuo.mutation.ClearAdminCreatedBy()
+	return fuo
+}
+
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (fuo *FileUpdateOne) ClearAdminUpdatedBy() *FileUpdateOne {
+	fuo.mutation.ClearAdminUpdatedBy()
+	return fuo
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
@@ -632,6 +791,64 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 	}
 	if value, ok := fuo.mutation.AddedSize(); ok {
 		_spec.AddField(file.FieldSize, field.TypeInt64, value)
+	}
+	if fuo.mutation.AdminCreatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminCreatedByTable,
+			Columns: []string{file.AdminCreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminCreatedByTable,
+			Columns: []string{file.AdminCreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if fuo.mutation.AdminUpdatedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminUpdatedByTable,
+			Columns: []string{file.AdminUpdatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminUpdatedByTable,
+			Columns: []string{file.AdminUpdatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if fuo.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{

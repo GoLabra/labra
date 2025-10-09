@@ -30,6 +30,7 @@ type Repository struct {
 	Permission repo.Permission
 	Role       repo.Role
 	User       repo.User
+	AdminUser  repo.AdminUser
 	File       repo.File
 }
 
@@ -40,6 +41,7 @@ func New(client *ent.Client) *Repository {
 		Permission: NewPermission(client),
 		Role:       NewRole(client),
 		User:       NewUser(client),
+		AdminUser:  NewAdminUser(client),
 		File:       NewFile(client),
 	}
 }

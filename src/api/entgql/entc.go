@@ -75,7 +75,7 @@ func main() {
 			templates.MutationInput,
 			templates.MutationSetEdge,
 			templates.MutationAddEdges,
-			templates.MutationUpdatedFields,
+			templates.MutationOldValues,
 			templates.AdditionalFields,
 		),
 		entgql.WithWhereInputs(true),
@@ -102,6 +102,7 @@ func main() {
 		Hooks: []gen.Hook{
 			// CleanupUserFiles(),
 			CreateGraphqlUniqueInputs(),
+			CreateOwnerFilterMethods(),
 			// CreateEntUniqueInputs(),
 			// CreateGraphqlSchema(),
 			// CreateServiceInterface(),
@@ -169,6 +170,32 @@ func CreateEntUniqueInputs() gen.Hook {
 			}
 
 			f, err := os.Create("./ent/gql_where_unique_input.go")
+			if err != nil {
+				return fmt.Errorf(errFormat, fmt.Errorf("error creating file: %w", err))
+			}
+
+			err = tmpl.Execute(f, g)
+			if err != nil {
+				f.Close()
+				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
+			}
+
+			f.Close()
+			return next.Generate(g)
+		})
+	}
+}
+
+func CreateOwnerFilterMethods() gen.Hook {
+	errFormat := "[CreateOwnerFilterMethods] %w"
+	return func(next gen.Generator) gen.Generator {
+		return gen.GenerateFunc(func(g *gen.Graph) error {
+			tmpl, err := templates.LoadTemplate("owner_filter_methods.go.tmpl", "ent/owner_filter_methods.go.tmpl", templateFuncMap)
+			if err != nil {
+				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
+			}
+
+			f, err := os.Create("./ent/owner_filter_methods.go")
 			if err != nil {
 				return fmt.Errorf(errFormat, fmt.Errorf("error creating file: %w", err))
 			}

@@ -8,6 +8,46 @@ import (
 )
 
 var (
+	// AdminUsersColumns holds the columns for the "admin_users" table.
+	AdminUsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Nullable: true},
+		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "password", Type: field.TypeString},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "admin_user_admin_created_by", Type: field.TypeString, Nullable: true},
+		{Name: "admin_user_admin_updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "admin_user_default_role", Type: field.TypeString, Nullable: true},
+	}
+	// AdminUsersTable holds the schema information for the "admin_users" table.
+	AdminUsersTable = &schema.Table{
+		Name:       "admin_users",
+		Columns:    AdminUsersColumns,
+		PrimaryKey: []*schema.Column{AdminUsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_users_admin_users_admin_created_by",
+				Columns:    []*schema.Column{AdminUsersColumns[8]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "admin_users_admin_users_admin_updated_by",
+				Columns:    []*schema.Column{AdminUsersColumns[9]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "admin_users_roles_default_role",
+				Columns:    []*schema.Column{AdminUsersColumns[10]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// FilesColumns holds the columns for the "files" table.
 	FilesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -18,6 +58,8 @@ var (
 		{Name: "mime_type", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
 		{Name: "storage_file_name", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
 		{Name: "size", Type: field.TypeInt64},
+		{Name: "file_admin_created_by", Type: field.TypeString, Nullable: true},
+		{Name: "file_admin_updated_by", Type: field.TypeString, Nullable: true},
 		{Name: "file_created_by", Type: field.TypeString, Nullable: true},
 		{Name: "file_updated_by", Type: field.TypeString, Nullable: true},
 	}
@@ -28,14 +70,26 @@ var (
 		PrimaryKey: []*schema.Column{FilesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "files_users_created_by",
+				Symbol:     "files_admin_users_admin_created_by",
 				Columns:    []*schema.Column{FilesColumns[8]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "files_admin_users_admin_updated_by",
+				Columns:    []*schema.Column{FilesColumns[9]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "files_users_created_by",
+				Columns:    []*schema.Column{FilesColumns[10]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "files_users_updated_by",
-				Columns:    []*schema.Column{FilesColumns[9]},
+				Columns:    []*schema.Column{FilesColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -48,8 +102,8 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
 		{Name: "entity", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
 		{Name: "operation", Type: field.TypeString, Default: ""},
-		{Name: "permission_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "permission_updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "permission_admin_created_by", Type: field.TypeString, Nullable: true},
+		{Name: "permission_admin_updated_by", Type: field.TypeString, Nullable: true},
 		{Name: "permission_role", Type: field.TypeString, Nullable: true},
 	}
 	// PermissionsTable holds the schema information for the "permissions" table.
@@ -59,15 +113,15 @@ var (
 		PrimaryKey: []*schema.Column{PermissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "permissions_users_created_by",
+				Symbol:     "permissions_admin_users_admin_created_by",
 				Columns:    []*schema.Column{PermissionsColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "permissions_users_updated_by",
+				Symbol:     "permissions_admin_users_admin_updated_by",
 				Columns:    []*schema.Column{PermissionsColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
@@ -84,8 +138,8 @@ var (
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "role_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "role_updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "role_admin_created_by", Type: field.TypeString, Nullable: true},
+		{Name: "role_admin_updated_by", Type: field.TypeString, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{
@@ -94,15 +148,15 @@ var (
 		PrimaryKey: []*schema.Column{RolesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "roles_users_created_by",
+				Symbol:     "roles_admin_users_admin_created_by",
 				Columns:    []*schema.Column{RolesColumns[4]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "roles_users_updated_by",
+				Symbol:     "roles_admin_users_admin_updated_by",
 				Columns:    []*schema.Column{RolesColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -110,15 +164,12 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
-		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
-		{Name: "first_name", Type: field.TypeString},
-		{Name: "last_name", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "user_created_by", Type: field.TypeString, Nullable: true},
 		{Name: "user_updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "user_admin_created_by", Type: field.TypeString, Nullable: true},
+		{Name: "user_admin_updated_by", Type: field.TypeString, Nullable: true},
 		{Name: "user_default_role", Type: field.TypeString, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
@@ -129,21 +180,58 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_users_created_by",
-				Columns:    []*schema.Column{UsersColumns[8]},
+				Columns:    []*schema.Column{UsersColumns[3]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "users_users_updated_by",
-				Columns:    []*schema.Column{UsersColumns[9]},
+				Columns:    []*schema.Column{UsersColumns[4]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
+				Symbol:     "users_admin_users_admin_created_by",
+				Columns:    []*schema.Column{UsersColumns[5]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_admin_users_admin_updated_by",
+				Columns:    []*schema.Column{UsersColumns[6]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
 				Symbol:     "users_roles_default_role",
-				Columns:    []*schema.Column{UsersColumns[10]},
+				Columns:    []*schema.Column{UsersColumns[7]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// AdminUserRolesColumns holds the columns for the "admin_user_roles" table.
+	AdminUserRolesColumns = []*schema.Column{
+		{Name: "admin_user_id", Type: field.TypeString},
+		{Name: "role_id", Type: field.TypeString},
+	}
+	// AdminUserRolesTable holds the schema information for the "admin_user_roles" table.
+	AdminUserRolesTable = &schema.Table{
+		Name:       "admin_user_roles",
+		Columns:    AdminUserRolesColumns,
+		PrimaryKey: []*schema.Column{AdminUserRolesColumns[0], AdminUserRolesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_user_roles_admin_user_id",
+				Columns:    []*schema.Column{AdminUserRolesColumns[0]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "admin_user_roles_role_id",
+				Columns:    []*schema.Column{AdminUserRolesColumns[1]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -174,25 +262,36 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AdminUsersTable,
 		FilesTable,
 		PermissionsTable,
 		RolesTable,
 		UsersTable,
+		AdminUserRolesTable,
 		UserRolesTable,
 	}
 )
 
 func init() {
-	FilesTable.ForeignKeys[0].RefTable = UsersTable
-	FilesTable.ForeignKeys[1].RefTable = UsersTable
-	PermissionsTable.ForeignKeys[0].RefTable = UsersTable
-	PermissionsTable.ForeignKeys[1].RefTable = UsersTable
+	AdminUsersTable.ForeignKeys[0].RefTable = AdminUsersTable
+	AdminUsersTable.ForeignKeys[1].RefTable = AdminUsersTable
+	AdminUsersTable.ForeignKeys[2].RefTable = RolesTable
+	FilesTable.ForeignKeys[0].RefTable = AdminUsersTable
+	FilesTable.ForeignKeys[1].RefTable = AdminUsersTable
+	FilesTable.ForeignKeys[2].RefTable = UsersTable
+	FilesTable.ForeignKeys[3].RefTable = UsersTable
+	PermissionsTable.ForeignKeys[0].RefTable = AdminUsersTable
+	PermissionsTable.ForeignKeys[1].RefTable = AdminUsersTable
 	PermissionsTable.ForeignKeys[2].RefTable = RolesTable
-	RolesTable.ForeignKeys[0].RefTable = UsersTable
-	RolesTable.ForeignKeys[1].RefTable = UsersTable
+	RolesTable.ForeignKeys[0].RefTable = AdminUsersTable
+	RolesTable.ForeignKeys[1].RefTable = AdminUsersTable
 	UsersTable.ForeignKeys[0].RefTable = UsersTable
 	UsersTable.ForeignKeys[1].RefTable = UsersTable
-	UsersTable.ForeignKeys[2].RefTable = RolesTable
+	UsersTable.ForeignKeys[2].RefTable = AdminUsersTable
+	UsersTable.ForeignKeys[3].RefTable = AdminUsersTable
+	UsersTable.ForeignKeys[4].RefTable = RolesTable
+	AdminUserRolesTable.ForeignKeys[0].RefTable = AdminUsersTable
+	AdminUserRolesTable.ForeignKeys[1].RefTable = RolesTable
 	UserRolesTable.ForeignKeys[0].RefTable = UsersTable
 	UserRolesTable.ForeignKeys[1].RefTable = RolesTable
 }

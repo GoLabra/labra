@@ -169,65 +169,65 @@ func (r *Role) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateRoleInpu
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
 	}
-	if data.CreatedBy != nil {
+	if data.AdminCreatedBy != nil {
 
-		if data.CreatedBy.Connect != nil {
-			toConnect, err := repository.User.GetOneTx(ctx, tx, *data.CreatedBy.Connect)
+		if data.AdminCreatedBy.Connect != nil {
+			toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *data.AdminCreatedBy.Connect)
 
 			if err != nil {
 				return nil, err
 			}
 
-			data.CreatedByID = &toConnect.ID
+			data.AdminCreatedByID = &toConnect.ID
 		}
-		if data.CreatedBy.Create != nil {
-			var createInput ent.CreateUserInput
-			err = mapstructure.Decode(data.CreatedBy.Create, &createInput)
+		if data.AdminCreatedBy.Create != nil {
+			var createInput ent.CreateAdminUserInput
+			err = mapstructure.Decode(data.AdminCreatedBy.Create, &createInput)
 			if err != nil {
 				return nil, err
 			}
 
-			toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
+			toConnect, err := repository.AdminUser.CreateTx(ctx, tx, createInput)
 
 			if err != nil {
 				return nil, err
 			}
 
-			data.CreatedByID = &toConnect.ID
+			data.AdminCreatedByID = &toConnect.ID
 		}
 	}
-	if data.UpdatedBy != nil {
+	if data.AdminUpdatedBy != nil {
 
-		if data.UpdatedBy.Connect != nil {
-			toConnect, err := repository.User.GetOneTx(ctx, tx, *data.UpdatedBy.Connect)
+		if data.AdminUpdatedBy.Connect != nil {
+			toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *data.AdminUpdatedBy.Connect)
 
 			if err != nil {
 				return nil, err
 			}
 
-			data.UpdatedByID = &toConnect.ID
+			data.AdminUpdatedByID = &toConnect.ID
 		}
-		if data.UpdatedBy.Create != nil {
-			var createInput ent.CreateUserInput
-			err = mapstructure.Decode(data.UpdatedBy.Create, &createInput)
+		if data.AdminUpdatedBy.Create != nil {
+			var createInput ent.CreateAdminUserInput
+			err = mapstructure.Decode(data.AdminUpdatedBy.Create, &createInput)
 			if err != nil {
 				return nil, err
 			}
 
-			toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
+			toConnect, err := repository.AdminUser.CreateTx(ctx, tx, createInput)
 
 			if err != nil {
 				return nil, err
 			}
 
-			data.UpdatedByID = &toConnect.ID
+			data.AdminUpdatedByID = &toConnect.ID
 		}
 	}
 	if data.UserRoles != nil {
 
 		if data.UserRoles.Connect != nil {
 			for _, connect := range data.UserRoles.Connect {
-				toConnect, err := repository.User.GetOneTx(ctx, tx, *connect)
+				toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *connect)
 
 				if err != nil {
 					return nil, err
@@ -363,37 +363,37 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 		return nil, fmt.Errorf("error getting item to update: %v", err)
 	}
 	created_byToDelete := ent.UserWhereUniqueInput{}
-	if data.CreatedBy != nil {
+	if data.AdminCreatedBy != nil {
 
-		if data.CreatedBy.Connect != nil {
-			toConnect, err := repository.User.GetOneTx(ctx, tx, *data.CreatedBy.Connect)
-
-			if err != nil {
-				return nil, err
-			}
-
-			data.CreatedByID = &toConnect.ID
-		}
-		if data.CreatedBy.Unset != nil && *data.CreatedBy.Unset {
-			data.ClearCreatedBy = true
-		}
-		if data.CreatedBy.Create != nil {
-			var createInput ent.CreateUserInput
-			err = mapstructure.Decode(data.CreatedBy.Create, &createInput)
-			if err != nil {
-				return nil, err
-			}
-
-			toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
+		if data.AdminCreatedBy.Connect != nil {
+			toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *data.AdminCreatedBy.Connect)
 
 			if err != nil {
 				return nil, err
 			}
 
-			data.CreatedByID = &toConnect.ID
+			data.AdminCreatedByID = &toConnect.ID
 		}
-		if data.CreatedBy.Delete != nil && *data.CreatedBy.Delete {
-			itemToDelete, err := item.CreatedBy(ctx)
+		if data.AdminCreatedBy.Unset != nil && *data.AdminCreatedBy.Unset {
+			data.ClearAdminCreatedBy = true
+		}
+		if data.AdminCreatedBy.Create != nil {
+			var createInput ent.CreateAdminUserInput
+			err = mapstructure.Decode(data.AdminCreatedBy.Create, &createInput)
+			if err != nil {
+				return nil, err
+			}
+
+			toConnect, err := repository.AdminUser.CreateTx(ctx, tx, createInput)
+
+			if err != nil {
+				return nil, err
+			}
+
+			data.AdminCreatedByID = &toConnect.ID
+		}
+		if data.AdminCreatedBy.Delete != nil && *data.AdminCreatedBy.Delete {
+			itemToDelete, err := item.AdminCreatedBy(ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -401,37 +401,37 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 		}
 	}
 	updated_byToDelete := ent.UserWhereUniqueInput{}
-	if data.UpdatedBy != nil {
+	if data.AdminUpdatedBy != nil {
 
-		if data.UpdatedBy.Connect != nil {
-			toConnect, err := repository.User.GetOneTx(ctx, tx, *data.UpdatedBy.Connect)
-
-			if err != nil {
-				return nil, err
-			}
-
-			data.UpdatedByID = &toConnect.ID
-		}
-		if data.UpdatedBy.Unset != nil && *data.UpdatedBy.Unset {
-			data.ClearUpdatedBy = true
-		}
-		if data.UpdatedBy.Create != nil {
-			var createInput ent.CreateUserInput
-			err = mapstructure.Decode(data.UpdatedBy.Create, &createInput)
-			if err != nil {
-				return nil, err
-			}
-
-			toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
+		if data.AdminUpdatedBy.Connect != nil {
+			toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *data.AdminUpdatedBy.Connect)
 
 			if err != nil {
 				return nil, err
 			}
 
-			data.UpdatedByID = &toConnect.ID
+			data.AdminUpdatedByID = &toConnect.ID
 		}
-		if data.UpdatedBy.Delete != nil && *data.UpdatedBy.Delete {
-			itemToDelete, err := item.UpdatedBy(ctx)
+		if data.AdminUpdatedBy.Unset != nil && *data.AdminUpdatedBy.Unset {
+			data.ClearAdminUpdatedBy = true
+		}
+		if data.AdminUpdatedBy.Create != nil {
+			var createInput ent.CreateAdminUserInput
+			err = mapstructure.Decode(data.AdminUpdatedBy.Create, &createInput)
+			if err != nil {
+				return nil, err
+			}
+
+			toConnect, err := repository.AdminUser.CreateTx(ctx, tx, createInput)
+
+			if err != nil {
+				return nil, err
+			}
+
+			data.AdminUpdatedByID = &toConnect.ID
+		}
+		if data.AdminUpdatedBy.Delete != nil && *data.AdminUpdatedBy.Delete {
+			itemToDelete, err := item.AdminUpdatedBy(ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -442,7 +442,7 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 
 		if data.UserRoles.Connect != nil {
 			for _, connect := range data.UserRoles.Connect {
-				toConnect, err := repository.User.GetOneTx(ctx, tx, *connect)
+				toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *connect)
 
 				if err != nil {
 					return nil, err
@@ -453,7 +453,7 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 		}
 		if data.UserRoles.Disconnect != nil {
 			for _, disconnect := range data.UserRoles.Disconnect {
-				toDisconnect, err := repository.User.GetOneTx(ctx, tx, *disconnect)
+				toDisconnect, err := repository.AdminUser.GetOneTx(ctx, tx, *disconnect)
 
 				if err != nil {
 					return nil, err
@@ -464,13 +464,13 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 		}
 		if data.UserRoles.Create != nil {
 			for _, create := range data.UserRoles.Create {
-				var createInput ent.CreateUserInput
+				var createInput ent.CreateAdminUserInput
 				err = mapstructure.Decode(create, &createInput)
 				if err != nil {
 					return nil, err
 				}
 
-				toConnect, err := repository.User.CreateTx(ctx, tx, createInput)
+				toConnect, err := repository.AdminUser.CreateTx(ctx, tx, createInput)
 
 				if err != nil {
 					return nil, err
@@ -481,7 +481,7 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 		}
 		if data.UserRoles.Delete != nil {
 			for _, delete := range data.UserRoles.Delete {
-				_, err := repository.User.DeleteTx(ctx, tx, *delete)
+				_, err := repository.AdminUser.DeleteTx(ctx, tx, *delete)
 
 				if err != nil {
 					return nil, err
@@ -545,13 +545,13 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 	if err != nil {
 		return nil, fmt.Errorf("error updating item: %v", err)
 	}
-	if data.CreatedBy != nil && data.CreatedBy.Delete != nil && *data.CreatedBy.Delete {
+	if data.AdminCreatedBy != nil && data.AdminCreatedBy.Delete != nil && *data.AdminCreatedBy.Delete {
 		_, err := repository.User.DeleteTx(ctx, tx, created_byToDelete)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if data.UpdatedBy != nil && data.UpdatedBy.Delete != nil && *data.UpdatedBy.Delete {
+	if data.AdminUpdatedBy != nil && data.AdminUpdatedBy.Delete != nil && *data.AdminUpdatedBy.Delete {
 		_, err := repository.User.DeleteTx(ctx, tx, updated_byToDelete)
 		if err != nil {
 			return nil, err

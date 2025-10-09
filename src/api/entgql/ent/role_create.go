@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
@@ -73,42 +74,57 @@ func (rc *RoleCreate) SetNillableID(s *string) *RoleCreate {
 	return rc
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (rc *RoleCreate) SetCreatedByID(id string) *RoleCreate {
-	rc.mutation.SetCreatedByID(id)
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (rc *RoleCreate) SetAdminCreatedByID(id string) *RoleCreate {
+	rc.mutation.SetAdminCreatedByID(id)
 	return rc
 }
 
-// SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (rc *RoleCreate) SetNillableCreatedByID(id *string) *RoleCreate {
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (rc *RoleCreate) SetNillableAdminCreatedByID(id *string) *RoleCreate {
 	if id != nil {
-		rc = rc.SetCreatedByID(*id)
+		rc = rc.SetAdminCreatedByID(*id)
 	}
 	return rc
 }
 
-// SetCreatedBy sets the "created_by" edge to the User entity.
-func (rc *RoleCreate) SetCreatedBy(u *User) *RoleCreate {
-	return rc.SetCreatedByID(u.ID)
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (rc *RoleCreate) SetAdminCreatedBy(a *AdminUser) *RoleCreate {
+	return rc.SetAdminCreatedByID(a.ID)
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (rc *RoleCreate) SetUpdatedByID(id string) *RoleCreate {
-	rc.mutation.SetUpdatedByID(id)
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (rc *RoleCreate) SetAdminUpdatedByID(id string) *RoleCreate {
+	rc.mutation.SetAdminUpdatedByID(id)
 	return rc
 }
 
-// SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (rc *RoleCreate) SetNillableUpdatedByID(id *string) *RoleCreate {
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (rc *RoleCreate) SetNillableAdminUpdatedByID(id *string) *RoleCreate {
 	if id != nil {
-		rc = rc.SetUpdatedByID(*id)
+		rc = rc.SetAdminUpdatedByID(*id)
 	}
 	return rc
 }
 
-// SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (rc *RoleCreate) SetUpdatedBy(u *User) *RoleCreate {
-	return rc.SetUpdatedByID(u.ID)
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (rc *RoleCreate) SetAdminUpdatedBy(a *AdminUser) *RoleCreate {
+	return rc.SetAdminUpdatedByID(a.ID)
+}
+
+// AddAdminUserRoleIDs adds the "admin_user_roles" edge to the AdminUser entity by IDs.
+func (rc *RoleCreate) AddAdminUserRoleIDs(ids ...string) *RoleCreate {
+	rc.mutation.AddAdminUserRoleIDs(ids...)
+	return rc
+}
+
+// AddAdminUserRoles adds the "admin_user_roles" edges to the AdminUser entity.
+func (rc *RoleCreate) AddAdminUserRoles(a ...*AdminUser) *RoleCreate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return rc.AddAdminUserRoleIDs(ids...)
 }
 
 // AddUserRoleIDs adds the "user_roles" edge to the User entity by IDs.
@@ -248,38 +264,54 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = &value
 	}
-	if nodes := rc.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.CreatedByTable,
-			Columns: []string{role.CreatedByColumn},
+			Table:   role.AdminCreatedByTable,
+			Columns: []string{role.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.role_created_by = &nodes[0]
+		_node.role_admin_created_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.UpdatedByTable,
-			Columns: []string{role.UpdatedByColumn},
+			Table:   role.AdminUpdatedByTable,
+			Columns: []string{role.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.role_updated_by = &nodes[0]
+		_node.role_admin_updated_by = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.AdminUserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rc.mutation.UserRolesIDs(); len(nodes) > 0 {

@@ -75,7 +75,7 @@ func main() {
 			templates.MutationInput,
 			templates.MutationSetEdge,
 			templates.MutationAddEdges,
-			templates.MutationUpdatedFields,
+			// templates.MutationOldValues,
 		),
 		entgql.WithWhereInputs(true),
 		entgql.WithConfigPath("./gqlgen.yml"),
@@ -92,7 +92,7 @@ func main() {
 		entc.Extensions(ex),
 		entc.FeatureNames("sql/execquery", "sql/upsert"),
 	}
-	
+
 	graph, err := entc.LoadGraph("./ent/schema", &gen.Config{})
 	if err != nil {
 		panic(err)

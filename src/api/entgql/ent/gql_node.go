@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
@@ -19,6 +20,11 @@ import (
 type Noder interface {
 	IsNode()
 }
+
+var adminuserImplementors = []string{"AdminUser", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*AdminUser) IsNode() {}
 
 var fileImplementors = []string{"File", "Node"}
 
@@ -98,6 +104,15 @@ func (c *Client) Noder(ctx context.Context, id string, opts ...NodeOption) (_ No
 
 func (c *Client) noder(ctx context.Context, table string, id string) (Noder, error) {
 	switch table {
+	case adminuser.Table:
+		query := c.AdminUser.Query().
+			Where(adminuser.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, adminuserImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
 	case file.Table:
 		query := c.File.Query().
 			Where(file.ID(id))
@@ -207,6 +222,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case adminuser.Table:
+		query := c.AdminUser.Query().
+			Where(adminuser.IDIn(ids...))
+		query, err := query.CollectFields(ctx, adminuserImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case file.Table:
 		query := c.File.Query().
 			Where(file.IDIn(ids...))

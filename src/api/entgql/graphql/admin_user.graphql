@@ -1,0 +1,55 @@
+extend type Query {
+    adminUsers(where: AdminUserWhereInput, orderBy: AdminUserOrder, skip: Int, first: Int, last: Int): [AdminUser!]
+    adminUsersConnection(where: AdminUserWhereInput, orderBy: AdminUserOrder, skip: Int, first: Int, last: Int): AdminUserConnection!
+}
+extend type Mutation {
+    createAdminUser(data: CreateAdminUserInput!): AdminUser!
+    createManyAdminUsers(data: [CreateAdminUserInput!]!): [AdminUser]!
+    updateAdminUser(where: AdminUserWhereUniqueInput!, data: UpdateAdminUserInput!): AdminUser!
+    updateManyAdminUsers(where: AdminUserWhereInput!, data: UpdateAdminUserInput!): Int!
+    upsertAdminUser(data: CreateAdminUserInput!): AdminUser!
+    upsertManyAdminUsers(data: [CreateAdminUserInput!]!): Int!
+    deleteAdminUser(where: AdminUserWhereUniqueInput!): AdminUser!
+    deleteManyAdminUsers(where: AdminUserWhereInput!): Int!
+}
+extend input CreateAdminUserInput {
+    refAdminCreatedBy: CreateManyAdminUserInput
+    adminCreatedBy: CreateOneAdminUserInput
+    refAdminUpdatedBy: CreateManyAdminUserInput
+    adminUpdatedBy: CreateOneAdminUserInput
+    roles: CreateManyRoleInput
+    defaultRole: CreateOneRoleInput
+}
+extend input UpdateAdminUserInput {
+    refAdminCreatedBy: UpdateManyAdminUserInput
+    adminCreatedBy: UpdateOneAdminUserInput
+    refAdminUpdatedBy: UpdateManyAdminUserInput
+    adminUpdatedBy: UpdateOneAdminUserInput
+    roles: UpdateManyRoleInput
+    defaultRole: UpdateOneRoleInput
+}
+
+input CreateOneAdminUserInput {
+    create: CreateAdminUserInput
+    connect: AdminUserWhereUniqueInput
+}
+
+input CreateManyAdminUserInput {
+    create: [CreateAdminUserInput!]
+    connect: [AdminUserWhereUniqueInput!]
+}
+
+
+input UpdateOneAdminUserInput {
+    create: CreateAdminUserInput
+    connect: AdminUserWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyAdminUserInput {
+    create: [CreateAdminUserInput!]
+    connect: [AdminUserWhereUniqueInput!]
+    delete: [AdminUserWhereUniqueInput!]
+    disconnect: [AdminUserWhereUniqueInput!]
+}

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/permission"
 	"github.com/GoLabra/labra/src/api/entgql/ent/predicate"
 	"github.com/GoLabra/labra/src/api/entgql/ent/role"
@@ -56,42 +57,57 @@ func (ru *RoleUpdate) ClearUpdatedAt() *RoleUpdate {
 	return ru
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (ru *RoleUpdate) SetCreatedByID(id string) *RoleUpdate {
-	ru.mutation.SetCreatedByID(id)
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (ru *RoleUpdate) SetAdminCreatedByID(id string) *RoleUpdate {
+	ru.mutation.SetAdminCreatedByID(id)
 	return ru
 }
 
-// SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (ru *RoleUpdate) SetNillableCreatedByID(id *string) *RoleUpdate {
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (ru *RoleUpdate) SetNillableAdminCreatedByID(id *string) *RoleUpdate {
 	if id != nil {
-		ru = ru.SetCreatedByID(*id)
+		ru = ru.SetAdminCreatedByID(*id)
 	}
 	return ru
 }
 
-// SetCreatedBy sets the "created_by" edge to the User entity.
-func (ru *RoleUpdate) SetCreatedBy(u *User) *RoleUpdate {
-	return ru.SetCreatedByID(u.ID)
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (ru *RoleUpdate) SetAdminCreatedBy(a *AdminUser) *RoleUpdate {
+	return ru.SetAdminCreatedByID(a.ID)
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (ru *RoleUpdate) SetUpdatedByID(id string) *RoleUpdate {
-	ru.mutation.SetUpdatedByID(id)
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (ru *RoleUpdate) SetAdminUpdatedByID(id string) *RoleUpdate {
+	ru.mutation.SetAdminUpdatedByID(id)
 	return ru
 }
 
-// SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (ru *RoleUpdate) SetNillableUpdatedByID(id *string) *RoleUpdate {
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (ru *RoleUpdate) SetNillableAdminUpdatedByID(id *string) *RoleUpdate {
 	if id != nil {
-		ru = ru.SetUpdatedByID(*id)
+		ru = ru.SetAdminUpdatedByID(*id)
 	}
 	return ru
 }
 
-// SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (ru *RoleUpdate) SetUpdatedBy(u *User) *RoleUpdate {
-	return ru.SetUpdatedByID(u.ID)
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (ru *RoleUpdate) SetAdminUpdatedBy(a *AdminUser) *RoleUpdate {
+	return ru.SetAdminUpdatedByID(a.ID)
+}
+
+// AddAdminUserRoleIDs adds the "admin_user_roles" edge to the AdminUser entity by IDs.
+func (ru *RoleUpdate) AddAdminUserRoleIDs(ids ...string) *RoleUpdate {
+	ru.mutation.AddAdminUserRoleIDs(ids...)
+	return ru
+}
+
+// AddAdminUserRoles adds the "admin_user_roles" edges to the AdminUser entity.
+func (ru *RoleUpdate) AddAdminUserRoles(a ...*AdminUser) *RoleUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ru.AddAdminUserRoleIDs(ids...)
 }
 
 // AddUserRoleIDs adds the "user_roles" edge to the User entity by IDs.
@@ -129,16 +145,37 @@ func (ru *RoleUpdate) Mutation() *RoleMutation {
 	return ru.mutation
 }
 
-// ClearCreatedBy clears the "created_by" edge to the User entity.
-func (ru *RoleUpdate) ClearCreatedBy() *RoleUpdate {
-	ru.mutation.ClearCreatedBy()
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (ru *RoleUpdate) ClearAdminCreatedBy() *RoleUpdate {
+	ru.mutation.ClearAdminCreatedBy()
 	return ru
 }
 
-// ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (ru *RoleUpdate) ClearUpdatedBy() *RoleUpdate {
-	ru.mutation.ClearUpdatedBy()
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (ru *RoleUpdate) ClearAdminUpdatedBy() *RoleUpdate {
+	ru.mutation.ClearAdminUpdatedBy()
 	return ru
+}
+
+// ClearAdminUserRoles clears all "admin_user_roles" edges to the AdminUser entity.
+func (ru *RoleUpdate) ClearAdminUserRoles() *RoleUpdate {
+	ru.mutation.ClearAdminUserRoles()
+	return ru
+}
+
+// RemoveAdminUserRoleIDs removes the "admin_user_roles" edge to AdminUser entities by IDs.
+func (ru *RoleUpdate) RemoveAdminUserRoleIDs(ids ...string) *RoleUpdate {
+	ru.mutation.RemoveAdminUserRoleIDs(ids...)
+	return ru
+}
+
+// RemoveAdminUserRoles removes "admin_user_roles" edges to AdminUser entities.
+func (ru *RoleUpdate) RemoveAdminUserRoles(a ...*AdminUser) *RoleUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ru.RemoveAdminUserRoleIDs(ids...)
 }
 
 // ClearUserRoles clears all "user_roles" edges to the User entity.
@@ -253,28 +290,28 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.UpdatedAtCleared() {
 		_spec.ClearField(role.FieldUpdatedAt, field.TypeTime)
 	}
-	if ru.mutation.CreatedByCleared() {
+	if ru.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.CreatedByTable,
-			Columns: []string{role.CreatedByColumn},
+			Table:   role.AdminCreatedByTable,
+			Columns: []string{role.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.CreatedByTable,
-			Columns: []string{role.CreatedByColumn},
+			Table:   role.AdminCreatedByTable,
+			Columns: []string{role.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -282,28 +319,73 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ru.mutation.UpdatedByCleared() {
+	if ru.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.UpdatedByTable,
-			Columns: []string{role.UpdatedByColumn},
+			Table:   role.AdminUpdatedByTable,
+			Columns: []string{role.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.UpdatedByTable,
-			Columns: []string{role.UpdatedByColumn},
+			Table:   role.AdminUpdatedByTable,
+			Columns: []string{role.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ru.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedAdminUserRolesIDs(); len(nodes) > 0 && !ru.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.AdminUserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -447,42 +529,57 @@ func (ruo *RoleUpdateOne) ClearUpdatedAt() *RoleUpdateOne {
 	return ruo
 }
 
-// SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (ruo *RoleUpdateOne) SetCreatedByID(id string) *RoleUpdateOne {
-	ruo.mutation.SetCreatedByID(id)
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (ruo *RoleUpdateOne) SetAdminCreatedByID(id string) *RoleUpdateOne {
+	ruo.mutation.SetAdminCreatedByID(id)
 	return ruo
 }
 
-// SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableCreatedByID(id *string) *RoleUpdateOne {
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableAdminCreatedByID(id *string) *RoleUpdateOne {
 	if id != nil {
-		ruo = ruo.SetCreatedByID(*id)
+		ruo = ruo.SetAdminCreatedByID(*id)
 	}
 	return ruo
 }
 
-// SetCreatedBy sets the "created_by" edge to the User entity.
-func (ruo *RoleUpdateOne) SetCreatedBy(u *User) *RoleUpdateOne {
-	return ruo.SetCreatedByID(u.ID)
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (ruo *RoleUpdateOne) SetAdminCreatedBy(a *AdminUser) *RoleUpdateOne {
+	return ruo.SetAdminCreatedByID(a.ID)
 }
 
-// SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (ruo *RoleUpdateOne) SetUpdatedByID(id string) *RoleUpdateOne {
-	ruo.mutation.SetUpdatedByID(id)
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (ruo *RoleUpdateOne) SetAdminUpdatedByID(id string) *RoleUpdateOne {
+	ruo.mutation.SetAdminUpdatedByID(id)
 	return ruo
 }
 
-// SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableUpdatedByID(id *string) *RoleUpdateOne {
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableAdminUpdatedByID(id *string) *RoleUpdateOne {
 	if id != nil {
-		ruo = ruo.SetUpdatedByID(*id)
+		ruo = ruo.SetAdminUpdatedByID(*id)
 	}
 	return ruo
 }
 
-// SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (ruo *RoleUpdateOne) SetUpdatedBy(u *User) *RoleUpdateOne {
-	return ruo.SetUpdatedByID(u.ID)
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (ruo *RoleUpdateOne) SetAdminUpdatedBy(a *AdminUser) *RoleUpdateOne {
+	return ruo.SetAdminUpdatedByID(a.ID)
+}
+
+// AddAdminUserRoleIDs adds the "admin_user_roles" edge to the AdminUser entity by IDs.
+func (ruo *RoleUpdateOne) AddAdminUserRoleIDs(ids ...string) *RoleUpdateOne {
+	ruo.mutation.AddAdminUserRoleIDs(ids...)
+	return ruo
+}
+
+// AddAdminUserRoles adds the "admin_user_roles" edges to the AdminUser entity.
+func (ruo *RoleUpdateOne) AddAdminUserRoles(a ...*AdminUser) *RoleUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ruo.AddAdminUserRoleIDs(ids...)
 }
 
 // AddUserRoleIDs adds the "user_roles" edge to the User entity by IDs.
@@ -520,16 +617,37 @@ func (ruo *RoleUpdateOne) Mutation() *RoleMutation {
 	return ruo.mutation
 }
 
-// ClearCreatedBy clears the "created_by" edge to the User entity.
-func (ruo *RoleUpdateOne) ClearCreatedBy() *RoleUpdateOne {
-	ruo.mutation.ClearCreatedBy()
+// ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
+func (ruo *RoleUpdateOne) ClearAdminCreatedBy() *RoleUpdateOne {
+	ruo.mutation.ClearAdminCreatedBy()
 	return ruo
 }
 
-// ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (ruo *RoleUpdateOne) ClearUpdatedBy() *RoleUpdateOne {
-	ruo.mutation.ClearUpdatedBy()
+// ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
+func (ruo *RoleUpdateOne) ClearAdminUpdatedBy() *RoleUpdateOne {
+	ruo.mutation.ClearAdminUpdatedBy()
 	return ruo
+}
+
+// ClearAdminUserRoles clears all "admin_user_roles" edges to the AdminUser entity.
+func (ruo *RoleUpdateOne) ClearAdminUserRoles() *RoleUpdateOne {
+	ruo.mutation.ClearAdminUserRoles()
+	return ruo
+}
+
+// RemoveAdminUserRoleIDs removes the "admin_user_roles" edge to AdminUser entities by IDs.
+func (ruo *RoleUpdateOne) RemoveAdminUserRoleIDs(ids ...string) *RoleUpdateOne {
+	ruo.mutation.RemoveAdminUserRoleIDs(ids...)
+	return ruo
+}
+
+// RemoveAdminUserRoles removes "admin_user_roles" edges to AdminUser entities.
+func (ruo *RoleUpdateOne) RemoveAdminUserRoles(a ...*AdminUser) *RoleUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ruo.RemoveAdminUserRoleIDs(ids...)
 }
 
 // ClearUserRoles clears all "user_roles" edges to the User entity.
@@ -674,28 +792,28 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	if ruo.mutation.UpdatedAtCleared() {
 		_spec.ClearField(role.FieldUpdatedAt, field.TypeTime)
 	}
-	if ruo.mutation.CreatedByCleared() {
+	if ruo.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.CreatedByTable,
-			Columns: []string{role.CreatedByColumn},
+			Table:   role.AdminCreatedByTable,
+			Columns: []string{role.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.CreatedByTable,
-			Columns: []string{role.CreatedByColumn},
+			Table:   role.AdminCreatedByTable,
+			Columns: []string{role.AdminCreatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -703,28 +821,73 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ruo.mutation.UpdatedByCleared() {
+	if ruo.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.UpdatedByTable,
-			Columns: []string{role.UpdatedByColumn},
+			Table:   role.AdminUpdatedByTable,
+			Columns: []string{role.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   role.UpdatedByTable,
-			Columns: []string{role.UpdatedByColumn},
+			Table:   role.AdminUpdatedByTable,
+			Columns: []string{role.AdminUpdatedByColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedAdminUserRolesIDs(); len(nodes) > 0 && !ruo.mutation.AdminUserRolesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.AdminUserRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.AdminUserRolesTable,
+			Columns: role.AdminUserRolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

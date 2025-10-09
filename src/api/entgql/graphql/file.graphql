@@ -13,10 +13,14 @@ extend type Mutation {
     deleteManyFiles(where: FileWhereInput!): Int!
 }
 extend input CreateFileInput {
+    adminCreatedBy: CreateOneAdminUserInput
+    adminUpdatedBy: CreateOneAdminUserInput
     createdBy: CreateOneUserInput
     updatedBy: CreateOneUserInput
 }
 extend input UpdateFileInput {
+    adminCreatedBy: UpdateOneAdminUserInput
+    adminUpdatedBy: UpdateOneAdminUserInput
     createdBy: UpdateOneUserInput
     updatedBy: UpdateOneUserInput
 }

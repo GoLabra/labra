@@ -33,26 +33,43 @@ input UpdateManyFileInput {
     disconnect: [FileWhereUniqueInput!]
 }
 
-input CreateOneUserInput {
-    connect: UserWhereUniqueInput
+input CreateOneAdminUserInput {
+    connect: AdminUserWhereUniqueInput
 }
 
-input CreateManyUserInput {
-    connect: [UserWhereUniqueInput!]
+input CreateManyAdminUserInput {
+    connect: [AdminUserWhereUniqueInput!]
 }
 
-
-input UpdateOneUserInput {
-    connect: UserWhereUniqueInput
+input UpdateOneAdminUserInput {
+    connect: AdminUserWhereUniqueInput
     unset: Boolean
 }
 
-input UpdateManyUserInput {
-    connect: [UserWhereUniqueInput!]
-    disconnect: [UserWhereUniqueInput!]
+input UpdateManyAdminUserInput {
+    connect: [AdminUserWhereUniqueInput!]
+    disconnect: [AdminUserWhereUniqueInput!]
 }
 
-extend type User {
+input CreateOneRoleInput {
+    connect: RoleWhereUniqueInput
+}
+
+input CreateManyRoleInput {
+    connect: [RoleWhereUniqueInput!]
+}
+
+input UpdateOneRoleInput {
+    connect: RoleWhereUniqueInput
+    unset: Boolean
+}
+
+input UpdateManyRoleInput {
+    connect: [RoleWhereUniqueInput!]
+    disconnect: [RoleWhereUniqueInput!]
+}
+
+extend type AdminUser {
   name: String
   email: String!
   password: String!
@@ -60,8 +77,8 @@ extend type User {
   lastName: String!
   createdAt: Time
   updatedAt: Time
-  createdBy: User
-  updatedBy: User
+  createdBy: AdminUser
+  updatedBy: AdminUser
   roles: [Role!]
   defaultRole: Role
 }
@@ -74,18 +91,16 @@ extend type File {
   storageFileName: String!
   size: Int!
   content: String!
-  createdBy: User
-  updatedBy: User
+  createdBy: AdminUser
+  updatedBy: AdminUser
 }
 
-type Role implements Node {
-  id: ID!
-  name: String!
+extend type Role {
   createdAt: Time
   updatedAt: Time
-  createdBy: User
-  updatedBy: User
-  userRoles: [User!]
+  createdBy: AdminUser
+  updatedBy: AdminUser
+  AdminUserRoles: [AdminUser!]
   permissions: [Permission!]
 }
 
@@ -95,8 +110,8 @@ type Permission implements Node {
   updatedAt: DateTime
   entity: String!
   operation: String!
-  createdBy: User
-  updatedBy: User
+  createdBy: AdminUser
+  updatedBy: AdminUser
   role: Role
 }
 scalar Time

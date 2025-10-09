@@ -2,7 +2,6 @@ extend type Query {
     permissions(where: PermissionWhereInput, orderBy: PermissionOrder, skip: Int, first: Int, last: Int): [Permission!]
     permissionsConnection(where: PermissionWhereInput, orderBy: PermissionOrder, skip: Int, first: Int, last: Int): PermissionConnection!
 }
-
 extend type Mutation {
     createPermission(data: CreatePermissionInput!): Permission!
     createManyPermissions(data: [CreatePermissionInput!]!): [Permission]!
@@ -14,13 +13,13 @@ extend type Mutation {
     deleteManyPermissions(where: PermissionWhereInput!): Int!
 }
 extend input CreatePermissionInput {
-    createdBy: CreateOneUserInput
-    updatedBy: CreateOneUserInput
+    adminCreatedBy: CreateOneAdminUserInput
+    adminUpdatedBy: CreateOneAdminUserInput
     role: CreateOneRoleInput
 }
 extend input UpdatePermissionInput {
-    createdBy: UpdateOneUserInput
-    updatedBy: UpdateOneUserInput
+    adminCreatedBy: UpdateOneAdminUserInput
+    adminUpdatedBy: UpdateOneAdminUserInput
     role: UpdateOneRoleInput
 }
 

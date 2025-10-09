@@ -22,28 +22,28 @@ const (
 	FieldEntity = "entity"
 	// FieldOperation holds the string denoting the operation field in the database.
 	FieldOperation = "operation"
-	// EdgeCreatedBy holds the string denoting the created_by edge name in mutations.
-	EdgeCreatedBy = "created_by"
-	// EdgeUpdatedBy holds the string denoting the updated_by edge name in mutations.
-	EdgeUpdatedBy = "updated_by"
+	// EdgeAdminCreatedBy holds the string denoting the admin_created_by edge name in mutations.
+	EdgeAdminCreatedBy = "admin_created_by"
+	// EdgeAdminUpdatedBy holds the string denoting the admin_updated_by edge name in mutations.
+	EdgeAdminUpdatedBy = "admin_updated_by"
 	// EdgeRole holds the string denoting the role edge name in mutations.
 	EdgeRole = "role"
 	// Table holds the table name of the permission in the database.
 	Table = "permissions"
-	// CreatedByTable is the table that holds the created_by relation/edge.
-	CreatedByTable = "permissions"
-	// CreatedByInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	CreatedByInverseTable = "users"
-	// CreatedByColumn is the table column denoting the created_by relation/edge.
-	CreatedByColumn = "permission_created_by"
-	// UpdatedByTable is the table that holds the updated_by relation/edge.
-	UpdatedByTable = "permissions"
-	// UpdatedByInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UpdatedByInverseTable = "users"
-	// UpdatedByColumn is the table column denoting the updated_by relation/edge.
-	UpdatedByColumn = "permission_updated_by"
+	// AdminCreatedByTable is the table that holds the admin_created_by relation/edge.
+	AdminCreatedByTable = "permissions"
+	// AdminCreatedByInverseTable is the table name for the AdminUser entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
+	AdminCreatedByInverseTable = "admin_users"
+	// AdminCreatedByColumn is the table column denoting the admin_created_by relation/edge.
+	AdminCreatedByColumn = "permission_admin_created_by"
+	// AdminUpdatedByTable is the table that holds the admin_updated_by relation/edge.
+	AdminUpdatedByTable = "permissions"
+	// AdminUpdatedByInverseTable is the table name for the AdminUser entity.
+	// It exists in this package in order to avoid circular dependency with the "adminuser" package.
+	AdminUpdatedByInverseTable = "admin_users"
+	// AdminUpdatedByColumn is the table column denoting the admin_updated_by relation/edge.
+	AdminUpdatedByColumn = "permission_admin_updated_by"
 	// RoleTable is the table that holds the role relation/edge.
 	RoleTable = "permissions"
 	// RoleInverseTable is the table name for the Role entity.
@@ -65,8 +65,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "permissions"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"permission_created_by",
-	"permission_updated_by",
+	"permission_admin_created_by",
+	"permission_admin_updated_by",
 	"permission_role",
 }
 
@@ -128,17 +128,17 @@ func ByOperation(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOperation, opts...).ToFunc()
 }
 
-// ByCreatedByField orders the results by created_by field.
-func ByCreatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByAdminCreatedByField orders the results by admin_created_by field.
+func ByAdminCreatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCreatedByStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newAdminCreatedByStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByUpdatedByField orders the results by updated_by field.
-func ByUpdatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByAdminUpdatedByField orders the results by admin_updated_by field.
+func ByAdminUpdatedByField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUpdatedByStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newAdminUpdatedByStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -148,18 +148,18 @@ func ByRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newRoleStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newCreatedByStep() *sqlgraph.Step {
+func newAdminCreatedByStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CreatedByInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, CreatedByTable, CreatedByColumn),
+		sqlgraph.To(AdminCreatedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, AdminCreatedByTable, AdminCreatedByColumn),
 	)
 }
-func newUpdatedByStep() *sqlgraph.Step {
+func newAdminUpdatedByStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UpdatedByInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, UpdatedByTable, UpdatedByColumn),
+		sqlgraph.To(AdminUpdatedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, AdminUpdatedByTable, AdminUpdatedByColumn),
 	)
 }
 func newRoleStep() *sqlgraph.Step {

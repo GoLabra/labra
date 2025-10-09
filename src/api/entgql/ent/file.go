@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
@@ -34,25 +35,53 @@ type File struct {
 	Size int64 `json:"size,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FileQuery when eager-loading is set.
-	Edges           FileEdges `json:"edges"`
-	file_created_by *string
-	file_updated_by *string
-	selectValues    sql.SelectValues
+	Edges                 FileEdges `json:"edges"`
+	file_admin_created_by *string
+	file_admin_updated_by *string
+	file_created_by       *string
+	file_updated_by       *string
+	selectValues          sql.SelectValues
 
 	Content string `json:"content,omitempty"`
 }
 
 // FileEdges holds the relations/edges for other nodes in the graph.
 type FileEdges struct {
+	// AdminCreatedBy holds the value of the admin_created_by edge.
+	AdminCreatedBy *AdminUser `json:"admin_created_by,omitempty"`
+	// AdminUpdatedBy holds the value of the admin_updated_by edge.
+	AdminUpdatedBy *AdminUser `json:"admin_updated_by,omitempty"`
 	// CreatedBy holds the value of the created_by edge.
 	CreatedBy *User `json:"created_by,omitempty"`
 	// UpdatedBy holds the value of the updated_by edge.
 	UpdatedBy *User `json:"updated_by,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [4]map[string]int
+}
+
+// AdminCreatedByOrErr returns the AdminCreatedBy value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e FileEdges) AdminCreatedByOrErr() (*AdminUser, error) {
+	if e.AdminCreatedBy != nil {
+		return e.AdminCreatedBy, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: adminuser.Label}
+	}
+	return nil, &NotLoadedError{edge: "admin_created_by"}
+}
+
+// AdminUpdatedByOrErr returns the AdminUpdatedBy value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e FileEdges) AdminUpdatedByOrErr() (*AdminUser, error) {
+	if e.AdminUpdatedBy != nil {
+		return e.AdminUpdatedBy, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: adminuser.Label}
+	}
+	return nil, &NotLoadedError{edge: "admin_updated_by"}
 }
 
 // CreatedByOrErr returns the CreatedBy value or an error if the edge
@@ -60,7 +89,7 @@ type FileEdges struct {
 func (e FileEdges) CreatedByOrErr() (*User, error) {
 	if e.CreatedBy != nil {
 		return e.CreatedBy, nil
-	} else if e.loadedTypes[0] {
+	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "created_by"}
@@ -71,7 +100,7 @@ func (e FileEdges) CreatedByOrErr() (*User, error) {
 func (e FileEdges) UpdatedByOrErr() (*User, error) {
 	if e.UpdatedBy != nil {
 		return e.UpdatedBy, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[3] {
 		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "updated_by"}
@@ -88,9 +117,13 @@ func (*File) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case file.FieldCreatedAt, file.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case file.ForeignKeys[0]: // file_created_by
+		case file.ForeignKeys[0]: // file_admin_created_by
 			values[i] = new(sql.NullString)
-		case file.ForeignKeys[1]: // file_updated_by
+		case file.ForeignKeys[1]: // file_admin_updated_by
+			values[i] = new(sql.NullString)
+		case file.ForeignKeys[2]: // file_created_by
+			values[i] = new(sql.NullString)
+		case file.ForeignKeys[3]: // file_updated_by
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -159,12 +192,26 @@ func (f *File) assignValues(columns []string, values []any) error {
 			}
 		case file.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field file_admin_created_by", values[i])
+			} else if value.Valid {
+				f.file_admin_created_by = new(string)
+				*f.file_admin_created_by = value.String
+			}
+		case file.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field file_admin_updated_by", values[i])
+			} else if value.Valid {
+				f.file_admin_updated_by = new(string)
+				*f.file_admin_updated_by = value.String
+			}
+		case file.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field file_created_by", values[i])
 			} else if value.Valid {
 				f.file_created_by = new(string)
 				*f.file_created_by = value.String
 			}
-		case file.ForeignKeys[1]:
+		case file.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field file_updated_by", values[i])
 			} else if value.Valid {
@@ -182,6 +229,16 @@ func (f *File) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (f *File) Value(name string) (ent.Value, error) {
 	return f.selectValues.Get(name)
+}
+
+// QueryAdminCreatedBy queries the "admin_created_by" edge of the File entity.
+func (f *File) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewFileClient(f.config).QueryAdminCreatedBy(f)
+}
+
+// QueryAdminUpdatedBy queries the "admin_updated_by" edge of the File entity.
+func (f *File) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewFileClient(f.config).QueryAdminUpdatedBy(f)
 }
 
 // QueryCreatedBy queries the "created_by" edge of the File entity.

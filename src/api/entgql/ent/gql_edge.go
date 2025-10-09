@@ -8,6 +8,70 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (au *AdminUser) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := au.Edges.AdminCreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = au.QueryAdminCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (au *AdminUser) RefAdminUpdatedBy(ctx context.Context) (result []*AdminUser, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = au.NamedRefAdminUpdatedBy(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = au.Edges.RefAdminUpdatedByOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = au.QueryRefAdminUpdatedBy().All(ctx)
+	}
+	return result, err
+}
+
+func (au *AdminUser) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := au.Edges.AdminUpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = au.QueryAdminUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (au *AdminUser) Roles(ctx context.Context) (result []*Role, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = au.NamedRoles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = au.Edges.RolesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = au.QueryRoles().All(ctx)
+	}
+	return result, err
+}
+
+func (au *AdminUser) DefaultRole(ctx context.Context) (*Role, error) {
+	result, err := au.Edges.DefaultRoleOrErr()
+	if IsNotLoaded(err) {
+		result, err = au.QueryDefaultRole().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (f *File) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := f.Edges.AdminCreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = f.QueryAdminCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (f *File) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := f.Edges.AdminUpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = f.QueryAdminUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (f *File) CreatedBy(ctx context.Context) (*User, error) {
 	result, err := f.Edges.CreatedByOrErr()
 	if IsNotLoaded(err) {
@@ -24,18 +88,18 @@ func (f *File) UpdatedBy(ctx context.Context) (*User, error) {
 	return result, MaskNotFound(err)
 }
 
-func (pe *Permission) CreatedBy(ctx context.Context) (*User, error) {
-	result, err := pe.Edges.CreatedByOrErr()
+func (pe *Permission) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := pe.Edges.AdminCreatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = pe.QueryCreatedBy().Only(ctx)
+		result, err = pe.QueryAdminCreatedBy().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
 
-func (pe *Permission) UpdatedBy(ctx context.Context) (*User, error) {
-	result, err := pe.Edges.UpdatedByOrErr()
+func (pe *Permission) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := pe.Edges.AdminUpdatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = pe.QueryUpdatedBy().Only(ctx)
+		result, err = pe.QueryAdminUpdatedBy().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
@@ -48,20 +112,32 @@ func (pe *Permission) Role(ctx context.Context) (*Role, error) {
 	return result, MaskNotFound(err)
 }
 
-func (r *Role) CreatedBy(ctx context.Context) (*User, error) {
-	result, err := r.Edges.CreatedByOrErr()
+func (r *Role) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := r.Edges.AdminCreatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryCreatedBy().Only(ctx)
+		result, err = r.QueryAdminCreatedBy().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
 
-func (r *Role) UpdatedBy(ctx context.Context) (*User, error) {
-	result, err := r.Edges.UpdatedByOrErr()
+func (r *Role) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := r.Edges.AdminUpdatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryUpdatedBy().Only(ctx)
+		result, err = r.QueryAdminUpdatedBy().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (r *Role) AdminUserRoles(ctx context.Context) (result []*AdminUser, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedAdminUserRoles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.AdminUserRolesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryAdminUserRoles().All(ctx)
+	}
+	return result, err
 }
 
 func (r *Role) UserRoles(ctx context.Context) (result []*User, err error) {
@@ -100,6 +176,22 @@ func (u *User) UpdatedBy(ctx context.Context) (*User, error) {
 	result, err := u.Edges.UpdatedByOrErr()
 	if IsNotLoaded(err) {
 		result, err = u.QueryUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (u *User) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := u.Edges.AdminCreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = u.QueryAdminCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (u *User) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := u.Edges.AdminUpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = u.QueryAdminUpdatedBy().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }

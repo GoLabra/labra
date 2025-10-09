@@ -5,6 +5,10 @@ scalar DateOnly
 scalar TimeOnly
 
 scalar DateTime
+input AdminUserWhereUniqueInput {
+  id: ID
+  email: String
+}
 input FileWhereUniqueInput {
   id: ID
   caption: String

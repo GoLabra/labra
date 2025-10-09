@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/GoLabra/labra/src/api/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/src/api/entgql/ent/file"
 	"github.com/GoLabra/labra/src/api/entgql/ent/user"
 )
@@ -102,6 +103,44 @@ func (fc *FileCreate) SetNillableID(s *string) *FileCreate {
 		fc.SetID(*s)
 	}
 	return fc
+}
+
+// SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
+func (fc *FileCreate) SetAdminCreatedByID(id string) *FileCreate {
+	fc.mutation.SetAdminCreatedByID(id)
+	return fc
+}
+
+// SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (fc *FileCreate) SetNillableAdminCreatedByID(id *string) *FileCreate {
+	if id != nil {
+		fc = fc.SetAdminCreatedByID(*id)
+	}
+	return fc
+}
+
+// SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
+func (fc *FileCreate) SetAdminCreatedBy(a *AdminUser) *FileCreate {
+	return fc.SetAdminCreatedByID(a.ID)
+}
+
+// SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
+func (fc *FileCreate) SetAdminUpdatedByID(id string) *FileCreate {
+	fc.mutation.SetAdminUpdatedByID(id)
+	return fc
+}
+
+// SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
+func (fc *FileCreate) SetNillableAdminUpdatedByID(id *string) *FileCreate {
+	if id != nil {
+		fc = fc.SetAdminUpdatedByID(*id)
+	}
+	return fc
+}
+
+// SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
+func (fc *FileCreate) SetAdminUpdatedBy(a *AdminUser) *FileCreate {
+	return fc.SetAdminUpdatedByID(a.ID)
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
@@ -268,6 +307,40 @@ func (fc *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 	if value, ok := fc.mutation.Size(); ok {
 		_spec.SetField(file.FieldSize, field.TypeInt64, value)
 		_node.Size = value
+	}
+	if nodes := fc.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminCreatedByTable,
+			Columns: []string{file.AdminCreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.file_admin_created_by = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := fc.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   file.AdminUpdatedByTable,
+			Columns: []string{file.AdminUpdatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.file_admin_updated_by = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := fc.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
