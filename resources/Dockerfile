@@ -34,7 +34,7 @@ COPY . .
 WORKDIR /app/app
 
 # Run the required commands in one shell execution
-RUN sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra => ../api" go.mod  && \
+RUN sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra => ..\/..\/." go.mod  && \
     go generate && \
     go mod tidy
 

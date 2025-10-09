@@ -176,7 +176,7 @@ replace github.com/GoLabra/labra => ../api
 or run:
 
 ```bash
-sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra => ../api" go.mod
+sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra => ..\/..\/." go.mod
 ```
 
 ---

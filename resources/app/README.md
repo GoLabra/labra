@@ -86,7 +86,7 @@ You should see startup logs indicating successful DB connection and GraphQL endp
    ```
 
    ```bash
-   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labrago => ../api" go.mod
+   sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labrago => ..\/..\/." go.mod
    ```
 
 ## Contributing
