@@ -15,7 +15,6 @@ export class MultipleEntityDesignerStrategyService implements IEntityDesignerStr
     }
 
     setDisplayField(entityName: string, displayField?: string) {
-        //this.resetChangesIfOtherEntity(entityName);
 
         if (!displayField) {
             modifiedDisplayFieldVar(Object.fromEntries(
@@ -39,20 +38,19 @@ export class MultipleEntityDesignerStrategyService implements IEntityDesignerStr
             ...modifiedEntityVar(),
             newDesignerEntity]
         );
-        // modifiedDisplayFieldVar({});
-        // modifiedEntityChildrenVar({});
     }
 
     editEntity(entityName: string, editedEntity: ChangedNameCaptionEntity) {
-        //reset edited entity if other entity
-        //this.resetChangesIfOtherEntity(entityName);
+        
+		const oldStatus = modifiedEntityVar().find(x => x.name == entityName)?.designerStatus ?? 'unchanged';
+		const newStatus:DesignerEntityStatus = oldStatus == 'new' ? 'new' : 'edited';
 
         modifiedEntityVar([
             ...modifiedEntityVar().filter(i => i.name != entityName),
             {
                 ...editedEntity,
                 name: entityName,
-                designerStatus: 'edited',
+                designerStatus: newStatus,
             }]);
     }
 
