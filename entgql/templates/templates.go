@@ -9,6 +9,8 @@ import (
 )
 
 type store struct {
+	CollectionTemplate *gen.Template
+	EdgeTemplate       *gen.Template
 	MutationInput      *gen.Template
 	MutationSetEdge    *gen.Template
 	MutationAddEdges   *gen.Template
@@ -29,6 +31,18 @@ func loadT(name, path string, templateFuncMap template.FuncMap) (*gen.Template, 
 func Load(templateFuncMap template.FuncMap) (store, error) {
 	var templateStore = store{}
 	var err error
+	templateStore.CollectionTemplate, err = loadT("gql_collection", "entgql/collection.go.tmpl", templateFuncMap)
+	if err != nil {
+		log.Fatalf("cannot parse collection template: %v", err)
+		return templateStore, err
+	}
+
+	templateStore.EdgeTemplate, err = loadT("gql_edge", "entgql/edge.go.tmpl", templateFuncMap)
+	if err != nil {
+		log.Fatalf("cannot parse edge template: %v", err)
+		return templateStore, err
+	}
+
 	templateStore.MutationAddEdges, err = loadT("mutation_add_edges", "entgql/mutation_add_edges.go.tmpl", templateFuncMap)
 	if err != nil {
 		log.Fatalf("cannot parse mutation input template: %v", err)

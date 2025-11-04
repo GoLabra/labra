@@ -62,20 +62,22 @@ func init() {
 }
 
 func main() {
-	templates, err := templates.Load(templateFuncMap)
+	templateStore, err := templates.Load(templateFuncMap)
+	if err != nil {
+		log.Fatalf("loading templates: %v", err)
+	}
 
 	ex, err := entgql.NewExtension(
 		entgql.WithTemplates(
-			entgql.CollectionTemplate,
+			templateStore.CollectionTemplate,
 			entgql.EnumTemplate,
 			entgql.NodeTemplate,
 			entgql.PaginationTemplate,
 			entgql.TransactionTemplate,
-			entgql.EdgeTemplate,
-			templates.MutationInput,
-			templates.MutationSetEdge,
-			templates.MutationAddEdges,
-			// templates.MutationOldValues,
+			templateStore.EdgeTemplate,
+			templateStore.MutationInput,
+			templateStore.MutationSetEdge,
+			templateStore.MutationAddEdges,
 		),
 		entgql.WithWhereInputs(true),
 		entgql.WithConfigPath("./gqlgen.yml"),
