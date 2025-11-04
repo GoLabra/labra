@@ -1,14 +1,10 @@
 {{- define "edge"}}
-        {{- /* Determine To vs From: M2O uses To (owns FK), O2M with Ref uses From (inverse) */}}
         {{- $useTo := false }}
         {{- if eq $.Edge.RelationType "ManyToOne" }}
-            {{- /* M2O always uses To - the entity owns the foreign key */}}
             {{- $useTo = true }}
         {{- else if eq $.Edge.RelationType "OneToMany" }}
-            {{- /* O2M: if Ref is set, use From (inverse), otherwise use To (owns FK) */}}
             {{- $useTo = eq $.Edge.Ref "" }}
         {{- else }}
-            {{- /* For other types (O2O, M2M, One), use Ref to determine */}}
             {{- $useTo = eq $.Edge.Ref "" }}
         {{- end }}
         edge.{{ if $useTo }}To{{ else }}From{{end}}("{{$.Edge.EntName}}", {{$.Edge.Type}}.Type).
