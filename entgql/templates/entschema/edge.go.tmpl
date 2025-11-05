@@ -1,12 +1,20 @@
 {{- define "edge"}}
-        edge.{{ if eq $.Edge.Ref "" }}To{{ else }}From{{end}}("{{$.Edge.EntName}}", {{$.Edge.Type}}.Type).
-            {{- if and ($.Edge.Required | IsTrue) (eq $.Edge.Ref "") }}
+        {{- $useTo := false }}
+        {{- if eq $.Edge.RelationType "ManyToOne" }}
+            {{- $useTo = true }}
+        {{- else if eq $.Edge.RelationType "OneToMany" }}
+            {{- $useTo = eq $.Edge.Ref "" }}
+        {{- else }}
+            {{- $useTo = eq $.Edge.Ref "" }}
+        {{- end }}
+        edge.{{ if $useTo }}To{{ else }}From{{end}}("{{$.Edge.EntName}}", {{$.Edge.Type}}.Type).
+            {{- if and ($.Edge.Required | IsTrue) $useTo }}
             Required().
             {{- end}}
-            {{- if ne $.Edge.Ref "" }}
+            {{- if not $useTo }}
             Ref("{{ $.Edge.Ref }}").
             {{- end}}
-            {{- if  or (eq $.Edge.RelationType "OneToOne") (eq $.Edge.RelationType "ManyToOne") (eq $.Edge.RelationType "One")}}
+            {{- if and $useTo (or (eq $.Edge.RelationType "OneToOne") (eq $.Edge.RelationType "ManyToOne") (eq $.Edge.RelationType "One"))}}
             Unique().
             {{- end }}
             Annotations(
