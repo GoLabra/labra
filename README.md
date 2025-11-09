@@ -20,6 +20,53 @@ This project is our way of making things simpler, cleaner, and more fun for anyo
 
 ---
 
+# Quick Install
+
+The easiest way to get started with LabraGo is using `labractl`, the official CLI tool. It automates project setup, dependency management, and development server orchestration.
+
+**Note:** `labractl` v1.1.0+ supports Labra v0.1.3.
+
+## Install labractl
+
+```bash
+go install github.com/GoLabra/labractl@latest
+```
+
+Make sure the Go bin directory is in your PATH. On macOS/Linux:
+
+```bash
+export PATH="$(go env GOPATH)/bin:$PATH"
+```
+
+## Create a new project
+
+```bash
+labractl create my-awesome-project
+```
+
+This command will:
+- Clone the LabraGo repository
+- Configure development environment
+- Install all dependencies
+- Set up PostgreSQL database
+- Generate configuration files
+
+## Start development servers
+
+```bash
+cd my-awesome-project
+labractl start
+```
+
+This launches:
+- **Backend server** on `http://localhost:4000`
+- **Frontend admin** on `http://localhost:3000`
+- **GraphQL Playground** on `http://localhost:4000/playground`
+
+For more information about `labractl`, visit the [labractl repository](https://github.com/GoLabra/labractl).
+
+---
+
 # Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
@@ -32,9 +79,11 @@ Before you begin, ensure you have the following installed on your system:
 
 ---
 
-# Getting Started
+# Getting Started (Manual Installation)
 
-This guide will walk you through setting up a new LabraGo project from scratch.
+> **Prefer automated setup?** Use the [Quick Install](#quick-install) section above to get started with `labractl` in just a few commands.
+
+This guide will walk you through manually setting up a new LabraGo project from scratch.
 
 ## Step 1: Copy the App Template
 
