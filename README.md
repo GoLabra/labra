@@ -1,10 +1,10 @@
 # What is LabraGo?
 
-## It’s a headless CMS… but not *that* kind.
+## It's a headless CMS… but not *that* kind.
 
-We’re not here to help you build a blog or a basic website. LabraGo was born to handle **real apps**—the complex, data-heavy, API-driven kind.
+We're not here to help you build a blog or a basic website. LabraGo was born to handle **real apps**—the complex, data-heavy, API-driven kind.
 
-Built with Go for performance and React for a clean, modern admin UI, it’s fast, flexible, and actually enjoyable to work with.
+Built with Go for performance and React for a clean, modern admin UI, it's fast, flexible, and actually enjoyable to work with.
 
 Think of it as your backend brain—powerful enough to manage complex data models, events, and permissions, without drowning you in endless configurations.
 
@@ -14,172 +14,352 @@ Think of it as your backend brain—powerful enough to manage complex data model
 
 ## Because we exist 🙂
 
-And because we’ve run into enough problems building data-heavy apps, we decided to do something about it.
+And because we've run into enough problems building data-heavy apps, we decided to do something about it.
 
 This project is our way of making things simpler, cleaner, and more fun for anyone facing the same challenges.
 
 ---
 
-# 📦 How to Install LabraGo
+# Prerequisites
 
-You can install and run LabraGo in two ways:
+Before you begin, ensure you have the following installed on your system:
+
+- **Go** (version 1.18 or later) - [Download](https://golang.org/dl/)
+- **PostgreSQL** (with an empty database ready) - [Download](https://www.postgresql.org/download/)
+- **Node.js** (version 18 or later) - [Download](https://nodejs.org/)
+- **Yarn** (version 1.22 or later) - [Installation Guide](https://yarnpkg.com/getting-started/install)
+- **Centrifugo** - Real-time messaging server - [Installation Guide](https://centrifugo.dev/docs/getting-started/installation/)
 
 ---
 
-## ✅ The Easy Way — Using `labractl` CLI
+# Getting Started
+
+This guide will walk you through setting up a new LabraGo project from scratch.
+
+## Step 1: Copy the App Template
+
+Start by copying the contents of `resources/app` to your new project directory:
 
 ```bash
-go install github.com/GoLabra/labractl@v.1.0.0
+# Create your new project directory
+mkdir my-labrago-project
+cd my-labrago-project
+
+# Copy the app template
+cp -r /path/to/labra/resources/app/* .
 ```
 
-Then run:
-
-```bash
-labractl create myproject
-cd myproject
-labractl start
-```
-
-This will:
-
-- Clone the repo
-- Patch `go.mod`
-- Set up `.env` files for frontend and backend
-- Run `go mod tidy` and `go generate`
-- Ensure PostgreSQL user and database
-- Install frontend dependencies
-- Start frontend and backend concurrently
-
-🔥 Done in seconds.
-
----
-
-## 🛠 The Manual Way (Advanced)
-
-See below:
-
----
-
-# Running LabraGo Admin Panel
-
-## Prerequisites
-To run this project, ensure you have the following installed on your system:
-
-- [Node.js](https://nodejs.org/) (version 18 or later is recommended)
-- [Yarn](https://yarnpkg.com/) (version 1.22 or later)
-
-## Installation
-Follow these steps to set up the project on your local machine:
+Or if you're cloning the LabraGo repository:
 
 ```bash
 git clone https://github.com/GoLabra/labra.git
-cd labra/src/admin
-yarn install
+cd labra
+mkdir my-project
+cp -r resources/app/* my-project/
+cd my-project
 ```
 
-## Running in Development Mode
+## Step 2: Configure Go Module
+
+Update the `go.mod` file to replace the LabraGo dependency with your local path (for development) or your repository path (for production):
 
 ```bash
-yarn dev
+# For local development, replace with the path to the labra repository
+sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra => ..\/..\/." go.mod
 ```
 
-Go to `http://localhost:3000` to view the app.
+Or manually edit `go.mod`:
 
-## Building the Project
-
-```bash
-yarn build
+```go
+replace github.com/GoLabra/labra => /path/to/labra
 ```
 
-## Starting the Production Server
+## Step 3: Configure Environment Variables
 
-```bash
-yarn start
-```
+### Backend Configuration
 
-## Set Environment Variables
+Copy the example environment file and configure it:
 
 ```bash
 cp .env.example .env
 ```
+
+Edit `.env` with your configuration. See [Backend Environment Variables](#backend-environment-variables) for detailed documentation.
+
+**Required variables:**
+- `DSN` - PostgreSQL connection string
+- `DB_DIALECT` - Database dialect (postgres)
+- `SECRET_KEY` - JWT secret key (generate with: `head -c 32 /dev/urandom | base64`)
+- `CENTRIFUGO_API_ADDRESS` - Centrifugo API address
+- `CENTRIFUGO_API_KEY` - Centrifugo API key (generate with: `head -c 32 /dev/urandom | base64`)
+
+**Optional variables (with defaults):**
+- `SERVER_PORT` - Defaults to `4000` if not set
+- `ENT_SCHEMA_PATH` - Defaults to `./ent/schema` if not set
+- `FILE_STORAGE_PROVIDER` - Defaults to `local` if not set
+- `FILE_STORAGE_PATH` - Defaults to `./storage` if not set
+
+For complete documentation, see [`resources/app/.env.example`](resources/app/.env.example).
+
+### Admin Frontend Configuration
+
+If you're setting up the admin frontend, navigate to the admin directory:
+
+```bash
+cd ../admin  # or wherever you have the admin frontend
+cp .env.example .env.local
+```
+
+Edit `.env.local` with your configuration. See [Admin Frontend Environment Variables](#admin-frontend-environment-variables) for detailed documentation.
+
+For complete documentation, see [`resources/admin/.env.example`](resources/admin/.env.example).
+
+## Step 4: Set Up Database
+
+Create a PostgreSQL database for your project:
+
+```bash
+# Connect to PostgreSQL
+psql -U postgres
+
+# Create database
+CREATE DATABASE labrago;
+
+# Exit psql
+\q
+```
+
+Update your `.env` file with the correct database connection string:
 
 ```env
-NEXT_PUBLIC_BRAND_PRODUCT_NAME="Labra·GO"
-NEXT_PUBLIC_BRAND_COLOR="blue"
-NEXT_PUBLIC_GRAPHQL_API_URL="http://localhost:4000"
-NEXT_PUBLIC_GRAPHQL_QUERY_API_URL="http://localhost:4000/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_SUBSCRIPTION_URL="ws://localhost:4000/query"
-NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL="http://localhost:4000/playground"
-NEXT_PUBLIC_GRAPHQL_ENTITY_API_URL="http://localhost:4000/entity"
-NEXT_PUBLIC_GRAPHQL_ENTITY_SUBSCRIPTION_URL="ws://localhost:4000/entity"
-NEXT_PUBLIC_GRAPHQL_ENTITY_PLAYGROUND_URL="http://localhost:4000/eplayground"
-NEXT_PUBLIC_CENTRIFUGO_URL="ws://localhost:8000/connection/websocket"
+DSN=postgres://postgres:yourpassword@localhost:5432/labrago?sslmode=disable
 ```
 
----
+## Step 5: Set Up File Storage
 
-# Running LabraGO – Backend/API
-
-## Prerequisites
-
-- Go 1.18 or later
-- PostgreSQL with an empty database
-
-## Setup
+Create the storage directory (if using the default local storage):
 
 ```bash
-cd labra/src/app
-cp .env.example .env
+mkdir -p storage
+chmod 755 storage
 ```
 
-Sample `.env`:
+The storage directory will be created automatically if it doesn't exist, but it's good practice to create it beforehand with proper permissions.
 
-```bash
-DSN=postgres://postgres:postgres@localhost:5432/labrago?sslmode=disable
-DB_DIALECT=postgres
-SERVER_PORT=4000
-ENT_SCHEMA_PATH=./ent/schema
-SECRET_KEY=XyZ7WpPqY2VW3m1O9QkH1fLj8zT6sJgKAsDfGhJ7K0I=
-SUPER_ADMIN_EMAIL=admin@labrago.eu
-CENTRIFUGO_API_ADDRESS=http://localhost:8000/api
-CENTRIFUGO_API_KEY=m4Q9KvJNpY8Gh2LxU7sR0cVf3eZUw1PnKaYtXjBmOq0=
-```
+See [File Storage Configuration](#file-storage-configuration) for more details.
 
-Generate a key:
+## Step 6: Generate Code
 
-```bash
-head -c 32 /dev/urandom | base64
-```
-
-## Development
+Install dependencies and generate code:
 
 ```bash
 go mod tidy
 go generate ./...
 ```
 
-## Run the API
+This will:
+- Install Go dependencies
+- Generate Ent schema code
+- Generate GraphQL resolvers and types
+
+## Step 7: Run the Backend
+
+Start the GraphQL API server:
 
 ```bash
-cd ../cli
-go run main.go start
+go run main.go
 ```
 
-## Local API Dev Shortcut
+The server will start on the port specified in your `SERVER_PORT` environment variable (default: 4000).
 
-In `/app/go.mod`:
+You should see startup logs indicating:
+- Successful database connection
+- GraphQL endpoint availability at `http://localhost:4000/query`
+- Admin GraphQL endpoint at `http://localhost:4000/admin/query`
+- GraphQL playgrounds available
 
-```go
-replace github.com/GoLabra/labra => ../api
-```
+## Step 8: Set Up and Run Admin Frontend (Optional)
 
-or run:
+If you want to use the admin UI:
 
 ```bash
-sed -i "/REPLACE_LABRAGO_DEVELOPMENT_API/c replace github.com\/GoLabra\/labra => ..\/..\/." go.mod
+# Navigate to admin directory
+cd ../admin  # or wherever you have the admin frontend
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+```
+
+The admin UI will be available at `http://localhost:3000`.
+
+---
+
+# Environment Variables Reference
+
+## Backend Environment Variables
+
+All backend environment variables are configured in `.env` in your app directory. See [`resources/app/.env.example`](resources/app/.env.example) for a complete reference with inline documentation.
+
+### Required Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DSN` | PostgreSQL connection string | `postgres://user:pass@localhost:5432/dbname?sslmode=disable` |
+| `DB_DIALECT` | Database dialect | `postgres` |
+| `SECRET_KEY` | JWT secret key (generate securely) | Generated with `head -c 32 /dev/urandom \| base64` |
+| `CENTRIFUGO_API_ADDRESS` | Centrifugo API server address | `http://localhost:8000/api` |
+| `CENTRIFUGO_API_KEY` | Centrifugo API key (generate securely) | Generated with `head -c 32 /dev/urandom \| base64` |
+
+### Optional Variables (with defaults)
+
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `SERVER_PORT` | API server port | `4000` | `4000` |
+| `ENT_SCHEMA_PATH` | Path to Ent schema directory | `./ent/schema` | `./ent/schema` |
+| `FILE_STORAGE_PROVIDER` | File storage provider | `local` | `local`, `S3`, `GCS` |
+| `FILE_STORAGE_PATH` | File storage directory path | `./storage` | `./storage` or `/var/lib/labrago/storage` |
+
+**Security Note:** Always generate new secret keys for production. Never use the example keys from `.env.example`.
+
+## Admin Frontend Environment Variables
+
+All admin frontend environment variables are configured in `.env.local` in the admin directory. See [`resources/admin/.env.example`](resources/admin/.env.example) for a complete reference with inline documentation.
+
+All variables below are optional and have defaults if not specified.
+
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `NEXT_PUBLIC_BRAND_PRODUCT_NAME` | Product name displayed in UI | `Labra·GO` | `Labra·GO` |
+| `NEXT_PUBLIC_BRAND_COLOR` | Brand color theme | `blue` | `blue` |
+| `NEXT_PUBLIC_GRAPHQL_API_URL` | Base GraphQL API URL | `http://localhost:4000` | `http://localhost:4000` |
+| `NEXT_PUBLIC_GRAPHQL_QUERY_API_URL` | App-level GraphQL query endpoint | `http://localhost:4000/query` | `http://localhost:4000/query` |
+| `NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL` | GraphQL query playground URL | `http://localhost:4000/playground` | `http://localhost:4000/playground` |
+| `NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL` | Admin-level GraphQL query endpoint | `http://localhost:4000/admin/query` | `http://localhost:4000/admin/query` |
+| `NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL` | Admin GraphQL playground URL | `http://localhost:4000/admin/playground` | `http://localhost:4000/admin/playground` |
+| `NEXT_PUBLIC_CENTRIFUGO_URL` | Centrifugo WebSocket URL | (no default) | `ws://localhost:8000/connection/websocket` |
+
+---
+
+# File Storage Configuration
+
+LabraGo supports multiple file storage providers for handling file uploads. Currently, only the `local` provider is fully implemented.
+
+## Storage Providers
+
+### Local Storage (Default)
+
+The `local` provider stores files on the local filesystem.
+
+**Configuration:**
+- `FILE_STORAGE_PROVIDER=local` (or omit for default)
+- `FILE_STORAGE_PATH=./storage` (or omit for default)
+
+**Requirements:**
+- The storage directory must exist and be writable by the application
+- Recommended permissions: `0755` for directory, `0644` for files
+- Path can be relative (e.g., `./storage`) or absolute (e.g., `/var/lib/labrago/storage`)
+
+**Example setup:**
+```bash
+mkdir -p storage
+chmod 755 storage
+```
+
+### Future Providers
+
+Support for the following providers is planned:
+- **S3** - Amazon S3 storage
+- **GCS** - Google Cloud Storage
+
+When these providers are implemented, additional configuration will be required (credentials, bucket names, regions, etc.).
+
+## Troubleshooting
+
+### Permission Errors
+
+If you encounter permission errors when uploading files:
+
+1. Check directory permissions: `ls -ld storage`
+2. Ensure the directory is writable: `chmod 755 storage`
+3. Verify the application user has write access
+
+### Path Issues
+
+- Use absolute paths in production for better reliability
+- Ensure relative paths are relative to where the application is executed
+- The default `./storage` path is relative to the application's working directory
+
+### Storage Directory Not Found
+
+The application will attempt to create the storage directory if it doesn't exist, but it's recommended to create it manually with proper permissions.
+
+---
+
+# Development Workflow
+
+## Code Generation
+
+After modifying your Ent schemas or GraphQL definitions, regenerate code:
+
+```bash
+go generate ./...
+```
+
+This runs all `//go:generate` directives in your codebase, including:
+- Ent schema generation
+- GraphQL code generation
+
+## Database Migrations
+
+LabraGo uses Ent for database schema management. Schema changes are automatically applied when the application starts. The application will:
+
+- Create new tables and columns
+- Drop removed columns (if `WithDropColumn(true)` is enabled)
+- Drop removed indexes (if `WithDropIndex(true)` is enabled)
+
+**Important:** Always backup your database before running migrations in production.
+
+## Local Development with LabraGo Source
+
+If you're developing LabraGo itself or need to use a local version:
+
+1. Update `go.mod` to point to your local LabraGo repository:
+   ```go
+   replace github.com/GoLabra/labra => /path/to/labra
+   ```
+
+2. Run `go mod tidy` to update dependencies
+
+3. Regenerate code: `go generate ./...`
+
+## Testing
+
+Run tests:
+
+```bash
+go test ./...
 ```
 
 ---
 
-## Contributing
-Check our [Contributing guide](https://github.com/GoLabra/labra/blob/feature/labra-module/CONTRIBUTING.md)
+# Contributing
+
+We welcome contributions to LabraGo! Please check our [Contributing guide](CONTRIBUTING.md) for details on:
+
+- Code style and standards
+- How to submit pull requests
+- Development setup
+- Testing requirements
+
+---
+
+# Additional Resources
+
+- [GraphQL Playground](http://localhost:4000/playground) - Test your GraphQL queries
+- [Admin GraphQL Playground](http://localhost:4000/admin/playground) - Test admin GraphQL queries
+- [Centrifugo Documentation](https://centrifugo.dev/docs/) - Real-time messaging setup
+- [Ent Documentation](https://entgo.io/) - Entity framework documentation
+- [gqlgen Documentation](https://gqlgen.com/) - GraphQL code generation

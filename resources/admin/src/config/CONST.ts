@@ -8,15 +8,15 @@ export const SYSTEM_CHILDREN = [ ...SYSTEM_FIELDS, ...SYSTEM_EDGES]
 export const ENTITY_CHILDREN_SYSTEM_KEYWORDS = [ ...systemKeywords, ...SYSTEM_CHILDREN]
 export const ENTITY_SYSTEM_KEYWORDS = [ ...systemKeywords]
 
-export const GRAPHQL_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_API_URL;
+export const GRAPHQL_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_API_URL || 'http://localhost:4000';
 
-export const GRAPHQL_QUERY_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_QUERY_API_URL;
-export const GRAPHQL_QUERY_PLAYGROUND_URL = process.env.NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL;
+export const GRAPHQL_QUERY_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_QUERY_API_URL || 'http://localhost:4000/query';
+export const GRAPHQL_QUERY_PLAYGROUND_URL = process.env.NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL || 'http://localhost:4000/playground';
 
-export const GRAPHQL_ADMIN_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL;
-export const GRAPHQL_ADMIN_PLAYGROUND_URL = process.env.NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL;
+export const GRAPHQL_ADMIN_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL || 'http://localhost:4000/admin/query';
+export const GRAPHQL_ADMIN_PLAYGROUND_URL = process.env.NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL || 'http://localhost:4000/admin/playground';
 
 export const CENTRIFUGO_URL = process.env.NEXT_PUBLIC_CENTRIFUGO_URL;
 
-export const PRODUCT_NAME = process.env.NEXT_PUBLIC_BRAND_PRODUCT_NAME;
-export const COLOR = process.env.NEXT_PUBLIC_BRAND_COLOR;
+export const PRODUCT_NAME = process.env.NEXT_PUBLIC_BRAND_PRODUCT_NAME || 'Labra·GO';
+export const COLOR = process.env.NEXT_PUBLIC_BRAND_COLOR || 'blue';
