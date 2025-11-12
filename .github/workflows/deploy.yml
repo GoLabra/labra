@@ -3,12 +3,10 @@ name: Deploy LabraGo To Kubernetes
 on:
   push:
     branches:
-      - develop
+      - main
     paths:
-      - "src/admin/**"
-      - "src/api/**"
-      - "src/app/**"
-      - "src/cli/**"
+      - "**"
+      - "resources/admin/**"
       - ".github/workflows/**"
 
   workflow_dispatch:
@@ -31,11 +29,11 @@ jobs:
         with:
           filters: |
             frontend:
-              - 'src/admin/**'
+              - 'resources/admin/**'
+              - '.github/workflows/**'
             backend:
-              - 'src/api/**'
-              - 'src/app/**'
-              - 'src/cli/**'
+              - '!resources/admin/**'
+              - '**'
 
   build-and-push-frontend:
     if: github.event_name == 'workflow_dispatch' || needs.folder-changes.outputs.frontend_changed == 'true'
@@ -61,7 +59,7 @@ jobs:
             --build-arg NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL }} \
             --build-arg NEXT_PUBLIC_CENTRIFUGO_URL=${{ vars.NEXT_PUBLIC_CENTRIFUGO_URL }} \
             -t registry.digitalocean.com/labrago/frontend:v1.1 \
-            -f ./src/admin/Dockerfile ./src/admin
+            -f ./resources/admin/Dockerfile ./resources/admin
 
           docker push registry.digitalocean.com/labrago/frontend:v1.1
 
@@ -71,28 +69,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Log in to DigitalOcean Container Registry
-        run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
+    - name: Log in to DigitalOcean Container Registry
+      run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
 
-      - name: Build and Push Backend Image
-        run: |
-          docker build --quiet \
-            --build-arg DSN=${{ secrets.DSN }} \
-            --build-arg DB_DIALECT=${{ secrets.DB_DIALECT }} \
-            --build-arg SERVER_PORT=${{ secrets.SERVER_PORT }} \
-            --build-arg ENT_SCHEMA_PATH=${{ secrets.ENT_SCHEMA_PATH }} \
-            --build-arg SECRET_KEY=${{ secrets.SECRET_KEY }} \
-            --build-arg CENTRIFUGO_API_ADDRESS=${{ secrets.CENTRIFUGO_API_ADDRESS }} \
-            --build-arg CENTRIFUGO_API_KEY=${{ secrets.CENTRIFUGO_API_KEY }} \
-            --build-arg FILE_STORAGE_PROVIDER=${{ secrets.FILE_STORAGE_PROVIDER }} \
-            --build-arg FILE_STORAGE_PATH=${{ secrets.FILE_STORAGE_PATH }} \
-            -t registry.digitalocean.com/labrago/backend:v1.1 \
-            -f ./src/Dockerfile ./src
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-          docker push registry.digitalocean.com/labrago/backend:v1.1
+    - name: Build and Push Backend Image
+      uses: docker/build-push-action@v6
+      with:
+        context: ./
+        file: ./Dockerfile
+        push: true
+        tags: registry.digitalocean.com/labrago/backend:v1.1
+        build-args: |
+          DSN=${{ secrets.DSN }}
+          DB_DIALECT=${{ secrets.DB_DIALECT }}
+          SERVER_PORT=${{ secrets.SERVER_PORT }}
+          ENT_SCHEMA_PATH=${{ secrets.ENT_SCHEMA_PATH }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          CENTRIFUGO_API_ADDRESS=${{ secrets.CENTRIFUGO_API_ADDRESS }}
+          CENTRIFUGO_API_KEY=${{ secrets.CENTRIFUGO_API_KEY }}
+          SUPER_ADMIN_EMAIL=${{ secrets.SUPER_ADMIN_EMAIL }}
+          FILE_STORAGE_PROVIDER=${{ secrets.FILE_STORAGE_PROVIDER }}
+          FILE_STORAGE_PATH=${{ secrets.FILE_STORAGE_PATH }}
 
   deploy:
     needs: [build-and-push-frontend, build-and-push-backend]
