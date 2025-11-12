@@ -3,7 +3,7 @@ name: Deploy LabraGo To Kubernetes
 on:
   push:
     branches:
-      - main
+      - develop
     paths:
       - "**"
       - "resources/admin/**"
