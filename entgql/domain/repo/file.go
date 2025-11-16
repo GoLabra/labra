@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"regexp"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
@@ -177,12 +178,21 @@ func (r *File) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateFileInpu
 
 	fileExtension := filepath.Ext(data.Name)
 
+	// Validate fileExtension to avoid path traversal or invalid values
+	if fileExtension == "" ||
+		strings.Contains(fileExtension, "/") ||
+		strings.Contains(fileExtension, "\\") ||
+		strings.Contains(fileExtension, "..") ||
+		!isValidExtension(fileExtension) { // see helper below
+		return nil, fmt.Errorf("[File.CreateTx] invalid or unsafe file extension: %q", fileExtension)
+	}
+
 	if data.Caption == nil {
 		caption := strings.TrimSuffix(data.Name, fileExtension)
 		data.Caption = &caption
 	}
 
-	data.StorageFileName = uuidv7.New().String() + "." + fileExtension
+	data.StorageFileName = uuidv7.New().String() + fileExtension
 
 	parts := strings.Split(data.Content, ";base64,")
 
@@ -196,6 +206,18 @@ func (r *File) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateFileInpu
 	if err != nil {
 		return nil, fmt.Errorf("[File.CreateTx] failed to decode base64 string: %w", err)
 	}
+	absStorageDir, err := filepath.Abs(config.FileStoragePath)
+	if err != nil {
+		return nil, fmt.Errorf("[File.CreateTx] unable to resolve storage directory: %w", err)
+	}
+	absOutputPath, err := filepath.Abs(outputPath)
+	if err != nil {
+		return nil, fmt.Errorf("[File.CreateTx] unable to resolve file path: %w", err)
+	}
+	if !strings.HasPrefix(absOutputPath, absStorageDir + string(os.PathSeparator)) && absOutputPath != absStorageDir {
+		return nil, fmt.Errorf("[File.CreateTx] file path escapes storage directory")
+	}
+
 
 	data.Size = int64(len(decoded))
 
