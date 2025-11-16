@@ -72,7 +72,10 @@ For more information about `labractl`, visit the [labractl repository](https://g
 Before you begin, ensure you have the following installed on your system:
 
 - **Go** (version 1.18 or later) - [Download](https://golang.org/dl/)
-- **PostgreSQL** (with an empty database ready) - [Download](https://www.postgresql.org/download/)
+- **Database** - PostgreSQL, SQLite, or MySQL (with an empty database ready)
+  - **PostgreSQL** - [Download](https://www.postgresql.org/download/)
+  - **SQLite** - Usually pre-installed on most systems, or [Download](https://www.sqlite.org/download.html)
+  - **MySQL** - [Download](https://dev.mysql.com/downloads/)
 - **Node.js** (version 18 or later) - [Download](https://nodejs.org/)
 - **Yarn** (version 1.22 or later) - [Installation Guide](https://yarnpkg.com/getting-started/install)
 - **Centrifugo** - Real-time messaging server - [Installation Guide](https://centrifugo.dev/docs/getting-started/installation/)
@@ -136,8 +139,8 @@ cp .env.example .env
 Edit `.env` with your configuration. See [Backend Environment Variables](#backend-environment-variables) for detailed documentation.
 
 **Required variables:**
-- `DSN` - PostgreSQL connection string
-- `DB_DIALECT` - Database dialect (postgres)
+- `DSN` - Database connection string (PostgreSQL, SQLite, or MySQL)
+- `DB_DIALECT` - Database dialect (`postgres`, `sqlite`, or `mysql`)
 - `SECRET_KEY` - JWT secret key (generate with: `head -c 32 /dev/urandom | base64`)
 - `CENTRIFUGO_API_ADDRESS` - Centrifugo API address
 - `CENTRIFUGO_API_KEY` - Centrifugo API key (generate with: `head -c 32 /dev/urandom | base64`)
@@ -165,6 +168,8 @@ For complete documentation, see [`resources/admin/.env.example`](resources/admin
 
 ## Step 4: Set Up Database
 
+### Option A: PostgreSQL
+
 Create a PostgreSQL database for your project:
 
 ```bash
@@ -178,10 +183,46 @@ CREATE DATABASE labrago;
 \q
 ```
 
-Update your `.env` file with the correct database connection string:
+Update your `.env` file with the PostgreSQL connection string:
 
 ```env
 DSN=postgres://postgres:yourpassword@localhost:5432/labrago?sslmode=disable
+DB_DIALECT=postgres
+```
+
+### Option B: SQLite
+
+SQLite requires no setup - the database file will be created automatically. Update your `.env` file:
+
+```env
+DSN=file:labra.db?cache=shared&mode=rwc&_fk=1
+DB_DIALECT=sqlite
+```
+
+**Important:** The `_fk=1` parameter is required to enable foreign key constraints in SQLite, which are necessary for ent to work correctly.
+
+**Note:** SQLite is great for development and small applications. For production with high concurrency, consider PostgreSQL or MySQL.
+
+### Option C: MySQL
+
+Create a MySQL database for your project:
+
+```bash
+# Connect to MySQL
+mysql -u root -p
+
+# Create database
+CREATE DATABASE labrago;
+
+# Exit MySQL
+exit
+```
+
+Update your `.env` file with the MySQL connection string:
+
+```env
+DSN=user:password@tcp(localhost:3306)/labrago?parseTime=true
+DB_DIALECT=mysql
 ```
 
 ## Step 5: Set Up File Storage
@@ -256,8 +297,8 @@ All backend environment variables are configured in `.env` in your app directory
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `DSN` | PostgreSQL connection string | `postgres://user:pass@localhost:5432/dbname?sslmode=disable` |
-| `DB_DIALECT` | Database dialect | `postgres` |
+| `DSN` | Database connection string | PostgreSQL: `postgres://user:pass@localhost:5432/dbname?sslmode=disable`<br>SQLite: `file:labra.db?cache=shared&mode=rwc&_fk=1`<br>MySQL: `user:pass@tcp(localhost:3306)/dbname?parseTime=true` |
+| `DB_DIALECT` | Database dialect | `postgres`, `sqlite`, or `mysql` |
 | `SECRET_KEY` | JWT secret key (generate securely) | Generated with `head -c 32 /dev/urandom \| base64` |
 | `CENTRIFUGO_API_ADDRESS` | Centrifugo API server address | `http://localhost:8000/api` |
 | `CENTRIFUGO_API_KEY` | Centrifugo API key (generate securely) | Generated with `head -c 32 /dev/urandom \| base64` |

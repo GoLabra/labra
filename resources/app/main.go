@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
 	"app/domain/repo"
@@ -38,6 +39,7 @@ import (
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/gorilla/websocket"
 	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/cors"
 
 	adminRepo "github.com/GoLabra/labra/entgql/domain/repo"
@@ -54,7 +56,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	db, err := sql.Open(conf.DBDialect, conf.DSN)
+	// Get the actual driver name for sql.Open()
+	driverName, err := getDriverName(conf.DBDialect)
+	if err != nil {
+		fmt.Printf("Invalid DB_DIALECT: %v\n", err)
+		os.Exit(1)
+	}
+
+	db, err := sql.Open(driverName, conf.DSN)
 
 	if err != nil {
 		fmt.Println(err)
@@ -68,9 +77,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	db.SetMaxOpenConns(100)
+	// Parse dialect from config for ent
+	entDialect, err := parseDialect(conf.DBDialect)
+	if err != nil {
+		fmt.Printf("Invalid DB_DIALECT: %v\n", err)
+		os.Exit(1)
+	}
 
-	drv := entsql.OpenDB(dialect.Postgres, db)
+	// SQLite requires max open connections of 1 to prevent database locking
+	if entDialect == dialect.SQLite {
+		db.SetMaxOpenConns(1)
+	} else {
+		db.SetMaxOpenConns(100)
+	}
+
+	drv := entsql.OpenDB(entDialect, db)
 
 	cache.NewEntityCache(1 * time.Hour)
 	cache.NewEdgeCache(1 * time.Hour)
@@ -305,4 +326,32 @@ func skipDiffOnUserEntities(next schema.Differ) schema.Differ {
 
 		return changes, nil
 	})
+}
+
+// getDriverName converts a database dialect string to the actual driver name for sql.Open().
+func getDriverName(dialectStr string) (string, error) {
+	switch strings.ToLower(dialectStr) {
+	case "sqlite", "sqlite3":
+		return "sqlite3", nil
+	case "postgres", "postgresql":
+		return "postgres", nil
+	case "mysql":
+		return "mysql", nil
+	default:
+		return "", fmt.Errorf("unsupported database dialect: %s (supported: sqlite, postgres, mysql)", dialectStr)
+	}
+}
+
+// parseDialect converts a database dialect string to an ent dialect constant.
+func parseDialect(dialectStr string) (string, error) {
+	switch strings.ToLower(dialectStr) {
+	case "sqlite", "sqlite3":
+		return dialect.SQLite, nil
+	case "postgres", "postgresql":
+		return dialect.Postgres, nil
+	case "mysql":
+		return dialect.MySQL, nil
+	default:
+		return "", fmt.Errorf("unsupported database dialect: %s (supported: sqlite, postgres, mysql)", dialectStr)
+	}
 }
