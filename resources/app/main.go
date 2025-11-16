@@ -37,6 +37,7 @@ import (
 	"github.com/centrifugal/gocent/v3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth/v5"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/websocket"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
