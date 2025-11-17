@@ -44,6 +44,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 🔥 Retry login up to 5 times
       - name: Log in to DigitalOcean Container Registry (with retry)
         run: |
           for i in {1..5}; do
@@ -76,6 +77,7 @@ jobs:
             -t registry.digitalocean.com/labrago/frontend:v1.1 \
             -f ./resources/admin/Dockerfile ./resources/admin
 
+      # 🔥 Retry push up to 5 times
       - name: Push Frontend Image (with retry)
         run: |
           for i in {1..5}; do
@@ -103,6 +105,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 🔥 Retry DOCR login up to 5 times (DOCR fails during GC)
       - name: Log in to DigitalOcean Container Registry (with retry)
         run: |
           for i in {1..5}; do
@@ -124,6 +127,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # 🔥 Build + Push with retry logic (buildx sometimes fails auth during GC)
       - name: Build and Push Backend Image (with retry)
         run: |
           for i in {1..5}; do
