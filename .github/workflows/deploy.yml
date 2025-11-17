@@ -121,7 +121,7 @@ jobs:
 
           echo "========================================"
 
-      - name: Build and Push Backend Image
+      - name: Build and Push Backend Image.
         run: |
           docker build \
             --build-arg DSN="${{ secrets.DSN }}" \
