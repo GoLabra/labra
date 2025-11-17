@@ -75,9 +75,65 @@ jobs:
       - name: Log in to DigitalOcean Container Registry
         run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
 
+      - name: Debug backend secrets safely
+        run: |
+          echo "========= DEBUGGING BUILD ARGS ========="
+
+          echo "DSN:"
+          printf '%q\n' "${{ secrets.DSN }}"
+          echo "-------------------------------"
+
+          echo "DB_DIALECT:"
+          printf '%q\n' "${{ secrets.DB_DIALECT }}"
+          echo "-------------------------------"
+
+          echo "SERVER_PORT:"
+          printf '%q\n' "${{ secrets.SERVER_PORT }}"
+          echo "-------------------------------"
+
+          echo "ENT_SCHEMA_PATH:"
+          printf '%q\n' "${{ secrets.ENT_SCHEMA_PATH }}"
+          echo "-------------------------------"
+
+          echo "SECRET_KEY:"
+          printf '%q\n' "${{ secrets.SECRET_KEY }}"
+          echo "-------------------------------"
+
+          echo "CENTRIFUGO_API_ADDRESS:"
+          printf '%q\n' "${{ secrets.CENTRIFUGO_API_ADDRESS }}"
+          echo "-------------------------------"
+
+          echo "CENTRIFUGO_API_KEY:"
+          printf '%q\n' "${{ secrets.CENTRIFUGO_API_KEY }}"
+          echo "-------------------------------"
+
+          echo "SUPER_ADMIN_EMAIL:"
+          printf '%q\n' "${{ secrets.SUPER_ADMIN_EMAIL }}"
+          echo "-------------------------------"
+
+          echo "FILE_STORAGE_PROVIDER:"
+          printf '%q\n' "${{ secrets.FILE_STORAGE_PROVIDER }}"
+          echo "-------------------------------"
+
+          echo "FILE_STORAGE_PATH:"
+          printf '%q\n' "${{ secrets.FILE_STORAGE_PATH }}"
+          echo "-------------------------------"
+
+          echo "========================================"
+
       - name: Build and Push Backend Image
         run: |
           docker build \
+            --build-arg DSN="${{ secrets.DSN }}" \
+            --build-arg DB_DIALECT="${{ secrets.DB_DIALECT }}" \
+            --build-arg SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+            --build-arg ENT_SCHEMA_PATH="${{ secrets.ENT_SCHEMA_PATH }}" \
+            --build-arg SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            --build-arg CENTRIFUGO_API_ADDRESS="${{ secrets.CENTRIFUGO_API_ADDRESS }}" \
+            --build-arg CENTRIFUGO_API_KEY="${{ secrets.CENTRIFUGO_API_KEY }}" \
+            --build-arg SUPER_ADMIN_EMAIL="${{ secrets.SUPER_ADMIN_EMAIL }}" \
+            --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
+            --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
             -t registry.digitalocean.com/labrago/backend:v1.1 \
             -f ./Dockerfile ./
           docker push registry.digitalocean.com/labrago/backend:v1.1
