@@ -78,27 +78,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 🔥 WRAPPER that retries your existing build step
-      - name: Retry Build & Push Backend
-        run: |
-          for i in {1..5}; do
-            echo "Attempt $i to build & push backend image..."
-            
-            if gh workflow run "${GITHUB_WORKFLOW}" --ref "${GITHUB_REF}"; then
-              echo "Retry wrapper triggered the build successfully."
-              exit 0
-            fi
-
-            echo "Retry failed — waiting 20 seconds..."
-            sleep 20
-          done
-
-          echo "All retries failed."
-          exit 1
-
-      # 🔥 YOUR ORIGINAL BUILD STEP — UNTOUCHED
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v6
+        retries: 5
         with:
           context: ./
           file: ./Dockerfile
