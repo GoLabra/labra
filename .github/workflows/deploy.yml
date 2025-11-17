@@ -125,14 +125,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push Backend Image (with retry)
+      - name: Build + Push Backend with Retries
         run: |
           for i in {1..5}; do
-            echo "Attempt $i to run buildx build and push..."
+            echo "Attempt $i to build+push backend..."
 
-            build_failed=""
-
-            docker buildx build \
+            # Run the old reliable action
+            if docker buildx build \
               --push \
               --tag registry.digitalocean.com/labrago/backend:v1.1 \
               --build-arg DSN="${{ secrets.DSN }}" \
@@ -145,19 +144,17 @@ jobs:
               --build-arg SUPER_ADMIN_EMAIL="${{ secrets.SUPER_ADMIN_EMAIL }}" \
               --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
               --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
-              -f ./Dockerfile \
-              . || build_failed=true
+              -f ./Dockerfile .; then
 
-            if [ -z "$build_failed" ]; then
-              echo "✅ Backend image built and pushed successfully."
+              echo "✅ Build succeed!"
               break
+            else
+              echo "❌ Attempt $i failed (likely DOCR GC). Retrying in 10 sec…"
+              sleep 10
             fi
 
-            echo "Buildx failed. Retrying in 10 seconds..."
-            sleep 10
-
             if [ "$i" -eq 5 ]; then
-              echo "❌ Failed to build + push backend image after 5 attempts."
+              echo "❌ Total failure after 5 retries."
               exit 1
             fi
           done
