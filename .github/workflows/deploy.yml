@@ -130,7 +130,9 @@ jobs:
           for i in {1..5}; do
             echo "Attempt $i to run buildx build and push..."
 
-            if docker buildx build \
+            build_failed=""
+
+            docker buildx build \
               --push \
               --tag registry.digitalocean.com/labrago/backend:v1.1 \
               --build-arg DSN="${{ secrets.DSN }}" \
@@ -144,14 +146,15 @@ jobs:
               --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
               --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
               -f ./Dockerfile \
-              . ; then
+              . || build_failed=true
 
+            if [ -z "$build_failed" ]; then
               echo "✅ Backend image built and pushed successfully."
               break
-            else
-              echo "Buildx failed. Retrying in 10 seconds..."
-              sleep 10
             fi
+
+            echo "Buildx failed. Retrying in 10 seconds..."
+            sleep 10
 
             if [ "$i" -eq 5 ]; then
               echo "❌ Failed to build + push backend image after 5 attempts."
