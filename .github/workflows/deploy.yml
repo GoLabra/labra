@@ -45,23 +45,43 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Log in to DigitalOcean Container Registry
-        run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
-
-      - name: Build and Push Frontend Image
+      - name: Log in to DigitalOcean Container Registry (with retry)
         run: |
-          docker build \
-            --build-arg NEXT_PUBLIC_BRAND_PRODUCT_NAME=${{ vars.NEXT_PUBLIC_BRAND_PRODUCT_NAME }} \
-            --build-arg NEXT_PUBLIC_BRAND_COLOR=${{ vars.NEXT_PUBLIC_BRAND_COLOR }} \
-            --build-arg NEXT_PUBLIC_GRAPHQL_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_API_URL }} \
-            --build-arg NEXT_PUBLIC_GRAPHQL_QUERY_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_QUERY_API_URL }} \
-            --build-arg NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL }} \
-            --build-arg NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL }} \
-            --build-arg NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL }} \
-            --build-arg NEXT_PUBLIC_CENTRIFUGO_URL=${{ vars.NEXT_PUBLIC_CENTRIFUGO_URL }} \
-            -t registry.digitalocean.com/labrago/frontend:v1.1 \
-            -f ./resources/admin/Dockerfile ./resources/admin
-          docker push registry.digitalocean.com/labrago/frontend:v1.1
+          for i in {1..5}; do
+            echo "Login attempt $i..."
+            if echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com; then
+              echo "Logged in successfully."
+              break
+            fi
+            echo "Login failed. Retrying in 10s..."
+            sleep 10
+          done
+
+      - name: Build and Push Frontend Image (with retry)
+        run: |
+          for i in {1..5}; do
+            echo "Build+Push attempt $i..."
+
+            if docker build \
+              --build-arg NEXT_PUBLIC_BRAND_PRODUCT_NAME=${{ vars.NEXT_PUBLIC_BRAND_PRODUCT_NAME }} \
+              --build-arg NEXT_PUBLIC_BRAND_COLOR=${{ vars.NEXT_PUBLIC_BRAND_COLOR }} \
+              --build-arg NEXT_PUBLIC_GRAPHQL_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_API_URL }} \
+              --build-arg NEXT_PUBLIC_GRAPHQL_QUERY_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_QUERY_API_URL }} \
+              --build-arg NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_QUERY_PLAYGROUND_URL }} \
+              --build-arg NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_ADMIN_API_URL }} \
+              --build-arg NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL=${{ vars.NEXT_PUBLIC_GRAPHQL_ADMIN_PLAYGROUND_URL }} \
+              --build-arg NEXT_PUBLIC_CENTRIFUGO_URL=${{ vars.NEXT_PUBLIC_CENTRIFUGO_URL }} \
+              -t registry.digitalocean.com/labrago/frontend:v1.1 \
+              -f ./resources/admin/Dockerfile ./resources/admin && \
+              docker push registry.digitalocean.com/labrago/frontend:v1.1; then
+
+              echo "✅ Frontend image built and pushed!"
+              break
+            fi
+
+            echo "Build failed. Retrying in 20s..."
+            sleep 20
+          done
 
   build-and-push-backend:
     if: github.event_name == 'workflow_dispatch' || needs.folder-changes.outputs.backend_changed == 'true'
@@ -72,71 +92,45 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Log in to DigitalOcean Container Registry
-        run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
-
-      - name: Debug backend secrets safely
+      - name: Log in to DigitalOcean Container Registry (with retry)
         run: |
-          echo "========= DEBUGGING BUILD ARGS ========="
+          for i in {1..5}; do
+            echo "Login attempt $i..."
+            if echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com; then
+              echo "Logged in successfully."
+              break
+            fi
+            echo "Login failed. Retrying in 10s..."
+            sleep 10
+          done
 
-          echo "DSN:"
-          printf '%q\n' "${{ secrets.DSN }}"
-          echo "-------------------------------"
-
-          echo "DB_DIALECT:"
-          printf '%q\n' "${{ secrets.DB_DIALECT }}"
-          echo "-------------------------------"
-
-          echo "SERVER_PORT:"
-          printf '%q\n' "${{ secrets.SERVER_PORT }}"
-          echo "-------------------------------"
-
-          echo "ENT_SCHEMA_PATH:"
-          printf '%q\n' "${{ secrets.ENT_SCHEMA_PATH }}"
-          echo "-------------------------------"
-
-          echo "SECRET_KEY:"
-          printf '%q\n' "${{ secrets.SECRET_KEY }}"
-          echo "-------------------------------"
-
-          echo "CENTRIFUGO_API_ADDRESS:"
-          printf '%q\n' "${{ secrets.CENTRIFUGO_API_ADDRESS }}"
-          echo "-------------------------------"
-
-          echo "CENTRIFUGO_API_KEY:"
-          printf '%q\n' "${{ secrets.CENTRIFUGO_API_KEY }}"
-          echo "-------------------------------"
-
-          echo "SUPER_ADMIN_EMAIL:"
-          printf '%q\n' "${{ secrets.SUPER_ADMIN_EMAIL }}"
-          echo "-------------------------------"
-
-          echo "FILE_STORAGE_PROVIDER:"
-          printf '%q\n' "${{ secrets.FILE_STORAGE_PROVIDER }}"
-          echo "-------------------------------"
-
-          echo "FILE_STORAGE_PATH:"
-          printf '%q\n' "${{ secrets.FILE_STORAGE_PATH }}"
-          echo "-------------------------------"
-
-          echo "========================================"
-
-      - name: Build and Push Backend Image.
+      - name: Build and Push Backend Image (with retry)
         run: |
-          docker build \
-            --build-arg DSN="${{ secrets.DSN }}" \
-            --build-arg DB_DIALECT="${{ secrets.DB_DIALECT }}" \
-            --build-arg SERVER_PORT="${{ secrets.SERVER_PORT }}" \
-            --build-arg ENT_SCHEMA_PATH="${{ secrets.ENT_SCHEMA_PATH }}" \
-            --build-arg SECRET_KEY="${{ secrets.SECRET_KEY }}" \
-            --build-arg CENTRIFUGO_API_ADDRESS="${{ secrets.CENTRIFUGO_API_ADDRESS }}" \
-            --build-arg CENTRIFUGO_API_KEY="${{ secrets.CENTRIFUGO_API_KEY }}" \
-            --build-arg SUPER_ADMIN_EMAIL="${{ secrets.SUPER_ADMIN_EMAIL }}" \
-            --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
-            --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
-            -t registry.digitalocean.com/labrago/backend:v1.1 \
-            -f ./Dockerfile ./
-          docker push registry.digitalocean.com/labrago/backend:v1.1
+          for i in {1..5}; do
+            echo "Build+Push attempt $i..."
+
+            if docker build \
+              --build-arg DSN="${{ secrets.DSN }}" \
+              --build-arg DB_DIALECT="${{ secrets.DB_DIALECT }}" \
+              --build-arg SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+              --build-arg ENT_SCHEMA_PATH="${{ secrets.ENT_SCHEMA_PATH }}" \
+              --build-arg SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+              --build-arg CENTRIFUGO_API_ADDRESS="${{ secrets.CENTRIFUGO_API_ADDRESS }}" \
+              --build-arg CENTRIFUGO_API_KEY="${{ secrets.CENTRIFUGO_API_KEY }}" \
+              --build-arg SUPER_ADMIN_EMAIL="${{ secrets.SUPER_ADMIN_EMAIL }}" \
+              --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
+              --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
+              -t registry.digitalocean.com/labrago/backend:v1.1 \
+              -f ./Dockerfile ./ && \
+              docker push registry.digitalocean.com/labrago/backend:v1.1; then
+
+              echo "✅ Backend image built and pushed!"
+              break
+            fi
+
+            echo "Build failed. Retrying in 20s..."
+            sleep 20
+          done
 
   deploy:
     needs: [build-and-push-frontend, build-and-push-backend]
