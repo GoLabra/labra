@@ -15,6 +15,7 @@ require (
 	github.com/centrifugal/gocent/v3 v3.3.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/jwtauth/v5 v5.3.3
+	github.com/go-sql-driver/mysql v1.9.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-multierror v1.1.1
@@ -22,12 +23,14 @@ require (
 	github.com/lestrrat-go/jwx/v2 v2.1.6
 	github.com/lib/pq v1.10.9
 	github.com/lucsky/cuid v1.2.1
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/rs/cors v1.11.1
 	github.com/vektah/gqlparser/v2 v2.5.27
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
