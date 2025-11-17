@@ -45,25 +45,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Log in to DigitalOcean Container Registry (with retry)
-        run: |
-          for i in {1..5}; do
-            echo "Attempt $i to log in to DOCR..."
-            if echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com; then
-              echo "Logged in successfully."
-              break
-            else
-              echo "Login failed. Waiting 10 seconds..."
-              sleep 10
-            fi
+      - name: Log in to DigitalOcean Container Registry
+        run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
 
-            if [ "$i" -eq 5 ]; then
-              echo "❌ Failed to authenticate to DOCR after 5 attempts."
-              exit 1
-            fi
-          done
-
-      - name: Build Frontend Image
+      - name: Build and Push Frontend Image
         run: |
           docker build \
             --build-arg NEXT_PUBLIC_BRAND_PRODUCT_NAME=${{ vars.NEXT_PUBLIC_BRAND_PRODUCT_NAME }} \
@@ -76,33 +61,11 @@ jobs:
             --build-arg NEXT_PUBLIC_CENTRIFUGO_URL=${{ vars.NEXT_PUBLIC_CENTRIFUGO_URL }} \
             -t registry.digitalocean.com/labrago/frontend:v1.1 \
             -f ./resources/admin/Dockerfile ./resources/admin
-
-      - name: Push Frontend Image (with retry)
-        run: |
-          for i in {1..5}; do
-            echo "Attempt $i to push image..."
-            if docker push registry.digitalocean.com/labrago/frontend:v1.1; then
-              echo "Image pushed successfully."
-              break
-            else
-              echo "Push failed. Waiting 10 seconds..."
-              sleep 10
-            fi
-
-            if [ "$i" -eq 5 ]; then
-              echo "❌ Failed to push image after 5 attempts."
-              exit 1
-            fi
-          done
-
+          docker push registry.digitalocean.com/labrago/frontend:v1.1
   build-and-push-backend:
     if: github.event_name == 'workflow_dispatch' || needs.folder-changes.outputs.backend_changed == 'true'
     needs: folder-changes
     runs-on: ubuntu-latest
-
-    # 🔁 Let GitHub automatically retry this job on failure (e.g. DOCR GC)
-    retry:
-      max-retries: 5 # how many times the whole job can be retried
 
     steps:
       - name: Checkout Code
