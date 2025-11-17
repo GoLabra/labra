@@ -62,7 +62,7 @@ jobs:
             sleep 10
           done
 
-      - name: Build and Push Frontend Image (with retry)
+      - name: Build and Push Frontend Image. (with retry)
         run: |
           for i in {1..5}; do
             echo "Build+Push attempt $i..."
@@ -109,7 +109,7 @@ jobs:
             sleep 10
           done
 
-      - name: Build and Push Backend Image (with retry)
+      - name: Build and Push Backend Image. (with retry)
         run: |
           for i in {1..5}; do
             echo "Build+Push attempt $i..."
