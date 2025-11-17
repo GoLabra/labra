@@ -75,52 +75,22 @@ jobs:
       - name: Log in to DigitalOcean Container Registry
         run: echo "${{ secrets.DO_ACCESS_TOKEN }}" | docker login -u "oauth" --password-stdin registry.digitalocean.com
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Retry Build and Push Backend
-        uses: nick-fields/retry@v3
-        with:
-          max_attempts: 5
-          retry_wait_seconds: 20
-          timeout_minutes: 30
-          shell: bash
-          command: |
-            docker buildx build \
-              --push \
-              --tag registry.digitalocean.com/labrago/backend:v1.1 \
-              --file ./Dockerfile \
-              --build-arg DSN="${{ secrets.DSN }}" \
-              --build-arg DB_DIALECT="${{ secrets.DB_DIALECT }}" \
-              --build-arg SERVER_PORT="${{ secrets.SERVER_PORT }}" \
-              --build-arg ENT_SCHEMA_PATH="${{ secrets.ENT_SCHEMA_PATH }}" \
-              --build-arg SECRET_KEY="${{ secrets.SECRET_KEY }}" \
-              --build-arg CENTRIFUGO_API_ADDRESS="${{ secrets.CENTRIFUGO_API_ADDRESS }}" \
-              --build-arg CENTRIFUGO_API_KEY="${{ secrets.CENTRIFUGO_API_KEY }}" \
-              --build-arg SUPER_ADMIN_EMAIL="${{ secrets.SUPER_ADMIN_EMAIL }}" \
-              --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
-              --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
-              .
-
       - name: Build and Push Backend Image
-        uses: docker/build-push-action@v6
-        max_attempts: 5
-        with:
-          context: ./
-          file: ./Dockerfile
-          push: true
-          tags: registry.digitalocean.com/labrago/backend:v1.1
-          build-args: |
-            DSN=${{ secrets.DSN }}
-            DB_DIALECT=${{ secrets.DB_DIALECT }}
-            SERVER_PORT=${{ secrets.SERVER_PORT }}
-            ENT_SCHEMA_PATH=${{ secrets.ENT_SCHEMA_PATH }}
-            SECRET_KEY=${{ secrets.SECRET_KEY }}
-            CENTRIFUGO_API_ADDRESS=${{ secrets.CENTRIFUGO_API_ADDRESS }}
-            CENTRIFUGO_API_KEY=${{ secrets.CENTRIFUGO_API_KEY }}
-            SUPER_ADMIN_EMAIL=${{ secrets.SUPER_ADMIN_EMAIL }}
-            FILE_STORAGE_PROVIDER=${{ secrets.FILE_STORAGE_PROVIDER }}
-            FILE_STORAGE_PATH=${{ secrets.FILE_STORAGE_PATH }}
+        run: |
+          docker build \
+            --build-arg DSN="${{ secrets.DSN }}" \
+            --build-arg DB_DIALECT="${{ secrets.DB_DIALECT }}" \
+            --build-arg SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+            --build-arg ENT_SCHEMA_PATH="${{ secrets.ENT_SCHEMA_PATH }}" \
+            --build-arg SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            --build-arg CENTRIFUGO_API_ADDRESS="${{ secrets.CENTRIFUGO_API_ADDRESS }}" \
+            --build-arg CENTRIFUGO_API_KEY="${{ secrets.CENTRIFUGO_API_KEY }}" \
+            --build-arg SUPER_ADMIN_EMAIL="${{ secrets.SUPER_ADMIN_EMAIL }}" \
+            --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
+            --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
+            -t registry.digitalocean.com/labrago/backend:v1.1 \
+            -f ./Dockerfile ./
+          docker push registry.digitalocean.com/labrago/backend:v1.1
 
   deploy:
     needs: [build-and-push-frontend, build-and-push-backend]
