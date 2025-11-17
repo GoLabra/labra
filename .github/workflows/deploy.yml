@@ -97,7 +97,7 @@ jobs:
               --build-arg FILE_STORAGE_PROVIDER="${{ secrets.FILE_STORAGE_PROVIDER }}" \
               --build-arg FILE_STORAGE_PATH="${{ secrets.FILE_STORAGE_PATH }}" \
               -f ./Dockerfile \
-              ./; then
+              .; then
 
               echo "Backend image built and pushed successfully."
               break
