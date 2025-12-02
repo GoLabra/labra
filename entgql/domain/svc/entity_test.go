@@ -85,6 +85,28 @@ var (
 		"Private":          BeNil(),
 		"Ref":              Equal(""),
 	})
+	adminCreatedByMatcher = MatchAllFields(Fields{
+		"Name":             Equal("AdminCreatedBy"),
+		"EntName":          Equal("admin_created_by"),
+		"Caption":          Equal("Admin Created By"),
+		"Type":             Equal("AdminUser"),
+		"BelongsToCaption": BeNil(),
+		"Required":         BeNil(), // TODO will be required
+		"RelationType":     Equal(entity.RelationTypeOne),
+		"Private":          BeNil(),
+		"Ref":              Equal(""),
+	})
+	adminUpdatedByMatcher = MatchAllFields(Fields{
+		"Name":             Equal("AdminUpdatedBy"),
+		"EntName":          Equal("admin_updated_by"),
+		"Caption":          Equal("Admin Updated By"),
+		"Type":             Equal("AdminUser"),
+		"BelongsToCaption": BeNil(),
+		"Required":         BeNil(), // TODO will be required
+		"RelationType":     Equal(entity.RelationTypeOne),
+		"Private":          BeNil(),
+		"Ref":              Equal(""),
+	})
 )
 
 var _ = Describe("Create Entity", func() {
@@ -156,6 +178,8 @@ var _ = Describe("Create Entity", func() {
 						"Edges": MatchAllElementsWithIndex(IndexIdentity, Elements{
 							"0": createdByMatcher,
 							"1": updatedByMatcher,
+							"2": adminCreatedByMatcher,
+							"3": adminUpdatedByMatcher,
 						}),
 						"RelatedEntities": BeEmpty(),
 					}),
@@ -219,6 +243,8 @@ var _ = Describe("Create Entity", func() {
 						"Edges": MatchAllElementsWithIndex(IndexIdentity, Elements{
 							"0": createdByMatcher,
 							"1": updatedByMatcher,
+							"2": adminCreatedByMatcher,
+							"3": adminUpdatedByMatcher,
 						}),
 						"RelatedEntities": BeEmpty(),
 					}),
@@ -264,6 +290,8 @@ var _ = Describe("Create Entity", func() {
 						"Edges": MatchAllElementsWithIndex(IndexIdentity, Elements{
 							"0": createdByMatcher,
 							"1": updatedByMatcher,
+							"2": adminCreatedByMatcher,
+							"3": adminUpdatedByMatcher,
 						}),
 						"RelatedEntities": BeEmpty(),
 					}),
@@ -348,6 +376,7 @@ var _ = Describe("Delete Entity", func() {
 
 				mockSchemaManager.EXPECT().BackupSchema().Return(nil)
 				mockSchemaManager.EXPECT().RemoveEntityFromSchema("test_entity").Return(nil)
+				mockSchemaManager.EXPECT().Generate(gomock.Any(), gomock.Any()).Return(nil)
 
 				result, err := e.DeleteEntity(ctx, deleteInput)
 
@@ -411,6 +440,20 @@ var _ = Describe("Delete Entity", func() {
 						Type:         "User",
 					},
 					{
+						Name:         "AdminCreatedBy",
+						EntName:      "admin_created_by",
+						Caption:      "Admin Created By",
+						RelationType: entity.RelationTypeOne,
+						Type:         "AdminUser",
+					},
+					{
+						Name:         "AdminUpdatedBy",
+						EntName:      "admin_updated_by",
+						Caption:      "Admin Updated By",
+						RelationType: entity.RelationTypeOne,
+						Type:         "AdminUser",
+					},
+					{
 						Name:         "TestEntityRef",
 						EntName:      "test_entity_ref",
 						Caption:      "Test Entity Reference",
@@ -440,11 +483,14 @@ var _ = Describe("Delete Entity", func() {
 						"Edges": MatchAllElementsWithIndex(IndexIdentity, Elements{
 							"0": createdByMatcher,
 							"1": updatedByMatcher,
+							"2": adminCreatedByMatcher,
+							"3": adminUpdatedByMatcher,
 						}),
 						"RelatedEntities": BeEmpty(),
 					}),
 				)).Return(nil)
 				mockSchemaManager.EXPECT().RemoveEntityFromSchema("test_entity").Return(nil)
+				mockSchemaManager.EXPECT().Generate(gomock.Any(), gomock.Any()).Return(nil)
 
 				result, err := e.DeleteEntity(ctx, deleteInput)
 
