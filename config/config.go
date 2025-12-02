@@ -7,6 +7,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const (
+	// MinJWTSecretLength is the minimum required length for JWT secrets
+	// HS256 requires at least 32 bytes (256 bits) for security, but we use 16 as a practical minimum
+	MinJWTSecretLength = 16
+)
+
 type Config struct {
 	DSN                  string `env:"DSN,required"`
 	DBDialect            string `env:"DB_DIALECT,required"`
@@ -41,6 +47,11 @@ func New() (*Config, error) {
 	}
 	if cfg.FileStoragePath == "" {
 		cfg.FileStoragePath = "./storage"
+	}
+
+	// Validate JWT secret length
+	if len(cfg.SecretKey) < MinJWTSecretLength {
+		return nil, fmt.Errorf("SECRET_KEY must be at least %d characters long for security", MinJWTSecretLength)
 	}
 
 	return cfg, nil
