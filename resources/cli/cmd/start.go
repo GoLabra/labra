@@ -44,7 +44,7 @@ func StartServer(cmd *cobra.Command, args []string) {
 		fmt.Printf("@@@@@@@@@@@@@@@@@ ~ Start Server ~ @@@@@@@@@@@@@@@@@\n")
 
 		run := exec.Command("go", "run", "main.go")
-		run.Dir = "../../../sabra/backend"
+		run.Dir = "../app"
 		stderr, _ := run.StderrPipe()
 
 		err := run.Start()
