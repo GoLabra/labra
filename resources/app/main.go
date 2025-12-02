@@ -110,7 +110,7 @@ func main() {
 		Key:  conf.CentrifugoKey,
 	})
 
-	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
+	tokenAuth := jwtauth.New("HS256", []byte(conf.SecretKey), nil)
 
 	// Configure CORS
 	corsMiddleware := cors.New(cors.Options{

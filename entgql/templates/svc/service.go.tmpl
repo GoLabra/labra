@@ -19,7 +19,7 @@ var (
 )
 
 type Service struct {
-	// Node                  svc.Node
+	*CustomService
     {{- range $n := $.Nodes }}
 	{{- if ne $n.Annotations.Entity.Owner "User" }}
 	{{$n.Name}}              adminInterfaces.{{$n.Name}}
@@ -31,10 +31,8 @@ type Service struct {
 
 func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service {
 	return &Service{
-		// Node:                  NewNode(repository),
+		CustomService: NewCustomService(repository),
         {{- range $n := $.Nodes }}
-		//  {{ $n.Annotations.Entity.Owner }}
-		//  {{ $n.Annotations.Entity }}
 		{{- if ne $n.Annotations.Entity.Owner "User" }}
         {{$n.Name}}:              adminSvc.New{{$n.Name}}(adminRepo),
 		{{- else }}
