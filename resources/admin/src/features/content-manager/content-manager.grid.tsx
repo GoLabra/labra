@@ -31,7 +31,7 @@ import { ShortcutActionItem } from "@/shared/components/key-handler/with-label-s
 import { FilterEditor } from "@/shared/components/filter-editor";
 import { InlineAvatar } from "@/shared/components/avatar";
 
-export const ContentManagerScene = () => {
+export const ContentManagerGrid = () => {
 
     const contentManager = useContentManagerContext();
     const contentManagerIds = useContentManagerIds(contentManager.contentManagerStore.state)
@@ -295,4 +295,4 @@ export const ContentManagerScene = () => {
         </>
     )
 }
-ContentManagerScene.displayName = 'ContentManagerScene';
+ContentManagerGrid.displayName = 'ContentManagerGrid';

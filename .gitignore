@@ -46,3 +46,7 @@ src/app/domain
 
 src/app/graphql/*
 !src/app/graphql/admin_graphql_definition.graphql
+
+# admin build
+out/
+out.labradmin/

@@ -15,7 +15,7 @@ import { GRAPHQL_ADMIN_PLAYGROUND_URL, GRAPHQL_QUERY_PLAYGROUND_URL } from "@/co
 import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
 import { HiExternalLink } from "react-icons/hi";
 
-export default function DeveloperEntities() {
+export default function DeveloperLeftSide() {
 
     const skipId = useSkipLink({ id: 'developer-entities', title: 'Go To Entities' });
 
@@ -107,6 +107,6 @@ const EntityButtonNavigation = (props: EntityButtonNavigationProps) => {
 
     return (<TreeListItemNavigation
         active={active}
-        path={`/developer/graphql/${entityName}`}
+        path={`/developer/graphql?e=${entityName}`}
         label={entityCaption ?? entityName} />)
 }

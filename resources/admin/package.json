@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+	"build-labradmin": "LABRA_BUILD=true next build",
     "start": "next start",
     "test": "jest",
     "lint": "next lint",

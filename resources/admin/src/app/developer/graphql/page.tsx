@@ -6,67 +6,78 @@ import { PageHeader } from "@/shared/components/page-header";
 import { WithEntitySchema } from "@/features/developer/with-entity-schema";
 import { ShowGraphQlQuery } from "@/features/developer/show-graph-ql-query";
 import { WithEntitiesSchema } from "@/features/developer/with-entities-schema";
+import { DeveloperSchema } from "@/features/developer/developer-schema";
+import { useCurrentEntityNameContext } from "@/hooks/use-current-entity";
+import DeveloperEntity from "./entity-id/page";
 
 export default function DeveloperGraphQl() {
 
     useDocumentTitle({ title: 'Developer - Export' });
 
-    const EntitiesSchema = WithEntitiesSchema(ShowGraphQlQuery);
+	const entityName = useCurrentEntityNameContext();
+	
+	if(entityName) {
+		return <DeveloperEntity />
+	}
 
-    return (
-        <Container
-            maxWidth="md"
-            sx={{
-                height: '100%',
-                py: 2
-            }}>
+	return <DeveloperSchema />
+	
+    // const EntitiesSchema = WithEntitiesSchema(ShowGraphQlQuery);
 
-            <Stack
-                spacing={2}
-                sx={{ height: '100%' }}>
+    // return (
+    //     <Container
+    //         maxWidth="md"
+    //         sx={{
+    //             height: '100%',
+    //             py: 2
+    //         }}>
 
-                <PageHeader
-                    sx={{
-                        pl: 1
-                    }}>
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        spacing={1}>
+    //         <Stack
+    //             spacing={2}
+    //             sx={{ height: '100%' }}>
 
-                        <Stack direction="row" alignItems="center" gap={1}>
-                            <Typography variant="h1">
-                                GRAPH-QL API
-                            </Typography>
+    //             <PageHeader
+    //                 sx={{
+    //                     pl: 1
+    //                 }}>
+    //                 <Stack
+    //                     direction="row"
+    //                     justifyContent="space-between"
+    //                     alignItems="center"
+    //                     spacing={1}>
 
-                        </Stack>
+    //                     <Stack direction="row" alignItems="center" gap={1}>
+    //                         <Typography variant="h1">
+    //                             GRAPH-QL API
+    //                         </Typography>
 
-                        <Stack
-                            direction="row"
-                            spacing={1}>
+    //                     </Stack>
 
-                            {/* <Button
-                                size="medium"
-                                variant="contained"
-                                // startIcon={<SvgIcon fontSize="small"><PlusIcon /></SvgIcon>}
-                                onClick={() => exportPostmanCollection()}
-                                aria-label="Add new entry"
-                                aria-haspopup="dialog">
-                                Export as Postman Collection
-                            </Button> */}
-                        </Stack>
+    //                     <Stack
+    //                         direction="row"
+    //                         spacing={1}>
 
-                    </Stack>
-                </PageHeader>
+    //                         {/* <Button
+    //                             size="medium"
+    //                             variant="contained"
+    //                             // startIcon={<SvgIcon fontSize="small"><PlusIcon /></SvgIcon>}
+    //                             onClick={() => exportPostmanCollection()}
+    //                             aria-label="Add new entry"
+    //                             aria-haspopup="dialog">
+    //                             Export as Postman Collection
+    //                         </Button> */}
+    //                     </Stack>
 
-                <Stack spacing={2}>
-                    <EntitiesSchema />
-                </Stack>
+    //                 </Stack>
+    //             </PageHeader>
 
-            </Stack>
+    //             <Stack spacing={2}>
+    //                 <EntitiesSchema />
+    //             </Stack>
 
-        </Container>
-    )
+    //         </Stack>
+
+    //     </Container>
+    //)
 }
 

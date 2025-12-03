@@ -4,7 +4,7 @@ go 1.23.0
 
 toolchain go1.23.7
 
-// REPLACE_LABRAGO_DEVELOPMENT_API
+replace github.com/GoLabra/labra => ../../.
 
 require (
 	ariga.io/atlas v0.33.1

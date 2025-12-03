@@ -16,7 +16,6 @@ import { useEntityDesignerForEntity } from "./use-designer-entities";
 import { Action, ColumnsFillRowSpacePlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightRowPlugin, MosaicDataTable, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams } from "mosaic-data-table";
 import { EmptyMessage } from "@/shared/components/empty-message";
 import { ActionList } from "@/shared/components/action-list";
-import { ActionListItem } from "@/shared/components/action-list-item";
 import { ConfirmationDialog } from "@/shared/components/confirmation-dialog";
 import { MuiCardFooter } from "@/shared/components/mui-card-footer";
 import { DesignerEdge, DesignerField } from "@/types/entity";
@@ -30,7 +29,7 @@ import { Key } from "@/shared/components/key-handler/types";
 interface EntityTypeDesignerSceneProps {
     entityName: string;
 }
-export default function EntityTypeDesignerScene(
+export default function EntityTypeDesignerGrid(
     props: EntityTypeDesignerSceneProps,
 ) {
     const { entityName } = props;
@@ -233,4 +232,4 @@ export default function EntityTypeDesignerScene(
         />
     </>);
 }
-EntityTypeDesignerScene.displayName = 'EntityTypeDesignerScene';
+EntityTypeDesignerGrid.displayName = 'EntityTypeDesignerGrid';

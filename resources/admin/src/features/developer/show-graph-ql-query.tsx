@@ -90,7 +90,7 @@ export const ShowGraphQlQuery: React.FC<ShowGraphQlQueryProps> = (props: ShowGra
 			{props.lqQuery && (<>
 				<CardContent>
 					<Stack direction="row" width={1} justifyContent="space-between">
-						<Chip label="LGQuery LIBRARY" color="success" variant="outlined" size="small" />
+						<Chip label="LGQuery library" color="success" variant="outlined" size="small" />
 						<Button variant="outlined" onClick={() => copy(variables!)}>
 							<ContentCopyIcon fontSize='small' />
 						</Button>

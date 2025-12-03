@@ -18,7 +18,7 @@ import { FormOpenMode } from "@/core-features/dynamic-form/form-field";
 import Avvvatars from 'avvvatars-react'
 import { EntityTypeChanges } from "@/features/entity-type-designer/entity-type-changes";
 import { EntityTypeDesignerEntryDialogContent } from "@/features/entity-type-designer/entity-type-designer-new-field-type-dialog";
-import EntityTypeDesignerScene from "@/features/entity-type-designer/entity-type-designer-scene";
+import EntityTypeDesignerGrid from "@/features/entity-type-designer/entity-type-designer.grid";
 import { EntityTypeNewEntityDialog } from "@/features/entity-type-designer/entity-type-new-entity-dialog";
 import { useEntitiesDesigner, useEntityDesignerForEntity } from "@/features/entity-type-designer/use-designer-entities";
 import { ActionsButton } from "@/shared/components/actions-button";
@@ -36,44 +36,24 @@ import { Key } from "@/shared/components/key-handler/types";
 export default function EntityTypeDesigner() {
 
     useDocumentTitle({ title: 'Entity Type Designer' });
-    const entityId = useCurrentEntityNameContext();
-    const appStatus = useAppStatus();
 
-    if (appStatus.isEntityFullyAvailable(entityId!) == false) {
-        return (<>
-            <Container
-                maxWidth={false}
-                sx={{
-                    height: '100%',
-                    py: 2
-                }}>
+	const entityId = useCurrentEntityNameContext();
+	const isEntityFullyAvailable = useAppStatus().isEntityFullyAvailable(entityId!);
 
-                <Stack
-                    spacing={2}>
+	return (
+		<Container
+			maxWidth={false}
+			sx={{
+				height: '100%',
+				py: 2
+			}}>
 
-                    <SkeletonEntityPage />
-
-                </Stack>
-            </Container>
-        </>)
-    }
-
-    return (
-        <>
-            <Container
-                maxWidth={false}
-                sx={{
-                    height: '100%',
-                    py: 2
-                }}>
-
-                <Stack spacing={2}>
-                    <PageContent entityId={entityId!} />
-                </Stack>
-            </Container>
-
-        </>
-    )
+			<Stack spacing={2}>
+				{isEntityFullyAvailable == false && <SkeletonEntityPage />}
+				{isEntityFullyAvailable == true && <PageContent entityId={entityId!} />}
+			</Stack>
+		</Container>
+	)
 }
 
 
@@ -123,7 +103,6 @@ const PageContent = (props: PageContentProps) => {
 
     return (
         <>
-
 
             <PageHeader
                 sx={{
@@ -219,7 +198,7 @@ const PageContent = (props: PageContentProps) => {
             </PageHeader>
 
             {entityDesigner.entityStatus != 'deleted' && (
-                <EntityTypeDesignerScene entityName={props.entityId}></EntityTypeDesignerScene>
+                <EntityTypeDesignerGrid entityName={props.entityId}></EntityTypeDesignerGrid>
             )}
 
             <DynamicDialog

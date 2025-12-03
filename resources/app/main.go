@@ -145,6 +145,7 @@ func main() {
 	})
 	router.Group(func(router chi.Router) {
 		router.Post("/login", handler.Login)
+		router.Mount("/labradmin", http.StripPrefix("/labradmin", adminHandler.ServeAdmin()))
 		router.Handle("/playground", adminHandler.Playground("GraphQL playground", "/query"))
 	})
 
