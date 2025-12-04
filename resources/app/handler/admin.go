@@ -4,6 +4,7 @@ import (
     "embed"
     "net/http"
     "io/fs"
+	"github.com/GoLabra/labra/handler"
 )
 
 // ...existing code...
@@ -24,5 +25,5 @@ func init() {
 }
 
 func ServeAdmin() http.Handler {
-    return ServeFS(adminAssets)
+    return handler.ServeFS(adminAssets)
 }

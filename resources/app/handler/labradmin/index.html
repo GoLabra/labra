@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Labra Admin Build Instructions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f6f8fb;
+      color: #222;
+      line-height: 1.5;
+    }
+    h1 {
+      color: #c0392b;
+    }
+    .container {
+      max-width: 760px;
+      margin: 3rem auto;
+      padding: 2rem 2.5rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+    .terminal {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      background: #1d1f21;
+      color: #ccff99;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      font-size: 0.95rem;
+      margin: 0.75rem 0;
+    }
+    .terminal code {
+      color: inherit;
+      background: none;
+      padding: 0;
+    }
+    code {
+      background: #f0f2f8;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+    ol {
+      padding-left: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Labra Admin Build Required</h1>
+    <p>
+      You are seeing this placeholder because the admin application
+      has not been built and copied into <code>app/handler/labradmin</code>.
+    </p>
+    <p>Please follow the steps below from the repository root:</p>
+    <ol>
+      <li>
+        <strong>Configure the admin environment</strong><br />
+        Create the <code>.env</code> file used by the React admin app.
+        <pre class="terminal"><code>cd resources/admin
+cp .env.example .env</code></pre>
+        Update the new <code>.env</code> with the required values before building.
+      </li>
+      <li>
+        <strong>Build the admin app</strong>
+        <pre class="terminal"><code>yarn install
+yarn build-labradmin</code></pre>
+      </li>
+      <li>
+        <strong>Copy the artifacts</strong><br />
+        The build creates static files in <code>resources/admin/out.labradmin</code>.
+        Copy everything from that directory into <code>handler/labradmin</code>.
+        <pre class="terminal"><code>cd ../
+rm -rf app/handler/labradmin/*
+cp -R admin/out.labradmin/* app/handler/labradmin/</code></pre>
+      </li>
+    </ol>
+    <p>
+      Once the files are copied, reload the admin site to verify the bundled Admin application loads instead of this notice.
+    </p>
+  </div>
+</body>
+</html>
