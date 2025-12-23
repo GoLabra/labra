@@ -49,4 +49,4 @@ src/app/graphql/*
 
 # admin build
 out/
-out.labradmin/
+out.static/

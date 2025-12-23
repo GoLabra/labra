@@ -15,6 +15,7 @@ import { PasswordFormField } from "@/core-features/dynamic-form/form-fields/Pass
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 
 const schema = z.object({
@@ -24,6 +25,7 @@ const schema = z.object({
 
 export default function AuthPage() {
 
+	useDocumentTitle({title: PRODUCT_NAME});
     const auth = useAuth<AuthContextType>();
     const router = useRouter();
     const searchParams = useSearchParams();

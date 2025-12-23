@@ -167,7 +167,6 @@ func main() {
 	})
 	router.Group(func(router chi.Router) {
 		router.Post("/login", handler.Login)
-		router.Mount("/labradmin", http.StripPrefix("/labradmin", handler.ServeAdmin()))
 		router.Handle("/playground", adminHandler.Playground("GraphQL playground", "/query"))
 	})
 
@@ -204,6 +203,7 @@ func main() {
 	router.Group(func(router chi.Router) {
 		router.Post("/admin/login", adminHandler.Login)
 		router.Post("/admin/signup", adminHandler.Signup)
+		router.Mount("/labradmin", http.StripPrefix("/labradmin", adminHandler.ServeAdmin()))
 		router.Handle("/admin/playground", adminHandler.Playground("GraphQL playground", "/admin/query"))
 	})
 
