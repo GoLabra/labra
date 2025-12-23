@@ -1,0 +1,298 @@
+import { Box, Card, CardContent, CardHeader, Divider, ListItemIcon, MenuItem, Stack, SvgIcon } from "@mui/material"
+import PlusCircleIcon from "@heroicons/react/24/outline/PlusCircleIcon"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+
+import { ContentManagerSearch } from "./content-manager-search"
+import { useSelection } from "@/hooks/use-selection";
+import { DynamicDialog, FinishResult } from "../../core-features/dynamic-dialog/src/dynamic-dialog"
+import { FormOpenMode } from "@/core-features/dynamic-form/form-field"
+import { useDialog } from "@/hooks/use-dialog"
+import { useContentManagerIds } from "./use-content-manger-ids"
+import { useDynamicDialog } from "@/core-features/dynamic-dialog/src/use-dynamic-dialog"
+import { ContentManagerEntryDialogContent } from "./content-manager-entry-form"
+import { Action, ColumnsFillRowSpacePlugin, ColumnSortPlugin, CustomBodyCellContentRenderPlugin, EmptyDataPlugin, ColumnDef, HighlightColumnPlugin, HighlightRowPlugin, MosaicDataTable, Order, PaddingPluggin, PinnedColumnsPlugin, RowActionsPlugin, RowSelectionPlugin, SkeletonLoadingPlugin, useGridPlugins, usePluginWithParams, FilterRowPlugin, DefaultStringFilterOptions, AbsoluteHeightContainer, createRowSelectionStore, RowDetailPlugin, createFilterRowStore, createResponsivePin } from "mosaic-data-table";
+import { useContentManagerContext } from "./use-content-manager-context"
+import { ActionList } from "@/shared/components/action-list";
+import { ActionListItem } from "@/shared/components/action-list-item";
+import { ConfirmationDialog } from "@/shared/components/confirmation-dialog";
+import { CenterPagination, CoolPagination } from "@/shared/components/cool-pagination";
+import { EmptyMessage } from "@/shared/components/empty-message";
+import { MuiCardFooter } from "@/shared/components/mui-card-footer";
+import { useDyamicGridFilter } from "./use-dyamic-grid-filter";
+import Defaults from "@/config/Defaults.json";
+import { ColumnSourceMeta, useDynamicGridColumns } from "@/hooks/use-dynamic-grid-columns";
+import { RelationViewerGridRoot } from "@/core-features/view-item/relation-viewer-grid";
+import { useViewRelationStore } from "@/core-features/view-item/use-view-relation-store";
+import { Edge } from "@/lib/apollo/graphql.entities";
+import { Key } from "@/shared/components/key-handler/types";
+import { ShortcutActionItem } from "@/shared/components/key-handler/with-label-shortcut";
+import { FilterEditor } from "@/shared/components/filter-editor";
+import { InlineAvatar } from "@/shared/components/avatar";
+
+export const ContentManagerGrid = () => {
+
+    const contentManager = useContentManagerContext();
+    const contentManagerIds = useContentManagerIds(contentManager.contentManagerStore.state)
+    const contentManagerSelection = useSelection<string>(contentManagerIds.storeIds);
+    const [selectionEnabled, setSelectionEnabled] = useState(false);
+    const [filterEnabled, setFilterEnabled] = useState<boolean>(!!Object.keys(contentManager.contentManagerSearch.state.filter).length);
+    const [showId, setShowId] = useState<boolean>(false);
+    const viewRelationStore = useViewRelationStore();
+    const dynamicDialog = useDynamicDialog();
+    const deleteConfirmationDialog = useDialog();
+    const bulkDeleteConfirmationDialog = useDialog();
+
+    useEffect(() => {
+        viewRelationStore.closeAll();
+    }, [contentManager.contentManagerStore.state.dataLoading]);
+
+    const headCells = useDynamicGridColumns({
+        entityName: contentManager.entityName,
+        fields: contentManager.fullEntity?.fields,
+        edges: contentManager.fullEntity?.edges,
+        displayFieldName: contentManager.displayFieldName,
+		openRelation: useCallback((entityName: string, edge: Edge, entryId: string) => {
+			viewRelationStore.addEdge(entryId, entityName, edge, entryId, true);
+		}, [viewRelationStore]),
+        showId: showId,
+		transformColumn: useCallback((column: ColumnDef, meta: ColumnSourceMeta) => {
+
+			let newColumn = column;
+			if(column.id === contentManager.displayFieldName) {
+				newColumn = {
+					...newColumn,
+					pin: createResponsivePin(true,'sm', 'up'),
+					highlight: true
+				}
+			}
+
+			if (meta.kind == 'field' && meta.field.name == 'name' && meta.field.type == 'ShortText') {
+
+				newColumn = {
+					...newColumn,
+					cell: (row: any) => { 
+						const cellValue = row[meta.field.name];
+						return (<Stack direction="row" gap={1} alignItems="center">
+						<InlineAvatar name={cellValue} />
+						{column.cell?.(row) ?? undefined}
+					</Stack>)}
+				}
+			}
+			return newColumn;
+		}, [contentManager.displayFieldName])
+    });
+
+    const gridFilter = useDyamicGridFilter({
+		search: contentManager.contentManagerSearch,
+        fields: contentManager.fullEntity?.fields
+    })
+
+    const editEntry = useCallback((field: any) => {
+        dynamicDialog.addPopup(ContentManagerEntryDialogContent, { entityName: contentManager.entityName, defaultValue: field }, FormOpenMode.Edit, field.id);
+    }, [dynamicDialog, contentManager.entityName]);
+
+    const deleteEntryConfirmed = useCallback(() => {
+        if (!deleteConfirmationDialog.data) {
+            return;
+        }
+        deleteConfirmationDialog.handleClose();
+        contentManager.contentManagerStore.deleteItem(deleteConfirmationDialog.data as string);
+    }, [deleteConfirmationDialog, contentManager.contentManagerStore.deleteItem]);
+
+    const bulkDeleteEntryConfirmed = useCallback(() => {
+        bulkDeleteConfirmationDialog.handleClose();
+        contentManager.contentManagerStore.deleteBulk(contentManagerSelection.selected);
+    }, [deleteConfirmationDialog, contentManager.contentManagerStore.deleteItem]);
+
+    // Row Actions
+    const actions: Action<unknown>[] = useMemo(() => [
+        {
+            id: 'edit',
+            render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => editEntry(field)}>
+                <ListItemIcon>
+                    <EditIcon />
+                </ListItemIcon>
+                Edit
+            </MenuItem>)
+        },
+        {
+            id: 'remove',
+            render: (field: any) => (<MenuItem id='remove-menu-item' key={`remove-${field}`} onClick={() => deleteConfirmationDialog.handleOpen(field.id)}> <ListItemIcon><DeleteIcon /></ListItemIcon> Remove </MenuItem>)
+        },
+    ], [editEntry, deleteConfirmationDialog]);
+
+    const finishDialog = useCallback((result: FinishResult) => {
+
+        if (result.openMode == FormOpenMode.Edit) {
+            if (!result.editId) {
+                return;
+            }
+            contentManager.contentManagerStore.updateItem(result.editId, result.data);
+            return;
+        }
+
+        if (result.openMode == FormOpenMode.New) {
+            contentManager.contentManagerStore.addItem(result.data);
+            return;
+        }
+
+    }, [contentManager.contentManagerStore]);
+
+    const gridPlugins = useGridPlugins(
+        CustomBodyCellContentRenderPlugin,
+        usePluginWithParams(FilterRowPlugin, {
+            visible: filterEnabled,
+            store: gridFilter.store,
+            filterChanged: contentManager.contentManagerSearch.handleFiltersApply,
+            key: 'filter_row',
+            filterColumns: gridFilter.filterDef
+        }),
+        usePluginWithParams(PaddingPluggin, {}),
+        usePluginWithParams(ColumnSortPlugin, {
+            order: contentManager.contentManagerSearch.state.order,
+            orderBy: contentManager.contentManagerSearch.state.sortBy,
+            onSort: contentManager.contentManagerSearch.handleSortChange
+        }),
+        usePluginWithParams(RowSelectionPlugin, {
+            visible: selectionEnabled,
+            onGetRowId: contentManagerIds.getId,
+            onSelectOne: contentManagerSelection.handleSelectOne,
+            onDeselectOne: contentManagerSelection.handleDeselectOne,
+            rowSelectionStore: useMemo(() => createRowSelectionStore<any>(), [])
+        }),
+		usePluginWithParams(RowDetailPlugin, {
+			showExpanderButton: false,
+			onGetRowId: contentManagerIds.getId,
+			rowDetailStore: viewRelationStore.detailsStore,
+			getExpansionNode: useCallback((row: any, params: any) => (
+				<AbsoluteHeightContainer>
+					<RelationViewerGridRoot rootEntryId={row.id} viewRelationStore={viewRelationStore} showId={showId}/>
+				</AbsoluteHeightContainer>), [showId, viewRelationStore])
+		}),
+        ColumnsFillRowSpacePlugin,
+        usePluginWithParams(RowActionsPlugin, {
+            actions: actions
+        }),
+        usePluginWithParams(HighlightColumnPlugin, {}),
+        usePluginWithParams(PinnedColumnsPlugin, {}),
+        usePluginWithParams(SkeletonLoadingPlugin, {
+            isLoading: contentManager.contentManagerStore.state.dataLoading,
+            rowsWhenEmpty: Defaults.dataTable.skeletonRowsCount,
+            maxRowsWhenNotEmpty: 15
+        }),
+        usePluginWithParams(EmptyDataPlugin, {
+            content: useMemo(() =><EmptyMessage />, [])
+        }),
+    );
+
+    return (
+        <>
+            <Card>
+                <CardHeader title={(
+					<>
+						<ContentManagerSearch
+							disabled={false}
+							onRefresh={contentManager.contentManagerStore.refresh}
+							onBulkDelete={() => bulkDeleteConfirmationDialog.handleOpen()}
+							onQueryChange={contentManager.contentManagerSearch.handleQueryChange}
+							query={contentManager.contentManagerSearch.state.query}
+							selected={contentManagerSelection.selected}
+
+							selectionEnabled={selectionEnabled}
+							onSelectionEnabledChange={(value) => {
+								setSelectionEnabled(value)
+								if (!value) {
+									contentManagerSelection.handleDeselectAll();
+								}
+							}}
+
+							filterEnabled={filterEnabled}
+							onFilterEnabledChange={setFilterEnabled}
+
+							contentManagerSearch={contentManager.contentManagerSearch}
+							showId={showId}
+							onShowIdChange={setShowId}
+						/>
+
+						<FilterEditor filter={contentManager.contentManagerSearch.state.filter} headCells={headCells} onRemove={(key) => {
+							gridFilter.store.clear(key);
+							contentManager.contentManagerSearch.handleFiltersApply(gridFilter.store.getSnapshot())
+						}} />
+
+					</>
+				)}>
+                </CardHeader>
+
+                <Divider />
+
+                <CardContent data-noxpadding="true">
+
+                    <MosaicDataTable
+						className="lpadding"
+                        plugins={gridPlugins}
+                        caption={`${contentManager.entityName} content`}
+                        items={contentManager.contentManagerStore.state.data}
+                        headCells={headCells}
+                    />
+
+                    <CenterPagination>
+                        <CoolPagination
+                            page={contentManager.contentManagerSearch.state.page}
+                            pagesCount={contentManager.contentManagerStore.state.pagesCount}
+                            totalItems={contentManager.contentManagerStore.state.totalItems}
+                            onChange={contentManager.contentManagerSearch.handlePageChange}
+                        />
+                    </CenterPagination>
+                </CardContent>
+
+                <Divider />
+
+                <MuiCardFooter>
+                    <ActionList>
+						<ShortcutActionItem
+								shortcutKey={Key.n}
+								
+								onClick={() => {
+									dynamicDialog.addPopup(ContentManagerEntryDialogContent, { entityName: contentManager.entityName }, FormOpenMode.New);
+								}}
+								icon={(
+									<SvgIcon fontSize="small">
+										<PlusCircleIcon />
+									</SvgIcon>
+								)}
+								label="Add New"
+								aria-label="Add new entry"
+								aria-haspopup="dialog" />
+                            
+                    </ActionList>
+                </MuiCardFooter>
+
+            </Card>
+
+            <DynamicDialog
+                ref={dynamicDialog.ref}
+                finish={finishDialog} />
+
+            <ConfirmationDialog
+                message="Are you sure you want to delete this item? This can't be undone."
+                onCancel={deleteConfirmationDialog.handleClose}
+                onConfirm={deleteEntryConfirmed}
+                open={deleteConfirmationDialog.open}
+                title="Delete Confirmation"
+                variant="error"
+            />
+
+            <ConfirmationDialog
+                message="Are you sure you want to delete the selected items? This can't be undone."
+                onCancel={bulkDeleteConfirmationDialog.handleClose}
+                onConfirm={bulkDeleteEntryConfirmed}
+                open={bulkDeleteConfirmationDialog.open}
+                title="Delete Confirmation"
+                variant="error"
+            />
+        </>
+    )
+}
+ContentManagerGrid.displayName = 'ContentManagerGrid';

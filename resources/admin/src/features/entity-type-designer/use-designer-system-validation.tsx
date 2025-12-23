@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useEntityDesignerForEntity } from "./use-designer-entities"; 
 import { z } from "zod";
-import { useParamSingleValue } from "@/hooks/useParam";
 import { ChangedFullEntity } from "@/types/entity";
 import { ChildTypeDescriptor } from "./designer-field-map";
+import { useSearchParams } from "next/navigation";
 
 
 export const checkChildCaptionExists = (caption: string, editId: string | undefined, entity: ChangedFullEntity) => {
@@ -16,7 +16,7 @@ export const checkChildCaptionExists = (caption: string, editId: string | undefi
 
 export const useSchemaEffectEntityParams = (editId?: string, schemaEffect?: ChildTypeDescriptor['schemaEffect']) => {
 
-    const entityName = useParamSingleValue('entity-id');
+	const entityName = useSearchParams().get('entity-id') ?? '';
     const entitiesDesigner = useEntityDesignerForEntity(entityName!);
 
     return useCallback((schema: z.ZodObject<any, any>) => {

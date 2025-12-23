@@ -4,6 +4,7 @@ import { Container, ContentLayout } from "./rootLayout";
 import { ThemeSwitcher } from "./header/ThemeSwitcher.tsx/ThemeSwitcher";
 import { Box, Stack } from "@mui/material";
 import { Header } from "./header/Header";
+import { BASE_PATH } from "@/config/CONST";
 
 interface Props {
     children: React.ReactNode;
@@ -25,7 +26,7 @@ export default function AuthLayout(props: Props) {
         />
         <Box sx={{
             gridArea: 'art',
-            background: 'url(/graph-background.png)',
+            background: `url(${BASE_PATH}/graph-background.png)`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: '100%',
             backgroundPositionY: 'bottom',

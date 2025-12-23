@@ -72,6 +72,6 @@ const EntityButtonNavigation = (props: EntityButtonNavigationProps) => {
 
     return (<TreeListItemNavigation
         active={active}
-        path={`/content-manager/${entityName}`}
+        path={`/content-manager?e=${entityName}`}
         label={entityCaption ?? entityName} />)
 }

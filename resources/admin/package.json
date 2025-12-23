@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": " RUNTIME_ENV=true next dev",
     "build": "next build",
+	"build-static": "BUILDTYPE=static next build",
+	"build-labra": "BUILDTYPE=labra next build",
     "start": "next start",
     "test": "jest",
     "lint": "next lint",
