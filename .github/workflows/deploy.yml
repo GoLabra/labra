@@ -7,8 +7,6 @@ on:
     paths:
       - "**"
       - "resources/admin/**"
-      - "**"
-      - "resources/admin/**"
       - ".github/workflows/**"
 
   workflow_dispatch:
@@ -33,11 +31,7 @@ jobs:
             frontend:
               - 'resources/admin/**'
               - '.github/workflows/**'
-              - 'resources/admin/**'
-              - '.github/workflows/**'
             backend:
-              - '!resources/admin/**'
-              - '**'
               - '!resources/admin/**'
               - '**'
 
