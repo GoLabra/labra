@@ -4,16 +4,30 @@ FROM golang:1.23.0-alpine3.20
 # Set the working directory inside the container
 WORKDIR /app
 
-ARG DSN
+# ============================================
+# NON-SENSITIVE CONFIGURATION (passed as ARGs)
+# ============================================
 ARG DB_DIALECT
 ARG SERVER_PORT
 ARG ENT_SCHEMA_PATH
-ARG SECRET_KEY
 ARG CENTRIFUGO_API_ADDRESS
-ARG CENTRIFUGO_API_KEY
 ARG FILE_STORAGE_PROVIDER
 ARG FILE_STORAGE_PATH
 ARG SUPER_ADMIN_EMAIL
+ARG APP_ENVIRONMENT
+
+# ============================================
+# INFISICAL AUTHENTICATION (for secrets)
+# ============================================
+# These are meta-credentials for accessing the vault - NOT the actual secrets.
+# Even if exposed, they:
+#   1. Only work from whitelisted IPs (configure in Infisical dashboard)
+#   2. Are fully audited with every access logged
+#   3. Can be instantly revoked without redeployment
+ARG INFISICAL_CLIENT_ID
+ARG INFISICAL_CLIENT_SECRET
+ARG INFISICAL_PROJECT_ID
+ARG INFISICAL_SITE_URL
 
 # Copy the entire project
 COPY . .

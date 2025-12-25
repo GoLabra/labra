@@ -91,14 +91,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		"role": role.Name,
 	})
 
-	config, ok := r.Context().Value("config").(*config.Config)
+	appConfig, ok := r.Context().Value("config").(*config.AppConfig)
 
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	signedToken, err := token.SignedString([]byte(config.SecretKey))
+	signedToken, err := token.SignedString([]byte(appConfig.SecretKey))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
