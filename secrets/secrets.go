@@ -37,8 +37,14 @@ type ProviderConfig struct {
 
 // NewProviderFromEnv creates a new secret provider based on environment configuration.
 // It returns an Infisical provider if credentials are available, otherwise falls back to env.
+// Set USE_ENV_SECRETS=true to force environment variable fallback (useful for testing/local dev).
 func NewProviderFromEnv() (Provider, error) {
 	cfg := loadProviderConfig()
+
+	// Honor explicit request to use environment variables (testing/legacy support)
+	if cfg.UseEnvFallback {
+		return NewEnvProvider(), nil
+	}
 
 	// If Infisical credentials are available, use Infisical
 	if cfg.InfisicalClientID != "" && cfg.InfisicalClientSecret != "" {
@@ -64,4 +70,3 @@ func LoadSecrets(ctx context.Context, environment string) (*config.Secrets, erro
 
 	return secrets, nil
 }
-
