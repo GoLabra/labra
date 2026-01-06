@@ -43,8 +43,10 @@ func TestLogin(t *testing.T) {
 					Return(testUser, nil)
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser) context.Context {
-				cfg := &config.Config{
-					SecretKey: "test-secret-key-that-is-long-enough-for-validation-minimum-16-chars",
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{
+						SecretKey: "test-secret-key-that-is-long-enough-for-validation-minimum-16-chars",
+					},
 				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
@@ -69,7 +71,7 @@ func TestLogin(t *testing.T) {
 					Return(nil, &ent.NotFoundError{})
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser) context.Context {
-				cfg := &config.Config{SecretKey: "test-secret-key-that-is-long-enough"}
+				cfg := &config.AppConfig{Secrets: config.Secrets{SecretKey: "test-secret-key-that-is-long-enough"}}
 				service := &svc.Service{AdminUser: mockAdminUser}
 				ctx := context.Background()
 				ctx = context.WithValue(ctx, constants.AdminServiceContextValue, service)
@@ -96,7 +98,7 @@ func TestLogin(t *testing.T) {
 					Return(testUser, nil)
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser) context.Context {
-				cfg := &config.Config{SecretKey: "test-secret-key-that-is-long-enough"}
+				cfg := &config.AppConfig{Secrets: config.Secrets{SecretKey: "test-secret-key-that-is-long-enough"}}
 				service := &svc.Service{AdminUser: mockAdminUser}
 				ctx := context.Background()
 				ctx = context.WithValue(ctx, constants.AdminServiceContextValue, service)
@@ -113,7 +115,7 @@ func TestLogin(t *testing.T) {
 				// No mocks needed
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser) context.Context {
-				cfg := &config.Config{SecretKey: "test-secret-key-that-is-long-enough"}
+				cfg := &config.AppConfig{Secrets: config.Secrets{SecretKey: "test-secret-key-that-is-long-enough"}}
 				service := &svc.Service{AdminUser: mockAdminUser}
 				ctx := context.Background()
 				ctx = context.WithValue(ctx, constants.AdminServiceContextValue, service)
@@ -134,7 +136,7 @@ func TestLogin(t *testing.T) {
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser) context.Context {
 				// Don't add service to context
-				cfg := &config.Config{SecretKey: "test-secret-key-that-is-long-enough"}
+				cfg := &config.AppConfig{Secrets: config.Secrets{SecretKey: "test-secret-key-that-is-long-enough"}}
 				ctx := context.Background()
 				ctx = context.WithValue(ctx, "config", cfg)
 				return ctx

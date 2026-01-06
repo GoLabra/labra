@@ -40,7 +40,7 @@ func Authenticator(next http.Handler) http.Handler {
 			return
 		}
 
-		config, ok := r.Context().Value("config").(*config.Config)
+		appConfig, ok := r.Context().Value("config").(*config.AppConfig)
 
 		if !ok {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -69,7 +69,7 @@ func Authenticator(next http.Handler) http.Handler {
 		token, err := jwt.ParseString(
 			tokenString,
 			jwt.WithValidate(true),
-			jwt.WithKey(jwt_hs.HS256, []byte(config.SecretKey)),
+			jwt.WithKey(jwt_hs.HS256, []byte(appConfig.SecretKey)),
 			jwt.WithVerify(true),
 		)
 		if err != nil {

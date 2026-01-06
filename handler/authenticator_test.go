@@ -54,7 +54,9 @@ func TestAuthenticator(t *testing.T) {
 					Return(role, nil)
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -97,7 +99,9 @@ func TestAuthenticator(t *testing.T) {
 					Return(role, nil)
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -122,7 +126,9 @@ func TestAuthenticator(t *testing.T) {
 				// No mocks needed - should skip authentication
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -144,7 +150,9 @@ func TestAuthenticator(t *testing.T) {
 				// No mocks needed
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -168,7 +176,9 @@ func TestAuthenticator(t *testing.T) {
 				// No mocks needed - token parsing will fail
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -199,7 +209,9 @@ func TestAuthenticator(t *testing.T) {
 				// No mocks needed - token validation will fail
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -232,7 +244,9 @@ func TestAuthenticator(t *testing.T) {
 					Return(nil, &ent.NotFoundError{})
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -271,7 +285,9 @@ func TestAuthenticator(t *testing.T) {
 					Return(nil, &ent.NotFoundError{})
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				service := &svc.Service{
 					AdminUser: mockAdminUser,
 					Role:      mockRole,
@@ -302,7 +318,9 @@ func TestAuthenticator(t *testing.T) {
 				// No mocks needed
 			},
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
-				cfg := &config.Config{SecretKey: secretKey}
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{SecretKey: secretKey},
+				}
 				ctx := context.Background()
 				ctx = context.WithValue(ctx, "config", cfg)
 				// Don't add service to context

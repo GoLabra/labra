@@ -32,6 +32,7 @@ import (
 	"github.com/GoLabra/labra/entgql/generator"
 	adminHandler "github.com/GoLabra/labra/handler"
 	"github.com/GoLabra/labra/hooks"
+	"github.com/GoLabra/labra/secrets"
 	"github.com/GoLabra/labra/subscription"
 	"github.com/GoLabra/labra/utils"
 	"github.com/centrifugal/gocent/v3"
@@ -51,20 +52,40 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+
+	// Load non-sensitive configuration from environment
 	conf, err := config.New()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Failed to load configuration: %v\n", err)
 		os.Exit(1)
 	}
 
+	// Load secrets from Infisical or environment variables
+	log.Println("Loading secrets...")
+	secretsData, err := secrets.LoadSecrets(ctx, conf.Environment)
+	if err != nil {
+		fmt.Printf("Failed to load secrets: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Combine config and secrets into AppConfig
+	appConfig, err := config.NewAppConfig(conf, secretsData)
+	if err != nil {
+		fmt.Printf("Invalid configuration: %v\n", err)
+		os.Exit(1)
+	}
+
+	log.Println("Secrets loaded successfully")
+
 	// Get the actual driver name for sql.Open()
-	driverName, err := getDriverName(conf.DBDialect)
+	driverName, err := getDriverName(appConfig.DBDialect)
 	if err != nil {
 		fmt.Printf("Invalid DB_DIALECT: %v\n", err)
 		os.Exit(1)
 	}
 
-	db, err := sql.Open(driverName, conf.DSN)
+	db, err := sql.Open(driverName, appConfig.DSN)
 
 	if err != nil {
 		fmt.Println(err)
@@ -79,7 +100,7 @@ func main() {
 	}
 
 	// Parse dialect from config for ent
-	entDialect, err := parseDialect(conf.DBDialect)
+	entDialect, err := parseDialect(appConfig.DBDialect)
 	if err != nil {
 		fmt.Printf("Invalid DB_DIALECT: %v\n", err)
 		os.Exit(1)
@@ -106,11 +127,11 @@ func main() {
 	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
 
 	gocentClient := gocent.New(gocent.Config{
-		Addr: conf.CentrifugoApiAddress,
-		Key:  conf.CentrifugoKey,
+		Addr: appConfig.CentrifugoApiAddress,
+		Key:  appConfig.CentrifugoKey,
 	})
 
-	tokenAuth := jwtauth.New("HS256", []byte(conf.SecretKey), nil)
+	tokenAuth := jwtauth.New("HS256", []byte(appConfig.SecretKey), nil)
 
 	// Configure CORS
 	corsMiddleware := cors.New(cors.Options{
@@ -130,7 +151,7 @@ func main() {
 			ctx = context.WithValue(ctx, constants.ServiceContextValue, service)
 			ctx = context.WithValue(ctx, constants.RepositoryContextValue, repository)
 			ctx = context.WithValue(ctx, constants.CentrifugeClientContextValue, gocentClient)
-			ctx = context.WithValue(ctx, "config", conf)
+			ctx = context.WithValue(ctx, "config", appConfig)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	})
@@ -208,11 +229,11 @@ func main() {
 	})
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%s", conf.ServerPort),
+		Addr:    fmt.Sprintf(":%s", appConfig.ServerPort),
 		Handler: router,
 	}
 
-	log.Printf("Server starting on port %s\n", conf.ServerPort)
+	log.Printf("Server starting on port %s\n", appConfig.ServerPort)
 
 	graphqlSubscriptionClient.PublishAppStatusMessage(subscription.AppStatusUp)
 

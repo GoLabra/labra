@@ -13,18 +13,36 @@ const (
 	MinJWTSecretLength = 16
 )
 
+// Config holds non-sensitive application configuration loaded from environment variables.
+// Sensitive credentials (DSN, SecretKey, CentrifugoKey) are managed separately via the secrets package.
 type Config struct {
-	DSN                  string `env:"DSN,required"`
 	DBDialect            string `env:"DB_DIALECT,required"`
 	ServerPort           string `env:"SERVER_PORT"`
 	EntSchemaPath        string `env:"ENT_SCHEMA_PATH"`
-	SecretKey            string `env:"SECRET_KEY,required"`
 	CentrifugoApiAddress string `env:"CENTRIFUGO_API_ADDRESS,required"`
-	CentrifugoKey        string `env:"CENTRIFUGO_API_KEY,required"`
 	FileStorageProvider  string `env:"FILE_STORAGE_PROVIDER"`
 	FileStoragePath      string `env:"FILE_STORAGE_PATH"`
+	// Environment specifies which Infisical environment to fetch secrets from (dev, staging, prod)
+	Environment string `env:"APP_ENVIRONMENT"`
 }
 
+// Secrets holds sensitive credentials fetched from Infisical or environment variables.
+// These values should never be logged or written to disk.
+type Secrets struct {
+	DSN           string
+	SecretKey     string
+	CentrifugoKey string
+}
+
+// AppConfig combines non-sensitive configuration with sensitive secrets.
+// This is the main configuration struct used by the application.
+type AppConfig struct {
+	Config
+	Secrets
+}
+
+// New loads non-sensitive configuration from environment variables.
+// Use NewWithSecrets to get a complete AppConfig with secrets loaded.
 func New() (*Config, error) {
 	godotenv.Load()
 
@@ -48,11 +66,39 @@ func New() (*Config, error) {
 	if cfg.FileStoragePath == "" {
 		cfg.FileStoragePath = "./storage"
 	}
-
-	// Validate JWT secret length
-	if len(cfg.SecretKey) < MinJWTSecretLength {
-		return nil, fmt.Errorf("SECRET_KEY must be at least %d characters long for security", MinJWTSecretLength)
+	if cfg.Environment == "" {
+		cfg.Environment = "dev"
 	}
 
 	return cfg, nil
+}
+
+// ValidateSecrets validates that secrets meet security requirements.
+func ValidateSecrets(s *Secrets) error {
+	if s.DSN == "" {
+		return fmt.Errorf("DSN is required")
+	}
+	if s.SecretKey == "" {
+		return fmt.Errorf("SECRET_KEY is required")
+	}
+	if len(s.SecretKey) < MinJWTSecretLength {
+		return fmt.Errorf("SECRET_KEY must be at least %d characters long for security", MinJWTSecretLength)
+	}
+	if s.CentrifugoKey == "" {
+		return fmt.Errorf("CENTRIFUGO_API_KEY is required")
+	}
+	return nil
+}
+
+// NewAppConfig creates a complete application configuration by combining
+// non-sensitive config with the provided secrets.
+func NewAppConfig(cfg *Config, secrets *Secrets) (*AppConfig, error) {
+	if err := ValidateSecrets(secrets); err != nil {
+		return nil, err
+	}
+
+	return &AppConfig{
+		Config:  *cfg,
+		Secrets: *secrets,
+	}, nil
 }

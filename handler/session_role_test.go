@@ -21,8 +21,10 @@ func TestChangeSessionRole(t *testing.T) {
 		{
 			name: "successful role change",
 			setupContext: func() context.Context {
-				cfg := &config.Config{
-					SecretKey: "test-secret-key-that-is-long-enough-for-validation-minimum-16-chars",
+				cfg := &config.AppConfig{
+					Secrets: config.Secrets{
+						SecretKey: "test-secret-key-that-is-long-enough-for-validation-minimum-16-chars",
+					},
 				}
 				user := CreateTestAdminUser("user-1", "test@example.com", "hashed-password")
 				role := CreateTestRole("role-1", "Admin")
@@ -39,7 +41,7 @@ func TestChangeSessionRole(t *testing.T) {
 		{
 			name: "user not in context",
 			setupContext: func() context.Context {
-				cfg := &config.Config{SecretKey: "test-secret-key-that-is-long-enough"}
+				cfg := &config.AppConfig{Secrets: config.Secrets{SecretKey: "test-secret-key-that-is-long-enough"}}
 				role := CreateTestRole("role-1", "Admin")
 
 				ctx := context.Background()
@@ -53,7 +55,7 @@ func TestChangeSessionRole(t *testing.T) {
 		{
 			name: "role not in context",
 			setupContext: func() context.Context {
-				cfg := &config.Config{SecretKey: "test-secret-key-that-is-long-enough"}
+				cfg := &config.AppConfig{Secrets: config.Secrets{SecretKey: "test-secret-key-that-is-long-enough"}}
 				user := CreateTestAdminUser("user-1", "test@example.com", "hashed-password")
 
 				ctx := context.Background()
