@@ -80,7 +80,7 @@
     "numeral": "^2.0.6",
     "nuqs": "^1.17.6",
     "pluralize": "^8.0.0",
-    "qs": "^6.14.0",
+    "qs": "^6.14.1",
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.3.8",
@@ -120,5 +120,15 @@
     "postcss": "^8",
     "ts-jest": "^29.2.5",
     "typescript": "^5.6.3"
+  },
+  "resolutions": {
+    "brace-expansion": "2.0.2",
+    "js-yaml": "4.1.1",
+    "tmp": "0.2.5"
+  },
+  "overrides": {
+    "brace-expansion": "2.0.2",
+    "js-yaml": "4.1.1",
+    "tmp": "0.2.5"
   }
 }
