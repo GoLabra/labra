@@ -81,6 +81,23 @@ type AdminUserWhereInput struct {
 	PasswordEqualFold    *string  `json:"passwordEqualFold,omitempty"`
 	PasswordContainsFold *string  `json:"passwordContainsFold,omitempty"`
 
+	// "activation_key" field predicates.
+	ActivationKey             *string  `json:"activationKey,omitempty"`
+	ActivationKeyNEQ          *string  `json:"activationKeyNEQ,omitempty"`
+	ActivationKeyIn           []string `json:"activationKeyIn,omitempty"`
+	ActivationKeyNotIn        []string `json:"activationKeyNotIn,omitempty"`
+	ActivationKeyGT           *string  `json:"activationKeyGT,omitempty"`
+	ActivationKeyGTE          *string  `json:"activationKeyGTE,omitempty"`
+	ActivationKeyLT           *string  `json:"activationKeyLT,omitempty"`
+	ActivationKeyLTE          *string  `json:"activationKeyLTE,omitempty"`
+	ActivationKeyContains     *string  `json:"activationKeyContains,omitempty"`
+	ActivationKeyHasPrefix    *string  `json:"activationKeyHasPrefix,omitempty"`
+	ActivationKeyHasSuffix    *string  `json:"activationKeyHasSuffix,omitempty"`
+	ActivationKeyIsNil        bool     `json:"activationKeyIsNil,omitempty"`
+	ActivationKeyNotNil       bool     `json:"activationKeyNotNil,omitempty"`
+	ActivationKeyEqualFold    *string  `json:"activationKeyEqualFold,omitempty"`
+	ActivationKeyContainsFold *string  `json:"activationKeyContainsFold,omitempty"`
+
 	// "first_name" field predicates.
 	FirstName             *string  `json:"firstName,omitempty"`
 	FirstNameNEQ          *string  `json:"firstNameNEQ,omitempty"`
@@ -379,6 +396,51 @@ func (i *AdminUserWhereInput) P() (predicate.AdminUser, error) {
 	}
 	if i.PasswordContainsFold != nil {
 		predicates = append(predicates, adminuser.PasswordContainsFold(*i.PasswordContainsFold))
+	}
+	if i.ActivationKey != nil {
+		predicates = append(predicates, adminuser.ActivationKeyEQ(*i.ActivationKey))
+	}
+	if i.ActivationKeyNEQ != nil {
+		predicates = append(predicates, adminuser.ActivationKeyNEQ(*i.ActivationKeyNEQ))
+	}
+	if len(i.ActivationKeyIn) > 0 {
+		predicates = append(predicates, adminuser.ActivationKeyIn(i.ActivationKeyIn...))
+	}
+	if len(i.ActivationKeyNotIn) > 0 {
+		predicates = append(predicates, adminuser.ActivationKeyNotIn(i.ActivationKeyNotIn...))
+	}
+	if i.ActivationKeyGT != nil {
+		predicates = append(predicates, adminuser.ActivationKeyGT(*i.ActivationKeyGT))
+	}
+	if i.ActivationKeyGTE != nil {
+		predicates = append(predicates, adminuser.ActivationKeyGTE(*i.ActivationKeyGTE))
+	}
+	if i.ActivationKeyLT != nil {
+		predicates = append(predicates, adminuser.ActivationKeyLT(*i.ActivationKeyLT))
+	}
+	if i.ActivationKeyLTE != nil {
+		predicates = append(predicates, adminuser.ActivationKeyLTE(*i.ActivationKeyLTE))
+	}
+	if i.ActivationKeyContains != nil {
+		predicates = append(predicates, adminuser.ActivationKeyContains(*i.ActivationKeyContains))
+	}
+	if i.ActivationKeyHasPrefix != nil {
+		predicates = append(predicates, adminuser.ActivationKeyHasPrefix(*i.ActivationKeyHasPrefix))
+	}
+	if i.ActivationKeyHasSuffix != nil {
+		predicates = append(predicates, adminuser.ActivationKeyHasSuffix(*i.ActivationKeyHasSuffix))
+	}
+	if i.ActivationKeyIsNil {
+		predicates = append(predicates, adminuser.ActivationKeyIsNil())
+	}
+	if i.ActivationKeyNotNil {
+		predicates = append(predicates, adminuser.ActivationKeyNotNil())
+	}
+	if i.ActivationKeyEqualFold != nil {
+		predicates = append(predicates, adminuser.ActivationKeyEqualFold(*i.ActivationKeyEqualFold))
+	}
+	if i.ActivationKeyContainsFold != nil {
+		predicates = append(predicates, adminuser.ActivationKeyContainsFold(*i.ActivationKeyContainsFold))
 	}
 	if i.FirstName != nil {
 		predicates = append(predicates, adminuser.FirstNameEQ(*i.FirstName))
@@ -2000,6 +2062,23 @@ type UserWhereInput struct {
 	PasswordEqualFold    *string  `json:"passwordEqualFold,omitempty"`
 	PasswordContainsFold *string  `json:"passwordContainsFold,omitempty"`
 
+	// "activation_key" field predicates.
+	ActivationKey             *string  `json:"activationKey,omitempty"`
+	ActivationKeyNEQ          *string  `json:"activationKeyNEQ,omitempty"`
+	ActivationKeyIn           []string `json:"activationKeyIn,omitempty"`
+	ActivationKeyNotIn        []string `json:"activationKeyNotIn,omitempty"`
+	ActivationKeyGT           *string  `json:"activationKeyGT,omitempty"`
+	ActivationKeyGTE          *string  `json:"activationKeyGTE,omitempty"`
+	ActivationKeyLT           *string  `json:"activationKeyLT,omitempty"`
+	ActivationKeyLTE          *string  `json:"activationKeyLTE,omitempty"`
+	ActivationKeyContains     *string  `json:"activationKeyContains,omitempty"`
+	ActivationKeyHasPrefix    *string  `json:"activationKeyHasPrefix,omitempty"`
+	ActivationKeyHasSuffix    *string  `json:"activationKeyHasSuffix,omitempty"`
+	ActivationKeyIsNil        bool     `json:"activationKeyIsNil,omitempty"`
+	ActivationKeyNotNil       bool     `json:"activationKeyNotNil,omitempty"`
+	ActivationKeyEqualFold    *string  `json:"activationKeyEqualFold,omitempty"`
+	ActivationKeyContainsFold *string  `json:"activationKeyContainsFold,omitempty"`
+
 	// "created_by" edge predicates.
 	HasCreatedBy     *bool             `json:"hasCreatedBy,omitempty"`
 	HasCreatedByWith []*UserWhereInput `json:"hasCreatedByWith,omitempty"`
@@ -2203,6 +2282,51 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	}
 	if i.PasswordContainsFold != nil {
 		predicates = append(predicates, user.PasswordContainsFold(*i.PasswordContainsFold))
+	}
+	if i.ActivationKey != nil {
+		predicates = append(predicates, user.ActivationKeyEQ(*i.ActivationKey))
+	}
+	if i.ActivationKeyNEQ != nil {
+		predicates = append(predicates, user.ActivationKeyNEQ(*i.ActivationKeyNEQ))
+	}
+	if len(i.ActivationKeyIn) > 0 {
+		predicates = append(predicates, user.ActivationKeyIn(i.ActivationKeyIn...))
+	}
+	if len(i.ActivationKeyNotIn) > 0 {
+		predicates = append(predicates, user.ActivationKeyNotIn(i.ActivationKeyNotIn...))
+	}
+	if i.ActivationKeyGT != nil {
+		predicates = append(predicates, user.ActivationKeyGT(*i.ActivationKeyGT))
+	}
+	if i.ActivationKeyGTE != nil {
+		predicates = append(predicates, user.ActivationKeyGTE(*i.ActivationKeyGTE))
+	}
+	if i.ActivationKeyLT != nil {
+		predicates = append(predicates, user.ActivationKeyLT(*i.ActivationKeyLT))
+	}
+	if i.ActivationKeyLTE != nil {
+		predicates = append(predicates, user.ActivationKeyLTE(*i.ActivationKeyLTE))
+	}
+	if i.ActivationKeyContains != nil {
+		predicates = append(predicates, user.ActivationKeyContains(*i.ActivationKeyContains))
+	}
+	if i.ActivationKeyHasPrefix != nil {
+		predicates = append(predicates, user.ActivationKeyHasPrefix(*i.ActivationKeyHasPrefix))
+	}
+	if i.ActivationKeyHasSuffix != nil {
+		predicates = append(predicates, user.ActivationKeyHasSuffix(*i.ActivationKeyHasSuffix))
+	}
+	if i.ActivationKeyIsNil {
+		predicates = append(predicates, user.ActivationKeyIsNil())
+	}
+	if i.ActivationKeyNotNil {
+		predicates = append(predicates, user.ActivationKeyNotNil())
+	}
+	if i.ActivationKeyEqualFold != nil {
+		predicates = append(predicates, user.ActivationKeyEqualFold(*i.ActivationKeyEqualFold))
+	}
+	if i.ActivationKeyContainsFold != nil {
+		predicates = append(predicates, user.ActivationKeyContainsFold(*i.ActivationKeyContainsFold))
 	}
 
 	if i.HasCreatedBy != nil {

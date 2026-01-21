@@ -23,6 +23,14 @@ type Config struct {
 	CentrifugoKey        string `env:"CENTRIFUGO_API_KEY,required"`
 	FileStorageProvider  string `env:"FILE_STORAGE_PROVIDER"`
 	FileStoragePath      string `env:"FILE_STORAGE_PATH"`
+	DefaultUserRole      string `env:"DEFAULT_USER_ROLE"`
+	DefaultAdminUserRole string `env:"DEFAULT_ADMIN_USER_ROLE"`
+	SMTPHost             string `env:"SMTP_HOST"`
+	SMTPPort             string `env:"SMTP_PORT"`
+	SMTPUsername         string `env:"SMTP_USERNAME"`
+	SMTPPassword         string `env:"SMTP_PASSWORD"`
+	SMTPFromEmail        string `env:"SMTP_FROM_EMAIL"`
+	SMTPFromName         string `env:"SMTP_FROM_NAME"`
 }
 
 func New() (*Config, error) {
@@ -47,6 +55,12 @@ func New() (*Config, error) {
 	}
 	if cfg.FileStoragePath == "" {
 		cfg.FileStoragePath = "./storage"
+	}
+	if cfg.SMTPPort == "" {
+		cfg.SMTPPort = "587"
+	}
+	if cfg.SMTPFromName == "" {
+		cfg.SMTPFromName = "Labra"
 	}
 
 	// Validate JWT secret length

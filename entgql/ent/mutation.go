@@ -44,6 +44,7 @@ type AdminUserMutation struct {
 	name                        *string
 	email                       *string
 	password                    *string
+	activation_key              *string
 	first_name                  *string
 	last_name                   *string
 	created_at                  *time.Time
@@ -292,6 +293,55 @@ func (m *AdminUserMutation) OldPassword(ctx context.Context) (v string, err erro
 // ResetPassword resets all changes to the "password" field.
 func (m *AdminUserMutation) ResetPassword() {
 	m.password = nil
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (m *AdminUserMutation) SetActivationKey(s string) {
+	m.activation_key = &s
+}
+
+// ActivationKey returns the value of the "activation_key" field in the mutation.
+func (m *AdminUserMutation) ActivationKey() (r string, exists bool) {
+	v := m.activation_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActivationKey returns the old "activation_key" field's value of the AdminUser entity.
+// If the AdminUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminUserMutation) OldActivationKey(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActivationKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActivationKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActivationKey: %w", err)
+	}
+	return oldValue.ActivationKey, nil
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (m *AdminUserMutation) ClearActivationKey() {
+	m.activation_key = nil
+	m.clearedFields[adminuser.FieldActivationKey] = struct{}{}
+}
+
+// ActivationKeyCleared returns if the "activation_key" field was cleared in this mutation.
+func (m *AdminUserMutation) ActivationKeyCleared() bool {
+	_, ok := m.clearedFields[adminuser.FieldActivationKey]
+	return ok
+}
+
+// ResetActivationKey resets all changes to the "activation_key" field.
+func (m *AdminUserMutation) ResetActivationKey() {
+	m.activation_key = nil
+	delete(m.clearedFields, adminuser.FieldActivationKey)
 }
 
 // SetFirstName sets the "first_name" field.
@@ -777,7 +827,7 @@ func (m *AdminUserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminUserMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, adminuser.FieldName)
 	}
@@ -786,6 +836,9 @@ func (m *AdminUserMutation) Fields() []string {
 	}
 	if m.password != nil {
 		fields = append(fields, adminuser.FieldPassword)
+	}
+	if m.activation_key != nil {
+		fields = append(fields, adminuser.FieldActivationKey)
 	}
 	if m.first_name != nil {
 		fields = append(fields, adminuser.FieldFirstName)
@@ -813,6 +866,8 @@ func (m *AdminUserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case adminuser.FieldPassword:
 		return m.Password()
+	case adminuser.FieldActivationKey:
+		return m.ActivationKey()
 	case adminuser.FieldFirstName:
 		return m.FirstName()
 	case adminuser.FieldLastName:
@@ -836,6 +891,8 @@ func (m *AdminUserMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldEmail(ctx)
 	case adminuser.FieldPassword:
 		return m.OldPassword(ctx)
+	case adminuser.FieldActivationKey:
+		return m.OldActivationKey(ctx)
 	case adminuser.FieldFirstName:
 		return m.OldFirstName(ctx)
 	case adminuser.FieldLastName:
@@ -873,6 +930,13 @@ func (m *AdminUserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPassword(v)
+		return nil
+	case adminuser.FieldActivationKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActivationKey(v)
 		return nil
 	case adminuser.FieldFirstName:
 		v, ok := value.(string)
@@ -935,6 +999,9 @@ func (m *AdminUserMutation) ClearedFields() []string {
 	if m.FieldCleared(adminuser.FieldName) {
 		fields = append(fields, adminuser.FieldName)
 	}
+	if m.FieldCleared(adminuser.FieldActivationKey) {
+		fields = append(fields, adminuser.FieldActivationKey)
+	}
 	if m.FieldCleared(adminuser.FieldCreatedAt) {
 		fields = append(fields, adminuser.FieldCreatedAt)
 	}
@@ -958,6 +1025,9 @@ func (m *AdminUserMutation) ClearField(name string) error {
 	case adminuser.FieldName:
 		m.ClearName()
 		return nil
+	case adminuser.FieldActivationKey:
+		m.ClearActivationKey()
+		return nil
 	case adminuser.FieldCreatedAt:
 		m.ClearCreatedAt()
 		return nil
@@ -980,6 +1050,9 @@ func (m *AdminUserMutation) ResetField(name string) error {
 		return nil
 	case adminuser.FieldPassword:
 		m.ResetPassword()
+		return nil
+	case adminuser.FieldActivationKey:
+		m.ResetActivationKey()
 		return nil
 	case adminuser.FieldFirstName:
 		m.ResetFirstName()
@@ -3769,6 +3842,7 @@ type UserMutation struct {
 	id                      *string
 	email                   *string
 	password                *string
+	activation_key          *string
 	clearedFields           map[string]struct{}
 	ref_created_by          map[string]struct{}
 	removedref_created_by   map[string]struct{}
@@ -3968,6 +4042,55 @@ func (m *UserMutation) OldPassword(ctx context.Context) (v string, err error) {
 // ResetPassword resets all changes to the "password" field.
 func (m *UserMutation) ResetPassword() {
 	m.password = nil
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (m *UserMutation) SetActivationKey(s string) {
+	m.activation_key = &s
+}
+
+// ActivationKey returns the value of the "activation_key" field in the mutation.
+func (m *UserMutation) ActivationKey() (r string, exists bool) {
+	v := m.activation_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActivationKey returns the old "activation_key" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldActivationKey(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActivationKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActivationKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActivationKey: %w", err)
+	}
+	return oldValue.ActivationKey, nil
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (m *UserMutation) ClearActivationKey() {
+	m.activation_key = nil
+	m.clearedFields[user.FieldActivationKey] = struct{}{}
+}
+
+// ActivationKeyCleared returns if the "activation_key" field was cleared in this mutation.
+func (m *UserMutation) ActivationKeyCleared() bool {
+	_, ok := m.clearedFields[user.FieldActivationKey]
+	return ok
+}
+
+// ResetActivationKey resets all changes to the "activation_key" field.
+func (m *UserMutation) ResetActivationKey() {
+	m.activation_key = nil
+	delete(m.clearedFields, user.FieldActivationKey)
 }
 
 // AddRefCreatedByIDs adds the "ref_created_by" edge to the User entity by ids.
@@ -4361,12 +4484,15 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
 	}
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
+	}
+	if m.activation_key != nil {
+		fields = append(fields, user.FieldActivationKey)
 	}
 	return fields
 }
@@ -4380,6 +4506,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldPassword:
 		return m.Password()
+	case user.FieldActivationKey:
+		return m.ActivationKey()
 	}
 	return nil, false
 }
@@ -4393,6 +4521,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldPassword:
 		return m.OldPassword(ctx)
+	case user.FieldActivationKey:
+		return m.OldActivationKey(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -4415,6 +4545,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPassword(v)
+		return nil
+	case user.FieldActivationKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActivationKey(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -4445,7 +4582,11 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldActivationKey) {
+		fields = append(fields, user.FieldActivationKey)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -4458,6 +4599,11 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldActivationKey:
+		m.ClearActivationKey()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -4470,6 +4616,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldPassword:
 		m.ResetPassword()
+		return nil
+	case user.FieldActivationKey:
+		m.ResetActivationKey()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

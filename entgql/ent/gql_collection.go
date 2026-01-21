@@ -109,6 +109,11 @@ func (au *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx 
 				selectedFields = append(selectedFields, adminuser.FieldPassword)
 				fieldSeen[adminuser.FieldPassword] = struct{}{}
 			}
+		case "activationKey":
+			if _, ok := fieldSeen[adminuser.FieldActivationKey]; !ok {
+				selectedFields = append(selectedFields, adminuser.FieldActivationKey)
+				fieldSeen[adminuser.FieldActivationKey] = struct{}{}
+			}
 		case "firstName":
 			if _, ok := fieldSeen[adminuser.FieldFirstName]; !ok {
 				selectedFields = append(selectedFields, adminuser.FieldFirstName)
@@ -774,6 +779,11 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			if _, ok := fieldSeen[user.FieldPassword]; !ok {
 				selectedFields = append(selectedFields, user.FieldPassword)
 				fieldSeen[user.FieldPassword] = struct{}{}
+			}
+		case "activationKey":
+			if _, ok := fieldSeen[user.FieldActivationKey]; !ok {
+				selectedFields = append(selectedFields, user.FieldActivationKey)
+				fieldSeen[user.FieldActivationKey] = struct{}{}
 			}
 		case "id":
 		case "__typename":

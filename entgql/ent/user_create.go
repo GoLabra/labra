@@ -36,6 +36,20 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	return uc
 }
 
+// SetActivationKey sets the "activation_key" field.
+func (uc *UserCreate) SetActivationKey(s string) *UserCreate {
+	uc.mutation.SetActivationKey(s)
+	return uc
+}
+
+// SetNillableActivationKey sets the "activation_key" field if the given value is not nil.
+func (uc *UserCreate) SetNillableActivationKey(s *string) *UserCreate {
+	if s != nil {
+		uc.SetActivationKey(*s)
+	}
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(s string) *UserCreate {
 	uc.mutation.SetID(s)
@@ -293,6 +307,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
 	}
+	if value, ok := uc.mutation.ActivationKey(); ok {
+		_spec.SetField(user.FieldActivationKey, field.TypeString, value)
+		_node.ActivationKey = &value
+	}
 	if nodes := uc.mutation.RefCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -502,6 +520,24 @@ func (u *UserUpsert) UpdatePassword() *UserUpsert {
 	return u
 }
 
+// SetActivationKey sets the "activation_key" field.
+func (u *UserUpsert) SetActivationKey(v string) *UserUpsert {
+	u.Set(user.FieldActivationKey, v)
+	return u
+}
+
+// UpdateActivationKey sets the "activation_key" field to the value that was provided on create.
+func (u *UserUpsert) UpdateActivationKey() *UserUpsert {
+	u.SetExcluded(user.FieldActivationKey)
+	return u
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (u *UserUpsert) ClearActivationKey() *UserUpsert {
+	u.SetNull(user.FieldActivationKey)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -575,6 +611,27 @@ func (u *UserUpsertOne) SetPassword(v string) *UserUpsertOne {
 func (u *UserUpsertOne) UpdatePassword() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdatePassword()
+	})
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (u *UserUpsertOne) SetActivationKey(v string) *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.SetActivationKey(v)
+	})
+}
+
+// UpdateActivationKey sets the "activation_key" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateActivationKey() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateActivationKey()
+	})
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (u *UserUpsertOne) ClearActivationKey() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.ClearActivationKey()
 	})
 }
 
@@ -818,6 +875,27 @@ func (u *UserUpsertBulk) SetPassword(v string) *UserUpsertBulk {
 func (u *UserUpsertBulk) UpdatePassword() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdatePassword()
+	})
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (u *UserUpsertBulk) SetActivationKey(v string) *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.SetActivationKey(v)
+	})
+}
+
+// UpdateActivationKey sets the "activation_key" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateActivationKey() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateActivationKey()
+	})
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (u *UserUpsertBulk) ClearActivationKey() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.ClearActivationKey()
 	})
 }
 

@@ -62,6 +62,17 @@ func (User) Fields() []ent.Field {
 					Private: true,
 				},
 			),
+
+		field.String("activation_key").
+			Optional().
+			Nillable().
+			Annotations(
+				annotations.Field{
+					Caption: "Activation Key",
+					Type:    entity.FieldTypeShortText,
+					Private: true,
+				},
+			),
 	}
 }
 

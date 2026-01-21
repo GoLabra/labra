@@ -28,4 +28,5 @@ type User interface {
 	DeleteTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniqueInput) (*ent.User, error)
 	DeleteMany(ctx context.Context, where ent.UserWhereInput) (int, error)
 	DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereInput) (int, error)
+	HasActiveUserWithRole(ctx context.Context, roleName string) (bool, error)
 }

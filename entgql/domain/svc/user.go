@@ -46,9 +46,7 @@ func (s *User) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateUserInpu
 }
 
 func (s *User) Create(ctx context.Context, data ent.CreateUserInput) (*ent.User, error) {
-
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
-
 	if err != nil {
 		return nil, fmt.Errorf("error hashing password: %w", err)
 	}
@@ -116,4 +114,28 @@ func (s *User) DeleteMany(ctx context.Context, where ent.UserWhereInput) (int, e
 
 func (s *User) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereInput) (int, error) {
 	return s.repository.User.DeleteManyTx(ctx, tx, where)
+}
+
+// HasActiveUserWithRole checks if there is at least one active user with the specified role in the system.
+// Returns true if a user with the role exists, false otherwise.
+func (s *User) HasActiveUserWithRole(ctx context.Context, roleName string) (bool, error) {
+	if roleName == "" {
+		return false, fmt.Errorf("role name cannot be empty")
+	}
+
+	where := &ent.UserWhereInput{
+		HasRolesWith: []*ent.RoleWhereInput{
+			{
+				Name: &roleName,
+			},
+		},
+	}
+
+	limit := 1
+	users, err := s.Get(ctx, where, nil, nil, &limit, nil)
+	if err != nil {
+		return false, fmt.Errorf("error checking for users with role %s: %w", roleName, err)
+	}
+
+	return len(users) > 0, nil
 }

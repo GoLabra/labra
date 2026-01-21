@@ -73,6 +73,11 @@ func Password(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPassword, v))
 }
 
+// ActivationKey applies equality check predicate on the "activation_key" field. It's identical to ActivationKeyEQ.
+func ActivationKey(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldActivationKey, v))
+}
+
 // EmailEQ applies the EQ predicate on the "email" field.
 func EmailEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldEmail, v))
@@ -201,6 +206,81 @@ func PasswordEqualFold(v string) predicate.User {
 // PasswordContainsFold applies the ContainsFold predicate on the "password" field.
 func PasswordContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPassword, v))
+}
+
+// ActivationKeyEQ applies the EQ predicate on the "activation_key" field.
+func ActivationKeyEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldActivationKey, v))
+}
+
+// ActivationKeyNEQ applies the NEQ predicate on the "activation_key" field.
+func ActivationKeyNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldActivationKey, v))
+}
+
+// ActivationKeyIn applies the In predicate on the "activation_key" field.
+func ActivationKeyIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldActivationKey, vs...))
+}
+
+// ActivationKeyNotIn applies the NotIn predicate on the "activation_key" field.
+func ActivationKeyNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldActivationKey, vs...))
+}
+
+// ActivationKeyGT applies the GT predicate on the "activation_key" field.
+func ActivationKeyGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldActivationKey, v))
+}
+
+// ActivationKeyGTE applies the GTE predicate on the "activation_key" field.
+func ActivationKeyGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldActivationKey, v))
+}
+
+// ActivationKeyLT applies the LT predicate on the "activation_key" field.
+func ActivationKeyLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldActivationKey, v))
+}
+
+// ActivationKeyLTE applies the LTE predicate on the "activation_key" field.
+func ActivationKeyLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldActivationKey, v))
+}
+
+// ActivationKeyContains applies the Contains predicate on the "activation_key" field.
+func ActivationKeyContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldActivationKey, v))
+}
+
+// ActivationKeyHasPrefix applies the HasPrefix predicate on the "activation_key" field.
+func ActivationKeyHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldActivationKey, v))
+}
+
+// ActivationKeyHasSuffix applies the HasSuffix predicate on the "activation_key" field.
+func ActivationKeyHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldActivationKey, v))
+}
+
+// ActivationKeyIsNil applies the IsNil predicate on the "activation_key" field.
+func ActivationKeyIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldActivationKey))
+}
+
+// ActivationKeyNotNil applies the NotNil predicate on the "activation_key" field.
+func ActivationKeyNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldActivationKey))
+}
+
+// ActivationKeyEqualFold applies the EqualFold predicate on the "activation_key" field.
+func ActivationKeyEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldActivationKey, v))
+}
+
+// ActivationKeyContainsFold applies the ContainsFold predicate on the "activation_key" field.
+func ActivationKeyContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldActivationKey, v))
 }
 
 // HasRefCreatedBy applies the HasEdge predicate on the "ref_created_by" edge.

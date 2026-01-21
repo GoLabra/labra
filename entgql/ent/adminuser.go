@@ -24,6 +24,8 @@ type AdminUser struct {
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
+	// ActivationKey holds the value of the "activation_key" field.
+	ActivationKey *string `json:"activation_key,omitempty"`
 	// FirstName holds the value of the "first_name" field.
 	FirstName string `json:"first_name,omitempty"`
 	// LastName holds the value of the "last_name" field.
@@ -131,7 +133,7 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case adminuser.FieldID, adminuser.FieldName, adminuser.FieldEmail, adminuser.FieldPassword, adminuser.FieldFirstName, adminuser.FieldLastName:
+		case adminuser.FieldID, adminuser.FieldName, adminuser.FieldEmail, adminuser.FieldPassword, adminuser.FieldActivationKey, adminuser.FieldFirstName, adminuser.FieldLastName:
 			values[i] = new(sql.NullString)
 		case adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -179,6 +181,13 @@ func (au *AdminUser) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				au.Password = value.String
+			}
+		case adminuser.FieldActivationKey:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field activation_key", values[i])
+			} else if value.Valid {
+				au.ActivationKey = new(string)
+				*au.ActivationKey = value.String
 			}
 		case adminuser.FieldFirstName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -301,6 +310,11 @@ func (au *AdminUser) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(au.Password)
+	builder.WriteString(", ")
+	if v := au.ActivationKey; v != nil {
+		builder.WriteString("activation_key=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("first_name=")
 	builder.WriteString(au.FirstName)

@@ -75,6 +75,17 @@ func (AdminUser) Fields() []ent.Field {
 				},
 			),
 
+		field.String("activation_key").
+			Optional().
+			Nillable().
+			Annotations(
+				annotations.Field{
+					Caption: "Activation Key",
+					Type:    entity.FieldTypeShortText,
+					Private: true,
+				},
+			),
+
 		field.String("first_name").
 			NotEmpty().
 			Annotations(

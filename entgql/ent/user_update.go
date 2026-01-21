@@ -57,6 +57,26 @@ func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
 	return uu
 }
 
+// SetActivationKey sets the "activation_key" field.
+func (uu *UserUpdate) SetActivationKey(s string) *UserUpdate {
+	uu.mutation.SetActivationKey(s)
+	return uu
+}
+
+// SetNillableActivationKey sets the "activation_key" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableActivationKey(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetActivationKey(*s)
+	}
+	return uu
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (uu *UserUpdate) ClearActivationKey() *UserUpdate {
+	uu.mutation.ClearActivationKey()
+	return uu
+}
+
 // AddRefCreatedByIDs adds the "ref_created_by" edge to the User entity by IDs.
 func (uu *UserUpdate) AddRefCreatedByIDs(ids ...string) *UserUpdate {
 	uu.mutation.AddRefCreatedByIDs(ids...)
@@ -354,6 +374,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.ActivationKey(); ok {
+		_spec.SetField(user.FieldActivationKey, field.TypeString, value)
+	}
+	if uu.mutation.ActivationKeyCleared() {
+		_spec.ClearField(user.FieldActivationKey, field.TypeString)
 	}
 	if uu.mutation.RefCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -680,6 +706,26 @@ func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
 	if s != nil {
 		uuo.SetPassword(*s)
 	}
+	return uuo
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (uuo *UserUpdateOne) SetActivationKey(s string) *UserUpdateOne {
+	uuo.mutation.SetActivationKey(s)
+	return uuo
+}
+
+// SetNillableActivationKey sets the "activation_key" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableActivationKey(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetActivationKey(*s)
+	}
+	return uuo
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (uuo *UserUpdateOne) ClearActivationKey() *UserUpdateOne {
+	uuo.mutation.ClearActivationKey()
 	return uuo
 }
 
@@ -1010,6 +1056,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.ActivationKey(); ok {
+		_spec.SetField(user.FieldActivationKey, field.TypeString, value)
+	}
+	if uuo.mutation.ActivationKeyCleared() {
+		_spec.ClearField(user.FieldActivationKey, field.TypeString)
 	}
 	if uuo.mutation.RefCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{

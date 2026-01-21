@@ -22,6 +22,8 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
+	// ActivationKey holds the value of the "activation_key" field.
+	ActivationKey *string `json:"activation_key,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges                 UserEdges `json:"edges"`
@@ -149,7 +151,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldEmail, user.FieldPassword:
+		case user.FieldID, user.FieldEmail, user.FieldPassword, user.FieldActivationKey:
 			values[i] = new(sql.NullString)
 		case user.ForeignKeys[0]: // user_created_by
 			values[i] = new(sql.NullString)
@@ -193,6 +195,13 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				u.Password = value.String
+			}
+		case user.FieldActivationKey:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field activation_key", values[i])
+			} else if value.Valid {
+				u.ActivationKey = new(string)
+				*u.ActivationKey = value.String
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -310,6 +319,11 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(u.Password)
+	builder.WriteString(", ")
+	if v := u.ActivationKey; v != nil {
+		builder.WriteString("activation_key=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -28,19 +28,19 @@ func init() {
 	// adminuser.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	adminuser.PasswordValidator = adminuserDescPassword.Validators[0].(func(string) error)
 	// adminuserDescFirstName is the schema descriptor for first_name field.
-	adminuserDescFirstName := adminuserFields[4].Descriptor()
+	adminuserDescFirstName := adminuserFields[5].Descriptor()
 	// adminuser.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
 	adminuser.FirstNameValidator = adminuserDescFirstName.Validators[0].(func(string) error)
 	// adminuserDescLastName is the schema descriptor for last_name field.
-	adminuserDescLastName := adminuserFields[5].Descriptor()
+	adminuserDescLastName := adminuserFields[6].Descriptor()
 	// adminuser.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	adminuser.LastNameValidator = adminuserDescLastName.Validators[0].(func(string) error)
 	// adminuserDescCreatedAt is the schema descriptor for created_at field.
-	adminuserDescCreatedAt := adminuserFields[6].Descriptor()
+	adminuserDescCreatedAt := adminuserFields[7].Descriptor()
 	// adminuser.DefaultCreatedAt holds the default value on creation for the created_at field.
 	adminuser.DefaultCreatedAt = adminuserDescCreatedAt.Default.(func() time.Time)
 	// adminuserDescUpdatedAt is the schema descriptor for updated_at field.
-	adminuserDescUpdatedAt := adminuserFields[7].Descriptor()
+	adminuserDescUpdatedAt := adminuserFields[8].Descriptor()
 	// adminuser.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	adminuser.DefaultUpdatedAt = adminuserDescUpdatedAt.Default.(func() time.Time)
 	// adminuser.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

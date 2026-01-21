@@ -77,6 +77,26 @@ func (auu *AdminUserUpdate) SetNillablePassword(s *string) *AdminUserUpdate {
 	return auu
 }
 
+// SetActivationKey sets the "activation_key" field.
+func (auu *AdminUserUpdate) SetActivationKey(s string) *AdminUserUpdate {
+	auu.mutation.SetActivationKey(s)
+	return auu
+}
+
+// SetNillableActivationKey sets the "activation_key" field if the given value is not nil.
+func (auu *AdminUserUpdate) SetNillableActivationKey(s *string) *AdminUserUpdate {
+	if s != nil {
+		auu.SetActivationKey(*s)
+	}
+	return auu
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (auu *AdminUserUpdate) ClearActivationKey() *AdminUserUpdate {
+	auu.mutation.ClearActivationKey()
+	return auu
+}
+
 // SetFirstName sets the "first_name" field.
 func (auu *AdminUserUpdate) SetFirstName(s string) *AdminUserUpdate {
 	auu.mutation.SetFirstName(s)
@@ -390,6 +410,12 @@ func (auu *AdminUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := auu.mutation.Password(); ok {
 		_spec.SetField(adminuser.FieldPassword, field.TypeString, value)
 	}
+	if value, ok := auu.mutation.ActivationKey(); ok {
+		_spec.SetField(adminuser.FieldActivationKey, field.TypeString, value)
+	}
+	if auu.mutation.ActivationKeyCleared() {
+		_spec.ClearField(adminuser.FieldActivationKey, field.TypeString)
+	}
 	if value, ok := auu.mutation.FirstName(); ok {
 		_spec.SetField(adminuser.FieldFirstName, field.TypeString, value)
 	}
@@ -692,6 +718,26 @@ func (auuo *AdminUserUpdateOne) SetNillablePassword(s *string) *AdminUserUpdateO
 	if s != nil {
 		auuo.SetPassword(*s)
 	}
+	return auuo
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (auuo *AdminUserUpdateOne) SetActivationKey(s string) *AdminUserUpdateOne {
+	auuo.mutation.SetActivationKey(s)
+	return auuo
+}
+
+// SetNillableActivationKey sets the "activation_key" field if the given value is not nil.
+func (auuo *AdminUserUpdateOne) SetNillableActivationKey(s *string) *AdminUserUpdateOne {
+	if s != nil {
+		auuo.SetActivationKey(*s)
+	}
+	return auuo
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (auuo *AdminUserUpdateOne) ClearActivationKey() *AdminUserUpdateOne {
+	auuo.mutation.ClearActivationKey()
 	return auuo
 }
 
@@ -1037,6 +1083,12 @@ func (auuo *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, 
 	}
 	if value, ok := auuo.mutation.Password(); ok {
 		_spec.SetField(adminuser.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := auuo.mutation.ActivationKey(); ok {
+		_spec.SetField(adminuser.FieldActivationKey, field.TypeString, value)
+	}
+	if auuo.mutation.ActivationKeyCleared() {
+		_spec.ClearField(adminuser.FieldActivationKey, field.TypeString)
 	}
 	if value, ok := auuo.mutation.FirstName(); ok {
 		_spec.SetField(adminuser.FieldFirstName, field.TypeString, value)

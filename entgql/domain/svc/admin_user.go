@@ -46,7 +46,6 @@ func (s *AdminUser) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateAdm
 }
 
 func (s *AdminUser) Create(ctx context.Context, data ent.CreateAdminUserInput) (*ent.AdminUser, error) {
-
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
 
 	if err != nil {
@@ -116,4 +115,28 @@ func (s *AdminUser) DeleteMany(ctx context.Context, where ent.AdminUserWhereInpu
 
 func (s *AdminUser) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereInput) (int, error) {
 	return s.repository.AdminUser.DeleteManyTx(ctx, tx, where)
+}
+
+// HasActiveAdminUserWithRole checks if there is at least one active admin user with the specified role in the system.
+// Returns true if an admin user with the role exists, false otherwise.
+func (s *AdminUser) HasActiveAdminUserWithRole(ctx context.Context, roleName string) (bool, error) {
+	if roleName == "" {
+		return false, fmt.Errorf("role name cannot be empty")
+	}
+
+	where := &ent.AdminUserWhereInput{
+		HasRolesWith: []*ent.RoleWhereInput{
+			{
+				Name: &roleName,
+			},
+		},
+	}
+
+	limit := 1
+	adminUsers, err := s.Get(ctx, where, nil, nil, &limit, nil)
+	if err != nil {
+		return false, fmt.Errorf("error checking for admin users with role %s: %w", roleName, err)
+	}
+
+	return len(adminUsers) > 0, nil
 }

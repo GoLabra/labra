@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
@@ -19,13 +20,11 @@ type SignupFormData struct {
 	LastName  string `json:"lastName"`
 }
 
-var superAdmin = "SuperAdmin"
-
 // TODO: 1. sanitize error messages; 2. move to api; 3. add logs;
 func Signup(w http.ResponseWriter, r *http.Request) {
 	var (
 		signupFormData SignupFormData
-		superAdminRole *ent.Role
+		defaultRole    *ent.Role
 	)
 
 	body, err := io.ReadAll(r.Body)
@@ -49,20 +48,33 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	cfg, ok := r.Context().Value("config").(*config.Config)
+	if !ok {
+		fmt.Printf("error getting config")
+		writeErrorResponse(w, "unable to get config", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the default admin user role from config, default to "SuperAdmin" if not set
+	roleName := cfg.DefaultAdminUserRole
+	if roleName == "" {
+		roleName = "SuperAdmin"
+	}
+
 	// Use internal context for role lookup (bypasses permission checks)
 	iCtx := context.WithValue(r.Context(), constants.IsInternalOperationContextValue, true)
-	superAdminRole, err = service.Role.GetOne(iCtx, ent.RoleWhereUniqueInput{Name: &superAdmin})
+	defaultRole, err = service.Role.GetOne(iCtx, ent.RoleWhereUniqueInput{Name: &roleName})
 	if err != nil && !ent.IsNotFound(err) {
-		fmt.Printf("error getting super admin role: %v", err)
-		writeErrorResponse(w, "unable to get super admin role", http.StatusInternalServerError)
+		fmt.Printf("error getting default admin role: %v", err)
+		writeErrorResponse(w, fmt.Sprintf("unable to get default admin role: %s", roleName), http.StatusInternalServerError)
 		return
 	} else if err != nil && ent.IsNotFound(err) {
-		superAdminRole, err = service.Role.Create(iCtx, ent.CreateRoleInput{
-			Name: superAdmin,
+		defaultRole, err = service.Role.Create(iCtx, ent.CreateRoleInput{
+			Name: roleName,
 		})
 		if err != nil {
-			fmt.Printf("error creating super admin role: %v", err)
-			writeErrorResponse(w, "unable to create super admin role", http.StatusInternalServerError)
+			fmt.Printf("error creating default admin role: %v", err)
+			writeErrorResponse(w, fmt.Sprintf("unable to create default admin role: %s", roleName), http.StatusInternalServerError)
 			return
 		}
 	}
@@ -75,13 +87,13 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		Roles: &ent.CreateManyRoleInput{
 			Connect: []*ent.RoleWhereUniqueInput{
 				{
-					ID: &superAdminRole.ID,
+					ID: &defaultRole.ID,
 				},
 			},
 		},
 		DefaultRole: &ent.CreateOneRoleInput{
 			Connect: &ent.RoleWhereUniqueInput{
-				ID: &superAdminRole.ID,
+				ID: &defaultRole.ID,
 			},
 		},
 	})

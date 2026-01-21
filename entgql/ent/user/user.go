@@ -16,6 +16,8 @@ const (
 	FieldEmail = "email"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
+	// FieldActivationKey holds the string denoting the activation_key field in the database.
+	FieldActivationKey = "activation_key"
 	// EdgeRefCreatedBy holds the string denoting the ref_created_by edge name in mutations.
 	EdgeRefCreatedBy = "ref_created_by"
 	// EdgeCreatedBy holds the string denoting the created_by edge name in mutations.
@@ -83,6 +85,7 @@ var Columns = []string{
 	FieldID,
 	FieldEmail,
 	FieldPassword,
+	FieldActivationKey,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"
@@ -141,6 +144,11 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByPassword orders the results by the password field.
 func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
+}
+
+// ByActivationKey orders the results by the activation_key field.
+func ByActivationKey(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActivationKey, opts...).ToFunc()
 }
 
 // ByRefCreatedByCount orders the results by ref_created_by count.

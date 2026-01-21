@@ -50,6 +50,20 @@ func (auc *AdminUserCreate) SetPassword(s string) *AdminUserCreate {
 	return auc
 }
 
+// SetActivationKey sets the "activation_key" field.
+func (auc *AdminUserCreate) SetActivationKey(s string) *AdminUserCreate {
+	auc.mutation.SetActivationKey(s)
+	return auc
+}
+
+// SetNillableActivationKey sets the "activation_key" field if the given value is not nil.
+func (auc *AdminUserCreate) SetNillableActivationKey(s *string) *AdminUserCreate {
+	if s != nil {
+		auc.SetActivationKey(*s)
+	}
+	return auc
+}
+
 // SetFirstName sets the "first_name" field.
 func (auc *AdminUserCreate) SetFirstName(s string) *AdminUserCreate {
 	auc.mutation.SetFirstName(s)
@@ -337,6 +351,10 @@ func (auc *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 		_spec.SetField(adminuser.FieldPassword, field.TypeString, value)
 		_node.Password = value
 	}
+	if value, ok := auc.mutation.ActivationKey(); ok {
+		_spec.SetField(adminuser.FieldActivationKey, field.TypeString, value)
+		_node.ActivationKey = &value
+	}
 	if value, ok := auc.mutation.FirstName(); ok {
 		_spec.SetField(adminuser.FieldFirstName, field.TypeString, value)
 		_node.FirstName = value
@@ -546,6 +564,24 @@ func (u *AdminUserUpsert) UpdatePassword() *AdminUserUpsert {
 	return u
 }
 
+// SetActivationKey sets the "activation_key" field.
+func (u *AdminUserUpsert) SetActivationKey(v string) *AdminUserUpsert {
+	u.Set(adminuser.FieldActivationKey, v)
+	return u
+}
+
+// UpdateActivationKey sets the "activation_key" field to the value that was provided on create.
+func (u *AdminUserUpsert) UpdateActivationKey() *AdminUserUpsert {
+	u.SetExcluded(adminuser.FieldActivationKey)
+	return u
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (u *AdminUserUpsert) ClearActivationKey() *AdminUserUpsert {
+	u.SetNull(adminuser.FieldActivationKey)
+	return u
+}
+
 // SetFirstName sets the "first_name" field.
 func (u *AdminUserUpsert) SetFirstName(v string) *AdminUserUpsert {
 	u.Set(adminuser.FieldFirstName, v)
@@ -685,6 +721,27 @@ func (u *AdminUserUpsertOne) SetPassword(v string) *AdminUserUpsertOne {
 func (u *AdminUserUpsertOne) UpdatePassword() *AdminUserUpsertOne {
 	return u.Update(func(s *AdminUserUpsert) {
 		s.UpdatePassword()
+	})
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (u *AdminUserUpsertOne) SetActivationKey(v string) *AdminUserUpsertOne {
+	return u.Update(func(s *AdminUserUpsert) {
+		s.SetActivationKey(v)
+	})
+}
+
+// UpdateActivationKey sets the "activation_key" field to the value that was provided on create.
+func (u *AdminUserUpsertOne) UpdateActivationKey() *AdminUserUpsertOne {
+	return u.Update(func(s *AdminUserUpsert) {
+		s.UpdateActivationKey()
+	})
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (u *AdminUserUpsertOne) ClearActivationKey() *AdminUserUpsertOne {
+	return u.Update(func(s *AdminUserUpsert) {
+		s.ClearActivationKey()
 	})
 }
 
@@ -1001,6 +1058,27 @@ func (u *AdminUserUpsertBulk) SetPassword(v string) *AdminUserUpsertBulk {
 func (u *AdminUserUpsertBulk) UpdatePassword() *AdminUserUpsertBulk {
 	return u.Update(func(s *AdminUserUpsert) {
 		s.UpdatePassword()
+	})
+}
+
+// SetActivationKey sets the "activation_key" field.
+func (u *AdminUserUpsertBulk) SetActivationKey(v string) *AdminUserUpsertBulk {
+	return u.Update(func(s *AdminUserUpsert) {
+		s.SetActivationKey(v)
+	})
+}
+
+// UpdateActivationKey sets the "activation_key" field to the value that was provided on create.
+func (u *AdminUserUpsertBulk) UpdateActivationKey() *AdminUserUpsertBulk {
+	return u.Update(func(s *AdminUserUpsert) {
+		s.UpdateActivationKey()
+	})
+}
+
+// ClearActivationKey clears the value of the "activation_key" field.
+func (u *AdminUserUpsertBulk) ClearActivationKey() *AdminUserUpsertBulk {
+	return u.Update(func(s *AdminUserUpsert) {
+		s.ClearActivationKey()
 	})
 }
 

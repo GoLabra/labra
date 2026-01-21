@@ -20,6 +20,8 @@ const (
 	FieldEmail = "email"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
+	// FieldActivationKey holds the string denoting the activation_key field in the database.
+	FieldActivationKey = "activation_key"
 	// FieldFirstName holds the string denoting the first_name field in the database.
 	FieldFirstName = "first_name"
 	// FieldLastName holds the string denoting the last_name field in the database.
@@ -78,6 +80,7 @@ var Columns = []string{
 	FieldName,
 	FieldEmail,
 	FieldPassword,
+	FieldActivationKey,
 	FieldFirstName,
 	FieldLastName,
 	FieldCreatedAt,
@@ -153,6 +156,11 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByPassword orders the results by the password field.
 func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
+}
+
+// ByActivationKey orders the results by the activation_key field.
+func ByActivationKey(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActivationKey, opts...).ToFunc()
 }
 
 // ByFirstName orders the results by the first_name field.

@@ -28,4 +28,5 @@ type AdminUser interface {
 	DeleteTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereUniqueInput) (*ent.AdminUser, error)
 	DeleteMany(ctx context.Context, where ent.AdminUserWhereInput) (int, error)
 	DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereInput) (int, error)
+	HasActiveAdminUserWithRole(ctx context.Context, roleName string) (bool, error)
 }

@@ -80,6 +80,11 @@ func Password(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldPassword, v))
 }
 
+// ActivationKey applies equality check predicate on the "activation_key" field. It's identical to ActivationKeyEQ.
+func ActivationKey(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldActivationKey, v))
+}
+
 // FirstName applies equality check predicate on the "first_name" field. It's identical to FirstNameEQ.
 func FirstName(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldFirstName, v))
@@ -303,6 +308,81 @@ func PasswordEqualFold(v string) predicate.AdminUser {
 // PasswordContainsFold applies the ContainsFold predicate on the "password" field.
 func PasswordContainsFold(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldContainsFold(FieldPassword, v))
+}
+
+// ActivationKeyEQ applies the EQ predicate on the "activation_key" field.
+func ActivationKeyEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldActivationKey, v))
+}
+
+// ActivationKeyNEQ applies the NEQ predicate on the "activation_key" field.
+func ActivationKeyNEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldActivationKey, v))
+}
+
+// ActivationKeyIn applies the In predicate on the "activation_key" field.
+func ActivationKeyIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldActivationKey, vs...))
+}
+
+// ActivationKeyNotIn applies the NotIn predicate on the "activation_key" field.
+func ActivationKeyNotIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldActivationKey, vs...))
+}
+
+// ActivationKeyGT applies the GT predicate on the "activation_key" field.
+func ActivationKeyGT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldActivationKey, v))
+}
+
+// ActivationKeyGTE applies the GTE predicate on the "activation_key" field.
+func ActivationKeyGTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldActivationKey, v))
+}
+
+// ActivationKeyLT applies the LT predicate on the "activation_key" field.
+func ActivationKeyLT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldActivationKey, v))
+}
+
+// ActivationKeyLTE applies the LTE predicate on the "activation_key" field.
+func ActivationKeyLTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldActivationKey, v))
+}
+
+// ActivationKeyContains applies the Contains predicate on the "activation_key" field.
+func ActivationKeyContains(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContains(FieldActivationKey, v))
+}
+
+// ActivationKeyHasPrefix applies the HasPrefix predicate on the "activation_key" field.
+func ActivationKeyHasPrefix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasPrefix(FieldActivationKey, v))
+}
+
+// ActivationKeyHasSuffix applies the HasSuffix predicate on the "activation_key" field.
+func ActivationKeyHasSuffix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasSuffix(FieldActivationKey, v))
+}
+
+// ActivationKeyIsNil applies the IsNil predicate on the "activation_key" field.
+func ActivationKeyIsNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIsNull(FieldActivationKey))
+}
+
+// ActivationKeyNotNil applies the NotNil predicate on the "activation_key" field.
+func ActivationKeyNotNil() predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotNull(FieldActivationKey))
+}
+
+// ActivationKeyEqualFold applies the EqualFold predicate on the "activation_key" field.
+func ActivationKeyEqualFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEqualFold(FieldActivationKey, v))
+}
+
+// ActivationKeyContainsFold applies the ContainsFold predicate on the "activation_key" field.
+func ActivationKeyContainsFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContainsFold(FieldActivationKey, v))
 }
 
 // FirstNameEQ applies the EQ predicate on the "first_name" field.
