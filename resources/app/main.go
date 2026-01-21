@@ -119,7 +119,7 @@ func main() {
 	cache.NewEdgeCache(1 * time.Hour)
 	cache.NewFieldCache(1 * time.Hour)
 
-	utils.LoadSchema(conf)
+	utils.LoadSchema(appConfig)
 
 	adminClient, adminRepository, adminService, adminResolver := InitAdmin(drv)
 	_, repository, service, resolver := InitApp(drv, adminClient, adminRepository, adminService)

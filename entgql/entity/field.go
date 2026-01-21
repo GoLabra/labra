@@ -29,7 +29,6 @@ const validateErrorMessageTemplate = "[Validate] field %s invalid: %w"
 
 // Reserved names that cannot be used for field names
 var reservedFieldNames = map[string]bool{
-	"id":          true, // Reserved by ent
 	"edges":       true, // Reserved by ent
 	"type":        true, // Go keyword
 	"func":        true, // Go keyword
