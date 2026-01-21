@@ -19,7 +19,7 @@ func NewUUIDV7() string {
 	return uuidv7.New().String()
 }
 
-func LoadSchema(config *config.Config) {
+func LoadSchema(config *config.AppConfig) {
 	LoadSystemEntities()
 
 	graph, err := entc.LoadGraph(config.EntSchemaPath, &gen.Config{})
