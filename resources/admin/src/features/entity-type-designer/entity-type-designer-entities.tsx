@@ -58,7 +58,7 @@ export default function EntityTypeBuilderEntities() {
 
     const finish = useCallback(({ data }: FinishResult<ChangedNameCaptionEntity>) => {
         addEntity(data);
-        router.push(`/entity-type-designer/${data.name}`);
+        router.push(`/entity-type-designer?e=${data.name}`);
 
     }, [addEntity]);
 
