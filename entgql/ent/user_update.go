@@ -24,285 +24,285 @@ type UserUpdate struct {
 }
 
 // Where appends a list predicates to the UserUpdate builder.
-func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
-	uu.mutation.Where(ps...)
-	return uu
+func (_u *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetEmail sets the "email" field.
-func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
-	uu.mutation.SetEmail(s)
-	return uu
+func (_u *UserUpdate) SetEmail(v string) *UserUpdate {
+	_u.mutation.SetEmail(v)
+	return _u
 }
 
 // SetNillableEmail sets the "email" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableEmail(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetEmail(*s)
+func (_u *UserUpdate) SetNillableEmail(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetEmail(*v)
 	}
-	return uu
+	return _u
 }
 
 // SetPassword sets the "password" field.
-func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
-	uu.mutation.SetPassword(s)
-	return uu
+func (_u *UserUpdate) SetPassword(v string) *UserUpdate {
+	_u.mutation.SetPassword(v)
+	return _u
 }
 
 // SetNillablePassword sets the "password" field if the given value is not nil.
-func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetPassword(*s)
+func (_u *UserUpdate) SetNillablePassword(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetPassword(*v)
 	}
-	return uu
+	return _u
 }
 
 // AddRefCreatedByIDs adds the "ref_created_by" edge to the User entity by IDs.
-func (uu *UserUpdate) AddRefCreatedByIDs(ids ...string) *UserUpdate {
-	uu.mutation.AddRefCreatedByIDs(ids...)
-	return uu
+func (_u *UserUpdate) AddRefCreatedByIDs(ids ...string) *UserUpdate {
+	_u.mutation.AddRefCreatedByIDs(ids...)
+	return _u
 }
 
 // AddRefCreatedBy adds the "ref_created_by" edges to the User entity.
-func (uu *UserUpdate) AddRefCreatedBy(u ...*User) *UserUpdate {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdate) AddRefCreatedBy(v ...*User) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.AddRefCreatedByIDs(ids...)
+	return _u.AddRefCreatedByIDs(ids...)
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (uu *UserUpdate) SetCreatedByID(id string) *UserUpdate {
-	uu.mutation.SetCreatedByID(id)
-	return uu
+func (_u *UserUpdate) SetCreatedByID(id string) *UserUpdate {
+	_u.mutation.SetCreatedByID(id)
+	return _u
 }
 
 // SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableCreatedByID(id *string) *UserUpdate {
+func (_u *UserUpdate) SetNillableCreatedByID(id *string) *UserUpdate {
 	if id != nil {
-		uu = uu.SetCreatedByID(*id)
+		_u = _u.SetCreatedByID(*id)
 	}
-	return uu
+	return _u
 }
 
 // SetCreatedBy sets the "created_by" edge to the User entity.
-func (uu *UserUpdate) SetCreatedBy(u *User) *UserUpdate {
-	return uu.SetCreatedByID(u.ID)
+func (_u *UserUpdate) SetCreatedBy(v *User) *UserUpdate {
+	return _u.SetCreatedByID(v.ID)
 }
 
 // AddRefUpdatedByIDs adds the "ref_updated_by" edge to the User entity by IDs.
-func (uu *UserUpdate) AddRefUpdatedByIDs(ids ...string) *UserUpdate {
-	uu.mutation.AddRefUpdatedByIDs(ids...)
-	return uu
+func (_u *UserUpdate) AddRefUpdatedByIDs(ids ...string) *UserUpdate {
+	_u.mutation.AddRefUpdatedByIDs(ids...)
+	return _u
 }
 
 // AddRefUpdatedBy adds the "ref_updated_by" edges to the User entity.
-func (uu *UserUpdate) AddRefUpdatedBy(u ...*User) *UserUpdate {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdate) AddRefUpdatedBy(v ...*User) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.AddRefUpdatedByIDs(ids...)
+	return _u.AddRefUpdatedByIDs(ids...)
 }
 
 // SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (uu *UserUpdate) SetUpdatedByID(id string) *UserUpdate {
-	uu.mutation.SetUpdatedByID(id)
-	return uu
+func (_u *UserUpdate) SetUpdatedByID(id string) *UserUpdate {
+	_u.mutation.SetUpdatedByID(id)
+	return _u
 }
 
 // SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableUpdatedByID(id *string) *UserUpdate {
+func (_u *UserUpdate) SetNillableUpdatedByID(id *string) *UserUpdate {
 	if id != nil {
-		uu = uu.SetUpdatedByID(*id)
+		_u = _u.SetUpdatedByID(*id)
 	}
-	return uu
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (uu *UserUpdate) SetUpdatedBy(u *User) *UserUpdate {
-	return uu.SetUpdatedByID(u.ID)
+func (_u *UserUpdate) SetUpdatedBy(v *User) *UserUpdate {
+	return _u.SetUpdatedByID(v.ID)
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (uu *UserUpdate) SetAdminCreatedByID(id string) *UserUpdate {
-	uu.mutation.SetAdminCreatedByID(id)
-	return uu
+func (_u *UserUpdate) SetAdminCreatedByID(id string) *UserUpdate {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableAdminCreatedByID(id *string) *UserUpdate {
+func (_u *UserUpdate) SetNillableAdminCreatedByID(id *string) *UserUpdate {
 	if id != nil {
-		uu = uu.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return uu
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (uu *UserUpdate) SetAdminCreatedBy(a *AdminUser) *UserUpdate {
-	return uu.SetAdminCreatedByID(a.ID)
+func (_u *UserUpdate) SetAdminCreatedBy(v *AdminUser) *UserUpdate {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (uu *UserUpdate) SetAdminUpdatedByID(id string) *UserUpdate {
-	uu.mutation.SetAdminUpdatedByID(id)
-	return uu
+func (_u *UserUpdate) SetAdminUpdatedByID(id string) *UserUpdate {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableAdminUpdatedByID(id *string) *UserUpdate {
+func (_u *UserUpdate) SetNillableAdminUpdatedByID(id *string) *UserUpdate {
 	if id != nil {
-		uu = uu.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return uu
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (uu *UserUpdate) SetAdminUpdatedBy(a *AdminUser) *UserUpdate {
-	return uu.SetAdminUpdatedByID(a.ID)
+func (_u *UserUpdate) SetAdminUpdatedBy(v *AdminUser) *UserUpdate {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (uu *UserUpdate) AddRoleIDs(ids ...string) *UserUpdate {
-	uu.mutation.AddRoleIDs(ids...)
-	return uu
+func (_u *UserUpdate) AddRoleIDs(ids ...string) *UserUpdate {
+	_u.mutation.AddRoleIDs(ids...)
+	return _u
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
-func (uu *UserUpdate) AddRoles(r ...*Role) *UserUpdate {
-	ids := make([]string, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *UserUpdate) AddRoles(v ...*Role) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.AddRoleIDs(ids...)
+	return _u.AddRoleIDs(ids...)
 }
 
 // SetDefaultRoleID sets the "default_role" edge to the Role entity by ID.
-func (uu *UserUpdate) SetDefaultRoleID(id string) *UserUpdate {
-	uu.mutation.SetDefaultRoleID(id)
-	return uu
+func (_u *UserUpdate) SetDefaultRoleID(id string) *UserUpdate {
+	_u.mutation.SetDefaultRoleID(id)
+	return _u
 }
 
 // SetNillableDefaultRoleID sets the "default_role" edge to the Role entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableDefaultRoleID(id *string) *UserUpdate {
+func (_u *UserUpdate) SetNillableDefaultRoleID(id *string) *UserUpdate {
 	if id != nil {
-		uu = uu.SetDefaultRoleID(*id)
+		_u = _u.SetDefaultRoleID(*id)
 	}
-	return uu
+	return _u
 }
 
 // SetDefaultRole sets the "default_role" edge to the Role entity.
-func (uu *UserUpdate) SetDefaultRole(r *Role) *UserUpdate {
-	return uu.SetDefaultRoleID(r.ID)
+func (_u *UserUpdate) SetDefaultRole(v *Role) *UserUpdate {
+	return _u.SetDefaultRoleID(v.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
-func (uu *UserUpdate) Mutation() *UserMutation {
-	return uu.mutation
+func (_u *UserUpdate) Mutation() *UserMutation {
+	return _u.mutation
 }
 
 // ClearRefCreatedBy clears all "ref_created_by" edges to the User entity.
-func (uu *UserUpdate) ClearRefCreatedBy() *UserUpdate {
-	uu.mutation.ClearRefCreatedBy()
-	return uu
+func (_u *UserUpdate) ClearRefCreatedBy() *UserUpdate {
+	_u.mutation.ClearRefCreatedBy()
+	return _u
 }
 
 // RemoveRefCreatedByIDs removes the "ref_created_by" edge to User entities by IDs.
-func (uu *UserUpdate) RemoveRefCreatedByIDs(ids ...string) *UserUpdate {
-	uu.mutation.RemoveRefCreatedByIDs(ids...)
-	return uu
+func (_u *UserUpdate) RemoveRefCreatedByIDs(ids ...string) *UserUpdate {
+	_u.mutation.RemoveRefCreatedByIDs(ids...)
+	return _u
 }
 
 // RemoveRefCreatedBy removes "ref_created_by" edges to User entities.
-func (uu *UserUpdate) RemoveRefCreatedBy(u ...*User) *UserUpdate {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdate) RemoveRefCreatedBy(v ...*User) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.RemoveRefCreatedByIDs(ids...)
+	return _u.RemoveRefCreatedByIDs(ids...)
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
-func (uu *UserUpdate) ClearCreatedBy() *UserUpdate {
-	uu.mutation.ClearCreatedBy()
-	return uu
+func (_u *UserUpdate) ClearCreatedBy() *UserUpdate {
+	_u.mutation.ClearCreatedBy()
+	return _u
 }
 
 // ClearRefUpdatedBy clears all "ref_updated_by" edges to the User entity.
-func (uu *UserUpdate) ClearRefUpdatedBy() *UserUpdate {
-	uu.mutation.ClearRefUpdatedBy()
-	return uu
+func (_u *UserUpdate) ClearRefUpdatedBy() *UserUpdate {
+	_u.mutation.ClearRefUpdatedBy()
+	return _u
 }
 
 // RemoveRefUpdatedByIDs removes the "ref_updated_by" edge to User entities by IDs.
-func (uu *UserUpdate) RemoveRefUpdatedByIDs(ids ...string) *UserUpdate {
-	uu.mutation.RemoveRefUpdatedByIDs(ids...)
-	return uu
+func (_u *UserUpdate) RemoveRefUpdatedByIDs(ids ...string) *UserUpdate {
+	_u.mutation.RemoveRefUpdatedByIDs(ids...)
+	return _u
 }
 
 // RemoveRefUpdatedBy removes "ref_updated_by" edges to User entities.
-func (uu *UserUpdate) RemoveRefUpdatedBy(u ...*User) *UserUpdate {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdate) RemoveRefUpdatedBy(v ...*User) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.RemoveRefUpdatedByIDs(ids...)
+	return _u.RemoveRefUpdatedByIDs(ids...)
 }
 
 // ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (uu *UserUpdate) ClearUpdatedBy() *UserUpdate {
-	uu.mutation.ClearUpdatedBy()
-	return uu
+func (_u *UserUpdate) ClearUpdatedBy() *UserUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (uu *UserUpdate) ClearAdminCreatedBy() *UserUpdate {
-	uu.mutation.ClearAdminCreatedBy()
-	return uu
+func (_u *UserUpdate) ClearAdminCreatedBy() *UserUpdate {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (uu *UserUpdate) ClearAdminUpdatedBy() *UserUpdate {
-	uu.mutation.ClearAdminUpdatedBy()
-	return uu
+func (_u *UserUpdate) ClearAdminUpdatedBy() *UserUpdate {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // ClearRoles clears all "roles" edges to the Role entity.
-func (uu *UserUpdate) ClearRoles() *UserUpdate {
-	uu.mutation.ClearRoles()
-	return uu
+func (_u *UserUpdate) ClearRoles() *UserUpdate {
+	_u.mutation.ClearRoles()
+	return _u
 }
 
 // RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
-func (uu *UserUpdate) RemoveRoleIDs(ids ...string) *UserUpdate {
-	uu.mutation.RemoveRoleIDs(ids...)
-	return uu
+func (_u *UserUpdate) RemoveRoleIDs(ids ...string) *UserUpdate {
+	_u.mutation.RemoveRoleIDs(ids...)
+	return _u
 }
 
 // RemoveRoles removes "roles" edges to Role entities.
-func (uu *UserUpdate) RemoveRoles(r ...*Role) *UserUpdate {
-	ids := make([]string, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *UserUpdate) RemoveRoles(v ...*Role) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.RemoveRoleIDs(ids...)
+	return _u.RemoveRoleIDs(ids...)
 }
 
 // ClearDefaultRole clears the "default_role" edge to the Role entity.
-func (uu *UserUpdate) ClearDefaultRole() *UserUpdate {
-	uu.mutation.ClearDefaultRole()
-	return uu
+func (_u *UserUpdate) ClearDefaultRole() *UserUpdate {
+	_u.mutation.ClearDefaultRole()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, uu.sqlSave, uu.mutation, uu.hooks)
+func (_u *UserUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (uu *UserUpdate) SaveX(ctx context.Context) int {
-	affected, err := uu.Save(ctx)
+func (_u *UserUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -310,26 +310,26 @@ func (uu *UserUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (uu *UserUpdate) Exec(ctx context.Context) error {
-	_, err := uu.Save(ctx)
+func (_u *UserUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (uu *UserUpdate) ExecX(ctx context.Context) {
-	if err := uu.Exec(ctx); err != nil {
+func (_u *UserUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (uu *UserUpdate) check() error {
-	if v, ok := uu.mutation.Email(); ok {
+func (_u *UserUpdate) check() error {
+	if v, ok := _u.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.Password(); ok {
+	if v, ok := _u.mutation.Password(); ok {
 		if err := user.PasswordValidator(v); err != nil {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
 		}
@@ -337,25 +337,25 @@ func (uu *UserUpdate) check() error {
 	return nil
 }
 
-func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := uu.check(); err != nil {
-		return n, err
+func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeString))
-	if ps := uu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := uu.mutation.Email(); ok {
+	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
 	}
-	if value, ok := uu.mutation.Password(); ok {
+	if value, ok := _u.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
-	if uu.mutation.RefCreatedByCleared() {
+	if _u.mutation.RefCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -368,7 +368,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedRefCreatedByIDs(); len(nodes) > 0 && !uu.mutation.RefCreatedByCleared() {
+	if nodes := _u.mutation.RemovedRefCreatedByIDs(); len(nodes) > 0 && !_u.mutation.RefCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -384,7 +384,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RefCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RefCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -400,7 +400,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.CreatedByCleared() {
+	if _u.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -413,7 +413,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -429,7 +429,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.RefUpdatedByCleared() {
+	if _u.mutation.RefUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -442,7 +442,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedRefUpdatedByIDs(); len(nodes) > 0 && !uu.mutation.RefUpdatedByCleared() {
+	if nodes := _u.mutation.RemovedRefUpdatedByIDs(); len(nodes) > 0 && !_u.mutation.RefUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -458,7 +458,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RefUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RefUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -474,7 +474,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -487,7 +487,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -503,7 +503,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.AdminCreatedByCleared() {
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -516,7 +516,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -532,7 +532,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -545,7 +545,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -561,7 +561,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.RolesCleared() {
+	if _u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -574,7 +574,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedRolesIDs(); len(nodes) > 0 && !uu.mutation.RolesCleared() {
+	if nodes := _u.mutation.RemovedRolesIDs(); len(nodes) > 0 && !_u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -590,7 +590,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -606,7 +606,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.DefaultRoleCleared() {
+	if _u.mutation.DefaultRoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -619,7 +619,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.DefaultRoleIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DefaultRoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -635,7 +635,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -643,8 +643,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	uu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // UserUpdateOne is the builder for updating a single User entity.
@@ -656,292 +656,292 @@ type UserUpdateOne struct {
 }
 
 // SetEmail sets the "email" field.
-func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
-	uuo.mutation.SetEmail(s)
-	return uuo
+func (_u *UserUpdateOne) SetEmail(v string) *UserUpdateOne {
+	_u.mutation.SetEmail(v)
+	return _u
 }
 
 // SetNillableEmail sets the "email" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableEmail(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetEmail(*s)
+func (_u *UserUpdateOne) SetNillableEmail(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetEmail(*v)
 	}
-	return uuo
+	return _u
 }
 
 // SetPassword sets the "password" field.
-func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
-	uuo.mutation.SetPassword(s)
-	return uuo
+func (_u *UserUpdateOne) SetPassword(v string) *UserUpdateOne {
+	_u.mutation.SetPassword(v)
+	return _u
 }
 
 // SetNillablePassword sets the "password" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetPassword(*s)
+func (_u *UserUpdateOne) SetNillablePassword(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetPassword(*v)
 	}
-	return uuo
+	return _u
 }
 
 // AddRefCreatedByIDs adds the "ref_created_by" edge to the User entity by IDs.
-func (uuo *UserUpdateOne) AddRefCreatedByIDs(ids ...string) *UserUpdateOne {
-	uuo.mutation.AddRefCreatedByIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) AddRefCreatedByIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.AddRefCreatedByIDs(ids...)
+	return _u
 }
 
 // AddRefCreatedBy adds the "ref_created_by" edges to the User entity.
-func (uuo *UserUpdateOne) AddRefCreatedBy(u ...*User) *UserUpdateOne {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdateOne) AddRefCreatedBy(v ...*User) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.AddRefCreatedByIDs(ids...)
+	return _u.AddRefCreatedByIDs(ids...)
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (uuo *UserUpdateOne) SetCreatedByID(id string) *UserUpdateOne {
-	uuo.mutation.SetCreatedByID(id)
-	return uuo
+func (_u *UserUpdateOne) SetCreatedByID(id string) *UserUpdateOne {
+	_u.mutation.SetCreatedByID(id)
+	return _u
 }
 
 // SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableCreatedByID(id *string) *UserUpdateOne {
+func (_u *UserUpdateOne) SetNillableCreatedByID(id *string) *UserUpdateOne {
 	if id != nil {
-		uuo = uuo.SetCreatedByID(*id)
+		_u = _u.SetCreatedByID(*id)
 	}
-	return uuo
+	return _u
 }
 
 // SetCreatedBy sets the "created_by" edge to the User entity.
-func (uuo *UserUpdateOne) SetCreatedBy(u *User) *UserUpdateOne {
-	return uuo.SetCreatedByID(u.ID)
+func (_u *UserUpdateOne) SetCreatedBy(v *User) *UserUpdateOne {
+	return _u.SetCreatedByID(v.ID)
 }
 
 // AddRefUpdatedByIDs adds the "ref_updated_by" edge to the User entity by IDs.
-func (uuo *UserUpdateOne) AddRefUpdatedByIDs(ids ...string) *UserUpdateOne {
-	uuo.mutation.AddRefUpdatedByIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) AddRefUpdatedByIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.AddRefUpdatedByIDs(ids...)
+	return _u
 }
 
 // AddRefUpdatedBy adds the "ref_updated_by" edges to the User entity.
-func (uuo *UserUpdateOne) AddRefUpdatedBy(u ...*User) *UserUpdateOne {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdateOne) AddRefUpdatedBy(v ...*User) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.AddRefUpdatedByIDs(ids...)
+	return _u.AddRefUpdatedByIDs(ids...)
 }
 
 // SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (uuo *UserUpdateOne) SetUpdatedByID(id string) *UserUpdateOne {
-	uuo.mutation.SetUpdatedByID(id)
-	return uuo
+func (_u *UserUpdateOne) SetUpdatedByID(id string) *UserUpdateOne {
+	_u.mutation.SetUpdatedByID(id)
+	return _u
 }
 
 // SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableUpdatedByID(id *string) *UserUpdateOne {
+func (_u *UserUpdateOne) SetNillableUpdatedByID(id *string) *UserUpdateOne {
 	if id != nil {
-		uuo = uuo.SetUpdatedByID(*id)
+		_u = _u.SetUpdatedByID(*id)
 	}
-	return uuo
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (uuo *UserUpdateOne) SetUpdatedBy(u *User) *UserUpdateOne {
-	return uuo.SetUpdatedByID(u.ID)
+func (_u *UserUpdateOne) SetUpdatedBy(v *User) *UserUpdateOne {
+	return _u.SetUpdatedByID(v.ID)
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (uuo *UserUpdateOne) SetAdminCreatedByID(id string) *UserUpdateOne {
-	uuo.mutation.SetAdminCreatedByID(id)
-	return uuo
+func (_u *UserUpdateOne) SetAdminCreatedByID(id string) *UserUpdateOne {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableAdminCreatedByID(id *string) *UserUpdateOne {
+func (_u *UserUpdateOne) SetNillableAdminCreatedByID(id *string) *UserUpdateOne {
 	if id != nil {
-		uuo = uuo.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return uuo
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (uuo *UserUpdateOne) SetAdminCreatedBy(a *AdminUser) *UserUpdateOne {
-	return uuo.SetAdminCreatedByID(a.ID)
+func (_u *UserUpdateOne) SetAdminCreatedBy(v *AdminUser) *UserUpdateOne {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (uuo *UserUpdateOne) SetAdminUpdatedByID(id string) *UserUpdateOne {
-	uuo.mutation.SetAdminUpdatedByID(id)
-	return uuo
+func (_u *UserUpdateOne) SetAdminUpdatedByID(id string) *UserUpdateOne {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableAdminUpdatedByID(id *string) *UserUpdateOne {
+func (_u *UserUpdateOne) SetNillableAdminUpdatedByID(id *string) *UserUpdateOne {
 	if id != nil {
-		uuo = uuo.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return uuo
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (uuo *UserUpdateOne) SetAdminUpdatedBy(a *AdminUser) *UserUpdateOne {
-	return uuo.SetAdminUpdatedByID(a.ID)
+func (_u *UserUpdateOne) SetAdminUpdatedBy(v *AdminUser) *UserUpdateOne {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (uuo *UserUpdateOne) AddRoleIDs(ids ...string) *UserUpdateOne {
-	uuo.mutation.AddRoleIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) AddRoleIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.AddRoleIDs(ids...)
+	return _u
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
-func (uuo *UserUpdateOne) AddRoles(r ...*Role) *UserUpdateOne {
-	ids := make([]string, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *UserUpdateOne) AddRoles(v ...*Role) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.AddRoleIDs(ids...)
+	return _u.AddRoleIDs(ids...)
 }
 
 // SetDefaultRoleID sets the "default_role" edge to the Role entity by ID.
-func (uuo *UserUpdateOne) SetDefaultRoleID(id string) *UserUpdateOne {
-	uuo.mutation.SetDefaultRoleID(id)
-	return uuo
+func (_u *UserUpdateOne) SetDefaultRoleID(id string) *UserUpdateOne {
+	_u.mutation.SetDefaultRoleID(id)
+	return _u
 }
 
 // SetNillableDefaultRoleID sets the "default_role" edge to the Role entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableDefaultRoleID(id *string) *UserUpdateOne {
+func (_u *UserUpdateOne) SetNillableDefaultRoleID(id *string) *UserUpdateOne {
 	if id != nil {
-		uuo = uuo.SetDefaultRoleID(*id)
+		_u = _u.SetDefaultRoleID(*id)
 	}
-	return uuo
+	return _u
 }
 
 // SetDefaultRole sets the "default_role" edge to the Role entity.
-func (uuo *UserUpdateOne) SetDefaultRole(r *Role) *UserUpdateOne {
-	return uuo.SetDefaultRoleID(r.ID)
+func (_u *UserUpdateOne) SetDefaultRole(v *Role) *UserUpdateOne {
+	return _u.SetDefaultRoleID(v.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
-func (uuo *UserUpdateOne) Mutation() *UserMutation {
-	return uuo.mutation
+func (_u *UserUpdateOne) Mutation() *UserMutation {
+	return _u.mutation
 }
 
 // ClearRefCreatedBy clears all "ref_created_by" edges to the User entity.
-func (uuo *UserUpdateOne) ClearRefCreatedBy() *UserUpdateOne {
-	uuo.mutation.ClearRefCreatedBy()
-	return uuo
+func (_u *UserUpdateOne) ClearRefCreatedBy() *UserUpdateOne {
+	_u.mutation.ClearRefCreatedBy()
+	return _u
 }
 
 // RemoveRefCreatedByIDs removes the "ref_created_by" edge to User entities by IDs.
-func (uuo *UserUpdateOne) RemoveRefCreatedByIDs(ids ...string) *UserUpdateOne {
-	uuo.mutation.RemoveRefCreatedByIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) RemoveRefCreatedByIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.RemoveRefCreatedByIDs(ids...)
+	return _u
 }
 
 // RemoveRefCreatedBy removes "ref_created_by" edges to User entities.
-func (uuo *UserUpdateOne) RemoveRefCreatedBy(u ...*User) *UserUpdateOne {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdateOne) RemoveRefCreatedBy(v ...*User) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.RemoveRefCreatedByIDs(ids...)
+	return _u.RemoveRefCreatedByIDs(ids...)
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
-func (uuo *UserUpdateOne) ClearCreatedBy() *UserUpdateOne {
-	uuo.mutation.ClearCreatedBy()
-	return uuo
+func (_u *UserUpdateOne) ClearCreatedBy() *UserUpdateOne {
+	_u.mutation.ClearCreatedBy()
+	return _u
 }
 
 // ClearRefUpdatedBy clears all "ref_updated_by" edges to the User entity.
-func (uuo *UserUpdateOne) ClearRefUpdatedBy() *UserUpdateOne {
-	uuo.mutation.ClearRefUpdatedBy()
-	return uuo
+func (_u *UserUpdateOne) ClearRefUpdatedBy() *UserUpdateOne {
+	_u.mutation.ClearRefUpdatedBy()
+	return _u
 }
 
 // RemoveRefUpdatedByIDs removes the "ref_updated_by" edge to User entities by IDs.
-func (uuo *UserUpdateOne) RemoveRefUpdatedByIDs(ids ...string) *UserUpdateOne {
-	uuo.mutation.RemoveRefUpdatedByIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) RemoveRefUpdatedByIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.RemoveRefUpdatedByIDs(ids...)
+	return _u
 }
 
 // RemoveRefUpdatedBy removes "ref_updated_by" edges to User entities.
-func (uuo *UserUpdateOne) RemoveRefUpdatedBy(u ...*User) *UserUpdateOne {
-	ids := make([]string, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdateOne) RemoveRefUpdatedBy(v ...*User) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.RemoveRefUpdatedByIDs(ids...)
+	return _u.RemoveRefUpdatedByIDs(ids...)
 }
 
 // ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (uuo *UserUpdateOne) ClearUpdatedBy() *UserUpdateOne {
-	uuo.mutation.ClearUpdatedBy()
-	return uuo
+func (_u *UserUpdateOne) ClearUpdatedBy() *UserUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (uuo *UserUpdateOne) ClearAdminCreatedBy() *UserUpdateOne {
-	uuo.mutation.ClearAdminCreatedBy()
-	return uuo
+func (_u *UserUpdateOne) ClearAdminCreatedBy() *UserUpdateOne {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (uuo *UserUpdateOne) ClearAdminUpdatedBy() *UserUpdateOne {
-	uuo.mutation.ClearAdminUpdatedBy()
-	return uuo
+func (_u *UserUpdateOne) ClearAdminUpdatedBy() *UserUpdateOne {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // ClearRoles clears all "roles" edges to the Role entity.
-func (uuo *UserUpdateOne) ClearRoles() *UserUpdateOne {
-	uuo.mutation.ClearRoles()
-	return uuo
+func (_u *UserUpdateOne) ClearRoles() *UserUpdateOne {
+	_u.mutation.ClearRoles()
+	return _u
 }
 
 // RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
-func (uuo *UserUpdateOne) RemoveRoleIDs(ids ...string) *UserUpdateOne {
-	uuo.mutation.RemoveRoleIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) RemoveRoleIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.RemoveRoleIDs(ids...)
+	return _u
 }
 
 // RemoveRoles removes "roles" edges to Role entities.
-func (uuo *UserUpdateOne) RemoveRoles(r ...*Role) *UserUpdateOne {
-	ids := make([]string, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *UserUpdateOne) RemoveRoles(v ...*Role) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.RemoveRoleIDs(ids...)
+	return _u.RemoveRoleIDs(ids...)
 }
 
 // ClearDefaultRole clears the "default_role" edge to the Role entity.
-func (uuo *UserUpdateOne) ClearDefaultRole() *UserUpdateOne {
-	uuo.mutation.ClearDefaultRole()
-	return uuo
+func (_u *UserUpdateOne) ClearDefaultRole() *UserUpdateOne {
+	_u.mutation.ClearDefaultRole()
+	return _u
 }
 
 // Where appends a list predicates to the UserUpdate builder.
-func (uuo *UserUpdateOne) Where(ps ...predicate.User) *UserUpdateOne {
-	uuo.mutation.Where(ps...)
-	return uuo
+func (_u *UserUpdateOne) Where(ps ...predicate.User) *UserUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (uuo *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne {
-	uuo.fields = append([]string{field}, fields...)
-	return uuo
+func (_u *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated User entity.
-func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
-	return withHooks(ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
+func (_u *UserUpdateOne) Save(ctx context.Context) (*User, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (uuo *UserUpdateOne) SaveX(ctx context.Context) *User {
-	node, err := uuo.Save(ctx)
+func (_u *UserUpdateOne) SaveX(ctx context.Context) *User {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -949,26 +949,26 @@ func (uuo *UserUpdateOne) SaveX(ctx context.Context) *User {
 }
 
 // Exec executes the query on the entity.
-func (uuo *UserUpdateOne) Exec(ctx context.Context) error {
-	_, err := uuo.Save(ctx)
+func (_u *UserUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
-	if err := uuo.Exec(ctx); err != nil {
+func (_u *UserUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (uuo *UserUpdateOne) check() error {
-	if v, ok := uuo.mutation.Email(); ok {
+func (_u *UserUpdateOne) check() error {
+	if v, ok := _u.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.Password(); ok {
+	if v, ok := _u.mutation.Password(); ok {
 		if err := user.PasswordValidator(v); err != nil {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
 		}
@@ -976,17 +976,17 @@ func (uuo *UserUpdateOne) check() error {
 	return nil
 }
 
-func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
-	if err := uuo.check(); err != nil {
+func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeString))
-	id, ok := uuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "User.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := uuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, user.FieldID)
 		for _, f := range fields {
@@ -998,20 +998,20 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
-	if ps := uuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := uuo.mutation.Email(); ok {
+	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
 	}
-	if value, ok := uuo.mutation.Password(); ok {
+	if value, ok := _u.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
-	if uuo.mutation.RefCreatedByCleared() {
+	if _u.mutation.RefCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1024,7 +1024,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedRefCreatedByIDs(); len(nodes) > 0 && !uuo.mutation.RefCreatedByCleared() {
+	if nodes := _u.mutation.RemovedRefCreatedByIDs(); len(nodes) > 0 && !_u.mutation.RefCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1040,7 +1040,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RefCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RefCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1056,7 +1056,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.CreatedByCleared() {
+	if _u.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1069,7 +1069,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1085,7 +1085,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.RefUpdatedByCleared() {
+	if _u.mutation.RefUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1098,7 +1098,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedRefUpdatedByIDs(); len(nodes) > 0 && !uuo.mutation.RefUpdatedByCleared() {
+	if nodes := _u.mutation.RemovedRefUpdatedByIDs(); len(nodes) > 0 && !_u.mutation.RefUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1114,7 +1114,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RefUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RefUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1130,7 +1130,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1143,7 +1143,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1159,7 +1159,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.AdminCreatedByCleared() {
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1172,7 +1172,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1188,7 +1188,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1201,7 +1201,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1217,7 +1217,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.RolesCleared() {
+	if _u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1230,7 +1230,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedRolesIDs(); len(nodes) > 0 && !uuo.mutation.RolesCleared() {
+	if nodes := _u.mutation.RemovedRolesIDs(); len(nodes) > 0 && !_u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1246,7 +1246,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1262,7 +1262,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.DefaultRoleCleared() {
+	if _u.mutation.DefaultRoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1275,7 +1275,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.DefaultRoleIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DefaultRoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1291,10 +1291,10 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &User{config: uuo.config}
+	_node = &User{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, uuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1302,6 +1302,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		return nil, err
 	}
-	uuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

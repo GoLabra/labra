@@ -294,8 +294,8 @@ func (c *AdminUserClient) Update() *AdminUserUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *AdminUserClient) UpdateOne(au *AdminUser) *AdminUserUpdateOne {
-	mutation := newAdminUserMutation(c.config, OpUpdateOne, withAdminUser(au))
+func (c *AdminUserClient) UpdateOne(_m *AdminUser) *AdminUserUpdateOne {
+	mutation := newAdminUserMutation(c.config, OpUpdateOne, withAdminUser(_m))
 	return &AdminUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -312,8 +312,8 @@ func (c *AdminUserClient) Delete() *AdminUserDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *AdminUserClient) DeleteOne(au *AdminUser) *AdminUserDeleteOne {
-	return c.DeleteOneID(au.ID)
+func (c *AdminUserClient) DeleteOne(_m *AdminUser) *AdminUserDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -348,96 +348,96 @@ func (c *AdminUserClient) GetX(ctx context.Context, id string) *AdminUser {
 }
 
 // QueryRefAdminCreatedBy queries the ref_admin_created_by edge of a AdminUser.
-func (c *AdminUserClient) QueryRefAdminCreatedBy(au *AdminUser) *AdminUserQuery {
+func (c *AdminUserClient) QueryRefAdminCreatedBy(_m *AdminUser) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := au.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, adminuser.RefAdminCreatedByTable, adminuser.RefAdminCreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(au.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminCreatedBy queries the admin_created_by edge of a AdminUser.
-func (c *AdminUserClient) QueryAdminCreatedBy(au *AdminUser) *AdminUserQuery {
+func (c *AdminUserClient) QueryAdminCreatedBy(_m *AdminUser) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := au.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, adminuser.AdminCreatedByTable, adminuser.AdminCreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(au.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryRefAdminUpdatedBy queries the ref_admin_updated_by edge of a AdminUser.
-func (c *AdminUserClient) QueryRefAdminUpdatedBy(au *AdminUser) *AdminUserQuery {
+func (c *AdminUserClient) QueryRefAdminUpdatedBy(_m *AdminUser) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := au.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, adminuser.RefAdminUpdatedByTable, adminuser.RefAdminUpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(au.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminUpdatedBy queries the admin_updated_by edge of a AdminUser.
-func (c *AdminUserClient) QueryAdminUpdatedBy(au *AdminUser) *AdminUserQuery {
+func (c *AdminUserClient) QueryAdminUpdatedBy(_m *AdminUser) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := au.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, adminuser.AdminUpdatedByTable, adminuser.AdminUpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(au.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryRoles queries the roles edge of a AdminUser.
-func (c *AdminUserClient) QueryRoles(au *AdminUser) *RoleQuery {
+func (c *AdminUserClient) QueryRoles(_m *AdminUser) *RoleQuery {
 	query := (&RoleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := au.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, adminuser.RolesTable, adminuser.RolesPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(au.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryDefaultRole queries the default_role edge of a AdminUser.
-func (c *AdminUserClient) QueryDefaultRole(au *AdminUser) *RoleQuery {
+func (c *AdminUserClient) QueryDefaultRole(_m *AdminUser) *RoleQuery {
 	query := (&RoleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := au.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, adminuser.DefaultRoleTable, adminuser.DefaultRoleColumn),
 		)
-		fromV = sqlgraph.Neighbors(au.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -523,8 +523,8 @@ func (c *FileClient) Update() *FileUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *FileClient) UpdateOne(f *File) *FileUpdateOne {
-	mutation := newFileMutation(c.config, OpUpdateOne, withFile(f))
+func (c *FileClient) UpdateOne(_m *File) *FileUpdateOne {
+	mutation := newFileMutation(c.config, OpUpdateOne, withFile(_m))
 	return &FileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -541,8 +541,8 @@ func (c *FileClient) Delete() *FileDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *FileClient) DeleteOne(f *File) *FileDeleteOne {
-	return c.DeleteOneID(f.ID)
+func (c *FileClient) DeleteOne(_m *File) *FileDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -577,64 +577,64 @@ func (c *FileClient) GetX(ctx context.Context, id string) *File {
 }
 
 // QueryAdminCreatedBy queries the admin_created_by edge of a File.
-func (c *FileClient) QueryAdminCreatedBy(f *File) *AdminUserQuery {
+func (c *FileClient) QueryAdminCreatedBy(_m *File) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(file.Table, file.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, file.AdminCreatedByTable, file.AdminCreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminUpdatedBy queries the admin_updated_by edge of a File.
-func (c *FileClient) QueryAdminUpdatedBy(f *File) *AdminUserQuery {
+func (c *FileClient) QueryAdminUpdatedBy(_m *File) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(file.Table, file.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, file.AdminUpdatedByTable, file.AdminUpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryCreatedBy queries the created_by edge of a File.
-func (c *FileClient) QueryCreatedBy(f *File) *UserQuery {
+func (c *FileClient) QueryCreatedBy(_m *File) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(file.Table, file.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, file.CreatedByTable, file.CreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryUpdatedBy queries the updated_by edge of a File.
-func (c *FileClient) QueryUpdatedBy(f *File) *UserQuery {
+func (c *FileClient) QueryUpdatedBy(_m *File) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(file.Table, file.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, file.UpdatedByTable, file.UpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -720,8 +720,8 @@ func (c *PermissionClient) Update() *PermissionUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *PermissionClient) UpdateOne(pe *Permission) *PermissionUpdateOne {
-	mutation := newPermissionMutation(c.config, OpUpdateOne, withPermission(pe))
+func (c *PermissionClient) UpdateOne(_m *Permission) *PermissionUpdateOne {
+	mutation := newPermissionMutation(c.config, OpUpdateOne, withPermission(_m))
 	return &PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -738,8 +738,8 @@ func (c *PermissionClient) Delete() *PermissionDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *PermissionClient) DeleteOne(pe *Permission) *PermissionDeleteOne {
-	return c.DeleteOneID(pe.ID)
+func (c *PermissionClient) DeleteOne(_m *Permission) *PermissionDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -774,48 +774,48 @@ func (c *PermissionClient) GetX(ctx context.Context, id string) *Permission {
 }
 
 // QueryAdminCreatedBy queries the admin_created_by edge of a Permission.
-func (c *PermissionClient) QueryAdminCreatedBy(pe *Permission) *AdminUserQuery {
+func (c *PermissionClient) QueryAdminCreatedBy(_m *Permission) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pe.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, permission.AdminCreatedByTable, permission.AdminCreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminUpdatedBy queries the admin_updated_by edge of a Permission.
-func (c *PermissionClient) QueryAdminUpdatedBy(pe *Permission) *AdminUserQuery {
+func (c *PermissionClient) QueryAdminUpdatedBy(_m *Permission) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pe.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, permission.AdminUpdatedByTable, permission.AdminUpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryRole queries the role edge of a Permission.
-func (c *PermissionClient) QueryRole(pe *Permission) *RoleQuery {
+func (c *PermissionClient) QueryRole(_m *Permission) *RoleQuery {
 	query := (&RoleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pe.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, permission.RoleTable, permission.RoleColumn),
 		)
-		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -901,8 +901,8 @@ func (c *RoleClient) Update() *RoleUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *RoleClient) UpdateOne(r *Role) *RoleUpdateOne {
-	mutation := newRoleMutation(c.config, OpUpdateOne, withRole(r))
+func (c *RoleClient) UpdateOne(_m *Role) *RoleUpdateOne {
+	mutation := newRoleMutation(c.config, OpUpdateOne, withRole(_m))
 	return &RoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -919,8 +919,8 @@ func (c *RoleClient) Delete() *RoleDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *RoleClient) DeleteOne(r *Role) *RoleDeleteOne {
-	return c.DeleteOneID(r.ID)
+func (c *RoleClient) DeleteOne(_m *Role) *RoleDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -955,80 +955,80 @@ func (c *RoleClient) GetX(ctx context.Context, id string) *Role {
 }
 
 // QueryAdminCreatedBy queries the admin_created_by edge of a Role.
-func (c *RoleClient) QueryAdminCreatedBy(r *Role) *AdminUserQuery {
+func (c *RoleClient) QueryAdminCreatedBy(_m *Role) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, role.AdminCreatedByTable, role.AdminCreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminUpdatedBy queries the admin_updated_by edge of a Role.
-func (c *RoleClient) QueryAdminUpdatedBy(r *Role) *AdminUserQuery {
+func (c *RoleClient) QueryAdminUpdatedBy(_m *Role) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, role.AdminUpdatedByTable, role.AdminUpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminUserRoles queries the admin_user_roles edge of a Role.
-func (c *RoleClient) QueryAdminUserRoles(r *Role) *AdminUserQuery {
+func (c *RoleClient) QueryAdminUserRoles(_m *Role) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, role.AdminUserRolesTable, role.AdminUserRolesPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryUserRoles queries the user_roles edge of a Role.
-func (c *RoleClient) QueryUserRoles(r *Role) *UserQuery {
+func (c *RoleClient) QueryUserRoles(_m *Role) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, role.UserRolesTable, role.UserRolesPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryPermissions queries the permissions edge of a Role.
-func (c *RoleClient) QueryPermissions(r *Role) *PermissionQuery {
+func (c *RoleClient) QueryPermissions(_m *Role) *PermissionQuery {
 	query := (&PermissionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
 			sqlgraph.To(permission.Table, permission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, role.PermissionsTable, role.PermissionsColumn),
 		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1114,8 +1114,8 @@ func (c *UserClient) Update() *UserUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUser(u))
+func (c *UserClient) UpdateOne(_m *User) *UserUpdateOne {
+	mutation := newUserMutation(c.config, OpUpdateOne, withUser(_m))
 	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1132,8 +1132,8 @@ func (c *UserClient) Delete() *UserDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
-	return c.DeleteOneID(u.ID)
+func (c *UserClient) DeleteOne(_m *User) *UserDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1168,128 +1168,128 @@ func (c *UserClient) GetX(ctx context.Context, id string) *User {
 }
 
 // QueryRefCreatedBy queries the ref_created_by edge of a User.
-func (c *UserClient) QueryRefCreatedBy(u *User) *UserQuery {
+func (c *UserClient) QueryRefCreatedBy(_m *User) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.RefCreatedByTable, user.RefCreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryCreatedBy queries the created_by edge of a User.
-func (c *UserClient) QueryCreatedBy(u *User) *UserQuery {
+func (c *UserClient) QueryCreatedBy(_m *User) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, user.CreatedByTable, user.CreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryRefUpdatedBy queries the ref_updated_by edge of a User.
-func (c *UserClient) QueryRefUpdatedBy(u *User) *UserQuery {
+func (c *UserClient) QueryRefUpdatedBy(_m *User) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.RefUpdatedByTable, user.RefUpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryUpdatedBy queries the updated_by edge of a User.
-func (c *UserClient) QueryUpdatedBy(u *User) *UserQuery {
+func (c *UserClient) QueryUpdatedBy(_m *User) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, user.UpdatedByTable, user.UpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminCreatedBy queries the admin_created_by edge of a User.
-func (c *UserClient) QueryAdminCreatedBy(u *User) *AdminUserQuery {
+func (c *UserClient) QueryAdminCreatedBy(_m *User) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, user.AdminCreatedByTable, user.AdminCreatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAdminUpdatedBy queries the admin_updated_by edge of a User.
-func (c *UserClient) QueryAdminUpdatedBy(u *User) *AdminUserQuery {
+func (c *UserClient) QueryAdminUpdatedBy(_m *User) *AdminUserQuery {
 	query := (&AdminUserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, user.AdminUpdatedByTable, user.AdminUpdatedByColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryRoles queries the roles edge of a User.
-func (c *UserClient) QueryRoles(u *User) *RoleQuery {
+func (c *UserClient) QueryRoles(_m *User) *RoleQuery {
 	query := (&RoleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.RolesTable, user.RolesPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryDefaultRole queries the default_role edge of a User.
-func (c *UserClient) QueryDefaultRole(u *User) *RoleQuery {
+func (c *UserClient) QueryDefaultRole(_m *User) *RoleQuery {
 	query := (&RoleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, user.DefaultRoleTable, user.DefaultRoleColumn),
 		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query

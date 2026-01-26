@@ -3,17 +3,19 @@
 package ent
 
 import (
-	"github.com/GoLabra/labra/entgql/ent/adminuser"
+	"github.com/GoLabra/labra/entgql/ent/predicate"
+	adminuser "github.com/GoLabra/labra/entgql/ent/adminuser"
 	file "github.com/GoLabra/labra/entgql/ent/file"
 	permission "github.com/GoLabra/labra/entgql/ent/permission"
-	"github.com/GoLabra/labra/entgql/ent/predicate"
 	role "github.com/GoLabra/labra/entgql/ent/role"
 )
 
+
+
 // WhereAdminCreatedBy adds a filter based on the AdminCreatedBy relationship.
 // This method allows owner-based permission filtering by admin user ID.
-func (au *AdminUserQuery) WhereAdminCreatedBy(adminUserID string) *AdminUserQuery {
-	return au.Where(
+func (_m *AdminUserQuery) WhereAdminCreatedBy(adminUserID string) *AdminUserQuery {
+	return _m.Where(
 		predicate.AdminUser(
 			adminuser.HasAdminCreatedByWith(
 				adminuser.IDEQ(adminUserID),
@@ -22,10 +24,11 @@ func (au *AdminUserQuery) WhereAdminCreatedBy(adminUserID string) *AdminUserQuer
 	)
 }
 
+
 // WhereAdminCreatedBy adds a filter based on the AdminCreatedBy relationship.
 // This method allows owner-based permission filtering by admin user ID.
-func (f *FileQuery) WhereAdminCreatedBy(adminUserID string) *FileQuery {
-	return f.Where(
+func (_m *FileQuery) WhereAdminCreatedBy(adminUserID string) *FileQuery {
+	return _m.Where(
 		predicate.File(
 			file.HasAdminCreatedByWith(
 				adminuser.IDEQ(adminUserID),
@@ -34,10 +37,11 @@ func (f *FileQuery) WhereAdminCreatedBy(adminUserID string) *FileQuery {
 	)
 }
 
+
 // WhereAdminCreatedBy adds a filter based on the AdminCreatedBy relationship.
 // This method allows owner-based permission filtering by admin user ID.
-func (p *PermissionQuery) WhereAdminCreatedBy(adminUserID string) *PermissionQuery {
-	return p.Where(
+func (_m *PermissionQuery) WhereAdminCreatedBy(adminUserID string) *PermissionQuery {
+	return _m.Where(
 		predicate.Permission(
 			permission.HasAdminCreatedByWith(
 				adminuser.IDEQ(adminUserID),
@@ -46,10 +50,11 @@ func (p *PermissionQuery) WhereAdminCreatedBy(adminUserID string) *PermissionQue
 	)
 }
 
+
 // WhereAdminCreatedBy adds a filter based on the AdminCreatedBy relationship.
 // This method allows owner-based permission filtering by admin user ID.
-func (r *RoleQuery) WhereAdminCreatedBy(adminUserID string) *RoleQuery {
-	return r.Where(
+func (_m *RoleQuery) WhereAdminCreatedBy(adminUserID string) *RoleQuery {
+	return _m.Where(
 		predicate.Role(
 			role.HasAdminCreatedByWith(
 				adminuser.IDEQ(adminUserID),
@@ -57,3 +62,5 @@ func (r *RoleQuery) WhereAdminCreatedBy(adminUserID string) *RoleQuery {
 		),
 	)
 }
+
+

@@ -22,6 +22,8 @@ const (
 	FieldEntity = "entity"
 	// FieldOperation holds the string denoting the operation field in the database.
 	FieldOperation = "operation"
+	// FieldLifecycleAccess holds the string denoting the lifecycle_access field in the database.
+	FieldLifecycleAccess = "lifecycle_access"
 	// EdgeAdminCreatedBy holds the string denoting the admin_created_by edge name in mutations.
 	EdgeAdminCreatedBy = "admin_created_by"
 	// EdgeAdminUpdatedBy holds the string denoting the admin_updated_by edge name in mutations.
@@ -60,6 +62,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldEntity,
 	FieldOperation,
+	FieldLifecycleAccess,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "permissions"
@@ -96,6 +99,8 @@ var (
 	DefaultOperation string
 	// OperationValidator is a validator for the "operation" field. It is called by the builders before save.
 	OperationValidator func(string) error
+	// LifecycleAccessValidator is a validator for the "lifecycle_access" field. It is called by the builders before save.
+	LifecycleAccessValidator func([]string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )

@@ -11,6 +11,7 @@ type Entity struct {
 	Caption          string
 	Owner            EntityOwner
 	DisplayFieldName string
+	EntityStateEnabled bool
 }
 
 // Reserved names that cannot be used for entity names

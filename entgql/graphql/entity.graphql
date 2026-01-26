@@ -39,6 +39,7 @@ input CreateEntityInput {
     displayField: FieldWhereUniqueInput!
     fields: CreateManyFieldsInput
     edges: CreateManyEdgesInput
+    lifecycle: LifecycleInput
 }
 
 input UpdateEntityInput {
@@ -46,6 +47,7 @@ input UpdateEntityInput {
     displayField: FieldWhereUniqueInput
     fields: UpdateManyFieldsInput
     edges: UpdateManyEdgesInput
+    lifecycle: LifecycleInput
 }
 
 input EntityWhereUniqueInput {
@@ -170,4 +172,15 @@ input UpdateEdgeInput {
     caption: String
     required: Boolean
     private: Boolean
+}
+
+enum EntityState {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+input LifecycleInput {
+    enabled: Boolean!
+    default: EntityState
 }

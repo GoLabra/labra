@@ -126,7 +126,7 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Role fields.
-func (r *Role) assignValues(columns []string, values []any) error {
+func (_m *Role) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -136,44 +136,44 @@ func (r *Role) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				r.ID = value.String
+				_m.ID = value.String
 			}
 		case role.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				r.Name = value.String
+				_m.Name = value.String
 			}
 		case role.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				r.CreatedAt = new(time.Time)
-				*r.CreatedAt = value.Time
+				_m.CreatedAt = new(time.Time)
+				*_m.CreatedAt = value.Time
 			}
 		case role.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				r.UpdatedAt = new(time.Time)
-				*r.UpdatedAt = value.Time
+				_m.UpdatedAt = new(time.Time)
+				*_m.UpdatedAt = value.Time
 			}
 		case role.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field role_admin_created_by", values[i])
 			} else if value.Valid {
-				r.role_admin_created_by = new(string)
-				*r.role_admin_created_by = value.String
+				_m.role_admin_created_by = new(string)
+				*_m.role_admin_created_by = value.String
 			}
 		case role.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field role_admin_updated_by", values[i])
 			} else if value.Valid {
-				r.role_admin_updated_by = new(string)
-				*r.role_admin_updated_by = value.String
+				_m.role_admin_updated_by = new(string)
+				*_m.role_admin_updated_by = value.String
 			}
 		default:
-			r.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -181,67 +181,67 @@ func (r *Role) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Role.
 // This includes values selected through modifiers, order, etc.
-func (r *Role) Value(name string) (ent.Value, error) {
-	return r.selectValues.Get(name)
+func (_m *Role) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAdminCreatedBy queries the "admin_created_by" edge of the Role entity.
-func (r *Role) QueryAdminCreatedBy() *AdminUserQuery {
-	return NewRoleClient(r.config).QueryAdminCreatedBy(r)
+func (_m *Role) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewRoleClient(_m.config).QueryAdminCreatedBy(_m)
 }
 
 // QueryAdminUpdatedBy queries the "admin_updated_by" edge of the Role entity.
-func (r *Role) QueryAdminUpdatedBy() *AdminUserQuery {
-	return NewRoleClient(r.config).QueryAdminUpdatedBy(r)
+func (_m *Role) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewRoleClient(_m.config).QueryAdminUpdatedBy(_m)
 }
 
 // QueryAdminUserRoles queries the "admin_user_roles" edge of the Role entity.
-func (r *Role) QueryAdminUserRoles() *AdminUserQuery {
-	return NewRoleClient(r.config).QueryAdminUserRoles(r)
+func (_m *Role) QueryAdminUserRoles() *AdminUserQuery {
+	return NewRoleClient(_m.config).QueryAdminUserRoles(_m)
 }
 
 // QueryUserRoles queries the "user_roles" edge of the Role entity.
-func (r *Role) QueryUserRoles() *UserQuery {
-	return NewRoleClient(r.config).QueryUserRoles(r)
+func (_m *Role) QueryUserRoles() *UserQuery {
+	return NewRoleClient(_m.config).QueryUserRoles(_m)
 }
 
 // QueryPermissions queries the "permissions" edge of the Role entity.
-func (r *Role) QueryPermissions() *PermissionQuery {
-	return NewRoleClient(r.config).QueryPermissions(r)
+func (_m *Role) QueryPermissions() *PermissionQuery {
+	return NewRoleClient(_m.config).QueryPermissions(_m)
 }
 
 // Update returns a builder for updating this Role.
 // Note that you need to call Role.Unwrap() before calling this method if this Role
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (r *Role) Update() *RoleUpdateOne {
-	return NewRoleClient(r.config).UpdateOne(r)
+func (_m *Role) Update() *RoleUpdateOne {
+	return NewRoleClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Role entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (r *Role) Unwrap() *Role {
-	_tx, ok := r.config.driver.(*txDriver)
+func (_m *Role) Unwrap() *Role {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Role is not a transactional entity")
 	}
-	r.config.driver = _tx.drv
-	return r
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (r *Role) String() string {
+func (_m *Role) String() string {
 	var builder strings.Builder
 	builder.WriteString("Role(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("name=")
-	builder.WriteString(r.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
-	if v := r.CreatedAt; v != nil {
+	if v := _m.CreatedAt; v != nil {
 		builder.WriteString("created_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := r.UpdatedAt; v != nil {
+	if v := _m.UpdatedAt; v != nil {
 		builder.WriteString("updated_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
@@ -251,73 +251,73 @@ func (r *Role) String() string {
 
 // NamedAdminUserRoles returns the AdminUserRoles named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Role) NamedAdminUserRoles(name string) ([]*AdminUser, error) {
-	if r.Edges.namedAdminUserRoles == nil {
+func (_m *Role) NamedAdminUserRoles(name string) ([]*AdminUser, error) {
+	if _m.Edges.namedAdminUserRoles == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedAdminUserRoles[name]
+	nodes, ok := _m.Edges.namedAdminUserRoles[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Role) appendNamedAdminUserRoles(name string, edges ...*AdminUser) {
-	if r.Edges.namedAdminUserRoles == nil {
-		r.Edges.namedAdminUserRoles = make(map[string][]*AdminUser)
+func (_m *Role) appendNamedAdminUserRoles(name string, edges ...*AdminUser) {
+	if _m.Edges.namedAdminUserRoles == nil {
+		_m.Edges.namedAdminUserRoles = make(map[string][]*AdminUser)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedAdminUserRoles[name] = []*AdminUser{}
+		_m.Edges.namedAdminUserRoles[name] = []*AdminUser{}
 	} else {
-		r.Edges.namedAdminUserRoles[name] = append(r.Edges.namedAdminUserRoles[name], edges...)
+		_m.Edges.namedAdminUserRoles[name] = append(_m.Edges.namedAdminUserRoles[name], edges...)
 	}
 }
 
 // NamedUserRoles returns the UserRoles named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Role) NamedUserRoles(name string) ([]*User, error) {
-	if r.Edges.namedUserRoles == nil {
+func (_m *Role) NamedUserRoles(name string) ([]*User, error) {
+	if _m.Edges.namedUserRoles == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedUserRoles[name]
+	nodes, ok := _m.Edges.namedUserRoles[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Role) appendNamedUserRoles(name string, edges ...*User) {
-	if r.Edges.namedUserRoles == nil {
-		r.Edges.namedUserRoles = make(map[string][]*User)
+func (_m *Role) appendNamedUserRoles(name string, edges ...*User) {
+	if _m.Edges.namedUserRoles == nil {
+		_m.Edges.namedUserRoles = make(map[string][]*User)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedUserRoles[name] = []*User{}
+		_m.Edges.namedUserRoles[name] = []*User{}
 	} else {
-		r.Edges.namedUserRoles[name] = append(r.Edges.namedUserRoles[name], edges...)
+		_m.Edges.namedUserRoles[name] = append(_m.Edges.namedUserRoles[name], edges...)
 	}
 }
 
 // NamedPermissions returns the Permissions named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Role) NamedPermissions(name string) ([]*Permission, error) {
-	if r.Edges.namedPermissions == nil {
+func (_m *Role) NamedPermissions(name string) ([]*Permission, error) {
+	if _m.Edges.namedPermissions == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedPermissions[name]
+	nodes, ok := _m.Edges.namedPermissions[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Role) appendNamedPermissions(name string, edges ...*Permission) {
-	if r.Edges.namedPermissions == nil {
-		r.Edges.namedPermissions = make(map[string][]*Permission)
+func (_m *Role) appendNamedPermissions(name string, edges ...*Permission) {
+	if _m.Edges.namedPermissions == nil {
+		_m.Edges.namedPermissions = make(map[string][]*Permission)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedPermissions[name] = []*Permission{}
+		_m.Edges.namedPermissions[name] = []*Permission{}
 	} else {
-		r.Edges.namedPermissions[name] = append(r.Edges.namedPermissions[name], edges...)
+		_m.Edges.namedPermissions[name] = append(_m.Edges.namedPermissions[name], edges...)
 	}
 }
 

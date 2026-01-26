@@ -25,240 +25,240 @@ type FileUpdate struct {
 }
 
 // Where appends a list predicates to the FileUpdate builder.
-func (fu *FileUpdate) Where(ps ...predicate.File) *FileUpdate {
-	fu.mutation.Where(ps...)
-	return fu
+func (_u *FileUpdate) Where(ps ...predicate.File) *FileUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (fu *FileUpdate) SetCreatedAt(t time.Time) *FileUpdate {
-	fu.mutation.SetCreatedAt(t)
-	return fu
+func (_u *FileUpdate) SetCreatedAt(v time.Time) *FileUpdate {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableCreatedAt(t *time.Time) *FileUpdate {
-	if t != nil {
-		fu.SetCreatedAt(*t)
+func (_u *FileUpdate) SetNillableCreatedAt(v *time.Time) *FileUpdate {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return fu
+	return _u
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (fu *FileUpdate) ClearCreatedAt() *FileUpdate {
-	fu.mutation.ClearCreatedAt()
-	return fu
+func (_u *FileUpdate) ClearCreatedAt() *FileUpdate {
+	_u.mutation.ClearCreatedAt()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (fu *FileUpdate) SetUpdatedAt(t time.Time) *FileUpdate {
-	fu.mutation.SetUpdatedAt(t)
-	return fu
+func (_u *FileUpdate) SetUpdatedAt(v time.Time) *FileUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (fu *FileUpdate) ClearUpdatedAt() *FileUpdate {
-	fu.mutation.ClearUpdatedAt()
-	return fu
+func (_u *FileUpdate) ClearUpdatedAt() *FileUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetCaption sets the "caption" field.
-func (fu *FileUpdate) SetCaption(s string) *FileUpdate {
-	fu.mutation.SetCaption(s)
-	return fu
+func (_u *FileUpdate) SetCaption(v string) *FileUpdate {
+	_u.mutation.SetCaption(v)
+	return _u
 }
 
 // SetNillableCaption sets the "caption" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableCaption(s *string) *FileUpdate {
-	if s != nil {
-		fu.SetCaption(*s)
+func (_u *FileUpdate) SetNillableCaption(v *string) *FileUpdate {
+	if v != nil {
+		_u.SetCaption(*v)
 	}
-	return fu
+	return _u
 }
 
 // ClearCaption clears the value of the "caption" field.
-func (fu *FileUpdate) ClearCaption() *FileUpdate {
-	fu.mutation.ClearCaption()
-	return fu
+func (_u *FileUpdate) ClearCaption() *FileUpdate {
+	_u.mutation.ClearCaption()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (fu *FileUpdate) SetName(s string) *FileUpdate {
-	fu.mutation.SetName(s)
-	return fu
+func (_u *FileUpdate) SetName(v string) *FileUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableName(s *string) *FileUpdate {
-	if s != nil {
-		fu.SetName(*s)
+func (_u *FileUpdate) SetNillableName(v *string) *FileUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return fu
+	return _u
 }
 
 // SetMimeType sets the "mime_type" field.
-func (fu *FileUpdate) SetMimeType(s string) *FileUpdate {
-	fu.mutation.SetMimeType(s)
-	return fu
+func (_u *FileUpdate) SetMimeType(v string) *FileUpdate {
+	_u.mutation.SetMimeType(v)
+	return _u
 }
 
 // SetNillableMimeType sets the "mime_type" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableMimeType(s *string) *FileUpdate {
-	if s != nil {
-		fu.SetMimeType(*s)
+func (_u *FileUpdate) SetNillableMimeType(v *string) *FileUpdate {
+	if v != nil {
+		_u.SetMimeType(*v)
 	}
-	return fu
+	return _u
 }
 
 // SetStorageFileName sets the "storage_file_name" field.
-func (fu *FileUpdate) SetStorageFileName(s string) *FileUpdate {
-	fu.mutation.SetStorageFileName(s)
-	return fu
+func (_u *FileUpdate) SetStorageFileName(v string) *FileUpdate {
+	_u.mutation.SetStorageFileName(v)
+	return _u
 }
 
 // SetNillableStorageFileName sets the "storage_file_name" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableStorageFileName(s *string) *FileUpdate {
-	if s != nil {
-		fu.SetStorageFileName(*s)
+func (_u *FileUpdate) SetNillableStorageFileName(v *string) *FileUpdate {
+	if v != nil {
+		_u.SetStorageFileName(*v)
 	}
-	return fu
+	return _u
 }
 
 // SetSize sets the "size" field.
-func (fu *FileUpdate) SetSize(i int64) *FileUpdate {
-	fu.mutation.ResetSize()
-	fu.mutation.SetSize(i)
-	return fu
+func (_u *FileUpdate) SetSize(v int64) *FileUpdate {
+	_u.mutation.ResetSize()
+	_u.mutation.SetSize(v)
+	return _u
 }
 
 // SetNillableSize sets the "size" field if the given value is not nil.
-func (fu *FileUpdate) SetNillableSize(i *int64) *FileUpdate {
-	if i != nil {
-		fu.SetSize(*i)
+func (_u *FileUpdate) SetNillableSize(v *int64) *FileUpdate {
+	if v != nil {
+		_u.SetSize(*v)
 	}
-	return fu
+	return _u
 }
 
-// AddSize adds i to the "size" field.
-func (fu *FileUpdate) AddSize(i int64) *FileUpdate {
-	fu.mutation.AddSize(i)
-	return fu
+// AddSize adds value to the "size" field.
+func (_u *FileUpdate) AddSize(v int64) *FileUpdate {
+	_u.mutation.AddSize(v)
+	return _u
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (fu *FileUpdate) SetAdminCreatedByID(id string) *FileUpdate {
-	fu.mutation.SetAdminCreatedByID(id)
-	return fu
+func (_u *FileUpdate) SetAdminCreatedByID(id string) *FileUpdate {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fu *FileUpdate) SetNillableAdminCreatedByID(id *string) *FileUpdate {
+func (_u *FileUpdate) SetNillableAdminCreatedByID(id *string) *FileUpdate {
 	if id != nil {
-		fu = fu.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return fu
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (fu *FileUpdate) SetAdminCreatedBy(a *AdminUser) *FileUpdate {
-	return fu.SetAdminCreatedByID(a.ID)
+func (_u *FileUpdate) SetAdminCreatedBy(v *AdminUser) *FileUpdate {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (fu *FileUpdate) SetAdminUpdatedByID(id string) *FileUpdate {
-	fu.mutation.SetAdminUpdatedByID(id)
-	return fu
+func (_u *FileUpdate) SetAdminUpdatedByID(id string) *FileUpdate {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fu *FileUpdate) SetNillableAdminUpdatedByID(id *string) *FileUpdate {
+func (_u *FileUpdate) SetNillableAdminUpdatedByID(id *string) *FileUpdate {
 	if id != nil {
-		fu = fu.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return fu
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (fu *FileUpdate) SetAdminUpdatedBy(a *AdminUser) *FileUpdate {
-	return fu.SetAdminUpdatedByID(a.ID)
+func (_u *FileUpdate) SetAdminUpdatedBy(v *AdminUser) *FileUpdate {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (fu *FileUpdate) SetCreatedByID(id string) *FileUpdate {
-	fu.mutation.SetCreatedByID(id)
-	return fu
+func (_u *FileUpdate) SetCreatedByID(id string) *FileUpdate {
+	_u.mutation.SetCreatedByID(id)
+	return _u
 }
 
 // SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (fu *FileUpdate) SetNillableCreatedByID(id *string) *FileUpdate {
+func (_u *FileUpdate) SetNillableCreatedByID(id *string) *FileUpdate {
 	if id != nil {
-		fu = fu.SetCreatedByID(*id)
+		_u = _u.SetCreatedByID(*id)
 	}
-	return fu
+	return _u
 }
 
 // SetCreatedBy sets the "created_by" edge to the User entity.
-func (fu *FileUpdate) SetCreatedBy(u *User) *FileUpdate {
-	return fu.SetCreatedByID(u.ID)
+func (_u *FileUpdate) SetCreatedBy(v *User) *FileUpdate {
+	return _u.SetCreatedByID(v.ID)
 }
 
 // SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (fu *FileUpdate) SetUpdatedByID(id string) *FileUpdate {
-	fu.mutation.SetUpdatedByID(id)
-	return fu
+func (_u *FileUpdate) SetUpdatedByID(id string) *FileUpdate {
+	_u.mutation.SetUpdatedByID(id)
+	return _u
 }
 
 // SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (fu *FileUpdate) SetNillableUpdatedByID(id *string) *FileUpdate {
+func (_u *FileUpdate) SetNillableUpdatedByID(id *string) *FileUpdate {
 	if id != nil {
-		fu = fu.SetUpdatedByID(*id)
+		_u = _u.SetUpdatedByID(*id)
 	}
-	return fu
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (fu *FileUpdate) SetUpdatedBy(u *User) *FileUpdate {
-	return fu.SetUpdatedByID(u.ID)
+func (_u *FileUpdate) SetUpdatedBy(v *User) *FileUpdate {
+	return _u.SetUpdatedByID(v.ID)
 }
 
 // Mutation returns the FileMutation object of the builder.
-func (fu *FileUpdate) Mutation() *FileMutation {
-	return fu.mutation
+func (_u *FileUpdate) Mutation() *FileMutation {
+	return _u.mutation
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (fu *FileUpdate) ClearAdminCreatedBy() *FileUpdate {
-	fu.mutation.ClearAdminCreatedBy()
-	return fu
+func (_u *FileUpdate) ClearAdminCreatedBy() *FileUpdate {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (fu *FileUpdate) ClearAdminUpdatedBy() *FileUpdate {
-	fu.mutation.ClearAdminUpdatedBy()
-	return fu
+func (_u *FileUpdate) ClearAdminUpdatedBy() *FileUpdate {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
-func (fu *FileUpdate) ClearCreatedBy() *FileUpdate {
-	fu.mutation.ClearCreatedBy()
-	return fu
+func (_u *FileUpdate) ClearCreatedBy() *FileUpdate {
+	_u.mutation.ClearCreatedBy()
+	return _u
 }
 
 // ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (fu *FileUpdate) ClearUpdatedBy() *FileUpdate {
-	fu.mutation.ClearUpdatedBy()
-	return fu
+func (_u *FileUpdate) ClearUpdatedBy() *FileUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (fu *FileUpdate) Save(ctx context.Context) (int, error) {
-	fu.defaults()
-	return withHooks(ctx, fu.sqlSave, fu.mutation, fu.hooks)
+func (_u *FileUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (fu *FileUpdate) SaveX(ctx context.Context) int {
-	affected, err := fu.Save(ctx)
+func (_u *FileUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -266,69 +266,69 @@ func (fu *FileUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (fu *FileUpdate) Exec(ctx context.Context) error {
-	_, err := fu.Save(ctx)
+func (_u *FileUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fu *FileUpdate) ExecX(ctx context.Context) {
-	if err := fu.Exec(ctx); err != nil {
+func (_u *FileUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (fu *FileUpdate) defaults() {
-	if _, ok := fu.mutation.UpdatedAt(); !ok && !fu.mutation.UpdatedAtCleared() {
+func (_u *FileUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := file.UpdateDefaultUpdatedAt()
-		fu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *FileUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(file.Table, file.Columns, sqlgraph.NewFieldSpec(file.FieldID, field.TypeString))
-	if ps := fu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := fu.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(file.FieldCreatedAt, field.TypeTime, value)
 	}
-	if fu.mutation.CreatedAtCleared() {
+	if _u.mutation.CreatedAtCleared() {
 		_spec.ClearField(file.FieldCreatedAt, field.TypeTime)
 	}
-	if value, ok := fu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if fu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(file.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := fu.mutation.Caption(); ok {
+	if value, ok := _u.mutation.Caption(); ok {
 		_spec.SetField(file.FieldCaption, field.TypeString, value)
 	}
-	if fu.mutation.CaptionCleared() {
+	if _u.mutation.CaptionCleared() {
 		_spec.ClearField(file.FieldCaption, field.TypeString)
 	}
-	if value, ok := fu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 	}
-	if value, ok := fu.mutation.MimeType(); ok {
+	if value, ok := _u.mutation.MimeType(); ok {
 		_spec.SetField(file.FieldMimeType, field.TypeString, value)
 	}
-	if value, ok := fu.mutation.StorageFileName(); ok {
+	if value, ok := _u.mutation.StorageFileName(); ok {
 		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
 	}
-	if value, ok := fu.mutation.Size(); ok {
+	if value, ok := _u.mutation.Size(); ok {
 		_spec.SetField(file.FieldSize, field.TypeInt64, value)
 	}
-	if value, ok := fu.mutation.AddedSize(); ok {
+	if value, ok := _u.mutation.AddedSize(); ok {
 		_spec.AddField(file.FieldSize, field.TypeInt64, value)
 	}
-	if fu.mutation.AdminCreatedByCleared() {
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -341,7 +341,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fu.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -357,7 +357,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fu.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -370,7 +370,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fu.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -386,7 +386,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fu.mutation.CreatedByCleared() {
+	if _u.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -399,7 +399,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fu.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -415,7 +415,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -428,7 +428,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fu.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -444,7 +444,7 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, fu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{file.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -452,8 +452,8 @@ func (fu *FileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	fu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // FileUpdateOne is the builder for updating a single File entity.
@@ -465,247 +465,247 @@ type FileUpdateOne struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (fuo *FileUpdateOne) SetCreatedAt(t time.Time) *FileUpdateOne {
-	fuo.mutation.SetCreatedAt(t)
-	return fuo
+func (_u *FileUpdateOne) SetCreatedAt(v time.Time) *FileUpdateOne {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableCreatedAt(t *time.Time) *FileUpdateOne {
-	if t != nil {
-		fuo.SetCreatedAt(*t)
+func (_u *FileUpdateOne) SetNillableCreatedAt(v *time.Time) *FileUpdateOne {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return fuo
+	return _u
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (fuo *FileUpdateOne) ClearCreatedAt() *FileUpdateOne {
-	fuo.mutation.ClearCreatedAt()
-	return fuo
+func (_u *FileUpdateOne) ClearCreatedAt() *FileUpdateOne {
+	_u.mutation.ClearCreatedAt()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (fuo *FileUpdateOne) SetUpdatedAt(t time.Time) *FileUpdateOne {
-	fuo.mutation.SetUpdatedAt(t)
-	return fuo
+func (_u *FileUpdateOne) SetUpdatedAt(v time.Time) *FileUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (fuo *FileUpdateOne) ClearUpdatedAt() *FileUpdateOne {
-	fuo.mutation.ClearUpdatedAt()
-	return fuo
+func (_u *FileUpdateOne) ClearUpdatedAt() *FileUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetCaption sets the "caption" field.
-func (fuo *FileUpdateOne) SetCaption(s string) *FileUpdateOne {
-	fuo.mutation.SetCaption(s)
-	return fuo
+func (_u *FileUpdateOne) SetCaption(v string) *FileUpdateOne {
+	_u.mutation.SetCaption(v)
+	return _u
 }
 
 // SetNillableCaption sets the "caption" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableCaption(s *string) *FileUpdateOne {
-	if s != nil {
-		fuo.SetCaption(*s)
+func (_u *FileUpdateOne) SetNillableCaption(v *string) *FileUpdateOne {
+	if v != nil {
+		_u.SetCaption(*v)
 	}
-	return fuo
+	return _u
 }
 
 // ClearCaption clears the value of the "caption" field.
-func (fuo *FileUpdateOne) ClearCaption() *FileUpdateOne {
-	fuo.mutation.ClearCaption()
-	return fuo
+func (_u *FileUpdateOne) ClearCaption() *FileUpdateOne {
+	_u.mutation.ClearCaption()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (fuo *FileUpdateOne) SetName(s string) *FileUpdateOne {
-	fuo.mutation.SetName(s)
-	return fuo
+func (_u *FileUpdateOne) SetName(v string) *FileUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableName(s *string) *FileUpdateOne {
-	if s != nil {
-		fuo.SetName(*s)
+func (_u *FileUpdateOne) SetNillableName(v *string) *FileUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return fuo
+	return _u
 }
 
 // SetMimeType sets the "mime_type" field.
-func (fuo *FileUpdateOne) SetMimeType(s string) *FileUpdateOne {
-	fuo.mutation.SetMimeType(s)
-	return fuo
+func (_u *FileUpdateOne) SetMimeType(v string) *FileUpdateOne {
+	_u.mutation.SetMimeType(v)
+	return _u
 }
 
 // SetNillableMimeType sets the "mime_type" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableMimeType(s *string) *FileUpdateOne {
-	if s != nil {
-		fuo.SetMimeType(*s)
+func (_u *FileUpdateOne) SetNillableMimeType(v *string) *FileUpdateOne {
+	if v != nil {
+		_u.SetMimeType(*v)
 	}
-	return fuo
+	return _u
 }
 
 // SetStorageFileName sets the "storage_file_name" field.
-func (fuo *FileUpdateOne) SetStorageFileName(s string) *FileUpdateOne {
-	fuo.mutation.SetStorageFileName(s)
-	return fuo
+func (_u *FileUpdateOne) SetStorageFileName(v string) *FileUpdateOne {
+	_u.mutation.SetStorageFileName(v)
+	return _u
 }
 
 // SetNillableStorageFileName sets the "storage_file_name" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableStorageFileName(s *string) *FileUpdateOne {
-	if s != nil {
-		fuo.SetStorageFileName(*s)
+func (_u *FileUpdateOne) SetNillableStorageFileName(v *string) *FileUpdateOne {
+	if v != nil {
+		_u.SetStorageFileName(*v)
 	}
-	return fuo
+	return _u
 }
 
 // SetSize sets the "size" field.
-func (fuo *FileUpdateOne) SetSize(i int64) *FileUpdateOne {
-	fuo.mutation.ResetSize()
-	fuo.mutation.SetSize(i)
-	return fuo
+func (_u *FileUpdateOne) SetSize(v int64) *FileUpdateOne {
+	_u.mutation.ResetSize()
+	_u.mutation.SetSize(v)
+	return _u
 }
 
 // SetNillableSize sets the "size" field if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableSize(i *int64) *FileUpdateOne {
-	if i != nil {
-		fuo.SetSize(*i)
+func (_u *FileUpdateOne) SetNillableSize(v *int64) *FileUpdateOne {
+	if v != nil {
+		_u.SetSize(*v)
 	}
-	return fuo
+	return _u
 }
 
-// AddSize adds i to the "size" field.
-func (fuo *FileUpdateOne) AddSize(i int64) *FileUpdateOne {
-	fuo.mutation.AddSize(i)
-	return fuo
+// AddSize adds value to the "size" field.
+func (_u *FileUpdateOne) AddSize(v int64) *FileUpdateOne {
+	_u.mutation.AddSize(v)
+	return _u
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (fuo *FileUpdateOne) SetAdminCreatedByID(id string) *FileUpdateOne {
-	fuo.mutation.SetAdminCreatedByID(id)
-	return fuo
+func (_u *FileUpdateOne) SetAdminCreatedByID(id string) *FileUpdateOne {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableAdminCreatedByID(id *string) *FileUpdateOne {
+func (_u *FileUpdateOne) SetNillableAdminCreatedByID(id *string) *FileUpdateOne {
 	if id != nil {
-		fuo = fuo.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return fuo
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (fuo *FileUpdateOne) SetAdminCreatedBy(a *AdminUser) *FileUpdateOne {
-	return fuo.SetAdminCreatedByID(a.ID)
+func (_u *FileUpdateOne) SetAdminCreatedBy(v *AdminUser) *FileUpdateOne {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (fuo *FileUpdateOne) SetAdminUpdatedByID(id string) *FileUpdateOne {
-	fuo.mutation.SetAdminUpdatedByID(id)
-	return fuo
+func (_u *FileUpdateOne) SetAdminUpdatedByID(id string) *FileUpdateOne {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableAdminUpdatedByID(id *string) *FileUpdateOne {
+func (_u *FileUpdateOne) SetNillableAdminUpdatedByID(id *string) *FileUpdateOne {
 	if id != nil {
-		fuo = fuo.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return fuo
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (fuo *FileUpdateOne) SetAdminUpdatedBy(a *AdminUser) *FileUpdateOne {
-	return fuo.SetAdminUpdatedByID(a.ID)
+func (_u *FileUpdateOne) SetAdminUpdatedBy(v *AdminUser) *FileUpdateOne {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (fuo *FileUpdateOne) SetCreatedByID(id string) *FileUpdateOne {
-	fuo.mutation.SetCreatedByID(id)
-	return fuo
+func (_u *FileUpdateOne) SetCreatedByID(id string) *FileUpdateOne {
+	_u.mutation.SetCreatedByID(id)
+	return _u
 }
 
 // SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableCreatedByID(id *string) *FileUpdateOne {
+func (_u *FileUpdateOne) SetNillableCreatedByID(id *string) *FileUpdateOne {
 	if id != nil {
-		fuo = fuo.SetCreatedByID(*id)
+		_u = _u.SetCreatedByID(*id)
 	}
-	return fuo
+	return _u
 }
 
 // SetCreatedBy sets the "created_by" edge to the User entity.
-func (fuo *FileUpdateOne) SetCreatedBy(u *User) *FileUpdateOne {
-	return fuo.SetCreatedByID(u.ID)
+func (_u *FileUpdateOne) SetCreatedBy(v *User) *FileUpdateOne {
+	return _u.SetCreatedByID(v.ID)
 }
 
 // SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (fuo *FileUpdateOne) SetUpdatedByID(id string) *FileUpdateOne {
-	fuo.mutation.SetUpdatedByID(id)
-	return fuo
+func (_u *FileUpdateOne) SetUpdatedByID(id string) *FileUpdateOne {
+	_u.mutation.SetUpdatedByID(id)
+	return _u
 }
 
 // SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (fuo *FileUpdateOne) SetNillableUpdatedByID(id *string) *FileUpdateOne {
+func (_u *FileUpdateOne) SetNillableUpdatedByID(id *string) *FileUpdateOne {
 	if id != nil {
-		fuo = fuo.SetUpdatedByID(*id)
+		_u = _u.SetUpdatedByID(*id)
 	}
-	return fuo
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (fuo *FileUpdateOne) SetUpdatedBy(u *User) *FileUpdateOne {
-	return fuo.SetUpdatedByID(u.ID)
+func (_u *FileUpdateOne) SetUpdatedBy(v *User) *FileUpdateOne {
+	return _u.SetUpdatedByID(v.ID)
 }
 
 // Mutation returns the FileMutation object of the builder.
-func (fuo *FileUpdateOne) Mutation() *FileMutation {
-	return fuo.mutation
+func (_u *FileUpdateOne) Mutation() *FileMutation {
+	return _u.mutation
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (fuo *FileUpdateOne) ClearAdminCreatedBy() *FileUpdateOne {
-	fuo.mutation.ClearAdminCreatedBy()
-	return fuo
+func (_u *FileUpdateOne) ClearAdminCreatedBy() *FileUpdateOne {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (fuo *FileUpdateOne) ClearAdminUpdatedBy() *FileUpdateOne {
-	fuo.mutation.ClearAdminUpdatedBy()
-	return fuo
+func (_u *FileUpdateOne) ClearAdminUpdatedBy() *FileUpdateOne {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
-func (fuo *FileUpdateOne) ClearCreatedBy() *FileUpdateOne {
-	fuo.mutation.ClearCreatedBy()
-	return fuo
+func (_u *FileUpdateOne) ClearCreatedBy() *FileUpdateOne {
+	_u.mutation.ClearCreatedBy()
+	return _u
 }
 
 // ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (fuo *FileUpdateOne) ClearUpdatedBy() *FileUpdateOne {
-	fuo.mutation.ClearUpdatedBy()
-	return fuo
+func (_u *FileUpdateOne) ClearUpdatedBy() *FileUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // Where appends a list predicates to the FileUpdate builder.
-func (fuo *FileUpdateOne) Where(ps ...predicate.File) *FileUpdateOne {
-	fuo.mutation.Where(ps...)
-	return fuo
+func (_u *FileUpdateOne) Where(ps ...predicate.File) *FileUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (fuo *FileUpdateOne) Select(field string, fields ...string) *FileUpdateOne {
-	fuo.fields = append([]string{field}, fields...)
-	return fuo
+func (_u *FileUpdateOne) Select(field string, fields ...string) *FileUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated File entity.
-func (fuo *FileUpdateOne) Save(ctx context.Context) (*File, error) {
-	fuo.defaults()
-	return withHooks(ctx, fuo.sqlSave, fuo.mutation, fuo.hooks)
+func (_u *FileUpdateOne) Save(ctx context.Context) (*File, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (fuo *FileUpdateOne) SaveX(ctx context.Context) *File {
-	node, err := fuo.Save(ctx)
+func (_u *FileUpdateOne) SaveX(ctx context.Context) *File {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -713,34 +713,34 @@ func (fuo *FileUpdateOne) SaveX(ctx context.Context) *File {
 }
 
 // Exec executes the query on the entity.
-func (fuo *FileUpdateOne) Exec(ctx context.Context) error {
-	_, err := fuo.Save(ctx)
+func (_u *FileUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fuo *FileUpdateOne) ExecX(ctx context.Context) {
-	if err := fuo.Exec(ctx); err != nil {
+func (_u *FileUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (fuo *FileUpdateOne) defaults() {
-	if _, ok := fuo.mutation.UpdatedAt(); !ok && !fuo.mutation.UpdatedAtCleared() {
+func (_u *FileUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := file.UpdateDefaultUpdatedAt()
-		fuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) {
+func (_u *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) {
 	_spec := sqlgraph.NewUpdateSpec(file.Table, file.Columns, sqlgraph.NewFieldSpec(file.FieldID, field.TypeString))
-	id, ok := fuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "File.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := fuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, file.FieldID)
 		for _, f := range fields {
@@ -752,47 +752,47 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 			}
 		}
 	}
-	if ps := fuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := fuo.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(file.FieldCreatedAt, field.TypeTime, value)
 	}
-	if fuo.mutation.CreatedAtCleared() {
+	if _u.mutation.CreatedAtCleared() {
 		_spec.ClearField(file.FieldCreatedAt, field.TypeTime)
 	}
-	if value, ok := fuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(file.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if fuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(file.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := fuo.mutation.Caption(); ok {
+	if value, ok := _u.mutation.Caption(); ok {
 		_spec.SetField(file.FieldCaption, field.TypeString, value)
 	}
-	if fuo.mutation.CaptionCleared() {
+	if _u.mutation.CaptionCleared() {
 		_spec.ClearField(file.FieldCaption, field.TypeString)
 	}
-	if value, ok := fuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(file.FieldName, field.TypeString, value)
 	}
-	if value, ok := fuo.mutation.MimeType(); ok {
+	if value, ok := _u.mutation.MimeType(); ok {
 		_spec.SetField(file.FieldMimeType, field.TypeString, value)
 	}
-	if value, ok := fuo.mutation.StorageFileName(); ok {
+	if value, ok := _u.mutation.StorageFileName(); ok {
 		_spec.SetField(file.FieldStorageFileName, field.TypeString, value)
 	}
-	if value, ok := fuo.mutation.Size(); ok {
+	if value, ok := _u.mutation.Size(); ok {
 		_spec.SetField(file.FieldSize, field.TypeInt64, value)
 	}
-	if value, ok := fuo.mutation.AddedSize(); ok {
+	if value, ok := _u.mutation.AddedSize(); ok {
 		_spec.AddField(file.FieldSize, field.TypeInt64, value)
 	}
-	if fuo.mutation.AdminCreatedByCleared() {
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -805,7 +805,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fuo.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -821,7 +821,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fuo.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -834,7 +834,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fuo.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -850,7 +850,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fuo.mutation.CreatedByCleared() {
+	if _u.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -863,7 +863,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fuo.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -879,7 +879,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -892,7 +892,7 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fuo.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -908,10 +908,10 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &File{config: fuo.config}
+	_node = &File{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, fuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{file.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -919,6 +919,6 @@ func (fuo *FileUpdateOne) sqlSave(ctx context.Context) (_node *File, err error) 
 		}
 		return nil, err
 	}
-	fuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

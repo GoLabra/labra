@@ -38,6 +38,16 @@ func LoadSchema(config *config.AppConfig) {
 			panic(err)
 		}
 
+		// Check for State annotation
+		entityStateEnabled := false
+		if stateAnnotation, ok := node.Annotations[annotations.EntityStateName]; ok {
+			var stateAnnotations annotations.State
+			err := mapstructure.Decode(stateAnnotation, &stateAnnotations)
+			if err == nil && stateAnnotations.Enabled {
+				entityStateEnabled = true
+			}
+		}
+
 		entityName := strcase.NodeNameToGraphqlName(node.Name)
 		cache.Entity.Set(entityName, entity.Entity{
 			Name:             entityName,
@@ -45,6 +55,7 @@ func LoadSchema(config *config.AppConfig) {
 			Caption:          entityAnnotations.Caption,
 			Owner:            entityAnnotations.Owner,
 			DisplayFieldName: entityAnnotations.DisplayField,
+			EntityStateEnabled: entityStateEnabled,
 		})
 
 		fields := []entity.Field{

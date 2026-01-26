@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/GoLabra/labra/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/entgql/ent/permission"
@@ -25,160 +26,178 @@ type PermissionUpdate struct {
 }
 
 // Where appends a list predicates to the PermissionUpdate builder.
-func (pu *PermissionUpdate) Where(ps ...predicate.Permission) *PermissionUpdate {
-	pu.mutation.Where(ps...)
-	return pu
+func (_u *PermissionUpdate) Where(ps ...predicate.Permission) *PermissionUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (pu *PermissionUpdate) SetCreatedAt(t time.Time) *PermissionUpdate {
-	pu.mutation.SetCreatedAt(t)
-	return pu
+func (_u *PermissionUpdate) SetCreatedAt(v time.Time) *PermissionUpdate {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableCreatedAt(t *time.Time) *PermissionUpdate {
-	if t != nil {
-		pu.SetCreatedAt(*t)
+func (_u *PermissionUpdate) SetNillableCreatedAt(v *time.Time) *PermissionUpdate {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (pu *PermissionUpdate) ClearCreatedAt() *PermissionUpdate {
-	pu.mutation.ClearCreatedAt()
-	return pu
+func (_u *PermissionUpdate) ClearCreatedAt() *PermissionUpdate {
+	_u.mutation.ClearCreatedAt()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (pu *PermissionUpdate) SetUpdatedAt(t time.Time) *PermissionUpdate {
-	pu.mutation.SetUpdatedAt(t)
-	return pu
+func (_u *PermissionUpdate) SetUpdatedAt(v time.Time) *PermissionUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (pu *PermissionUpdate) ClearUpdatedAt() *PermissionUpdate {
-	pu.mutation.ClearUpdatedAt()
-	return pu
+func (_u *PermissionUpdate) ClearUpdatedAt() *PermissionUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetEntity sets the "entity" field.
-func (pu *PermissionUpdate) SetEntity(s string) *PermissionUpdate {
-	pu.mutation.SetEntity(s)
-	return pu
+func (_u *PermissionUpdate) SetEntity(v string) *PermissionUpdate {
+	_u.mutation.SetEntity(v)
+	return _u
 }
 
 // SetNillableEntity sets the "entity" field if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableEntity(s *string) *PermissionUpdate {
-	if s != nil {
-		pu.SetEntity(*s)
+func (_u *PermissionUpdate) SetNillableEntity(v *string) *PermissionUpdate {
+	if v != nil {
+		_u.SetEntity(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetOperation sets the "operation" field.
-func (pu *PermissionUpdate) SetOperation(s string) *PermissionUpdate {
-	pu.mutation.SetOperation(s)
-	return pu
+func (_u *PermissionUpdate) SetOperation(v string) *PermissionUpdate {
+	_u.mutation.SetOperation(v)
+	return _u
 }
 
 // SetNillableOperation sets the "operation" field if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableOperation(s *string) *PermissionUpdate {
-	if s != nil {
-		pu.SetOperation(*s)
+func (_u *PermissionUpdate) SetNillableOperation(v *string) *PermissionUpdate {
+	if v != nil {
+		_u.SetOperation(*v)
 	}
-	return pu
+	return _u
+}
+
+// SetLifecycleAccess sets the "lifecycle_access" field.
+func (_u *PermissionUpdate) SetLifecycleAccess(v []string) *PermissionUpdate {
+	_u.mutation.SetLifecycleAccess(v)
+	return _u
+}
+
+// AppendLifecycleAccess appends value to the "lifecycle_access" field.
+func (_u *PermissionUpdate) AppendLifecycleAccess(v []string) *PermissionUpdate {
+	_u.mutation.AppendLifecycleAccess(v)
+	return _u
+}
+
+// ClearLifecycleAccess clears the value of the "lifecycle_access" field.
+func (_u *PermissionUpdate) ClearLifecycleAccess() *PermissionUpdate {
+	_u.mutation.ClearLifecycleAccess()
+	return _u
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (pu *PermissionUpdate) SetAdminCreatedByID(id string) *PermissionUpdate {
-	pu.mutation.SetAdminCreatedByID(id)
-	return pu
+func (_u *PermissionUpdate) SetAdminCreatedByID(id string) *PermissionUpdate {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableAdminCreatedByID(id *string) *PermissionUpdate {
+func (_u *PermissionUpdate) SetNillableAdminCreatedByID(id *string) *PermissionUpdate {
 	if id != nil {
-		pu = pu.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return pu
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (pu *PermissionUpdate) SetAdminCreatedBy(a *AdminUser) *PermissionUpdate {
-	return pu.SetAdminCreatedByID(a.ID)
+func (_u *PermissionUpdate) SetAdminCreatedBy(v *AdminUser) *PermissionUpdate {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (pu *PermissionUpdate) SetAdminUpdatedByID(id string) *PermissionUpdate {
-	pu.mutation.SetAdminUpdatedByID(id)
-	return pu
+func (_u *PermissionUpdate) SetAdminUpdatedByID(id string) *PermissionUpdate {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableAdminUpdatedByID(id *string) *PermissionUpdate {
+func (_u *PermissionUpdate) SetNillableAdminUpdatedByID(id *string) *PermissionUpdate {
 	if id != nil {
-		pu = pu.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return pu
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (pu *PermissionUpdate) SetAdminUpdatedBy(a *AdminUser) *PermissionUpdate {
-	return pu.SetAdminUpdatedByID(a.ID)
+func (_u *PermissionUpdate) SetAdminUpdatedBy(v *AdminUser) *PermissionUpdate {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // SetRoleID sets the "role" edge to the Role entity by ID.
-func (pu *PermissionUpdate) SetRoleID(id string) *PermissionUpdate {
-	pu.mutation.SetRoleID(id)
-	return pu
+func (_u *PermissionUpdate) SetRoleID(id string) *PermissionUpdate {
+	_u.mutation.SetRoleID(id)
+	return _u
 }
 
 // SetNillableRoleID sets the "role" edge to the Role entity by ID if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableRoleID(id *string) *PermissionUpdate {
+func (_u *PermissionUpdate) SetNillableRoleID(id *string) *PermissionUpdate {
 	if id != nil {
-		pu = pu.SetRoleID(*id)
+		_u = _u.SetRoleID(*id)
 	}
-	return pu
+	return _u
 }
 
 // SetRole sets the "role" edge to the Role entity.
-func (pu *PermissionUpdate) SetRole(r *Role) *PermissionUpdate {
-	return pu.SetRoleID(r.ID)
+func (_u *PermissionUpdate) SetRole(v *Role) *PermissionUpdate {
+	return _u.SetRoleID(v.ID)
 }
 
 // Mutation returns the PermissionMutation object of the builder.
-func (pu *PermissionUpdate) Mutation() *PermissionMutation {
-	return pu.mutation
+func (_u *PermissionUpdate) Mutation() *PermissionMutation {
+	return _u.mutation
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (pu *PermissionUpdate) ClearAdminCreatedBy() *PermissionUpdate {
-	pu.mutation.ClearAdminCreatedBy()
-	return pu
+func (_u *PermissionUpdate) ClearAdminCreatedBy() *PermissionUpdate {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (pu *PermissionUpdate) ClearAdminUpdatedBy() *PermissionUpdate {
-	pu.mutation.ClearAdminUpdatedBy()
-	return pu
+func (_u *PermissionUpdate) ClearAdminUpdatedBy() *PermissionUpdate {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // ClearRole clears the "role" edge to the Role entity.
-func (pu *PermissionUpdate) ClearRole() *PermissionUpdate {
-	pu.mutation.ClearRole()
-	return pu
+func (_u *PermissionUpdate) ClearRole() *PermissionUpdate {
+	_u.mutation.ClearRole()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (pu *PermissionUpdate) Save(ctx context.Context) (int, error) {
-	pu.defaults()
-	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
+func (_u *PermissionUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (pu *PermissionUpdate) SaveX(ctx context.Context) int {
-	affected, err := pu.Save(ctx)
+func (_u *PermissionUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -186,67 +205,83 @@ func (pu *PermissionUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (pu *PermissionUpdate) Exec(ctx context.Context) error {
-	_, err := pu.Save(ctx)
+func (_u *PermissionUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pu *PermissionUpdate) ExecX(ctx context.Context) {
-	if err := pu.Exec(ctx); err != nil {
+func (_u *PermissionUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (pu *PermissionUpdate) defaults() {
-	if _, ok := pu.mutation.UpdatedAt(); !ok && !pu.mutation.UpdatedAtCleared() {
+func (_u *PermissionUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := permission.UpdateDefaultUpdatedAt()
-		pu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (pu *PermissionUpdate) check() error {
-	if v, ok := pu.mutation.Operation(); ok {
+func (_u *PermissionUpdate) check() error {
+	if v, ok := _u.mutation.Operation(); ok {
 		if err := permission.OperationValidator(v); err != nil {
 			return &ValidationError{Name: "operation", err: fmt.Errorf(`ent: validator failed for field "Permission.operation": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.LifecycleAccess(); ok {
+		if err := permission.LifecycleAccessValidator(v); err != nil {
+			return &ValidationError{Name: "lifecycle_access", err: fmt.Errorf(`ent: validator failed for field "Permission.lifecycle_access": %w`, err)}
 		}
 	}
 	return nil
 }
 
-func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := pu.check(); err != nil {
-		return n, err
+func (_u *PermissionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(permission.Table, permission.Columns, sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString))
-	if ps := pu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := pu.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(permission.FieldCreatedAt, field.TypeTime, value)
 	}
-	if pu.mutation.CreatedAtCleared() {
+	if _u.mutation.CreatedAtCleared() {
 		_spec.ClearField(permission.FieldCreatedAt, field.TypeTime)
 	}
-	if value, ok := pu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(permission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if pu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(permission.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := pu.mutation.Entity(); ok {
+	if value, ok := _u.mutation.Entity(); ok {
 		_spec.SetField(permission.FieldEntity, field.TypeString, value)
 	}
-	if value, ok := pu.mutation.Operation(); ok {
+	if value, ok := _u.mutation.Operation(); ok {
 		_spec.SetField(permission.FieldOperation, field.TypeString, value)
 	}
-	if pu.mutation.AdminCreatedByCleared() {
+	if value, ok := _u.mutation.LifecycleAccess(); ok {
+		_spec.SetField(permission.FieldLifecycleAccess, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedLifecycleAccess(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, permission.FieldLifecycleAccess, value)
+		})
+	}
+	if _u.mutation.LifecycleAccessCleared() {
+		_spec.ClearField(permission.FieldLifecycleAccess, field.TypeJSON)
+	}
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -259,7 +294,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -275,7 +310,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -288,7 +323,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -304,7 +339,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.RoleCleared() {
+	if _u.mutation.RoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -317,7 +352,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RoleIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -333,7 +368,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{permission.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -341,8 +376,8 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	pu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // PermissionUpdateOne is the builder for updating a single Permission entity.
@@ -354,167 +389,185 @@ type PermissionUpdateOne struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (puo *PermissionUpdateOne) SetCreatedAt(t time.Time) *PermissionUpdateOne {
-	puo.mutation.SetCreatedAt(t)
-	return puo
+func (_u *PermissionUpdateOne) SetCreatedAt(v time.Time) *PermissionUpdateOne {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableCreatedAt(t *time.Time) *PermissionUpdateOne {
-	if t != nil {
-		puo.SetCreatedAt(*t)
+func (_u *PermissionUpdateOne) SetNillableCreatedAt(v *time.Time) *PermissionUpdateOne {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (puo *PermissionUpdateOne) ClearCreatedAt() *PermissionUpdateOne {
-	puo.mutation.ClearCreatedAt()
-	return puo
+func (_u *PermissionUpdateOne) ClearCreatedAt() *PermissionUpdateOne {
+	_u.mutation.ClearCreatedAt()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (puo *PermissionUpdateOne) SetUpdatedAt(t time.Time) *PermissionUpdateOne {
-	puo.mutation.SetUpdatedAt(t)
-	return puo
+func (_u *PermissionUpdateOne) SetUpdatedAt(v time.Time) *PermissionUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (puo *PermissionUpdateOne) ClearUpdatedAt() *PermissionUpdateOne {
-	puo.mutation.ClearUpdatedAt()
-	return puo
+func (_u *PermissionUpdateOne) ClearUpdatedAt() *PermissionUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetEntity sets the "entity" field.
-func (puo *PermissionUpdateOne) SetEntity(s string) *PermissionUpdateOne {
-	puo.mutation.SetEntity(s)
-	return puo
+func (_u *PermissionUpdateOne) SetEntity(v string) *PermissionUpdateOne {
+	_u.mutation.SetEntity(v)
+	return _u
 }
 
 // SetNillableEntity sets the "entity" field if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableEntity(s *string) *PermissionUpdateOne {
-	if s != nil {
-		puo.SetEntity(*s)
+func (_u *PermissionUpdateOne) SetNillableEntity(v *string) *PermissionUpdateOne {
+	if v != nil {
+		_u.SetEntity(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetOperation sets the "operation" field.
-func (puo *PermissionUpdateOne) SetOperation(s string) *PermissionUpdateOne {
-	puo.mutation.SetOperation(s)
-	return puo
+func (_u *PermissionUpdateOne) SetOperation(v string) *PermissionUpdateOne {
+	_u.mutation.SetOperation(v)
+	return _u
 }
 
 // SetNillableOperation sets the "operation" field if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableOperation(s *string) *PermissionUpdateOne {
-	if s != nil {
-		puo.SetOperation(*s)
+func (_u *PermissionUpdateOne) SetNillableOperation(v *string) *PermissionUpdateOne {
+	if v != nil {
+		_u.SetOperation(*v)
 	}
-	return puo
+	return _u
+}
+
+// SetLifecycleAccess sets the "lifecycle_access" field.
+func (_u *PermissionUpdateOne) SetLifecycleAccess(v []string) *PermissionUpdateOne {
+	_u.mutation.SetLifecycleAccess(v)
+	return _u
+}
+
+// AppendLifecycleAccess appends value to the "lifecycle_access" field.
+func (_u *PermissionUpdateOne) AppendLifecycleAccess(v []string) *PermissionUpdateOne {
+	_u.mutation.AppendLifecycleAccess(v)
+	return _u
+}
+
+// ClearLifecycleAccess clears the value of the "lifecycle_access" field.
+func (_u *PermissionUpdateOne) ClearLifecycleAccess() *PermissionUpdateOne {
+	_u.mutation.ClearLifecycleAccess()
+	return _u
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (puo *PermissionUpdateOne) SetAdminCreatedByID(id string) *PermissionUpdateOne {
-	puo.mutation.SetAdminCreatedByID(id)
-	return puo
+func (_u *PermissionUpdateOne) SetAdminCreatedByID(id string) *PermissionUpdateOne {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableAdminCreatedByID(id *string) *PermissionUpdateOne {
+func (_u *PermissionUpdateOne) SetNillableAdminCreatedByID(id *string) *PermissionUpdateOne {
 	if id != nil {
-		puo = puo.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return puo
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (puo *PermissionUpdateOne) SetAdminCreatedBy(a *AdminUser) *PermissionUpdateOne {
-	return puo.SetAdminCreatedByID(a.ID)
+func (_u *PermissionUpdateOne) SetAdminCreatedBy(v *AdminUser) *PermissionUpdateOne {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (puo *PermissionUpdateOne) SetAdminUpdatedByID(id string) *PermissionUpdateOne {
-	puo.mutation.SetAdminUpdatedByID(id)
-	return puo
+func (_u *PermissionUpdateOne) SetAdminUpdatedByID(id string) *PermissionUpdateOne {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableAdminUpdatedByID(id *string) *PermissionUpdateOne {
+func (_u *PermissionUpdateOne) SetNillableAdminUpdatedByID(id *string) *PermissionUpdateOne {
 	if id != nil {
-		puo = puo.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return puo
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (puo *PermissionUpdateOne) SetAdminUpdatedBy(a *AdminUser) *PermissionUpdateOne {
-	return puo.SetAdminUpdatedByID(a.ID)
+func (_u *PermissionUpdateOne) SetAdminUpdatedBy(v *AdminUser) *PermissionUpdateOne {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // SetRoleID sets the "role" edge to the Role entity by ID.
-func (puo *PermissionUpdateOne) SetRoleID(id string) *PermissionUpdateOne {
-	puo.mutation.SetRoleID(id)
-	return puo
+func (_u *PermissionUpdateOne) SetRoleID(id string) *PermissionUpdateOne {
+	_u.mutation.SetRoleID(id)
+	return _u
 }
 
 // SetNillableRoleID sets the "role" edge to the Role entity by ID if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableRoleID(id *string) *PermissionUpdateOne {
+func (_u *PermissionUpdateOne) SetNillableRoleID(id *string) *PermissionUpdateOne {
 	if id != nil {
-		puo = puo.SetRoleID(*id)
+		_u = _u.SetRoleID(*id)
 	}
-	return puo
+	return _u
 }
 
 // SetRole sets the "role" edge to the Role entity.
-func (puo *PermissionUpdateOne) SetRole(r *Role) *PermissionUpdateOne {
-	return puo.SetRoleID(r.ID)
+func (_u *PermissionUpdateOne) SetRole(v *Role) *PermissionUpdateOne {
+	return _u.SetRoleID(v.ID)
 }
 
 // Mutation returns the PermissionMutation object of the builder.
-func (puo *PermissionUpdateOne) Mutation() *PermissionMutation {
-	return puo.mutation
+func (_u *PermissionUpdateOne) Mutation() *PermissionMutation {
+	return _u.mutation
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (puo *PermissionUpdateOne) ClearAdminCreatedBy() *PermissionUpdateOne {
-	puo.mutation.ClearAdminCreatedBy()
-	return puo
+func (_u *PermissionUpdateOne) ClearAdminCreatedBy() *PermissionUpdateOne {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (puo *PermissionUpdateOne) ClearAdminUpdatedBy() *PermissionUpdateOne {
-	puo.mutation.ClearAdminUpdatedBy()
-	return puo
+func (_u *PermissionUpdateOne) ClearAdminUpdatedBy() *PermissionUpdateOne {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // ClearRole clears the "role" edge to the Role entity.
-func (puo *PermissionUpdateOne) ClearRole() *PermissionUpdateOne {
-	puo.mutation.ClearRole()
-	return puo
+func (_u *PermissionUpdateOne) ClearRole() *PermissionUpdateOne {
+	_u.mutation.ClearRole()
+	return _u
 }
 
 // Where appends a list predicates to the PermissionUpdate builder.
-func (puo *PermissionUpdateOne) Where(ps ...predicate.Permission) *PermissionUpdateOne {
-	puo.mutation.Where(ps...)
-	return puo
+func (_u *PermissionUpdateOne) Where(ps ...predicate.Permission) *PermissionUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (puo *PermissionUpdateOne) Select(field string, fields ...string) *PermissionUpdateOne {
-	puo.fields = append([]string{field}, fields...)
-	return puo
+func (_u *PermissionUpdateOne) Select(field string, fields ...string) *PermissionUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Permission entity.
-func (puo *PermissionUpdateOne) Save(ctx context.Context) (*Permission, error) {
-	puo.defaults()
-	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
+func (_u *PermissionUpdateOne) Save(ctx context.Context) (*Permission, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (puo *PermissionUpdateOne) SaveX(ctx context.Context) *Permission {
-	node, err := puo.Save(ctx)
+func (_u *PermissionUpdateOne) SaveX(ctx context.Context) *Permission {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -522,47 +575,52 @@ func (puo *PermissionUpdateOne) SaveX(ctx context.Context) *Permission {
 }
 
 // Exec executes the query on the entity.
-func (puo *PermissionUpdateOne) Exec(ctx context.Context) error {
-	_, err := puo.Save(ctx)
+func (_u *PermissionUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (puo *PermissionUpdateOne) ExecX(ctx context.Context) {
-	if err := puo.Exec(ctx); err != nil {
+func (_u *PermissionUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (puo *PermissionUpdateOne) defaults() {
-	if _, ok := puo.mutation.UpdatedAt(); !ok && !puo.mutation.UpdatedAtCleared() {
+func (_u *PermissionUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := permission.UpdateDefaultUpdatedAt()
-		puo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (puo *PermissionUpdateOne) check() error {
-	if v, ok := puo.mutation.Operation(); ok {
+func (_u *PermissionUpdateOne) check() error {
+	if v, ok := _u.mutation.Operation(); ok {
 		if err := permission.OperationValidator(v); err != nil {
 			return &ValidationError{Name: "operation", err: fmt.Errorf(`ent: validator failed for field "Permission.operation": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.LifecycleAccess(); ok {
+		if err := permission.LifecycleAccessValidator(v); err != nil {
+			return &ValidationError{Name: "lifecycle_access", err: fmt.Errorf(`ent: validator failed for field "Permission.lifecycle_access": %w`, err)}
 		}
 	}
 	return nil
 }
 
-func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission, err error) {
-	if err := puo.check(); err != nil {
+func (_u *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(permission.Table, permission.Columns, sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString))
-	id, ok := puo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Permission.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := puo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, permission.FieldID)
 		for _, f := range fields {
@@ -574,32 +632,43 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 			}
 		}
 	}
-	if ps := puo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := puo.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(permission.FieldCreatedAt, field.TypeTime, value)
 	}
-	if puo.mutation.CreatedAtCleared() {
+	if _u.mutation.CreatedAtCleared() {
 		_spec.ClearField(permission.FieldCreatedAt, field.TypeTime)
 	}
-	if value, ok := puo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(permission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if puo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(permission.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := puo.mutation.Entity(); ok {
+	if value, ok := _u.mutation.Entity(); ok {
 		_spec.SetField(permission.FieldEntity, field.TypeString, value)
 	}
-	if value, ok := puo.mutation.Operation(); ok {
+	if value, ok := _u.mutation.Operation(); ok {
 		_spec.SetField(permission.FieldOperation, field.TypeString, value)
 	}
-	if puo.mutation.AdminCreatedByCleared() {
+	if value, ok := _u.mutation.LifecycleAccess(); ok {
+		_spec.SetField(permission.FieldLifecycleAccess, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedLifecycleAccess(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, permission.FieldLifecycleAccess, value)
+		})
+	}
+	if _u.mutation.LifecycleAccessCleared() {
+		_spec.ClearField(permission.FieldLifecycleAccess, field.TypeJSON)
+	}
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -612,7 +681,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -628,7 +697,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -641,7 +710,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -657,7 +726,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.RoleCleared() {
+	if _u.mutation.RoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -670,7 +739,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RoleIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -686,10 +755,10 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Permission{config: puo.config}
+	_node = &Permission{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, puo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{permission.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -697,6 +766,6 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 		}
 		return nil, err
 	}
-	puo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -102,6 +102,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
 		{Name: "entity", Type: field.TypeString, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
 		{Name: "operation", Type: field.TypeString, Default: ""},
+		{Name: "lifecycle_access", Type: field.TypeJSON, Nullable: true},
 		{Name: "permission_admin_created_by", Type: field.TypeString, Nullable: true},
 		{Name: "permission_admin_updated_by", Type: field.TypeString, Nullable: true},
 		{Name: "permission_role", Type: field.TypeString, Nullable: true},
@@ -114,19 +115,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "permissions_admin_users_admin_created_by",
-				Columns:    []*schema.Column{PermissionsColumns[5]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "permissions_admin_users_admin_updated_by",
 				Columns:    []*schema.Column{PermissionsColumns[6]},
 				RefColumns: []*schema.Column{AdminUsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "permissions_roles_role",
+				Symbol:     "permissions_admin_users_admin_updated_by",
 				Columns:    []*schema.Column{PermissionsColumns[7]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "permissions_roles_role",
+				Columns:    []*schema.Column{PermissionsColumns[8]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

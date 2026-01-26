@@ -1,4 +1,17 @@
 {{- define "Enum" }}
+		{{- if eq $.Type "EntityState" }}
+		field.Enum("{{$.EntName}}").
+			GoType(entity.EntityState("")).
+            {{- if $.Required | IsFalse  }}
+            Optional().
+            {{- end}}
+            {{- if $.DefaultValue}}
+			Default(string(entity.EntityState{{$.DefaultValue}})).
+            {{- end}}
+			Annotations(
+                entgql.Type("{{$.Type}}"),
+			),
+		{{- else }}
 		field.Enum("{{$.EntName}}").
 			GoType(enum.{{$.Type}}("")).
             {{- if $.Required | IsFalse  }}
@@ -10,4 +23,5 @@
 			Annotations(
                 entgql.Type("{{$.Type}}"),
 			),
+		{{- end }}
 {{- end }}

@@ -21,7 +21,7 @@ type {{$.Entity.EntName}} struct {
 }
 
 func ({{$.Entity.EntName}}) Annotations() []schema.Annotation {
-	return []schema.Annotation{
+	annotationsList := []schema.Annotation{
 		entgql.MultiOrder(),
 		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
@@ -31,6 +31,22 @@ func ({{$.Entity.EntName}}) Annotations() []schema.Annotation {
             DisplayField: "{{$.Entity.DisplayFieldName}}",
 		},
 	}
+	{{- if $.Entity.EntityStateEnabled }}
+	{{- $entityStateField := nil }}
+	{{- range $f := $.Fields }}
+	{{- if eq $f.Name "entityState" }}
+	{{- $entityStateField = $f }}
+	{{- end }}
+	{{- end }}
+	stateAnnotation := annotations.State{
+		Enabled: true,
+	}
+	{{- if and $entityStateField $entityStateField.DefaultValue }}
+	stateAnnotation.Default = "{{$entityStateField.DefaultValue}}"
+	{{- end }}
+	annotationsList = append(annotationsList, stateAnnotation)
+	{{- end }}
+	return annotationsList
 }
 
 // Fields of the  {{$.Entity.EntName}}.
@@ -38,6 +54,8 @@ func ({{$.Entity.EntName}}) Fields() []ent.Field {
 	return []ent.Field{
         {{- range $f := $.Fields}}
         {{- if eq $f.Type "Enum"}}
+            {{template "Enum" $f}}
+        {{- else if eq $f.Type "EntityState"}}
             {{template "Enum" $f}}
         {{- else if eq $f.Type "Enums"}}
             {{template "Enums" $f}}
