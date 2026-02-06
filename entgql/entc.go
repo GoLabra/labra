@@ -51,6 +51,31 @@ func init() {
 	templateFuncMap["Ignore"] = func(t *gen.Type) bool {
 		return t.Annotations["Entity"] != nil && t.Annotations["Entity"].(map[string]any)["Owner"] == "User"
 	}
+	templateFuncMap["hasStateAnnotation"] = func(t *gen.Type) bool {
+		if stateAnnotation, ok := t.Annotations[annotations.EntityStateName]; ok {
+			var stateAnnotations annotations.State
+			if err := mapstructure.Decode(stateAnnotation, &stateAnnotations); err == nil {
+				return stateAnnotations.Enabled
+			}
+		}
+		return false
+	}
+	templateFuncMap["hasEntityStateField"] = func(t *gen.Type) bool {
+		for _, f := range t.Fields {
+			if f.Name == "entity_state" {
+				return true
+			}
+		}
+		return false
+	}
+	templateFuncMap["isEntityStatePointer"] = func(t *gen.Type) bool {
+		for _, f := range t.Fields {
+			if f.Name == "entity_state" {
+				return f.Optional || (f.Type.RType != nil && f.Type.RType.IsPtr())
+			}
+		}
+		return false
+	}
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
 	os.MkdirAll("./domain/resolvers", os.ModePerm)
@@ -101,8 +126,8 @@ func main() {
 		},
 		Hooks: []gen.Hook{
 			// CleanupUserFiles(),
-			CreateGraphqlUniqueInputs(),
-			CreateOwnerFilterMethods(),
+			RunGraphTemplates(),
+			CreateLifecycleMethods(),
 			// CreateEntUniqueInputs(),
 			// CreateGraphqlSchema(),
 			// CreateServiceInterface(),
@@ -160,6 +185,50 @@ func DeleteUserFilesFromDirectory(directoryName, fileExtension string) {
 	}
 }
 
+// runTemplate loads the template, creates the output file, executes with data, and closes the file.
+func runTemplate(errPrefix, tmplName, tmplPath, outPath string, data interface{}) error {
+	tmpl, err := templates.LoadTemplate(tmplName, tmplPath, templateFuncMap)
+	if err != nil {
+		return fmt.Errorf("%s %w", errPrefix, err)
+	}
+	f, err := os.Create(outPath)
+	if err != nil {
+		return fmt.Errorf("%s %w", errPrefix, err)
+	}
+	defer f.Close()
+	if err := tmpl.Execute(f, data); err != nil {
+		return fmt.Errorf("%s %w", errPrefix, err)
+	}
+	return nil
+}
+
+// RunGraphTemplates runs all graph-level templates (unique inputs, owner filter) then calls next.
+func RunGraphTemplates() gen.Hook {
+	errPrefix := "[RunGraphTemplates]"
+	return func(next gen.Generator) gen.Generator {
+		return gen.GenerateFunc(func(g *gen.Graph) error {
+			t := TemplateData{
+				Graph: g,
+				TypesTemplate: map[string]string{
+					"string":                  "String",
+					"bool":                    "Boolean",
+					"time.Time":               "Time",
+					"int":                     "Int",
+					"float64":                 "Float",
+					"map[string]interface {}": "Map",
+				},
+			}
+			if err := runTemplate(errPrefix, "unique_inputs.graphql.tmpl", "graphql/unique_inputs.graphql.tmpl", "./graphql/unique_inputs.graphql", t); err != nil {
+				return err
+			}
+			if err := runTemplate(errPrefix, "owner_filter_methods.go.tmpl", "ent/owner_filter_methods.go.tmpl", "./ent/owner_filter_methods.go", g); err != nil {
+				return err
+			}
+			return next.Generate(g)
+		})
+	}
+}
+
 func CreateEntUniqueInputs() gen.Hook {
 	errFormat := "[CreateEntUniqueInputs] %w"
 	return func(next gen.Generator) gen.Generator {
@@ -186,70 +255,17 @@ func CreateEntUniqueInputs() gen.Hook {
 	}
 }
 
-func CreateOwnerFilterMethods() gen.Hook {
-	errFormat := "[CreateOwnerFilterMethods] %w"
+func CreateLifecycleMethods() gen.Hook {
+	errPrefix := "[CreateLifecycleMethods]"
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
-			tmpl, err := templates.LoadTemplate("owner_filter_methods.go.tmpl", "ent/owner_filter_methods.go.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
+			if err := next.Generate(g); err != nil {
+				return err
 			}
-
-			f, err := os.Create("./ent/owner_filter_methods.go")
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating file: %w", err))
+			if err := runTemplate(errPrefix, "lifecycle.go.tmpl", "ent/lifecycle.go.tmpl", "./ent/lifecycle.go", g); err != nil {
+				return err
 			}
-
-			err = tmpl.Execute(f, g)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-			}
-
-			f.Close()
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateGraphqlUniqueInputs() gen.Hook {
-	errFormat := "[CreateGraphqlUniqueInputs] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			t := TemplateData{
-				Graph: g,
-				TypesTemplate: map[string]string{
-					"string":                  "String",
-					"bool":                    "Boolean",
-					"time.Time":               "Time",
-					"int":                     "Int",
-					"float64":                 "Float",
-					"map[string]interface {}": "Map",
-				},
-			}
-
-			tmpl, err := templates.LoadTemplate("unique_inputs.graphql.tmpl", "graphql/unique_inputs.graphql.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-			}
-
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating folder: %w", err))
-			}
-
-			f, err := os.Create("./graphql/unique_inputs.graphql")
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating file: %w", err))
-			}
-
-			err = tmpl.Execute(f, t)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-			}
-
-			f.Close()
-			return next.Generate(g)
+			return runTemplate(errPrefix, "lifecycle_filter_methods.go.tmpl", "ent/lifecycle_filter_methods.go.tmpl", "./ent/lifecycle_filter_methods.go", g)
 		})
 	}
 }

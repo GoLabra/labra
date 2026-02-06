@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/GoLabra/labra/cache"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
+	"github.com/GoLabra/labra/entgql/entity"
 	"github.com/GoLabra/labra/strcase"
 )
 
@@ -18,12 +20,51 @@ type QueryWithAdminCreatedBy interface {
 	WhereAdminCreatedBy(adminUserID string) ent.Query
 }
 
+// LifecycleFilterQuery is an interface for queries that support filtering by entity_state.
+// The WhereEntityStateIn method is generated for entities with lifecycle enabled.
+type LifecycleFilterQuery interface {
+	ent.Query
+	WhereEntityStateIn(states ...entity.EntityState) ent.Query
+}
+
 // applyOwnerFilter applies the owner filter to any query that implements WhereAdminCreatedBy.
 // This uses the generated WhereAdminCreatedBy method from the ent template.
 func applyOwnerFilter(q ent.Query, adminUserID string) {
 	if ownerQuery, ok := q.(QueryWithAdminCreatedBy); ok {
 		ownerQuery.WhereAdminCreatedBy(adminUserID)
 	}
+}
+
+// applyLifecycleFilter restricts the query to rows whose entity_state is in the allowed set.
+func applyLifecycleFilter(q ent.Query, allowedStates []entity.EntityState) {
+	if len(allowedStates) == 0 {
+		return
+	}
+	if lq, ok := q.(LifecycleFilterQuery); ok {
+		lq.WhereEntityStateIn(allowedStates...)
+	}
+}
+
+// allowedStatesFromPermissions returns the union of states allowed by the given permissions.
+// Empty LifecycleAccess means all states. Returns nil when the union is all states (no filter needed).
+func allowedStatesFromPermissions(permissions []*ent.Permission) []entity.EntityState {
+	set := make(map[entity.EntityState]struct{})
+	for _, perm := range permissions {
+		if len(perm.LifecycleAccess) == 0 {
+			return nil // full access
+		}
+		for _, s := range perm.LifecycleAccess {
+			set[entity.EntityState(s)] = struct{}{}
+		}
+	}
+	if len(set) == 3 {
+		return nil
+	}
+	out := make([]entity.EntityState, 0, len(set))
+	for st := range set {
+		out = append(out, st)
+	}
+	return out
 }
 
 // CreatedByUpdatedByHook automatically sets created_by and updated_by fields
@@ -72,7 +113,7 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 
 		service, ok := ctx.Value(constants.AdminServiceContextValue).(*svc.Service)
 		if !ok {
-			return nil, fmt.Errorf(svc.ErrServiceNotSetInContext)
+			return nil, fmt.Errorf("%s", svc.ErrServiceNotSetInContext)
 		}
 
 		role, ok := ctx.Value(constants.RoleContextValue).(*ent.Role)
@@ -114,6 +155,20 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 			return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 		}
 
+		// For Update/Delete on entities with lifecycle, ensure each target row's state is allowed by at least one permission.
+		// Empty lifecycle_access means full access; populated means only those states are allowed.
+		if m.Op().Is(ent.OpUpdateOne | ent.OpUpdate | ent.OpDeleteOne | ent.OpDelete) {
+			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityStateEnabled {
+				allowed, err := mutationTargetsAllowedByLifecycle(ctx, m, t, permissions)
+				if err != nil {
+					return nil, fmt.Errorf("entity state check: %w", err)
+				}
+				if !allowed {
+					return nil, fmt.Errorf("Forbidden: you may not update or delete this %s in its current lifecycle state", entityName)
+				}
+			}
+		}
+
 		return next.Mutate(ctx, m)
 	})
 }
@@ -146,49 +201,52 @@ func EntityReadPermission() ent.Interceptor {
 			}
 
 			operationName := "Read"
-			// Use internal context for permission queries (bypasses permission checks)
 			iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
-			permissions, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
-				HasRoleWith: []*ent.RoleWhereInput{
-					{
-						Name: &role.Name,
-					},
-				},
-				Entity:    &entityName,
-				Operation: &operationName,
+			readPerms, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
+				HasRoleWith: []*ent.RoleWhereInput{{Name: &role.Name}},
+				Entity:      &entityName,
+				Operation:   &operationName,
 			}, nil, nil, nil, nil)
-
 			if err != nil {
 				return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 			}
 
-			if len(permissions) > 0 {
-				return next.Query(ctx, q)
-			}
-
-			// If there is an Owner permission for this entity and role, apply owner filter
 			ownerOperation := "Owner"
 			ownerPerms, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
-				HasRoleWith: []*ent.RoleWhereInput{
-					{
-						Name: &role.Name,
-					},
-				},
-				Entity:    &entityName,
-				Operation: &ownerOperation,
+				HasRoleWith: []*ent.RoleWhereInput{{Name: &role.Name}},
+				Entity:      &entityName,
+				Operation:   &ownerOperation,
 			}, nil, nil, nil, nil)
-
-			if err != nil || len(ownerPerms) == 0 {
+			if err != nil {
 				return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 			}
 
-			adminUser, ok := ctx.Value(constants.UserContextValue).(*ent.AdminUser)
-			if !ok || adminUser == nil {
+			allowedByRead := len(readPerms) > 0
+			allowedByOwner := len(ownerPerms) > 0
+			if !allowedByRead && !allowedByOwner {
 				return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 			}
 
-			// Apply owner filter using the generated WhereAdminCreatedBy method
-			applyOwnerFilter(q, adminUser.ID)
+			// Collect all permissions that grant access for lifecycle_access union
+			allPerms := make([]*ent.Permission, 0, len(readPerms)+len(ownerPerms))
+			if allowedByRead {
+				allPerms = append(allPerms, readPerms...)
+			}
+			if allowedByOwner {
+				allPerms = append(allPerms, ownerPerms...)
+			}
+			allowedStates := allowedStatesFromPermissions(allPerms)
+			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityStateEnabled && len(allowedStates) > 0 {
+				applyLifecycleFilter(q, allowedStates)
+			}
+
+			if allowedByOwner && !allowedByRead {
+				adminUser, ok := ctx.Value(constants.UserContextValue).(*ent.AdminUser)
+				if !ok || adminUser == nil {
+					return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
+				}
+				applyOwnerFilter(q, adminUser.ID)
+			}
 
 			return next.Query(ctx, q)
 		})
@@ -210,4 +268,166 @@ func getEntityNameFromQuery(q ent.Query) string {
 	}
 
 	return strcase.LowerFirstLetter(entityName)
+}
+
+// isMutationTargetArchived returns true if the mutation targets one or more rows whose entity_state is ARCHIVED.
+// entityType is the schema type name (e.g. "File", "User"). Uses reflection to call Client().<Type>.Get(ctx, id) and
+// then uses the LifecycleStateGetter interface to get the lifecycle state.
+func isMutationTargetArchived(ctx context.Context, m ent.Mutation, entityType string) (bool, error) {
+	// Get IDs from mutation (IDs(ctx) ([]string, error))
+	mv := reflect.ValueOf(m)
+	if mv.Kind() == reflect.Ptr {
+		mv = mv.Elem()
+	}
+	idsMethod := mv.Addr().MethodByName("IDs")
+	if !idsMethod.IsValid() {
+		return false, nil // no IDs method, skip check
+	}
+	outs := idsMethod.Call([]reflect.Value{reflect.ValueOf(ctx)})
+	if len(outs) != 2 {
+		return false, nil
+	}
+	idsSlice := outs[0].Interface().([]string)
+	if err := outs[1].Interface(); err != nil {
+		return false, err.(error)
+	}
+	if len(idsSlice) == 0 {
+		return false, nil
+	}
+
+	// Get client from mutation (Client() *Client)
+	clientMethod := mv.Addr().MethodByName("Client")
+	if !clientMethod.IsValid() {
+		return false, nil
+	}
+	clientOuts := clientMethod.Call(nil)
+	if len(clientOuts) == 0 || clientOuts[0].IsNil() {
+		return false, nil
+	}
+	client := clientOuts[0].Interface().(*ent.Client)
+
+	// Get the entity client (e.g. client.File)
+	clientVal := reflect.ValueOf(client).Elem()
+	entityClient := clientVal.FieldByName(entityType)
+	if !entityClient.IsValid() || entityClient.IsNil() {
+		return false, nil
+	}
+
+	// For each ID, call Get(ctx, id) and check lifecycle state using the interface
+	for _, id := range idsSlice {
+		getMethod := entityClient.MethodByName("Get")
+		if !getMethod.IsValid() {
+			continue
+		}
+		getOuts := getMethod.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(id)})
+		if len(getOuts) < 2 {
+			continue
+		}
+		if err := getOuts[1].Interface(); err != nil {
+			return false, err.(error)
+		}
+		nodeValue := getOuts[0]
+		if nodeValue.IsNil() {
+			continue
+		}
+
+		// Type assert to LifecycleStateGetter interface
+		node := nodeValue.Interface()
+		if getter, ok := node.(entity.LifecycleStateGetter); ok {
+			state := getter.GetLifecycleState()
+			if state == entity.EntityStateArchived {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
+// permissionAllowsState returns true if the permission allows the given lifecycle state.
+// Empty LifecycleAccess means full access; otherwise the state must be in the list.
+func permissionAllowsState(perm *ent.Permission, state entity.EntityState) bool {
+	if len(perm.LifecycleAccess) == 0 {
+		return true
+	}
+	s := string(state)
+	for _, allowed := range perm.LifecycleAccess {
+		if allowed == s {
+			return true
+		}
+	}
+	return false
+}
+
+// mutationTargetsAllowedByLifecycle loads each target row of the mutation, gets its lifecycle state,
+// and returns true only if every row's state is allowed by at least one of the given permissions.
+func mutationTargetsAllowedByLifecycle(ctx context.Context, m ent.Mutation, entityType string, permissions []*ent.Permission) (bool, error) {
+	mv := reflect.ValueOf(m)
+	if mv.Kind() == reflect.Ptr {
+		mv = mv.Elem()
+	}
+	idsMethod := mv.Addr().MethodByName("IDs")
+	if !idsMethod.IsValid() {
+		return true, nil
+	}
+	outs := idsMethod.Call([]reflect.Value{reflect.ValueOf(ctx)})
+	if len(outs) != 2 {
+		return true, nil
+	}
+	idsSlice := outs[0].Interface().([]string)
+	if err := outs[1].Interface(); err != nil {
+		return false, err.(error)
+	}
+	if len(idsSlice) == 0 {
+		return true, nil
+	}
+
+	clientMethod := mv.Addr().MethodByName("Client")
+	if !clientMethod.IsValid() {
+		return true, nil
+	}
+	clientOuts := clientMethod.Call(nil)
+	if len(clientOuts) == 0 || clientOuts[0].IsNil() {
+		return true, nil
+	}
+	client := clientOuts[0].Interface().(*ent.Client)
+	clientVal := reflect.ValueOf(client).Elem()
+	entityClient := clientVal.FieldByName(entityType)
+	if !entityClient.IsValid() || entityClient.IsNil() {
+		return true, nil
+	}
+
+	for _, id := range idsSlice {
+		getMethod := entityClient.MethodByName("Get")
+		if !getMethod.IsValid() {
+			continue
+		}
+		getOuts := getMethod.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(id)})
+		if len(getOuts) < 2 {
+			continue
+		}
+		if err := getOuts[1].Interface(); err != nil {
+			return false, err.(error)
+		}
+		nodeValue := getOuts[0]
+		if nodeValue.IsNil() {
+			continue
+		}
+		node := nodeValue.Interface()
+		getter, ok := node.(entity.LifecycleStateGetter)
+		if !ok {
+			continue
+		}
+		state := getter.GetLifecycleState()
+		allowed := false
+		for _, perm := range permissions {
+			if permissionAllowsState(perm, state) {
+				allowed = true
+				break
+			}
+		}
+		if !allowed {
+			return false, nil
+		}
+	}
+	return true, nil
 }

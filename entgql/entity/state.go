@@ -63,3 +63,9 @@ func (e EntityState) MarshalJSON() ([]byte, error) {
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil
 }
+
+// LifecycleStateGetter is implemented by generated ent models that have entity state (lifecycle) enabled.
+// Used by hooks to check lifecycle state without reflection.
+type LifecycleStateGetter interface {
+	GetLifecycleState() EntityState
+}
