@@ -304,8 +304,7 @@ func RunNodeTemplates() gen.Hook {
 				if err := runTemplate(errPrefix, "interface.go.tmpl", "repo/interface.go.tmpl", "./interfaces/repo/"+baseName+".go", node); err != nil {
 					return err
 				}
-				resolverData := GraphqlSchemaTemplateData{Name: node.Name}
-				if err := runTemplate(errPrefix, "entity.resolver.go.tmpl", "resolver/entity.resolver.go.tmpl", "./domain/resolvers/"+baseName+".resolvers.go", resolverData); err != nil {
+				if err := runTemplate(errPrefix, "entity.resolver.go.tmpl", "resolver/entity.resolver.go.tmpl", "./domain/resolvers/"+baseName+".resolvers.go", node); err != nil {
 					return err
 				}
 			}

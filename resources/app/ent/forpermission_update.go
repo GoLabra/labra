@@ -25,224 +25,224 @@ type ForPermissionUpdate struct {
 }
 
 // Where appends a list predicates to the ForPermissionUpdate builder.
-func (fpu *ForPermissionUpdate) Where(ps ...predicate.ForPermission) *ForPermissionUpdate {
-	fpu.mutation.Where(ps...)
-	return fpu
+func (_u *ForPermissionUpdate) Where(ps ...predicate.ForPermission) *ForPermissionUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (fpu *ForPermissionUpdate) SetCreatedAt(t time.Time) *ForPermissionUpdate {
-	fpu.mutation.SetCreatedAt(t)
-	return fpu
+func (_u *ForPermissionUpdate) SetCreatedAt(v time.Time) *ForPermissionUpdate {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableCreatedAt(t *time.Time) *ForPermissionUpdate {
-	if t != nil {
-		fpu.SetCreatedAt(*t)
+func (_u *ForPermissionUpdate) SetNillableCreatedAt(v *time.Time) *ForPermissionUpdate {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return fpu
+	return _u
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (fpu *ForPermissionUpdate) ClearCreatedAt() *ForPermissionUpdate {
-	fpu.mutation.ClearCreatedAt()
-	return fpu
+func (_u *ForPermissionUpdate) ClearCreatedAt() *ForPermissionUpdate {
+	_u.mutation.ClearCreatedAt()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (fpu *ForPermissionUpdate) SetUpdatedAt(t time.Time) *ForPermissionUpdate {
-	fpu.mutation.SetUpdatedAt(t)
-	return fpu
+func (_u *ForPermissionUpdate) SetUpdatedAt(v time.Time) *ForPermissionUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (fpu *ForPermissionUpdate) ClearUpdatedAt() *ForPermissionUpdate {
-	fpu.mutation.ClearUpdatedAt()
-	return fpu
+func (_u *ForPermissionUpdate) ClearUpdatedAt() *ForPermissionUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (fpu *ForPermissionUpdate) SetName(s string) *ForPermissionUpdate {
-	fpu.mutation.SetName(s)
-	return fpu
+func (_u *ForPermissionUpdate) SetName(v string) *ForPermissionUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableName(s *string) *ForPermissionUpdate {
-	if s != nil {
-		fpu.SetName(*s)
+func (_u *ForPermissionUpdate) SetNillableName(v *string) *ForPermissionUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return fpu
+	return _u
 }
 
 // ClearName clears the value of the "name" field.
-func (fpu *ForPermissionUpdate) ClearName() *ForPermissionUpdate {
-	fpu.mutation.ClearName()
-	return fpu
+func (_u *ForPermissionUpdate) ClearName() *ForPermissionUpdate {
+	_u.mutation.ClearName()
+	return _u
 }
 
 // SetAge sets the "age" field.
-func (fpu *ForPermissionUpdate) SetAge(i int) *ForPermissionUpdate {
-	fpu.mutation.ResetAge()
-	fpu.mutation.SetAge(i)
-	return fpu
+func (_u *ForPermissionUpdate) SetAge(v int) *ForPermissionUpdate {
+	_u.mutation.ResetAge()
+	_u.mutation.SetAge(v)
+	return _u
 }
 
 // SetNillableAge sets the "age" field if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableAge(i *int) *ForPermissionUpdate {
-	if i != nil {
-		fpu.SetAge(*i)
+func (_u *ForPermissionUpdate) SetNillableAge(v *int) *ForPermissionUpdate {
+	if v != nil {
+		_u.SetAge(*v)
 	}
-	return fpu
+	return _u
 }
 
-// AddAge adds i to the "age" field.
-func (fpu *ForPermissionUpdate) AddAge(i int) *ForPermissionUpdate {
-	fpu.mutation.AddAge(i)
-	return fpu
+// AddAge adds value to the "age" field.
+func (_u *ForPermissionUpdate) AddAge(v int) *ForPermissionUpdate {
+	_u.mutation.AddAge(v)
+	return _u
 }
 
 // ClearAge clears the value of the "age" field.
-func (fpu *ForPermissionUpdate) ClearAge() *ForPermissionUpdate {
-	fpu.mutation.ClearAge()
-	return fpu
+func (_u *ForPermissionUpdate) ClearAge() *ForPermissionUpdate {
+	_u.mutation.ClearAge()
+	return _u
 }
 
 // SetIsStupid sets the "is_stupid" field.
-func (fpu *ForPermissionUpdate) SetIsStupid(b bool) *ForPermissionUpdate {
-	fpu.mutation.SetIsStupid(b)
-	return fpu
+func (_u *ForPermissionUpdate) SetIsStupid(v bool) *ForPermissionUpdate {
+	_u.mutation.SetIsStupid(v)
+	return _u
 }
 
 // SetNillableIsStupid sets the "is_stupid" field if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableIsStupid(b *bool) *ForPermissionUpdate {
-	if b != nil {
-		fpu.SetIsStupid(*b)
+func (_u *ForPermissionUpdate) SetNillableIsStupid(v *bool) *ForPermissionUpdate {
+	if v != nil {
+		_u.SetIsStupid(*v)
 	}
-	return fpu
+	return _u
 }
 
 // ClearIsStupid clears the value of the "is_stupid" field.
-func (fpu *ForPermissionUpdate) ClearIsStupid() *ForPermissionUpdate {
-	fpu.mutation.ClearIsStupid()
-	return fpu
+func (_u *ForPermissionUpdate) ClearIsStupid() *ForPermissionUpdate {
+	_u.mutation.ClearIsStupid()
+	return _u
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (fpu *ForPermissionUpdate) SetCreatedByID(id string) *ForPermissionUpdate {
-	fpu.mutation.SetCreatedByID(id)
-	return fpu
+func (_u *ForPermissionUpdate) SetCreatedByID(id string) *ForPermissionUpdate {
+	_u.mutation.SetCreatedByID(id)
+	return _u
 }
 
 // SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableCreatedByID(id *string) *ForPermissionUpdate {
+func (_u *ForPermissionUpdate) SetNillableCreatedByID(id *string) *ForPermissionUpdate {
 	if id != nil {
-		fpu = fpu.SetCreatedByID(*id)
+		_u = _u.SetCreatedByID(*id)
 	}
-	return fpu
+	return _u
 }
 
 // SetCreatedBy sets the "created_by" edge to the User entity.
-func (fpu *ForPermissionUpdate) SetCreatedBy(u *User) *ForPermissionUpdate {
-	return fpu.SetCreatedByID(u.ID)
+func (_u *ForPermissionUpdate) SetCreatedBy(v *User) *ForPermissionUpdate {
+	return _u.SetCreatedByID(v.ID)
 }
 
 // SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (fpu *ForPermissionUpdate) SetUpdatedByID(id string) *ForPermissionUpdate {
-	fpu.mutation.SetUpdatedByID(id)
-	return fpu
+func (_u *ForPermissionUpdate) SetUpdatedByID(id string) *ForPermissionUpdate {
+	_u.mutation.SetUpdatedByID(id)
+	return _u
 }
 
 // SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableUpdatedByID(id *string) *ForPermissionUpdate {
+func (_u *ForPermissionUpdate) SetNillableUpdatedByID(id *string) *ForPermissionUpdate {
 	if id != nil {
-		fpu = fpu.SetUpdatedByID(*id)
+		_u = _u.SetUpdatedByID(*id)
 	}
-	return fpu
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (fpu *ForPermissionUpdate) SetUpdatedBy(u *User) *ForPermissionUpdate {
-	return fpu.SetUpdatedByID(u.ID)
+func (_u *ForPermissionUpdate) SetUpdatedBy(v *User) *ForPermissionUpdate {
+	return _u.SetUpdatedByID(v.ID)
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (fpu *ForPermissionUpdate) SetAdminCreatedByID(id string) *ForPermissionUpdate {
-	fpu.mutation.SetAdminCreatedByID(id)
-	return fpu
+func (_u *ForPermissionUpdate) SetAdminCreatedByID(id string) *ForPermissionUpdate {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableAdminCreatedByID(id *string) *ForPermissionUpdate {
+func (_u *ForPermissionUpdate) SetNillableAdminCreatedByID(id *string) *ForPermissionUpdate {
 	if id != nil {
-		fpu = fpu.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return fpu
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (fpu *ForPermissionUpdate) SetAdminCreatedBy(a *AdminUser) *ForPermissionUpdate {
-	return fpu.SetAdminCreatedByID(a.ID)
+func (_u *ForPermissionUpdate) SetAdminCreatedBy(v *AdminUser) *ForPermissionUpdate {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (fpu *ForPermissionUpdate) SetAdminUpdatedByID(id string) *ForPermissionUpdate {
-	fpu.mutation.SetAdminUpdatedByID(id)
-	return fpu
+func (_u *ForPermissionUpdate) SetAdminUpdatedByID(id string) *ForPermissionUpdate {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fpu *ForPermissionUpdate) SetNillableAdminUpdatedByID(id *string) *ForPermissionUpdate {
+func (_u *ForPermissionUpdate) SetNillableAdminUpdatedByID(id *string) *ForPermissionUpdate {
 	if id != nil {
-		fpu = fpu.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return fpu
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (fpu *ForPermissionUpdate) SetAdminUpdatedBy(a *AdminUser) *ForPermissionUpdate {
-	return fpu.SetAdminUpdatedByID(a.ID)
+func (_u *ForPermissionUpdate) SetAdminUpdatedBy(v *AdminUser) *ForPermissionUpdate {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // Mutation returns the ForPermissionMutation object of the builder.
-func (fpu *ForPermissionUpdate) Mutation() *ForPermissionMutation {
-	return fpu.mutation
+func (_u *ForPermissionUpdate) Mutation() *ForPermissionMutation {
+	return _u.mutation
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
-func (fpu *ForPermissionUpdate) ClearCreatedBy() *ForPermissionUpdate {
-	fpu.mutation.ClearCreatedBy()
-	return fpu
+func (_u *ForPermissionUpdate) ClearCreatedBy() *ForPermissionUpdate {
+	_u.mutation.ClearCreatedBy()
+	return _u
 }
 
 // ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (fpu *ForPermissionUpdate) ClearUpdatedBy() *ForPermissionUpdate {
-	fpu.mutation.ClearUpdatedBy()
-	return fpu
+func (_u *ForPermissionUpdate) ClearUpdatedBy() *ForPermissionUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (fpu *ForPermissionUpdate) ClearAdminCreatedBy() *ForPermissionUpdate {
-	fpu.mutation.ClearAdminCreatedBy()
-	return fpu
+func (_u *ForPermissionUpdate) ClearAdminCreatedBy() *ForPermissionUpdate {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (fpu *ForPermissionUpdate) ClearAdminUpdatedBy() *ForPermissionUpdate {
-	fpu.mutation.ClearAdminUpdatedBy()
-	return fpu
+func (_u *ForPermissionUpdate) ClearAdminUpdatedBy() *ForPermissionUpdate {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (fpu *ForPermissionUpdate) Save(ctx context.Context) (int, error) {
-	fpu.defaults()
-	return withHooks(ctx, fpu.sqlSave, fpu.mutation, fpu.hooks)
+func (_u *ForPermissionUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (fpu *ForPermissionUpdate) SaveX(ctx context.Context) int {
-	affected, err := fpu.Save(ctx)
+func (_u *ForPermissionUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -250,69 +250,69 @@ func (fpu *ForPermissionUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (fpu *ForPermissionUpdate) Exec(ctx context.Context) error {
-	_, err := fpu.Save(ctx)
+func (_u *ForPermissionUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fpu *ForPermissionUpdate) ExecX(ctx context.Context) {
-	if err := fpu.Exec(ctx); err != nil {
+func (_u *ForPermissionUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (fpu *ForPermissionUpdate) defaults() {
-	if _, ok := fpu.mutation.UpdatedAt(); !ok && !fpu.mutation.UpdatedAtCleared() {
+func (_u *ForPermissionUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := forpermission.UpdateDefaultUpdatedAt()
-		fpu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *ForPermissionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(forpermission.Table, forpermission.Columns, sqlgraph.NewFieldSpec(forpermission.FieldID, field.TypeString))
-	if ps := fpu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := fpu.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(forpermission.FieldCreatedAt, field.TypeTime, value)
 	}
-	if fpu.mutation.CreatedAtCleared() {
+	if _u.mutation.CreatedAtCleared() {
 		_spec.ClearField(forpermission.FieldCreatedAt, field.TypeTime)
 	}
-	if value, ok := fpu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(forpermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if fpu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(forpermission.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := fpu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(forpermission.FieldName, field.TypeString, value)
 	}
-	if fpu.mutation.NameCleared() {
+	if _u.mutation.NameCleared() {
 		_spec.ClearField(forpermission.FieldName, field.TypeString)
 	}
-	if value, ok := fpu.mutation.Age(); ok {
+	if value, ok := _u.mutation.Age(); ok {
 		_spec.SetField(forpermission.FieldAge, field.TypeInt, value)
 	}
-	if value, ok := fpu.mutation.AddedAge(); ok {
+	if value, ok := _u.mutation.AddedAge(); ok {
 		_spec.AddField(forpermission.FieldAge, field.TypeInt, value)
 	}
-	if fpu.mutation.AgeCleared() {
+	if _u.mutation.AgeCleared() {
 		_spec.ClearField(forpermission.FieldAge, field.TypeInt)
 	}
-	if value, ok := fpu.mutation.IsStupid(); ok {
+	if value, ok := _u.mutation.IsStupid(); ok {
 		_spec.SetField(forpermission.FieldIsStupid, field.TypeBool, value)
 	}
-	if fpu.mutation.IsStupidCleared() {
+	if _u.mutation.IsStupidCleared() {
 		_spec.ClearField(forpermission.FieldIsStupid, field.TypeBool)
 	}
-	if fpu.mutation.CreatedByCleared() {
+	if _u.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -325,7 +325,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpu.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -341,7 +341,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fpu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -354,7 +354,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpu.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -370,7 +370,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fpu.mutation.AdminCreatedByCleared() {
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -383,7 +383,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpu.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -399,7 +399,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fpu.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -412,7 +412,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpu.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -428,7 +428,7 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, fpu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{forpermission.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -436,8 +436,8 @@ func (fpu *ForPermissionUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		return 0, err
 	}
-	fpu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // ForPermissionUpdateOne is the builder for updating a single ForPermission entity.
@@ -449,231 +449,231 @@ type ForPermissionUpdateOne struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (fpuo *ForPermissionUpdateOne) SetCreatedAt(t time.Time) *ForPermissionUpdateOne {
-	fpuo.mutation.SetCreatedAt(t)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetCreatedAt(v time.Time) *ForPermissionUpdateOne {
+	_u.mutation.SetCreatedAt(v)
+	return _u
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableCreatedAt(t *time.Time) *ForPermissionUpdateOne {
-	if t != nil {
-		fpuo.SetCreatedAt(*t)
+func (_u *ForPermissionUpdateOne) SetNillableCreatedAt(v *time.Time) *ForPermissionUpdateOne {
+	if v != nil {
+		_u.SetCreatedAt(*v)
 	}
-	return fpuo
+	return _u
 }
 
 // ClearCreatedAt clears the value of the "created_at" field.
-func (fpuo *ForPermissionUpdateOne) ClearCreatedAt() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearCreatedAt()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearCreatedAt() *ForPermissionUpdateOne {
+	_u.mutation.ClearCreatedAt()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (fpuo *ForPermissionUpdateOne) SetUpdatedAt(t time.Time) *ForPermissionUpdateOne {
-	fpuo.mutation.SetUpdatedAt(t)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetUpdatedAt(v time.Time) *ForPermissionUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (fpuo *ForPermissionUpdateOne) ClearUpdatedAt() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearUpdatedAt()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearUpdatedAt() *ForPermissionUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (fpuo *ForPermissionUpdateOne) SetName(s string) *ForPermissionUpdateOne {
-	fpuo.mutation.SetName(s)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetName(v string) *ForPermissionUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableName(s *string) *ForPermissionUpdateOne {
-	if s != nil {
-		fpuo.SetName(*s)
+func (_u *ForPermissionUpdateOne) SetNillableName(v *string) *ForPermissionUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return fpuo
+	return _u
 }
 
 // ClearName clears the value of the "name" field.
-func (fpuo *ForPermissionUpdateOne) ClearName() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearName()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearName() *ForPermissionUpdateOne {
+	_u.mutation.ClearName()
+	return _u
 }
 
 // SetAge sets the "age" field.
-func (fpuo *ForPermissionUpdateOne) SetAge(i int) *ForPermissionUpdateOne {
-	fpuo.mutation.ResetAge()
-	fpuo.mutation.SetAge(i)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetAge(v int) *ForPermissionUpdateOne {
+	_u.mutation.ResetAge()
+	_u.mutation.SetAge(v)
+	return _u
 }
 
 // SetNillableAge sets the "age" field if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableAge(i *int) *ForPermissionUpdateOne {
-	if i != nil {
-		fpuo.SetAge(*i)
+func (_u *ForPermissionUpdateOne) SetNillableAge(v *int) *ForPermissionUpdateOne {
+	if v != nil {
+		_u.SetAge(*v)
 	}
-	return fpuo
+	return _u
 }
 
-// AddAge adds i to the "age" field.
-func (fpuo *ForPermissionUpdateOne) AddAge(i int) *ForPermissionUpdateOne {
-	fpuo.mutation.AddAge(i)
-	return fpuo
+// AddAge adds value to the "age" field.
+func (_u *ForPermissionUpdateOne) AddAge(v int) *ForPermissionUpdateOne {
+	_u.mutation.AddAge(v)
+	return _u
 }
 
 // ClearAge clears the value of the "age" field.
-func (fpuo *ForPermissionUpdateOne) ClearAge() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearAge()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearAge() *ForPermissionUpdateOne {
+	_u.mutation.ClearAge()
+	return _u
 }
 
 // SetIsStupid sets the "is_stupid" field.
-func (fpuo *ForPermissionUpdateOne) SetIsStupid(b bool) *ForPermissionUpdateOne {
-	fpuo.mutation.SetIsStupid(b)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetIsStupid(v bool) *ForPermissionUpdateOne {
+	_u.mutation.SetIsStupid(v)
+	return _u
 }
 
 // SetNillableIsStupid sets the "is_stupid" field if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableIsStupid(b *bool) *ForPermissionUpdateOne {
-	if b != nil {
-		fpuo.SetIsStupid(*b)
+func (_u *ForPermissionUpdateOne) SetNillableIsStupid(v *bool) *ForPermissionUpdateOne {
+	if v != nil {
+		_u.SetIsStupid(*v)
 	}
-	return fpuo
+	return _u
 }
 
 // ClearIsStupid clears the value of the "is_stupid" field.
-func (fpuo *ForPermissionUpdateOne) ClearIsStupid() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearIsStupid()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearIsStupid() *ForPermissionUpdateOne {
+	_u.mutation.ClearIsStupid()
+	return _u
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (fpuo *ForPermissionUpdateOne) SetCreatedByID(id string) *ForPermissionUpdateOne {
-	fpuo.mutation.SetCreatedByID(id)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetCreatedByID(id string) *ForPermissionUpdateOne {
+	_u.mutation.SetCreatedByID(id)
+	return _u
 }
 
 // SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableCreatedByID(id *string) *ForPermissionUpdateOne {
+func (_u *ForPermissionUpdateOne) SetNillableCreatedByID(id *string) *ForPermissionUpdateOne {
 	if id != nil {
-		fpuo = fpuo.SetCreatedByID(*id)
+		_u = _u.SetCreatedByID(*id)
 	}
-	return fpuo
+	return _u
 }
 
 // SetCreatedBy sets the "created_by" edge to the User entity.
-func (fpuo *ForPermissionUpdateOne) SetCreatedBy(u *User) *ForPermissionUpdateOne {
-	return fpuo.SetCreatedByID(u.ID)
+func (_u *ForPermissionUpdateOne) SetCreatedBy(v *User) *ForPermissionUpdateOne {
+	return _u.SetCreatedByID(v.ID)
 }
 
 // SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (fpuo *ForPermissionUpdateOne) SetUpdatedByID(id string) *ForPermissionUpdateOne {
-	fpuo.mutation.SetUpdatedByID(id)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetUpdatedByID(id string) *ForPermissionUpdateOne {
+	_u.mutation.SetUpdatedByID(id)
+	return _u
 }
 
 // SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableUpdatedByID(id *string) *ForPermissionUpdateOne {
+func (_u *ForPermissionUpdateOne) SetNillableUpdatedByID(id *string) *ForPermissionUpdateOne {
 	if id != nil {
-		fpuo = fpuo.SetUpdatedByID(*id)
+		_u = _u.SetUpdatedByID(*id)
 	}
-	return fpuo
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (fpuo *ForPermissionUpdateOne) SetUpdatedBy(u *User) *ForPermissionUpdateOne {
-	return fpuo.SetUpdatedByID(u.ID)
+func (_u *ForPermissionUpdateOne) SetUpdatedBy(v *User) *ForPermissionUpdateOne {
+	return _u.SetUpdatedByID(v.ID)
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (fpuo *ForPermissionUpdateOne) SetAdminCreatedByID(id string) *ForPermissionUpdateOne {
-	fpuo.mutation.SetAdminCreatedByID(id)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetAdminCreatedByID(id string) *ForPermissionUpdateOne {
+	_u.mutation.SetAdminCreatedByID(id)
+	return _u
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableAdminCreatedByID(id *string) *ForPermissionUpdateOne {
+func (_u *ForPermissionUpdateOne) SetNillableAdminCreatedByID(id *string) *ForPermissionUpdateOne {
 	if id != nil {
-		fpuo = fpuo.SetAdminCreatedByID(*id)
+		_u = _u.SetAdminCreatedByID(*id)
 	}
-	return fpuo
+	return _u
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (fpuo *ForPermissionUpdateOne) SetAdminCreatedBy(a *AdminUser) *ForPermissionUpdateOne {
-	return fpuo.SetAdminCreatedByID(a.ID)
+func (_u *ForPermissionUpdateOne) SetAdminCreatedBy(v *AdminUser) *ForPermissionUpdateOne {
+	return _u.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (fpuo *ForPermissionUpdateOne) SetAdminUpdatedByID(id string) *ForPermissionUpdateOne {
-	fpuo.mutation.SetAdminUpdatedByID(id)
-	return fpuo
+func (_u *ForPermissionUpdateOne) SetAdminUpdatedByID(id string) *ForPermissionUpdateOne {
+	_u.mutation.SetAdminUpdatedByID(id)
+	return _u
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fpuo *ForPermissionUpdateOne) SetNillableAdminUpdatedByID(id *string) *ForPermissionUpdateOne {
+func (_u *ForPermissionUpdateOne) SetNillableAdminUpdatedByID(id *string) *ForPermissionUpdateOne {
 	if id != nil {
-		fpuo = fpuo.SetAdminUpdatedByID(*id)
+		_u = _u.SetAdminUpdatedByID(*id)
 	}
-	return fpuo
+	return _u
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (fpuo *ForPermissionUpdateOne) SetAdminUpdatedBy(a *AdminUser) *ForPermissionUpdateOne {
-	return fpuo.SetAdminUpdatedByID(a.ID)
+func (_u *ForPermissionUpdateOne) SetAdminUpdatedBy(v *AdminUser) *ForPermissionUpdateOne {
+	return _u.SetAdminUpdatedByID(v.ID)
 }
 
 // Mutation returns the ForPermissionMutation object of the builder.
-func (fpuo *ForPermissionUpdateOne) Mutation() *ForPermissionMutation {
-	return fpuo.mutation
+func (_u *ForPermissionUpdateOne) Mutation() *ForPermissionMutation {
+	return _u.mutation
 }
 
 // ClearCreatedBy clears the "created_by" edge to the User entity.
-func (fpuo *ForPermissionUpdateOne) ClearCreatedBy() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearCreatedBy()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearCreatedBy() *ForPermissionUpdateOne {
+	_u.mutation.ClearCreatedBy()
+	return _u
 }
 
 // ClearUpdatedBy clears the "updated_by" edge to the User entity.
-func (fpuo *ForPermissionUpdateOne) ClearUpdatedBy() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearUpdatedBy()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearUpdatedBy() *ForPermissionUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // ClearAdminCreatedBy clears the "admin_created_by" edge to the AdminUser entity.
-func (fpuo *ForPermissionUpdateOne) ClearAdminCreatedBy() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearAdminCreatedBy()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearAdminCreatedBy() *ForPermissionUpdateOne {
+	_u.mutation.ClearAdminCreatedBy()
+	return _u
 }
 
 // ClearAdminUpdatedBy clears the "admin_updated_by" edge to the AdminUser entity.
-func (fpuo *ForPermissionUpdateOne) ClearAdminUpdatedBy() *ForPermissionUpdateOne {
-	fpuo.mutation.ClearAdminUpdatedBy()
-	return fpuo
+func (_u *ForPermissionUpdateOne) ClearAdminUpdatedBy() *ForPermissionUpdateOne {
+	_u.mutation.ClearAdminUpdatedBy()
+	return _u
 }
 
 // Where appends a list predicates to the ForPermissionUpdate builder.
-func (fpuo *ForPermissionUpdateOne) Where(ps ...predicate.ForPermission) *ForPermissionUpdateOne {
-	fpuo.mutation.Where(ps...)
-	return fpuo
+func (_u *ForPermissionUpdateOne) Where(ps ...predicate.ForPermission) *ForPermissionUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (fpuo *ForPermissionUpdateOne) Select(field string, fields ...string) *ForPermissionUpdateOne {
-	fpuo.fields = append([]string{field}, fields...)
-	return fpuo
+func (_u *ForPermissionUpdateOne) Select(field string, fields ...string) *ForPermissionUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated ForPermission entity.
-func (fpuo *ForPermissionUpdateOne) Save(ctx context.Context) (*ForPermission, error) {
-	fpuo.defaults()
-	return withHooks(ctx, fpuo.sqlSave, fpuo.mutation, fpuo.hooks)
+func (_u *ForPermissionUpdateOne) Save(ctx context.Context) (*ForPermission, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (fpuo *ForPermissionUpdateOne) SaveX(ctx context.Context) *ForPermission {
-	node, err := fpuo.Save(ctx)
+func (_u *ForPermissionUpdateOne) SaveX(ctx context.Context) *ForPermission {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -681,34 +681,34 @@ func (fpuo *ForPermissionUpdateOne) SaveX(ctx context.Context) *ForPermission {
 }
 
 // Exec executes the query on the entity.
-func (fpuo *ForPermissionUpdateOne) Exec(ctx context.Context) error {
-	_, err := fpuo.Save(ctx)
+func (_u *ForPermissionUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fpuo *ForPermissionUpdateOne) ExecX(ctx context.Context) {
-	if err := fpuo.Exec(ctx); err != nil {
+func (_u *ForPermissionUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (fpuo *ForPermissionUpdateOne) defaults() {
-	if _, ok := fpuo.mutation.UpdatedAt(); !ok && !fpuo.mutation.UpdatedAtCleared() {
+func (_u *ForPermissionUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := forpermission.UpdateDefaultUpdatedAt()
-		fpuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPermission, err error) {
+func (_u *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPermission, err error) {
 	_spec := sqlgraph.NewUpdateSpec(forpermission.Table, forpermission.Columns, sqlgraph.NewFieldSpec(forpermission.FieldID, field.TypeString))
-	id, ok := fpuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ForPermission.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := fpuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, forpermission.FieldID)
 		for _, f := range fields {
@@ -720,47 +720,47 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 			}
 		}
 	}
-	if ps := fpuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := fpuo.mutation.CreatedAt(); ok {
+	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(forpermission.FieldCreatedAt, field.TypeTime, value)
 	}
-	if fpuo.mutation.CreatedAtCleared() {
+	if _u.mutation.CreatedAtCleared() {
 		_spec.ClearField(forpermission.FieldCreatedAt, field.TypeTime)
 	}
-	if value, ok := fpuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(forpermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if fpuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(forpermission.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := fpuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(forpermission.FieldName, field.TypeString, value)
 	}
-	if fpuo.mutation.NameCleared() {
+	if _u.mutation.NameCleared() {
 		_spec.ClearField(forpermission.FieldName, field.TypeString)
 	}
-	if value, ok := fpuo.mutation.Age(); ok {
+	if value, ok := _u.mutation.Age(); ok {
 		_spec.SetField(forpermission.FieldAge, field.TypeInt, value)
 	}
-	if value, ok := fpuo.mutation.AddedAge(); ok {
+	if value, ok := _u.mutation.AddedAge(); ok {
 		_spec.AddField(forpermission.FieldAge, field.TypeInt, value)
 	}
-	if fpuo.mutation.AgeCleared() {
+	if _u.mutation.AgeCleared() {
 		_spec.ClearField(forpermission.FieldAge, field.TypeInt)
 	}
-	if value, ok := fpuo.mutation.IsStupid(); ok {
+	if value, ok := _u.mutation.IsStupid(); ok {
 		_spec.SetField(forpermission.FieldIsStupid, field.TypeBool, value)
 	}
-	if fpuo.mutation.IsStupidCleared() {
+	if _u.mutation.IsStupidCleared() {
 		_spec.ClearField(forpermission.FieldIsStupid, field.TypeBool)
 	}
-	if fpuo.mutation.CreatedByCleared() {
+	if _u.mutation.CreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -773,7 +773,7 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpuo.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -789,7 +789,7 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fpuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -802,7 +802,7 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpuo.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -818,7 +818,7 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fpuo.mutation.AdminCreatedByCleared() {
+	if _u.mutation.AdminCreatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -831,7 +831,7 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpuo.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -847,7 +847,7 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fpuo.mutation.AdminUpdatedByCleared() {
+	if _u.mutation.AdminUpdatedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -860,7 +860,7 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fpuo.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -876,10 +876,10 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &ForPermission{config: fpuo.config}
+	_node = &ForPermission{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, fpuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{forpermission.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -887,6 +887,6 @@ func (fpuo *ForPermissionUpdateOne) sqlSave(ctx context.Context) (_node *ForPerm
 		}
 		return nil, err
 	}
-	fpuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

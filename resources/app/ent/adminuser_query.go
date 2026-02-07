@@ -30,40 +30,40 @@ type AdminUserQuery struct {
 }
 
 // Where adds a new predicate for the AdminUserQuery builder.
-func (auq *AdminUserQuery) Where(ps ...predicate.AdminUser) *AdminUserQuery {
-	auq.predicates = append(auq.predicates, ps...)
-	return auq
+func (_q *AdminUserQuery) Where(ps ...predicate.AdminUser) *AdminUserQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (auq *AdminUserQuery) Limit(limit int) *AdminUserQuery {
-	auq.ctx.Limit = &limit
-	return auq
+func (_q *AdminUserQuery) Limit(limit int) *AdminUserQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (auq *AdminUserQuery) Offset(offset int) *AdminUserQuery {
-	auq.ctx.Offset = &offset
-	return auq
+func (_q *AdminUserQuery) Offset(offset int) *AdminUserQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (auq *AdminUserQuery) Unique(unique bool) *AdminUserQuery {
-	auq.ctx.Unique = &unique
-	return auq
+func (_q *AdminUserQuery) Unique(unique bool) *AdminUserQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (auq *AdminUserQuery) Order(o ...adminuser.OrderOption) *AdminUserQuery {
-	auq.order = append(auq.order, o...)
-	return auq
+func (_q *AdminUserQuery) Order(o ...adminuser.OrderOption) *AdminUserQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // First returns the first AdminUser entity from the query.
 // Returns a *NotFoundError when no AdminUser was found.
-func (auq *AdminUserQuery) First(ctx context.Context) (*AdminUser, error) {
-	nodes, err := auq.Limit(1).All(setContextOp(ctx, auq.ctx, ent.OpQueryFirst))
+func (_q *AdminUserQuery) First(ctx context.Context) (*AdminUser, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -74,8 +74,8 @@ func (auq *AdminUserQuery) First(ctx context.Context) (*AdminUser, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (auq *AdminUserQuery) FirstX(ctx context.Context) *AdminUser {
-	node, err := auq.First(ctx)
+func (_q *AdminUserQuery) FirstX(ctx context.Context) *AdminUser {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -84,9 +84,9 @@ func (auq *AdminUserQuery) FirstX(ctx context.Context) *AdminUser {
 
 // FirstID returns the first AdminUser ID from the query.
 // Returns a *NotFoundError when no AdminUser ID was found.
-func (auq *AdminUserQuery) FirstID(ctx context.Context) (id string, err error) {
+func (_q *AdminUserQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = auq.Limit(1).IDs(setContextOp(ctx, auq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -97,8 +97,8 @@ func (auq *AdminUserQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (auq *AdminUserQuery) FirstIDX(ctx context.Context) string {
-	id, err := auq.FirstID(ctx)
+func (_q *AdminUserQuery) FirstIDX(ctx context.Context) string {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -108,8 +108,8 @@ func (auq *AdminUserQuery) FirstIDX(ctx context.Context) string {
 // Only returns a single AdminUser entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one AdminUser entity is found.
 // Returns a *NotFoundError when no AdminUser entities are found.
-func (auq *AdminUserQuery) Only(ctx context.Context) (*AdminUser, error) {
-	nodes, err := auq.Limit(2).All(setContextOp(ctx, auq.ctx, ent.OpQueryOnly))
+func (_q *AdminUserQuery) Only(ctx context.Context) (*AdminUser, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +124,8 @@ func (auq *AdminUserQuery) Only(ctx context.Context) (*AdminUser, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (auq *AdminUserQuery) OnlyX(ctx context.Context) *AdminUser {
-	node, err := auq.Only(ctx)
+func (_q *AdminUserQuery) OnlyX(ctx context.Context) *AdminUser {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -135,9 +135,9 @@ func (auq *AdminUserQuery) OnlyX(ctx context.Context) *AdminUser {
 // OnlyID is like Only, but returns the only AdminUser ID in the query.
 // Returns a *NotSingularError when more than one AdminUser ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (auq *AdminUserQuery) OnlyID(ctx context.Context) (id string, err error) {
+func (_q *AdminUserQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = auq.Limit(2).IDs(setContextOp(ctx, auq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -152,8 +152,8 @@ func (auq *AdminUserQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (auq *AdminUserQuery) OnlyIDX(ctx context.Context) string {
-	id, err := auq.OnlyID(ctx)
+func (_q *AdminUserQuery) OnlyIDX(ctx context.Context) string {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -161,18 +161,18 @@ func (auq *AdminUserQuery) OnlyIDX(ctx context.Context) string {
 }
 
 // All executes the query and returns a list of AdminUsers.
-func (auq *AdminUserQuery) All(ctx context.Context) ([]*AdminUser, error) {
-	ctx = setContextOp(ctx, auq.ctx, ent.OpQueryAll)
-	if err := auq.prepareQuery(ctx); err != nil {
+func (_q *AdminUserQuery) All(ctx context.Context) ([]*AdminUser, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*AdminUser, *AdminUserQuery]()
-	return withInterceptors[[]*AdminUser](ctx, auq, qr, auq.inters)
+	return withInterceptors[[]*AdminUser](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (auq *AdminUserQuery) AllX(ctx context.Context) []*AdminUser {
-	nodes, err := auq.All(ctx)
+func (_q *AdminUserQuery) AllX(ctx context.Context) []*AdminUser {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -180,20 +180,20 @@ func (auq *AdminUserQuery) AllX(ctx context.Context) []*AdminUser {
 }
 
 // IDs executes the query and returns a list of AdminUser IDs.
-func (auq *AdminUserQuery) IDs(ctx context.Context) (ids []string, err error) {
-	if auq.ctx.Unique == nil && auq.path != nil {
-		auq.Unique(true)
+func (_q *AdminUserQuery) IDs(ctx context.Context) (ids []string, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, auq.ctx, ent.OpQueryIDs)
-	if err = auq.Select(adminuser.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(adminuser.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (auq *AdminUserQuery) IDsX(ctx context.Context) []string {
-	ids, err := auq.IDs(ctx)
+func (_q *AdminUserQuery) IDsX(ctx context.Context) []string {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -201,17 +201,17 @@ func (auq *AdminUserQuery) IDsX(ctx context.Context) []string {
 }
 
 // Count returns the count of the given query.
-func (auq *AdminUserQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, auq.ctx, ent.OpQueryCount)
-	if err := auq.prepareQuery(ctx); err != nil {
+func (_q *AdminUserQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, auq, querierCount[*AdminUserQuery](), auq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*AdminUserQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (auq *AdminUserQuery) CountX(ctx context.Context) int {
-	count, err := auq.Count(ctx)
+func (_q *AdminUserQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -219,9 +219,9 @@ func (auq *AdminUserQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (auq *AdminUserQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, auq.ctx, ent.OpQueryExist)
-	switch _, err := auq.FirstID(ctx); {
+func (_q *AdminUserQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -232,8 +232,8 @@ func (auq *AdminUserQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (auq *AdminUserQuery) ExistX(ctx context.Context) bool {
-	exist, err := auq.Exist(ctx)
+func (_q *AdminUserQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -242,28 +242,28 @@ func (auq *AdminUserQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the AdminUserQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (auq *AdminUserQuery) Clone() *AdminUserQuery {
-	if auq == nil {
+func (_q *AdminUserQuery) Clone() *AdminUserQuery {
+	if _q == nil {
 		return nil
 	}
 	return &AdminUserQuery{
-		config:     auq.config,
-		ctx:        auq.ctx.Clone(),
-		order:      append([]adminuser.OrderOption{}, auq.order...),
-		inters:     append([]Interceptor{}, auq.inters...),
-		predicates: append([]predicate.AdminUser{}, auq.predicates...),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]adminuser.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.AdminUser{}, _q.predicates...),
 		// clone intermediate query.
-		sql:  auq.sql.Clone(),
-		path: auq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
-func (auq *AdminUserQuery) GroupBy(field string, fields ...string) *AdminUserGroupBy {
-	auq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &AdminUserGroupBy{build: auq}
-	grbuild.flds = &auq.ctx.Fields
+func (_q *AdminUserQuery) GroupBy(field string, fields ...string) *AdminUserGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &AdminUserGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = adminuser.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -271,99 +271,99 @@ func (auq *AdminUserQuery) GroupBy(field string, fields ...string) *AdminUserGro
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
-func (auq *AdminUserQuery) Select(fields ...string) *AdminUserSelect {
-	auq.ctx.Fields = append(auq.ctx.Fields, fields...)
-	sbuild := &AdminUserSelect{AdminUserQuery: auq}
+func (_q *AdminUserQuery) Select(fields ...string) *AdminUserSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &AdminUserSelect{AdminUserQuery: _q}
 	sbuild.label = adminuser.Label
-	sbuild.flds, sbuild.scan = &auq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a AdminUserSelect configured with the given aggregations.
-func (auq *AdminUserQuery) Aggregate(fns ...AggregateFunc) *AdminUserSelect {
-	return auq.Select().Aggregate(fns...)
+func (_q *AdminUserQuery) Aggregate(fns ...AggregateFunc) *AdminUserSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (auq *AdminUserQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range auq.inters {
+func (_q *AdminUserQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, auq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range auq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !adminuser.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if auq.path != nil {
-		prev, err := auq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		auq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (auq *AdminUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AdminUser, error) {
+func (_q *AdminUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AdminUser, error) {
 	var (
 		nodes = []*AdminUser{}
-		_spec = auq.querySpec()
+		_spec = _q.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AdminUser).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &AdminUser{config: auq.config}
+		node := &AdminUser{config: _q.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
-	if len(auq.modifiers) > 0 {
-		_spec.Modifiers = auq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, auq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	for i := range auq.loadTotal {
-		if err := auq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (auq *AdminUserQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := auq.querySpec()
-	if len(auq.modifiers) > 0 {
-		_spec.Modifiers = auq.modifiers
+func (_q *AdminUserQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = auq.ctx.Fields
-	if len(auq.ctx.Fields) > 0 {
-		_spec.Unique = auq.ctx.Unique != nil && *auq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, auq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (auq *AdminUserQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *AdminUserQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(adminuser.Table, adminuser.Columns, sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString))
-	_spec.From = auq.sql
-	if unique := auq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if auq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := auq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, adminuser.FieldID)
 		for i := range fields {
@@ -372,20 +372,20 @@ func (auq *AdminUserQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := auq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := auq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := auq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := auq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -395,33 +395,33 @@ func (auq *AdminUserQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (auq *AdminUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(auq.driver.Dialect())
+func (_q *AdminUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(adminuser.Table)
-	columns := auq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = adminuser.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if auq.sql != nil {
-		selector = auq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if auq.ctx.Unique != nil && *auq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range auq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range auq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := auq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := auq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -434,41 +434,41 @@ type AdminUserGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (augb *AdminUserGroupBy) Aggregate(fns ...AggregateFunc) *AdminUserGroupBy {
-	augb.fns = append(augb.fns, fns...)
-	return augb
+func (_g *AdminUserGroupBy) Aggregate(fns ...AggregateFunc) *AdminUserGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (augb *AdminUserGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, augb.build.ctx, ent.OpQueryGroupBy)
-	if err := augb.build.prepareQuery(ctx); err != nil {
+func (_g *AdminUserGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AdminUserQuery, *AdminUserGroupBy](ctx, augb.build, augb, augb.build.inters, v)
+	return scanWithInterceptors[*AdminUserQuery, *AdminUserGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (augb *AdminUserGroupBy) sqlScan(ctx context.Context, root *AdminUserQuery, v any) error {
+func (_g *AdminUserGroupBy) sqlScan(ctx context.Context, root *AdminUserQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(augb.fns))
-	for _, fn := range augb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*augb.flds)+len(augb.fns))
-		for _, f := range *augb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*augb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := augb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -482,27 +482,27 @@ type AdminUserSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (aus *AdminUserSelect) Aggregate(fns ...AggregateFunc) *AdminUserSelect {
-	aus.fns = append(aus.fns, fns...)
-	return aus
+func (_s *AdminUserSelect) Aggregate(fns ...AggregateFunc) *AdminUserSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (aus *AdminUserSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, aus.ctx, ent.OpQuerySelect)
-	if err := aus.prepareQuery(ctx); err != nil {
+func (_s *AdminUserSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AdminUserQuery, *AdminUserSelect](ctx, aus.AdminUserQuery, aus, aus.inters, v)
+	return scanWithInterceptors[*AdminUserQuery, *AdminUserSelect](ctx, _s.AdminUserQuery, _s, _s.inters, v)
 }
 
-func (aus *AdminUserSelect) sqlScan(ctx context.Context, root *AdminUserQuery, v any) error {
+func (_s *AdminUserSelect) sqlScan(ctx context.Context, root *AdminUserQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(aus.fns))
-	for _, fn := range aus.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*aus.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -510,7 +510,7 @@ func (aus *AdminUserSelect) sqlScan(ctx context.Context, root *AdminUserQuery, v
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := aus.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

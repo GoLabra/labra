@@ -29,23 +29,16 @@ func ({{$.Entity.EntName}}) Annotations() []schema.Annotation {
 			Caption: "{{$.Entity.Caption}}",
 			Owner:   entity.EntityOwnerUser,
             DisplayField: "{{$.Entity.DisplayFieldName}}",
+            {{- if $.Entity.EntityState.Enabled }}
+            State: entity.State{
+                Enabled: true,
+                {{- if $.Entity.EntityState.Default }}
+                Default: "{{$.Entity.EntityState.Default}}",
+                {{- end }}
+            },
+            {{- end }}
 		},
 	}
-	{{- if $.Entity.EntityStateEnabled }}
-	{{- $entityStateField := nil }}
-	{{- range $f := $.Fields }}
-	{{- if eq $f.Name "entityState" }}
-	{{- $entityStateField = $f }}
-	{{- end }}
-	{{- end }}
-	stateAnnotation := annotations.State{
-		Enabled: true,
-	}
-	{{- if and $entityStateField $entityStateField.DefaultValue }}
-	stateAnnotation.Default = "{{$entityStateField.DefaultValue}}"
-	{{- end }}
-	annotationsList = append(annotationsList, stateAnnotation)
-	{{- end }}
 	return annotationsList
 }
 
@@ -54,8 +47,6 @@ func ({{$.Entity.EntName}}) Fields() []ent.Field {
 	return []ent.Field{
         {{- range $f := $.Fields}}
         {{- if eq $f.Type "Enum"}}
-            {{template "Enum" $f}}
-        {{- else if eq $f.Type "EntityState"}}
             {{template "Enum" $f}}
         {{- else if eq $f.Type "Enums"}}
             {{template "Enums" $f}}
@@ -90,6 +81,9 @@ func ({{$.Entity.EntName}}) Fields() []ent.Field {
         {{- else if eq $f.Type "Json" }}
             {{template "Json" $f}}
         {{- end }}
+        {{- end }}
+        {{- if $.Entity.EntityState.Enabled }}
+        {{template "EntityState" $.Entity.EntityState}}
         {{- end }}
 	}
 }

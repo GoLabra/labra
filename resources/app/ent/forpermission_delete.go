@@ -20,56 +20,56 @@ type ForPermissionDelete struct {
 }
 
 // Where appends a list predicates to the ForPermissionDelete builder.
-func (fpd *ForPermissionDelete) Where(ps ...predicate.ForPermission) *ForPermissionDelete {
-	fpd.mutation.Where(ps...)
-	return fpd
+func (_d *ForPermissionDelete) Where(ps ...predicate.ForPermission) *ForPermissionDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (fpd *ForPermissionDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, fpd.sqlExec, fpd.mutation, fpd.hooks)
+func (_d *ForPermissionDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fpd *ForPermissionDelete) ExecX(ctx context.Context) int {
-	n, err := fpd.Exec(ctx)
+func (_d *ForPermissionDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (fpd *ForPermissionDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *ForPermissionDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(forpermission.Table, sqlgraph.NewFieldSpec(forpermission.FieldID, field.TypeString))
-	if ps := fpd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, fpd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	fpd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // ForPermissionDeleteOne is the builder for deleting a single ForPermission entity.
 type ForPermissionDeleteOne struct {
-	fpd *ForPermissionDelete
+	_d *ForPermissionDelete
 }
 
 // Where appends a list predicates to the ForPermissionDelete builder.
-func (fpdo *ForPermissionDeleteOne) Where(ps ...predicate.ForPermission) *ForPermissionDeleteOne {
-	fpdo.fpd.mutation.Where(ps...)
-	return fpdo
+func (_d *ForPermissionDeleteOne) Where(ps ...predicate.ForPermission) *ForPermissionDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (fpdo *ForPermissionDeleteOne) Exec(ctx context.Context) error {
-	n, err := fpdo.fpd.Exec(ctx)
+func (_d *ForPermissionDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (fpdo *ForPermissionDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fpdo *ForPermissionDeleteOne) ExecX(ctx context.Context) {
-	if err := fpdo.Exec(ctx); err != nil {
+func (_d *ForPermissionDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

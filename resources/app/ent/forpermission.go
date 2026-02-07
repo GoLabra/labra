@@ -130,7 +130,7 @@ func (*ForPermission) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the ForPermission fields.
-func (fp *ForPermission) assignValues(columns []string, values []any) error {
+func (_m *ForPermission) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -140,73 +140,73 @@ func (fp *ForPermission) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				fp.ID = value.String
+				_m.ID = value.String
 			}
 		case forpermission.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				fp.CreatedAt = new(time.Time)
-				*fp.CreatedAt = value.Time
+				_m.CreatedAt = new(time.Time)
+				*_m.CreatedAt = value.Time
 			}
 		case forpermission.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				fp.UpdatedAt = new(time.Time)
-				*fp.UpdatedAt = value.Time
+				_m.UpdatedAt = new(time.Time)
+				*_m.UpdatedAt = value.Time
 			}
 		case forpermission.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				fp.Name = new(string)
-				*fp.Name = value.String
+				_m.Name = new(string)
+				*_m.Name = value.String
 			}
 		case forpermission.FieldAge:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				fp.Age = new(int)
-				*fp.Age = int(value.Int64)
+				_m.Age = new(int)
+				*_m.Age = int(value.Int64)
 			}
 		case forpermission.FieldIsStupid:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_stupid", values[i])
 			} else if value.Valid {
-				fp.IsStupid = new(bool)
-				*fp.IsStupid = value.Bool
+				_m.IsStupid = new(bool)
+				*_m.IsStupid = value.Bool
 			}
 		case forpermission.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field for_permission_created_by", values[i])
 			} else if value.Valid {
-				fp.for_permission_created_by = new(string)
-				*fp.for_permission_created_by = value.String
+				_m.for_permission_created_by = new(string)
+				*_m.for_permission_created_by = value.String
 			}
 		case forpermission.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field for_permission_updated_by", values[i])
 			} else if value.Valid {
-				fp.for_permission_updated_by = new(string)
-				*fp.for_permission_updated_by = value.String
+				_m.for_permission_updated_by = new(string)
+				*_m.for_permission_updated_by = value.String
 			}
 		case forpermission.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field for_permission_admin_created_by", values[i])
 			} else if value.Valid {
-				fp.for_permission_admin_created_by = new(string)
-				*fp.for_permission_admin_created_by = value.String
+				_m.for_permission_admin_created_by = new(string)
+				*_m.for_permission_admin_created_by = value.String
 			}
 		case forpermission.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field for_permission_admin_updated_by", values[i])
 			} else if value.Valid {
-				fp.for_permission_admin_updated_by = new(string)
-				*fp.for_permission_admin_updated_by = value.String
+				_m.for_permission_admin_updated_by = new(string)
+				*_m.for_permission_admin_updated_by = value.String
 			}
 		default:
-			fp.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -214,74 +214,74 @@ func (fp *ForPermission) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the ForPermission.
 // This includes values selected through modifiers, order, etc.
-func (fp *ForPermission) Value(name string) (ent.Value, error) {
-	return fp.selectValues.Get(name)
+func (_m *ForPermission) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryCreatedBy queries the "created_by" edge of the ForPermission entity.
-func (fp *ForPermission) QueryCreatedBy() *UserQuery {
-	return NewForPermissionClient(fp.config).QueryCreatedBy(fp)
+func (_m *ForPermission) QueryCreatedBy() *UserQuery {
+	return NewForPermissionClient(_m.config).QueryCreatedBy(_m)
 }
 
 // QueryUpdatedBy queries the "updated_by" edge of the ForPermission entity.
-func (fp *ForPermission) QueryUpdatedBy() *UserQuery {
-	return NewForPermissionClient(fp.config).QueryUpdatedBy(fp)
+func (_m *ForPermission) QueryUpdatedBy() *UserQuery {
+	return NewForPermissionClient(_m.config).QueryUpdatedBy(_m)
 }
 
 // QueryAdminCreatedBy queries the "admin_created_by" edge of the ForPermission entity.
-func (fp *ForPermission) QueryAdminCreatedBy() *AdminUserQuery {
-	return NewForPermissionClient(fp.config).QueryAdminCreatedBy(fp)
+func (_m *ForPermission) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewForPermissionClient(_m.config).QueryAdminCreatedBy(_m)
 }
 
 // QueryAdminUpdatedBy queries the "admin_updated_by" edge of the ForPermission entity.
-func (fp *ForPermission) QueryAdminUpdatedBy() *AdminUserQuery {
-	return NewForPermissionClient(fp.config).QueryAdminUpdatedBy(fp)
+func (_m *ForPermission) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewForPermissionClient(_m.config).QueryAdminUpdatedBy(_m)
 }
 
 // Update returns a builder for updating this ForPermission.
 // Note that you need to call ForPermission.Unwrap() before calling this method if this ForPermission
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (fp *ForPermission) Update() *ForPermissionUpdateOne {
-	return NewForPermissionClient(fp.config).UpdateOne(fp)
+func (_m *ForPermission) Update() *ForPermissionUpdateOne {
+	return NewForPermissionClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the ForPermission entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (fp *ForPermission) Unwrap() *ForPermission {
-	_tx, ok := fp.config.driver.(*txDriver)
+func (_m *ForPermission) Unwrap() *ForPermission {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: ForPermission is not a transactional entity")
 	}
-	fp.config.driver = _tx.drv
-	return fp
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (fp *ForPermission) String() string {
+func (_m *ForPermission) String() string {
 	var builder strings.Builder
 	builder.WriteString("ForPermission(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", fp.ID))
-	if v := fp.CreatedAt; v != nil {
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	if v := _m.CreatedAt; v != nil {
 		builder.WriteString("created_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := fp.UpdatedAt; v != nil {
+	if v := _m.UpdatedAt; v != nil {
 		builder.WriteString("updated_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := fp.Name; v != nil {
+	if v := _m.Name; v != nil {
 		builder.WriteString("name=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := fp.Age; v != nil {
+	if v := _m.Age; v != nil {
 		builder.WriteString("age=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := fp.IsStupid; v != nil {
+	if v := _m.IsStupid; v != nil {
 		builder.WriteString("is_stupid=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}

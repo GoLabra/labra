@@ -158,7 +158,7 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 		// For Update/Delete on entities with lifecycle, ensure each target row's state is allowed by at least one permission.
 		// Empty lifecycle_access means full access; populated means only those states are allowed.
 		if m.Op().Is(ent.OpUpdateOne | ent.OpUpdate | ent.OpDeleteOne | ent.OpDelete) {
-			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityStateEnabled {
+			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityState.Enabled {
 				allowed, err := mutationTargetsAllowedByLifecycle(ctx, m, t, permissions)
 				if err != nil {
 					return nil, fmt.Errorf("entity state check: %w", err)
@@ -236,7 +236,7 @@ func EntityReadPermission() ent.Interceptor {
 				allPerms = append(allPerms, ownerPerms...)
 			}
 			allowedStates := allowedStatesFromPermissions(allPerms)
-			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityStateEnabled && len(allowedStates) > 0 {
+			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityState.Enabled && len(allowedStates) > 0 {
 				applyLifecycleFilter(q, allowedStates)
 			}
 

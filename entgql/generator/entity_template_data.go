@@ -233,26 +233,6 @@ func (e *EntityTemplateData) AddDefaultFields(lifecycle *entity.LifecycleInput) 
 		Nillable:      true,
 		UpdateDefault: true,
 	})
-
-	// Add entityState field if EntityState is enabled
-	// Use the default value from lifecycle input if provided
-	if e.Entity.EntityStateEnabled {
-		required := false
-		field := entity.Field{
-			Name:     "entityState",
-			EntName:  "entity_state",
-			Caption:  "Entity State",
-			Type:     "EntityState", // Use EntityState as the type to match enum template
-			Required: &required,
-			Nillable: true,
-		}
-		// Set default value from lifecycle input if provided
-		if lifecycle != nil && lifecycle.Default != nil {
-			defaultValue := string(*lifecycle.Default)
-			field.DefaultValue = &defaultValue
-		}
-		e.Fields = append(e.Fields, field)
-	}
 }
 
 func (e *EntityTemplateData) AddFieldsCreate(fieldsCreateInput []*entity.CreateFieldInput) error {
@@ -404,52 +384,6 @@ func ApplyEntityUpdate(where entity.EntityWhereUniqueInput, data entity.UpdateEn
 		}
 	}
 
-	// Handle lifecycle update
-	if data.Lifecycle != nil {
-		if data.Lifecycle.Enabled {
-			entityTemplateData.Entity.EntityStateEnabled = true
-			// Check if entityState field already exists
-			entityStateFieldExists := false
-			for i, field := range entityTemplateData.Fields {
-				if field.Name == "entityState" {
-					entityStateFieldExists = true
-					// Update default value if provided
-					if data.Lifecycle.Default != nil {
-						defaultValue := string(*data.Lifecycle.Default)
-						entityTemplateData.Fields[i].DefaultValue = &defaultValue
-					}
-					break
-				}
-			}
-			// Add entityState field if it doesn't exist
-			if !entityStateFieldExists {
-				required := false
-				field := entity.Field{
-					Name:     "entityState",
-					EntName:  "entity_state",
-					Caption:  "Entity State",
-					Type:     "EntityState",
-					Required: &required,
-					Nillable: true,
-				}
-				if data.Lifecycle.Default != nil {
-					defaultValue := string(*data.Lifecycle.Default)
-					field.DefaultValue = &defaultValue
-				}
-				entityTemplateData.Fields = append(entityTemplateData.Fields, field)
-			}
-		} else {
-			// If lifecycle is disabled, remove entityState field if it exists
-			entityTemplateData.Entity.EntityStateEnabled = false
-			for i, field := range entityTemplateData.Fields {
-				if field.Name == "entityState" {
-					entityTemplateData.Fields = append(entityTemplateData.Fields[:i], entityTemplateData.Fields[i+1:]...)
-					break
-				}
-			}
-		}
-	}
-
 	return entityTemplateData, nil
 }
 
@@ -466,9 +400,13 @@ func ApplyEntityCreate(data entity.CreateEntityInput) (*EntityTemplateData, erro
 		Owner:   "User",
 	}
 
-	// Set EntityStateEnabled if lifecycle is provided and enabled
 	if data.Lifecycle != nil && data.Lifecycle.Enabled {
-		entityTemplateData.Entity.EntityStateEnabled = true
+		entityTemplateData.Entity.EntityState.Enabled = data.Lifecycle.Enabled
+		stateDefault := entity.EntityStateDraft
+		if data.Lifecycle.Default != nil {
+			stateDefault = *data.Lifecycle.Default
+		}
+		entityTemplateData.Entity.EntityState.Default = stateDefault
 	}
 
 	entityTemplateData.AddDefaultFields(data.Lifecycle)

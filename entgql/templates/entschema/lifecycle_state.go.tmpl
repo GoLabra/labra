@@ -1,0 +1,9 @@
+{{- define "EntityState" }}
+		field.Enum("entity_state").
+			GoType(entity.EntityState("")).
+            Optional().
+			Default("{{$.Default}}").
+			Annotations(
+                entgql.Type("EntityState"),
+			),
+{{- end }}

@@ -7,6 +7,11 @@ import (
 	"strconv"
 )
 
+type State struct {
+	Enabled bool
+	Default EntityState
+}
+
 type EntityState string
 
 const (
@@ -62,6 +67,13 @@ func (e EntityState) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil
+}
+
+func (EntityState) Values() (kinds []string) {
+	for _, s := range []EntityState{EntityStateDraft, EntityStateArchived, EntityStatePublished} {
+		kinds = append(kinds, string(s))
+	}
+	return
 }
 
 // LifecycleStateGetter is implemented by generated ent models that have entity state (lifecycle) enabled.
