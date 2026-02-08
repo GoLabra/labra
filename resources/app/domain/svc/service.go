@@ -16,8 +16,11 @@ var (
 type Service struct {
 	*CustomService
 	AdminUser              adminInterfaces.AdminUser
+	Cycle              svc.Cycle
 	File              adminInterfaces.File
 	ForPermission              svc.ForPermission
+	LifeCycleNot              svc.LifeCycleNot
+	Miau              svc.Miau
 	Role              adminInterfaces.Role
 	User              svc.User
 }
@@ -26,8 +29,11 @@ func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service 
 	return &Service{
 		CustomService: NewCustomService(repository),
         AdminUser:              adminSvc.NewAdminUser(adminRepo),
+		Cycle:              NewCycle(repository),
         File:              adminSvc.NewFile(adminRepo),
 		ForPermission:              NewForPermission(repository),
+		LifeCycleNot:              NewLifeCycleNot(repository),
+		Miau:              NewMiau(repository),
         Role:              adminSvc.NewRole(adminRepo),
 		User:              NewUser(repository),
 	}

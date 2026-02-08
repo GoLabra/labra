@@ -50,6 +50,15 @@ func init() {
 	templateFuncMap["Ignore"] = func(t *gen.Type) bool {
 		return t.Annotations["Entity"] == nil || t.Annotations["Entity"].(map[string]any)["Owner"] != "User"
 	}
+	templateFuncMap["hasStateAnnotation"] = func(t *gen.Type) bool {
+		var entityAnnotations annotations.Entity
+		err := mapstructure.Decode(t.Annotations["Entity"], &entityAnnotations)
+		if err != nil {
+			panic(err)
+		}
+
+		return entityAnnotations.State.Enabled
+	}
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
 	os.MkdirAll("./domain/resolvers", os.ModePerm)
@@ -107,6 +116,7 @@ func main() {
 			CleanupUserFiles(),
 			RunGraphTemplates(),
 			RunNodeTemplates(),
+			CreateLifecycleMethods(),
 		},
 		Target:  "./ent",
 		Package: "app/ent",
@@ -494,6 +504,21 @@ func CreateInputs(nodes []*gen.Type) map[string]map[string]string {
 		}
 	}
 	return createInputs
+}
+
+func CreateLifecycleMethods() gen.Hook {
+	errPrefix := "[CreateLifecycleMethods]"
+	return func(next gen.Generator) gen.Generator {
+		return gen.GenerateFunc(func(g *gen.Graph) error {
+			if err := next.Generate(g); err != nil {
+				panic(err)
+			}
+			if err := runTemplate(errPrefix, "lifecycle.go.tmpl", "ent/lifecycle.go.tmpl", "./ent/lifecycle.go", g); err != nil {
+				panic(err)
+			}
+			return runTemplate(errPrefix, "lifecycle_filter_methods.go.tmpl", "ent/lifecycle_filter_methods.go.tmpl", "./ent/lifecycle_filter_methods.go", g)
+		})
+	}
 }
 
 func GoInputName(isCreate bool, node *gen.Type, edge *gen.Edge) string {

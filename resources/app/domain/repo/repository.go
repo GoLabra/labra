@@ -30,8 +30,11 @@ type Repository struct {
 	// Node                  repo.Node
 	Tx   Txer
 	AdminUser              adminInterfaces.AdminUser
+	Cycle              repo.Cycle
 	File              adminInterfaces.File
 	ForPermission              repo.ForPermission
+	LifeCycleNot              repo.LifeCycleNot
+	Miau              repo.Miau
 	Role              adminInterfaces.Role
 	User              repo.User
 }
@@ -41,8 +44,11 @@ func New(client *ent.Client, adminClient *adminEnt.Client) *Repository {
 		// Node:                  NewNode(client),
 		Tx:   NewTx(client),
         AdminUser:              adminRepo.NewAdminUser(adminClient),
+        Cycle:              NewCycle(client),
         File:              adminRepo.NewFile(adminClient),
         ForPermission:              NewForPermission(client),
+        LifeCycleNot:              NewLifeCycleNot(client),
+        Miau:              NewMiau(client),
         Role:              adminRepo.NewRole(adminClient),
         User:              NewUser(client),
 	}

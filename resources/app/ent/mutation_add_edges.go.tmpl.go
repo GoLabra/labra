@@ -18,6 +18,14 @@ func (m *AdminUserMutation) AddEdges(name string, values []string) error {
 
 // AddEdges sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema
+func (m *CycleMutation) AddEdges(name string, values []string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Cycle edge %s", name)
+}
+
+// AddEdges sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
 func (m *FileMutation) AddEdges(name string, values []string) error {
 	switch name {
 	}
@@ -30,6 +38,22 @@ func (m *ForPermissionMutation) AddEdges(name string, values []string) error {
 	switch name {
 	}
 	return fmt.Errorf("unknown ForPermission edge %s", name)
+}
+
+// AddEdges sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
+func (m *LifeCycleNotMutation) AddEdges(name string, values []string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown LifeCycleNot edge %s", name)
+}
+
+// AddEdges sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
+func (m *MiauMutation) AddEdges(name string, values []string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Miau edge %s", name)
 }
 
 // AddEdges sets the value of a field with the given name. It returns an error if

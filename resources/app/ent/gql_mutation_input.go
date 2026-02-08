@@ -6,8 +6,32 @@ import (
 	"time"
 
 	admin "github.com/GoLabra/labra/entgql/ent"
+	"github.com/GoLabra/labra/entgql/entity"
 )
 
+type CreateManyCycleInput struct {
+	Create  []*CreateCycleInput      `json:"create,omitempty"`
+	Connect []*CycleWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type CreateOneCycleInput struct {
+	Create  *CreateCycleInput      `json:"create,omitempty"`
+	Connect *CycleWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyCycleInput struct {
+	Create     []*CreateCycleInput      `json:"create,omitempty"`
+	Connect    []*CycleWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*CycleWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*CycleWhereUniqueInput `json:"delete,omitempty"`
+}
+
+type UpdateOneCycleInput struct {
+	Create  *CreateCycleInput      `json:"create,omitempty"`
+	Connect *CycleWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                  `json:"unset,omitempty"`
+	Delete  *bool                  `json:"delete,omitempty"`
+}
 type CreateManyForPermissionInput struct {
 	Create  []*CreateForPermissionInput      `json:"create,omitempty"`
 	Connect []*ForPermissionWhereUniqueInput `json:"connect,omitempty"`
@@ -31,6 +55,52 @@ type UpdateOneForPermissionInput struct {
 	Unset   *bool                          `json:"unset,omitempty"`
 	Delete  *bool                          `json:"delete,omitempty"`
 }
+type CreateManyLifeCycleNotInput struct {
+	Create  []*CreateLifeCycleNotInput      `json:"create,omitempty"`
+	Connect []*LifeCycleNotWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type CreateOneLifeCycleNotInput struct {
+	Create  *CreateLifeCycleNotInput      `json:"create,omitempty"`
+	Connect *LifeCycleNotWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyLifeCycleNotInput struct {
+	Create     []*CreateLifeCycleNotInput      `json:"create,omitempty"`
+	Connect    []*LifeCycleNotWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*LifeCycleNotWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*LifeCycleNotWhereUniqueInput `json:"delete,omitempty"`
+}
+
+type UpdateOneLifeCycleNotInput struct {
+	Create  *CreateLifeCycleNotInput      `json:"create,omitempty"`
+	Connect *LifeCycleNotWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                         `json:"unset,omitempty"`
+	Delete  *bool                         `json:"delete,omitempty"`
+}
+type CreateManyMiauInput struct {
+	Create  []*CreateMiauInput      `json:"create,omitempty"`
+	Connect []*MiauWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type CreateOneMiauInput struct {
+	Create  *CreateMiauInput      `json:"create,omitempty"`
+	Connect *MiauWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyMiauInput struct {
+	Create     []*CreateMiauInput      `json:"create,omitempty"`
+	Connect    []*MiauWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*MiauWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*MiauWhereUniqueInput `json:"delete,omitempty"`
+}
+
+type UpdateOneMiauInput struct {
+	Create  *CreateMiauInput      `json:"create,omitempty"`
+	Connect *MiauWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                 `json:"unset,omitempty"`
+	Delete  *bool                 `json:"delete,omitempty"`
+}
 type CreateManyUserInput struct {
 	Create  []*CreateUserInput      `json:"create,omitempty"`
 	Connect []*UserWhereUniqueInput `json:"connect,omitempty"`
@@ -53,6 +123,136 @@ type UpdateOneUserInput struct {
 	Connect *UserWhereUniqueInput `json:"connect,omitempty"`
 	Unset   *bool                 `json:"unset,omitempty"`
 	Delete  *bool                 `json:"delete,omitempty"`
+}
+
+// CreateCycleInput represents a mutation input for creating cycles.
+type CreateCycleInput struct {
+	CreatedAt        *time.Time
+	UpdatedAt        *time.Time
+	Name             *string
+	EntityState      *entity.EntityState
+	CreatedBy        *CreateOneUserInput
+	CreatedByID      *string
+	UpdatedBy        *CreateOneUserInput
+	UpdatedByID      *string
+	AdminCreatedBy   *admin.CreateOneAdminUserInput
+	AdminCreatedByID *string
+	AdminUpdatedBy   *admin.CreateOneAdminUserInput
+	AdminUpdatedByID *string
+}
+
+// Mutate applies the CreateCycleInput on the CycleMutation builder.
+func (i *CreateCycleInput) Mutate(m *CycleMutation) {
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.EntityState; v != nil {
+		m.SetEntityState(*v)
+	}
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateCycleInput on the CycleCreate builder.
+func (c *CycleCreate) SetInput(i CreateCycleInput) *CycleCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateCycleInput represents a mutation input for updating cycles.
+type UpdateCycleInput struct {
+	ClearCreatedAt      bool
+	CreatedAt           *time.Time
+	ClearUpdatedAt      bool
+	UpdatedAt           *time.Time
+	ClearName           bool
+	Name                *string
+	ClearCreatedBy      bool
+	CreatedBy           *UpdateOneUserInput
+	CreatedByID         *string
+	ClearUpdatedBy      bool
+	UpdatedBy           *UpdateOneUserInput
+	UpdatedByID         *string
+	ClearAdminCreatedBy bool
+	AdminCreatedBy      *admin.UpdateOneAdminUserInput
+	AdminCreatedByID    *string
+	ClearAdminUpdatedBy bool
+	AdminUpdatedBy      *admin.UpdateOneAdminUserInput
+	AdminUpdatedByID    *string
+}
+
+// Mutate applies the UpdateCycleInput on the CycleMutation builder.
+func (i *UpdateCycleInput) Mutate(m *CycleMutation) {
+	if i.ClearCreatedAt {
+		m.ClearCreatedAt()
+	}
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if i.ClearUpdatedAt {
+		m.ClearUpdatedAt()
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if i.ClearName {
+		m.ClearName()
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if i.ClearCreatedBy {
+		m.ClearCreatedBy()
+	}
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if i.ClearUpdatedBy {
+		m.ClearUpdatedBy()
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateCycleInput on the CycleUpdate builder.
+func (c *CycleUpdate) SetInput(i UpdateCycleInput) *CycleUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateCycleInput on the CycleUpdateOne builder.
+func (c *CycleUpdateOne) SetInput(i UpdateCycleInput) *CycleUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
 }
 
 // CreateForPermissionInput represents a mutation input for creating forpermissions.
@@ -201,6 +401,262 @@ func (c *ForPermissionUpdate) SetInput(i UpdateForPermissionInput) *ForPermissio
 
 // SetInput applies the change-set in the UpdateForPermissionInput on the ForPermissionUpdateOne builder.
 func (c *ForPermissionUpdateOne) SetInput(i UpdateForPermissionInput) *ForPermissionUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateLifeCycleNotInput represents a mutation input for creating lifecyclenots.
+type CreateLifeCycleNotInput struct {
+	CreatedAt        *time.Time
+	UpdatedAt        *time.Time
+	Name             *string
+	EntityState      *entity.EntityState
+	CreatedBy        *CreateOneUserInput
+	CreatedByID      *string
+	UpdatedBy        *CreateOneUserInput
+	UpdatedByID      *string
+	AdminCreatedBy   *admin.CreateOneAdminUserInput
+	AdminCreatedByID *string
+	AdminUpdatedBy   *admin.CreateOneAdminUserInput
+	AdminUpdatedByID *string
+}
+
+// Mutate applies the CreateLifeCycleNotInput on the LifeCycleNotMutation builder.
+func (i *CreateLifeCycleNotInput) Mutate(m *LifeCycleNotMutation) {
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.EntityState; v != nil {
+		m.SetEntityState(*v)
+	}
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateLifeCycleNotInput on the LifeCycleNotCreate builder.
+func (c *LifeCycleNotCreate) SetInput(i CreateLifeCycleNotInput) *LifeCycleNotCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateLifeCycleNotInput represents a mutation input for updating lifecyclenots.
+type UpdateLifeCycleNotInput struct {
+	ClearCreatedAt      bool
+	CreatedAt           *time.Time
+	ClearUpdatedAt      bool
+	UpdatedAt           *time.Time
+	ClearName           bool
+	Name                *string
+	ClearCreatedBy      bool
+	CreatedBy           *UpdateOneUserInput
+	CreatedByID         *string
+	ClearUpdatedBy      bool
+	UpdatedBy           *UpdateOneUserInput
+	UpdatedByID         *string
+	ClearAdminCreatedBy bool
+	AdminCreatedBy      *admin.UpdateOneAdminUserInput
+	AdminCreatedByID    *string
+	ClearAdminUpdatedBy bool
+	AdminUpdatedBy      *admin.UpdateOneAdminUserInput
+	AdminUpdatedByID    *string
+}
+
+// Mutate applies the UpdateLifeCycleNotInput on the LifeCycleNotMutation builder.
+func (i *UpdateLifeCycleNotInput) Mutate(m *LifeCycleNotMutation) {
+	if i.ClearCreatedAt {
+		m.ClearCreatedAt()
+	}
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if i.ClearUpdatedAt {
+		m.ClearUpdatedAt()
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if i.ClearName {
+		m.ClearName()
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if i.ClearCreatedBy {
+		m.ClearCreatedBy()
+	}
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if i.ClearUpdatedBy {
+		m.ClearUpdatedBy()
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateLifeCycleNotInput on the LifeCycleNotUpdate builder.
+func (c *LifeCycleNotUpdate) SetInput(i UpdateLifeCycleNotInput) *LifeCycleNotUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateLifeCycleNotInput on the LifeCycleNotUpdateOne builder.
+func (c *LifeCycleNotUpdateOne) SetInput(i UpdateLifeCycleNotInput) *LifeCycleNotUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateMiauInput represents a mutation input for creating miaus.
+type CreateMiauInput struct {
+	CreatedAt        *time.Time
+	UpdatedAt        *time.Time
+	Name             *string
+	CreatedBy        *CreateOneUserInput
+	CreatedByID      *string
+	UpdatedBy        *CreateOneUserInput
+	UpdatedByID      *string
+	AdminCreatedBy   *admin.CreateOneAdminUserInput
+	AdminCreatedByID *string
+	AdminUpdatedBy   *admin.CreateOneAdminUserInput
+	AdminUpdatedByID *string
+}
+
+// Mutate applies the CreateMiauInput on the MiauMutation builder.
+func (i *CreateMiauInput) Mutate(m *MiauMutation) {
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateMiauInput on the MiauCreate builder.
+func (c *MiauCreate) SetInput(i CreateMiauInput) *MiauCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateMiauInput represents a mutation input for updating miaus.
+type UpdateMiauInput struct {
+	ClearCreatedAt      bool
+	CreatedAt           *time.Time
+	ClearUpdatedAt      bool
+	UpdatedAt           *time.Time
+	ClearName           bool
+	Name                *string
+	ClearCreatedBy      bool
+	CreatedBy           *UpdateOneUserInput
+	CreatedByID         *string
+	ClearUpdatedBy      bool
+	UpdatedBy           *UpdateOneUserInput
+	UpdatedByID         *string
+	ClearAdminCreatedBy bool
+	AdminCreatedBy      *admin.UpdateOneAdminUserInput
+	AdminCreatedByID    *string
+	ClearAdminUpdatedBy bool
+	AdminUpdatedBy      *admin.UpdateOneAdminUserInput
+	AdminUpdatedByID    *string
+}
+
+// Mutate applies the UpdateMiauInput on the MiauMutation builder.
+func (i *UpdateMiauInput) Mutate(m *MiauMutation) {
+	if i.ClearCreatedAt {
+		m.ClearCreatedAt()
+	}
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if i.ClearUpdatedAt {
+		m.ClearUpdatedAt()
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if i.ClearName {
+		m.ClearName()
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if i.ClearCreatedBy {
+		m.ClearCreatedBy()
+	}
+	if v := i.CreatedByID; v != nil {
+		m.SetCreatedByID(*v)
+	}
+	if i.ClearUpdatedBy {
+		m.ClearUpdatedBy()
+	}
+	if v := i.UpdatedByID; v != nil {
+		m.SetUpdatedByID(*v)
+	}
+	if i.ClearAdminCreatedBy {
+		m.ClearAdminCreatedBy()
+	}
+	if v := i.AdminCreatedByID; v != nil {
+		m.SetAdminCreatedByID(*v)
+	}
+	if i.ClearAdminUpdatedBy {
+		m.ClearAdminUpdatedBy()
+	}
+	if v := i.AdminUpdatedByID; v != nil {
+		m.SetAdminUpdatedByID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateMiauInput on the MiauUpdate builder.
+func (c *MiauUpdate) SetInput(i UpdateMiauInput) *MiauUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateMiauInput on the MiauUpdateOne builder.
+func (c *MiauUpdateOne) SetInput(i UpdateMiauInput) *MiauUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

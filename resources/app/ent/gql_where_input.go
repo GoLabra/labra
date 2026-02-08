@@ -4,14 +4,19 @@ package ent
 
 import (
 	"app/ent/adminuser"
+	"app/ent/cycle"
 	"app/ent/file"
 	"app/ent/forpermission"
+	"app/ent/lifecyclenot"
+	"app/ent/miau"
 	"app/ent/predicate"
 	"app/ent/role"
 	"app/ent/user"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/GoLabra/labra/entgql/entity"
 )
 
 // AdminUserWhereInput represents a where input for filtering AdminUser queries.
@@ -143,6 +148,398 @@ func (i *AdminUserWhereInput) P() (predicate.AdminUser, error) {
 		return predicates[0], nil
 	default:
 		return adminuser.And(predicates...), nil
+	}
+}
+
+// CycleWhereInput represents a where input for filtering Cycle queries.
+type CycleWhereInput struct {
+	Predicates []predicate.Cycle  `json:"-"`
+	Not        *CycleWhereInput   `json:"not,omitempty"`
+	Or         []*CycleWhereInput `json:"or,omitempty"`
+	And        []*CycleWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID             *string  `json:"id,omitempty"`
+	IDNEQ          *string  `json:"idNEQ,omitempty"`
+	IDIn           []string `json:"idIn,omitempty"`
+	IDNotIn        []string `json:"idNotIn,omitempty"`
+	IDGT           *string  `json:"idGT,omitempty"`
+	IDGTE          *string  `json:"idGTE,omitempty"`
+	IDLT           *string  `json:"idLT,omitempty"`
+	IDLTE          *string  `json:"idLTE,omitempty"`
+	IDEqualFold    *string  `json:"idEqualFold,omitempty"`
+	IDContainsFold *string  `json:"idContainsFold,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt       *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ    *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn     []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn  []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT     *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE    *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT     *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE    *time.Time  `json:"createdAtLTE,omitempty"`
+	CreatedAtIsNil  bool        `json:"createdAtIsNil,omitempty"`
+	CreatedAtNotNil bool        `json:"createdAtNotNil,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt       *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ    *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn     []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn  []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT     *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE    *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT     *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE    *time.Time  `json:"updatedAtLTE,omitempty"`
+	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
+	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameIsNil        bool     `json:"nameIsNil,omitempty"`
+	NameNotNil       bool     `json:"nameNotNil,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "entity_state" field predicates.
+	EntityState       *entity.EntityState  `json:"entityState,omitempty"`
+	EntityStateNEQ    *entity.EntityState  `json:"entityStateNEQ,omitempty"`
+	EntityStateIn     []entity.EntityState `json:"entityStateIn,omitempty"`
+	EntityStateNotIn  []entity.EntityState `json:"entityStateNotIn,omitempty"`
+	EntityStateIsNil  bool                 `json:"entityStateIsNil,omitempty"`
+	EntityStateNotNil bool                 `json:"entityStateNotNil,omitempty"`
+
+	// "created_by" edge predicates.
+	HasCreatedBy     *bool             `json:"hasCreatedBy,omitempty"`
+	HasCreatedByWith []*UserWhereInput `json:"hasCreatedByWith,omitempty"`
+
+	// "updated_by" edge predicates.
+	HasUpdatedBy     *bool             `json:"hasUpdatedBy,omitempty"`
+	HasUpdatedByWith []*UserWhereInput `json:"hasUpdatedByWith,omitempty"`
+
+	// "admin_created_by" edge predicates.
+	HasAdminCreatedBy     *bool                  `json:"hasAdminCreatedBy,omitempty"`
+	HasAdminCreatedByWith []*AdminUserWhereInput `json:"hasAdminCreatedByWith,omitempty"`
+
+	// "admin_updated_by" edge predicates.
+	HasAdminUpdatedBy     *bool                  `json:"hasAdminUpdatedBy,omitempty"`
+	HasAdminUpdatedByWith []*AdminUserWhereInput `json:"hasAdminUpdatedByWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *CycleWhereInput) AddPredicates(predicates ...predicate.Cycle) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the CycleWhereInput filter on the CycleQuery builder.
+func (i *CycleWhereInput) Filter(q *CycleQuery) (*CycleQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyCycleWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyCycleWhereInput is returned in case the CycleWhereInput is empty.
+var ErrEmptyCycleWhereInput = errors.New("ent: empty predicate CycleWhereInput")
+
+// P returns a predicate for filtering cycles.
+// An error is returned if the input is empty or invalid.
+func (i *CycleWhereInput) P() (predicate.Cycle, error) {
+	var predicates []predicate.Cycle
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, cycle.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Cycle, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, cycle.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Cycle, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, cycle.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, cycle.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, cycle.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, cycle.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, cycle.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, cycle.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, cycle.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, cycle.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, cycle.IDLTE(*i.IDLTE))
+	}
+	if i.IDEqualFold != nil {
+		predicates = append(predicates, cycle.IDEqualFold(*i.IDEqualFold))
+	}
+	if i.IDContainsFold != nil {
+		predicates = append(predicates, cycle.IDContainsFold(*i.IDContainsFold))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, cycle.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, cycle.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, cycle.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, cycle.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, cycle.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, cycle.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, cycle.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, cycle.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.CreatedAtIsNil {
+		predicates = append(predicates, cycle.CreatedAtIsNil())
+	}
+	if i.CreatedAtNotNil {
+		predicates = append(predicates, cycle.CreatedAtNotNil())
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, cycle.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, cycle.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, cycle.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, cycle.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, cycle.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, cycle.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, cycle.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, cycle.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.UpdatedAtIsNil {
+		predicates = append(predicates, cycle.UpdatedAtIsNil())
+	}
+	if i.UpdatedAtNotNil {
+		predicates = append(predicates, cycle.UpdatedAtNotNil())
+	}
+	if i.Name != nil {
+		predicates = append(predicates, cycle.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, cycle.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, cycle.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, cycle.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, cycle.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, cycle.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, cycle.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, cycle.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, cycle.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, cycle.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, cycle.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameIsNil {
+		predicates = append(predicates, cycle.NameIsNil())
+	}
+	if i.NameNotNil {
+		predicates = append(predicates, cycle.NameNotNil())
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, cycle.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, cycle.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.EntityState != nil {
+		predicates = append(predicates, cycle.EntityStateEQ(*i.EntityState))
+	}
+	if i.EntityStateNEQ != nil {
+		predicates = append(predicates, cycle.EntityStateNEQ(*i.EntityStateNEQ))
+	}
+	if len(i.EntityStateIn) > 0 {
+		predicates = append(predicates, cycle.EntityStateIn(i.EntityStateIn...))
+	}
+	if len(i.EntityStateNotIn) > 0 {
+		predicates = append(predicates, cycle.EntityStateNotIn(i.EntityStateNotIn...))
+	}
+	if i.EntityStateIsNil {
+		predicates = append(predicates, cycle.EntityStateIsNil())
+	}
+	if i.EntityStateNotNil {
+		predicates = append(predicates, cycle.EntityStateNotNil())
+	}
+
+	if i.HasCreatedBy != nil {
+		p := cycle.HasCreatedBy()
+		if !*i.HasCreatedBy {
+			p = cycle.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCreatedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasCreatedByWith))
+		for _, w := range i.HasCreatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCreatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, cycle.HasCreatedByWith(with...))
+	}
+	if i.HasUpdatedBy != nil {
+		p := cycle.HasUpdatedBy()
+		if !*i.HasUpdatedBy {
+			p = cycle.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasUpdatedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasUpdatedByWith))
+		for _, w := range i.HasUpdatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasUpdatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, cycle.HasUpdatedByWith(with...))
+	}
+	if i.HasAdminCreatedBy != nil {
+		p := cycle.HasAdminCreatedBy()
+		if !*i.HasAdminCreatedBy {
+			p = cycle.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAdminCreatedByWith) > 0 {
+		with := make([]predicate.AdminUser, 0, len(i.HasAdminCreatedByWith))
+		for _, w := range i.HasAdminCreatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAdminCreatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, cycle.HasAdminCreatedByWith(with...))
+	}
+	if i.HasAdminUpdatedBy != nil {
+		p := cycle.HasAdminUpdatedBy()
+		if !*i.HasAdminUpdatedBy {
+			p = cycle.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAdminUpdatedByWith) > 0 {
+		with := make([]predicate.AdminUser, 0, len(i.HasAdminUpdatedByWith))
+		for _, w := range i.HasAdminUpdatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAdminUpdatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, cycle.HasAdminUpdatedByWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyCycleWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return cycle.And(predicates...), nil
 	}
 }
 
@@ -701,6 +1098,764 @@ func (i *ForPermissionWhereInput) P() (predicate.ForPermission, error) {
 		return predicates[0], nil
 	default:
 		return forpermission.And(predicates...), nil
+	}
+}
+
+// LifeCycleNotWhereInput represents a where input for filtering LifeCycleNot queries.
+type LifeCycleNotWhereInput struct {
+	Predicates []predicate.LifeCycleNot  `json:"-"`
+	Not        *LifeCycleNotWhereInput   `json:"not,omitempty"`
+	Or         []*LifeCycleNotWhereInput `json:"or,omitempty"`
+	And        []*LifeCycleNotWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID             *string  `json:"id,omitempty"`
+	IDNEQ          *string  `json:"idNEQ,omitempty"`
+	IDIn           []string `json:"idIn,omitempty"`
+	IDNotIn        []string `json:"idNotIn,omitempty"`
+	IDGT           *string  `json:"idGT,omitempty"`
+	IDGTE          *string  `json:"idGTE,omitempty"`
+	IDLT           *string  `json:"idLT,omitempty"`
+	IDLTE          *string  `json:"idLTE,omitempty"`
+	IDEqualFold    *string  `json:"idEqualFold,omitempty"`
+	IDContainsFold *string  `json:"idContainsFold,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt       *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ    *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn     []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn  []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT     *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE    *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT     *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE    *time.Time  `json:"createdAtLTE,omitempty"`
+	CreatedAtIsNil  bool        `json:"createdAtIsNil,omitempty"`
+	CreatedAtNotNil bool        `json:"createdAtNotNil,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt       *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ    *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn     []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn  []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT     *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE    *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT     *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE    *time.Time  `json:"updatedAtLTE,omitempty"`
+	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
+	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameIsNil        bool     `json:"nameIsNil,omitempty"`
+	NameNotNil       bool     `json:"nameNotNil,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "entity_state" field predicates.
+	EntityState       *entity.EntityState  `json:"entityState,omitempty"`
+	EntityStateNEQ    *entity.EntityState  `json:"entityStateNEQ,omitempty"`
+	EntityStateIn     []entity.EntityState `json:"entityStateIn,omitempty"`
+	EntityStateNotIn  []entity.EntityState `json:"entityStateNotIn,omitempty"`
+	EntityStateIsNil  bool                 `json:"entityStateIsNil,omitempty"`
+	EntityStateNotNil bool                 `json:"entityStateNotNil,omitempty"`
+
+	// "created_by" edge predicates.
+	HasCreatedBy     *bool             `json:"hasCreatedBy,omitempty"`
+	HasCreatedByWith []*UserWhereInput `json:"hasCreatedByWith,omitempty"`
+
+	// "updated_by" edge predicates.
+	HasUpdatedBy     *bool             `json:"hasUpdatedBy,omitempty"`
+	HasUpdatedByWith []*UserWhereInput `json:"hasUpdatedByWith,omitempty"`
+
+	// "admin_created_by" edge predicates.
+	HasAdminCreatedBy     *bool                  `json:"hasAdminCreatedBy,omitempty"`
+	HasAdminCreatedByWith []*AdminUserWhereInput `json:"hasAdminCreatedByWith,omitempty"`
+
+	// "admin_updated_by" edge predicates.
+	HasAdminUpdatedBy     *bool                  `json:"hasAdminUpdatedBy,omitempty"`
+	HasAdminUpdatedByWith []*AdminUserWhereInput `json:"hasAdminUpdatedByWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *LifeCycleNotWhereInput) AddPredicates(predicates ...predicate.LifeCycleNot) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the LifeCycleNotWhereInput filter on the LifeCycleNotQuery builder.
+func (i *LifeCycleNotWhereInput) Filter(q *LifeCycleNotQuery) (*LifeCycleNotQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyLifeCycleNotWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyLifeCycleNotWhereInput is returned in case the LifeCycleNotWhereInput is empty.
+var ErrEmptyLifeCycleNotWhereInput = errors.New("ent: empty predicate LifeCycleNotWhereInput")
+
+// P returns a predicate for filtering lifecyclenots.
+// An error is returned if the input is empty or invalid.
+func (i *LifeCycleNotWhereInput) P() (predicate.LifeCycleNot, error) {
+	var predicates []predicate.LifeCycleNot
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, lifecyclenot.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.LifeCycleNot, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, lifecyclenot.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.LifeCycleNot, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, lifecyclenot.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, lifecyclenot.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, lifecyclenot.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, lifecyclenot.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, lifecyclenot.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, lifecyclenot.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, lifecyclenot.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, lifecyclenot.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, lifecyclenot.IDLTE(*i.IDLTE))
+	}
+	if i.IDEqualFold != nil {
+		predicates = append(predicates, lifecyclenot.IDEqualFold(*i.IDEqualFold))
+	}
+	if i.IDContainsFold != nil {
+		predicates = append(predicates, lifecyclenot.IDContainsFold(*i.IDContainsFold))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, lifecyclenot.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, lifecyclenot.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, lifecyclenot.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, lifecyclenot.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, lifecyclenot.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, lifecyclenot.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, lifecyclenot.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, lifecyclenot.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.CreatedAtIsNil {
+		predicates = append(predicates, lifecyclenot.CreatedAtIsNil())
+	}
+	if i.CreatedAtNotNil {
+		predicates = append(predicates, lifecyclenot.CreatedAtNotNil())
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, lifecyclenot.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, lifecyclenot.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.UpdatedAtIsNil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtIsNil())
+	}
+	if i.UpdatedAtNotNil {
+		predicates = append(predicates, lifecyclenot.UpdatedAtNotNil())
+	}
+	if i.Name != nil {
+		predicates = append(predicates, lifecyclenot.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, lifecyclenot.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, lifecyclenot.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, lifecyclenot.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, lifecyclenot.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, lifecyclenot.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, lifecyclenot.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, lifecyclenot.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, lifecyclenot.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, lifecyclenot.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, lifecyclenot.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameIsNil {
+		predicates = append(predicates, lifecyclenot.NameIsNil())
+	}
+	if i.NameNotNil {
+		predicates = append(predicates, lifecyclenot.NameNotNil())
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, lifecyclenot.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, lifecyclenot.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.EntityState != nil {
+		predicates = append(predicates, lifecyclenot.EntityStateEQ(*i.EntityState))
+	}
+	if i.EntityStateNEQ != nil {
+		predicates = append(predicates, lifecyclenot.EntityStateNEQ(*i.EntityStateNEQ))
+	}
+	if len(i.EntityStateIn) > 0 {
+		predicates = append(predicates, lifecyclenot.EntityStateIn(i.EntityStateIn...))
+	}
+	if len(i.EntityStateNotIn) > 0 {
+		predicates = append(predicates, lifecyclenot.EntityStateNotIn(i.EntityStateNotIn...))
+	}
+	if i.EntityStateIsNil {
+		predicates = append(predicates, lifecyclenot.EntityStateIsNil())
+	}
+	if i.EntityStateNotNil {
+		predicates = append(predicates, lifecyclenot.EntityStateNotNil())
+	}
+
+	if i.HasCreatedBy != nil {
+		p := lifecyclenot.HasCreatedBy()
+		if !*i.HasCreatedBy {
+			p = lifecyclenot.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCreatedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasCreatedByWith))
+		for _, w := range i.HasCreatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCreatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, lifecyclenot.HasCreatedByWith(with...))
+	}
+	if i.HasUpdatedBy != nil {
+		p := lifecyclenot.HasUpdatedBy()
+		if !*i.HasUpdatedBy {
+			p = lifecyclenot.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasUpdatedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasUpdatedByWith))
+		for _, w := range i.HasUpdatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasUpdatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, lifecyclenot.HasUpdatedByWith(with...))
+	}
+	if i.HasAdminCreatedBy != nil {
+		p := lifecyclenot.HasAdminCreatedBy()
+		if !*i.HasAdminCreatedBy {
+			p = lifecyclenot.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAdminCreatedByWith) > 0 {
+		with := make([]predicate.AdminUser, 0, len(i.HasAdminCreatedByWith))
+		for _, w := range i.HasAdminCreatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAdminCreatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, lifecyclenot.HasAdminCreatedByWith(with...))
+	}
+	if i.HasAdminUpdatedBy != nil {
+		p := lifecyclenot.HasAdminUpdatedBy()
+		if !*i.HasAdminUpdatedBy {
+			p = lifecyclenot.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAdminUpdatedByWith) > 0 {
+		with := make([]predicate.AdminUser, 0, len(i.HasAdminUpdatedByWith))
+		for _, w := range i.HasAdminUpdatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAdminUpdatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, lifecyclenot.HasAdminUpdatedByWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyLifeCycleNotWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return lifecyclenot.And(predicates...), nil
+	}
+}
+
+// MiauWhereInput represents a where input for filtering Miau queries.
+type MiauWhereInput struct {
+	Predicates []predicate.Miau  `json:"-"`
+	Not        *MiauWhereInput   `json:"not,omitempty"`
+	Or         []*MiauWhereInput `json:"or,omitempty"`
+	And        []*MiauWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID             *string  `json:"id,omitempty"`
+	IDNEQ          *string  `json:"idNEQ,omitempty"`
+	IDIn           []string `json:"idIn,omitempty"`
+	IDNotIn        []string `json:"idNotIn,omitempty"`
+	IDGT           *string  `json:"idGT,omitempty"`
+	IDGTE          *string  `json:"idGTE,omitempty"`
+	IDLT           *string  `json:"idLT,omitempty"`
+	IDLTE          *string  `json:"idLTE,omitempty"`
+	IDEqualFold    *string  `json:"idEqualFold,omitempty"`
+	IDContainsFold *string  `json:"idContainsFold,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt       *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ    *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn     []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn  []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT     *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE    *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT     *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE    *time.Time  `json:"createdAtLTE,omitempty"`
+	CreatedAtIsNil  bool        `json:"createdAtIsNil,omitempty"`
+	CreatedAtNotNil bool        `json:"createdAtNotNil,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt       *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ    *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn     []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn  []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT     *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE    *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT     *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE    *time.Time  `json:"updatedAtLTE,omitempty"`
+	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
+	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameIsNil        bool     `json:"nameIsNil,omitempty"`
+	NameNotNil       bool     `json:"nameNotNil,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "created_by" edge predicates.
+	HasCreatedBy     *bool             `json:"hasCreatedBy,omitempty"`
+	HasCreatedByWith []*UserWhereInput `json:"hasCreatedByWith,omitempty"`
+
+	// "updated_by" edge predicates.
+	HasUpdatedBy     *bool             `json:"hasUpdatedBy,omitempty"`
+	HasUpdatedByWith []*UserWhereInput `json:"hasUpdatedByWith,omitempty"`
+
+	// "admin_created_by" edge predicates.
+	HasAdminCreatedBy     *bool                  `json:"hasAdminCreatedBy,omitempty"`
+	HasAdminCreatedByWith []*AdminUserWhereInput `json:"hasAdminCreatedByWith,omitempty"`
+
+	// "admin_updated_by" edge predicates.
+	HasAdminUpdatedBy     *bool                  `json:"hasAdminUpdatedBy,omitempty"`
+	HasAdminUpdatedByWith []*AdminUserWhereInput `json:"hasAdminUpdatedByWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *MiauWhereInput) AddPredicates(predicates ...predicate.Miau) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the MiauWhereInput filter on the MiauQuery builder.
+func (i *MiauWhereInput) Filter(q *MiauQuery) (*MiauQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyMiauWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyMiauWhereInput is returned in case the MiauWhereInput is empty.
+var ErrEmptyMiauWhereInput = errors.New("ent: empty predicate MiauWhereInput")
+
+// P returns a predicate for filtering miaus.
+// An error is returned if the input is empty or invalid.
+func (i *MiauWhereInput) P() (predicate.Miau, error) {
+	var predicates []predicate.Miau
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, miau.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Miau, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, miau.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Miau, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, miau.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, miau.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, miau.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, miau.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, miau.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, miau.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, miau.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, miau.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, miau.IDLTE(*i.IDLTE))
+	}
+	if i.IDEqualFold != nil {
+		predicates = append(predicates, miau.IDEqualFold(*i.IDEqualFold))
+	}
+	if i.IDContainsFold != nil {
+		predicates = append(predicates, miau.IDContainsFold(*i.IDContainsFold))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, miau.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, miau.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, miau.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, miau.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, miau.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, miau.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, miau.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, miau.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.CreatedAtIsNil {
+		predicates = append(predicates, miau.CreatedAtIsNil())
+	}
+	if i.CreatedAtNotNil {
+		predicates = append(predicates, miau.CreatedAtNotNil())
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, miau.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, miau.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, miau.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, miau.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, miau.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, miau.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, miau.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, miau.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.UpdatedAtIsNil {
+		predicates = append(predicates, miau.UpdatedAtIsNil())
+	}
+	if i.UpdatedAtNotNil {
+		predicates = append(predicates, miau.UpdatedAtNotNil())
+	}
+	if i.Name != nil {
+		predicates = append(predicates, miau.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, miau.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, miau.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, miau.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, miau.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, miau.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, miau.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, miau.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, miau.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, miau.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, miau.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameIsNil {
+		predicates = append(predicates, miau.NameIsNil())
+	}
+	if i.NameNotNil {
+		predicates = append(predicates, miau.NameNotNil())
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, miau.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, miau.NameContainsFold(*i.NameContainsFold))
+	}
+
+	if i.HasCreatedBy != nil {
+		p := miau.HasCreatedBy()
+		if !*i.HasCreatedBy {
+			p = miau.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCreatedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasCreatedByWith))
+		for _, w := range i.HasCreatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCreatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, miau.HasCreatedByWith(with...))
+	}
+	if i.HasUpdatedBy != nil {
+		p := miau.HasUpdatedBy()
+		if !*i.HasUpdatedBy {
+			p = miau.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasUpdatedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasUpdatedByWith))
+		for _, w := range i.HasUpdatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasUpdatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, miau.HasUpdatedByWith(with...))
+	}
+	if i.HasAdminCreatedBy != nil {
+		p := miau.HasAdminCreatedBy()
+		if !*i.HasAdminCreatedBy {
+			p = miau.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAdminCreatedByWith) > 0 {
+		with := make([]predicate.AdminUser, 0, len(i.HasAdminCreatedByWith))
+		for _, w := range i.HasAdminCreatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAdminCreatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, miau.HasAdminCreatedByWith(with...))
+	}
+	if i.HasAdminUpdatedBy != nil {
+		p := miau.HasAdminUpdatedBy()
+		if !*i.HasAdminUpdatedBy {
+			p = miau.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAdminUpdatedByWith) > 0 {
+		with := make([]predicate.AdminUser, 0, len(i.HasAdminUpdatedByWith))
+		for _, w := range i.HasAdminUpdatedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAdminUpdatedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, miau.HasAdminUpdatedByWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyMiauWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return miau.And(predicates...), nil
 	}
 }
 

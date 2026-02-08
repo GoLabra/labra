@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/GoLabra/labra/cache"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
@@ -34,6 +35,8 @@ func applyOwnerFilter(q ent.Query, adminUserID string) {
 		ownerQuery.WhereAdminCreatedBy(adminUserID)
 	}
 }
+
+type WherePred func(*sql.Selector)
 
 // applyLifecycleFilter restricts the query to rows whose entity_state is in the allowed set.
 func applyLifecycleFilter(q ent.Query, allowedStates []entity.EntityState) {

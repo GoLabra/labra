@@ -3,6 +3,10 @@ package svc
 import (
 	"app/ent"
 	"context"
+	{{- if hasStateAnnotation $ }}
+
+	"github.com/GoLabra/labra/entgql/entity"
+	{{- end }}
 )
 
 type {{$.Name}} interface {
@@ -19,6 +23,9 @@ type {{$.Name}} interface {
     {{- end }}
     {{- if not (ShouldSkip $ "mutation_update_input") }}
     Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error)
+    {{- if hasStateAnnotation $ }}
+    UpdateState(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, state entity.EntityState) (*ent.{{$.Name}}, error)
+    {{- end }}
     UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error)
     UpdateMany(ctx context.Context, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error)
     UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error)

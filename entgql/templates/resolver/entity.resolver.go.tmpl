@@ -7,6 +7,10 @@ package resolvers
 import (
 	"app/ent"
 	"context"
+	{{- if hasStateAnnotation $ }}
+
+	"github.com/GoLabra/labra/entgql/entity"
+	{{- end }}
 
 	admin "github.com/GoLabra/labra/entgql/ent"
 )
@@ -30,6 +34,13 @@ func (r *mutationResolver) CreateMany{{$.Name | Plural}}(ctx context.Context, da
 func (r *mutationResolver) Update{{$.Name}}(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	return r.Service.{{$.Name}}.Update(ctx, where, data)
 }
+
+{{- if hasStateAnnotation $ }}
+// Update{{$.Name}}State is the resolver for the update{{$.Name}}State field.
+func (r *mutationResolver) Update{{$.Name}}State(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, state entity.EntityState) (*ent.{{$.Name}}, error) {
+	return r.Service.{{$.Name}}.UpdateState(ctx, where, state)
+}
+{{- end }}
 
 // UpdateMany{{$.Name | Plural}} is the resolver for the updateMany{{$.Name | Plural}} field.
 func (r *mutationResolver) UpdateMany{{$.Name | Plural}}(ctx context.Context, where ent.{{$.Name}}WhereInput, data ent.Update{{$.Name}}Input) (int, error) {

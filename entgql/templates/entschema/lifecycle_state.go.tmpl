@@ -5,5 +5,9 @@
 			Default("{{$.Default}}").
 			Annotations(
                 entgql.Type("EntityState"),
+                entgql.Skip(entgql.SkipMutationUpdateInput),
+                annotations.Field{
+                    Caption:   "Entity State",
+                },
 			),
 {{- end }}

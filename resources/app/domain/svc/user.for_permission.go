@@ -3,7 +3,7 @@ package svc
 import (
 	"context"
 	"app/ent"
-    "app/domain/repo"
+	"app/domain/repo"
 )
 
 type ForPermission struct {

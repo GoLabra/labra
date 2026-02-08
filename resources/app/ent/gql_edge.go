@@ -8,6 +8,38 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (_m *Cycle) CreatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.CreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *Cycle) UpdatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *Cycle) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminCreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAdminCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *Cycle) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminUpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAdminUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (_m *ForPermission) CreatedBy(ctx context.Context) (*User, error) {
 	result, err := _m.Edges.CreatedByOrErr()
 	if IsNotLoaded(err) {
@@ -33,6 +65,70 @@ func (_m *ForPermission) AdminCreatedBy(ctx context.Context) (*AdminUser, error)
 }
 
 func (_m *ForPermission) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminUpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAdminUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *LifeCycleNot) CreatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.CreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *LifeCycleNot) UpdatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *LifeCycleNot) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminCreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAdminCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *LifeCycleNot) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminUpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAdminUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *Miau) CreatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.CreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *Miau) UpdatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UpdatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryUpdatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *Miau) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminCreatedByOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAdminCreatedBy().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_m *Miau) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
 	result, err := _m.Edges.AdminUpdatedByOrErr()
 	if IsNotLoaded(err) {
 		result, err = _m.QueryAdminUpdatedBy().Only(ctx)

@@ -3,7 +3,10 @@
 package ent
 
 import (
+	"app/ent/cycle"
 	"app/ent/forpermission"
+	"app/ent/lifecyclenot"
+	"app/ent/miau"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -54,6 +57,160 @@ func newAdminUserPaginateArgs(rv map[string]any) *adminuserPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*AdminUserWhereInput); ok {
 		args.opts = append(args.opts, WithAdminUserFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *CycleQuery) CollectFields(ctx context.Context, satisfies ...string) (*CycleQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *CycleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(cycle.Columns))
+		selectedFields = []string{cycle.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "createdBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			_q.withCreatedBy = query
+
+		case "updatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			_q.withUpdatedBy = query
+
+		case "adminCreatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			_q.withAdminCreatedBy = query
+
+		case "adminUpdatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			_q.withAdminUpdatedBy = query
+		case "createdAt":
+			if _, ok := fieldSeen[cycle.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, cycle.FieldCreatedAt)
+				fieldSeen[cycle.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[cycle.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, cycle.FieldUpdatedAt)
+				fieldSeen[cycle.FieldUpdatedAt] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[cycle.FieldName]; !ok {
+				selectedFields = append(selectedFields, cycle.FieldName)
+				fieldSeen[cycle.FieldName] = struct{}{}
+			}
+		case "entityState":
+			if _, ok := fieldSeen[cycle.FieldEntityState]; !ok {
+				selectedFields = append(selectedFields, cycle.FieldEntityState)
+				fieldSeen[cycle.FieldEntityState] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type cyclePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []CyclePaginateOption
+}
+
+func newCyclePaginateArgs(rv map[string]any) *cyclePaginateArgs {
+	args := &cyclePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case []*CycleOrder:
+			args.opts = append(args.opts, WithCycleOrder(v))
+		case []any:
+			var orders []*CycleOrder
+			for i := range v {
+				mv, ok := v[i].(map[string]any)
+				if !ok {
+					continue
+				}
+				var (
+					err1, err2 error
+					order      = &CycleOrder{Field: &CycleOrderField{}, Direction: entgql.OrderDirectionAsc}
+				)
+				if d, ok := mv[directionField]; ok {
+					err1 = order.Direction.UnmarshalGQL(d)
+				}
+				if f, ok := mv[fieldField]; ok {
+					err2 = order.Field.UnmarshalGQL(f)
+				}
+				if err1 == nil && err2 == nil {
+					orders = append(orders, order)
+				}
+			}
+			args.opts = append(args.opts, WithCycleOrder(orders))
+		}
+	}
+	if v, ok := rv[whereField].(*CycleWhereInput); ok {
+		args.opts = append(args.opts, WithCycleFilter(v.Filter))
 	}
 	return args
 }
@@ -259,6 +416,309 @@ func newForPermissionPaginateArgs(rv map[string]any) *forpermissionPaginateArgs 
 	}
 	if v, ok := rv[whereField].(*ForPermissionWhereInput); ok {
 		args.opts = append(args.opts, WithForPermissionFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *LifeCycleNotQuery) CollectFields(ctx context.Context, satisfies ...string) (*LifeCycleNotQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *LifeCycleNotQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(lifecyclenot.Columns))
+		selectedFields = []string{lifecyclenot.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "createdBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			_q.withCreatedBy = query
+
+		case "updatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			_q.withUpdatedBy = query
+
+		case "adminCreatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			_q.withAdminCreatedBy = query
+
+		case "adminUpdatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			_q.withAdminUpdatedBy = query
+		case "createdAt":
+			if _, ok := fieldSeen[lifecyclenot.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, lifecyclenot.FieldCreatedAt)
+				fieldSeen[lifecyclenot.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[lifecyclenot.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, lifecyclenot.FieldUpdatedAt)
+				fieldSeen[lifecyclenot.FieldUpdatedAt] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[lifecyclenot.FieldName]; !ok {
+				selectedFields = append(selectedFields, lifecyclenot.FieldName)
+				fieldSeen[lifecyclenot.FieldName] = struct{}{}
+			}
+		case "entityState":
+			if _, ok := fieldSeen[lifecyclenot.FieldEntityState]; !ok {
+				selectedFields = append(selectedFields, lifecyclenot.FieldEntityState)
+				fieldSeen[lifecyclenot.FieldEntityState] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type lifecyclenotPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []LifeCycleNotPaginateOption
+}
+
+func newLifeCycleNotPaginateArgs(rv map[string]any) *lifecyclenotPaginateArgs {
+	args := &lifecyclenotPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case []*LifeCycleNotOrder:
+			args.opts = append(args.opts, WithLifeCycleNotOrder(v))
+		case []any:
+			var orders []*LifeCycleNotOrder
+			for i := range v {
+				mv, ok := v[i].(map[string]any)
+				if !ok {
+					continue
+				}
+				var (
+					err1, err2 error
+					order      = &LifeCycleNotOrder{Field: &LifeCycleNotOrderField{}, Direction: entgql.OrderDirectionAsc}
+				)
+				if d, ok := mv[directionField]; ok {
+					err1 = order.Direction.UnmarshalGQL(d)
+				}
+				if f, ok := mv[fieldField]; ok {
+					err2 = order.Field.UnmarshalGQL(f)
+				}
+				if err1 == nil && err2 == nil {
+					orders = append(orders, order)
+				}
+			}
+			args.opts = append(args.opts, WithLifeCycleNotOrder(orders))
+		}
+	}
+	if v, ok := rv[whereField].(*LifeCycleNotWhereInput); ok {
+		args.opts = append(args.opts, WithLifeCycleNotFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *MiauQuery) CollectFields(ctx context.Context, satisfies ...string) (*MiauQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *MiauQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(miau.Columns))
+		selectedFields = []string{miau.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "createdBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			_q.withCreatedBy = query
+
+		case "updatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			_q.withUpdatedBy = query
+
+		case "adminCreatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			_q.withAdminCreatedBy = query
+
+		case "adminUpdatedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AdminUserClient{config: _q.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
+				return err
+			}
+			_q.withAdminUpdatedBy = query
+		case "createdAt":
+			if _, ok := fieldSeen[miau.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, miau.FieldCreatedAt)
+				fieldSeen[miau.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[miau.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, miau.FieldUpdatedAt)
+				fieldSeen[miau.FieldUpdatedAt] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[miau.FieldName]; !ok {
+				selectedFields = append(selectedFields, miau.FieldName)
+				fieldSeen[miau.FieldName] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type miauPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []MiauPaginateOption
+}
+
+func newMiauPaginateArgs(rv map[string]any) *miauPaginateArgs {
+	args := &miauPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case []*MiauOrder:
+			args.opts = append(args.opts, WithMiauOrder(v))
+		case []any:
+			var orders []*MiauOrder
+			for i := range v {
+				mv, ok := v[i].(map[string]any)
+				if !ok {
+					continue
+				}
+				var (
+					err1, err2 error
+					order      = &MiauOrder{Field: &MiauOrderField{}, Direction: entgql.OrderDirectionAsc}
+				)
+				if d, ok := mv[directionField]; ok {
+					err1 = order.Direction.UnmarshalGQL(d)
+				}
+				if f, ok := mv[fieldField]; ok {
+					err2 = order.Field.UnmarshalGQL(f)
+				}
+				if err1 == nil && err2 == nil {
+					orders = append(orders, order)
+				}
+			}
+			args.opts = append(args.opts, WithMiauOrder(orders))
+		}
+	}
+	if v, ok := rv[whereField].(*MiauWhereInput); ok {
+		args.opts = append(args.opts, WithMiauFilter(v.Filter))
 	}
 	return args
 }

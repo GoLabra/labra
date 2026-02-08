@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"app/ent"
+
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/ext/mapstructure"
 )
@@ -306,7 +307,8 @@ func (r *ForPermission) Update(ctx context.Context, where ent.ForPermissionWhere
 }
 
 func (r *ForPermission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.ForPermissionWhereUniqueInput, data ent.UpdateForPermissionInput) (*ent.ForPermission, error) {
-	
+	var iCtx = context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+
     repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
@@ -317,7 +319,7 @@ func (r *ForPermission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.ForP
 	if err != nil {
 		return nil, fmt.Errorf("error applying unique where condition: %v", err)
 	}
-	item, err := query.First(ctx)
+	item, err := query.First(iCtx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting item to update: %v", err)
 	}

@@ -1,0 +1,52 @@
+extend type Query {
+    lifeCycleNots(where: LifeCycleNotWhereInput, orderBy: LifeCycleNotOrder, skip: Int, first: Int, last: Int): [LifeCycleNot!]
+    lifeCycleNotsConnection(where: LifeCycleNotWhereInput, orderBy: LifeCycleNotOrder, skip: Int, first: Int, last: Int): LifeCycleNotConnection!
+}
+extend type Mutation {
+    createLifeCycleNot(data: CreateLifeCycleNotInput!): LifeCycleNot!
+    createManyLifeCycleNots(data: [CreateLifeCycleNotInput!]!): [LifeCycleNot]!
+    updateLifeCycleNot(where: LifeCycleNotWhereUniqueInput!, data: UpdateLifeCycleNotInput!): LifeCycleNot!
+    updateLifeCycleNotState(where: LifeCycleNotWhereUniqueInput!, state: EntityState!): LifeCycleNot!
+    updateManyLifeCycleNots(where: LifeCycleNotWhereInput!, data: UpdateLifeCycleNotInput!): Int!
+    upsertLifeCycleNot(data: CreateLifeCycleNotInput!): LifeCycleNot!
+    upsertManyLifeCycleNots(data: [CreateLifeCycleNotInput!]!): Int!
+    deleteLifeCycleNot(where: LifeCycleNotWhereUniqueInput!): LifeCycleNot!
+    deleteManyLifeCycleNots(where: LifeCycleNotWhereInput!): Int!
+}
+extend input CreateLifeCycleNotInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+    adminCreatedBy: CreateOneAdminUserInput
+    adminUpdatedBy: CreateOneAdminUserInput
+}
+extend input UpdateLifeCycleNotInput {
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+    adminCreatedBy: UpdateOneAdminUserInput
+    adminUpdatedBy: UpdateOneAdminUserInput
+}
+
+input CreateOneLifeCycleNotInput {
+    create: CreateLifeCycleNotInput
+    connect: LifeCycleNotWhereUniqueInput
+}
+
+input CreateManyLifeCycleNotInput {
+    create: [CreateLifeCycleNotInput!]
+    connect: [LifeCycleNotWhereUniqueInput!]
+}
+
+
+input UpdateOneLifeCycleNotInput {
+    create: CreateLifeCycleNotInput
+    connect: LifeCycleNotWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyLifeCycleNotInput {
+    create: [CreateLifeCycleNotInput!]
+    connect: [LifeCycleNotWhereUniqueInput!]
+    delete: [LifeCycleNotWhereUniqueInput!]
+    disconnect: [LifeCycleNotWhereUniqueInput!]
+}

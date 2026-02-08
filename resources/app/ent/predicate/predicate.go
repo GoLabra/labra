@@ -9,11 +9,20 @@ import (
 // AdminUser is the predicate function for adminuser builders.
 type AdminUser func(*sql.Selector)
 
+// Cycle is the predicate function for cycle builders.
+type Cycle func(*sql.Selector)
+
 // File is the predicate function for file builders.
 type File func(*sql.Selector)
 
 // ForPermission is the predicate function for forpermission builders.
 type ForPermission func(*sql.Selector)
+
+// LifeCycleNot is the predicate function for lifecyclenot builders.
+type LifeCycleNot func(*sql.Selector)
+
+// Miau is the predicate function for miau builders.
+type Miau func(*sql.Selector)
 
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)

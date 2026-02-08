@@ -3,26 +3,24 @@
 package ent
 
 import (
-	"github.com/GoLabra/labra/entgql/entity"
-	"github.com/GoLabra/labra/entgql/ent/predicate"
 {{- range $n := $.Nodes}}
-{{- if and (hasStateAnnotation $n) (hasEntityStateField $n) }}
-	{{ $n.Package }} "github.com/GoLabra/labra/entgql/ent/{{ $n.Package }}"
+{{- if and (hasStateAnnotation $n)}}
+	{{ $n.Package }} "app/ent/{{ $n.Package }}"
 {{- end }}
 {{- end }}
+	"app/ent/predicate"
+
+	"github.com/GoLabra/labra/entgql/entity"
+	"entgo.io/ent"
 )
 
 {{ range $n := $.Nodes }}
-{{- if and (hasStateAnnotation $n) (hasEntityStateField $n) }}
+{{- if and (hasStateAnnotation $n)}}
 
 // WhereEntityStateIn restricts results to rows whose entity_state is in the given list.
 // Used by read permission hook to enforce lifecycle_access.
-func ({{ $n.Receiver }} *{{ $n.Name }}Query) WhereEntityStateIn(states ...entity.EntityState) *{{ $n.Name }}Query {
-	vs := make([]string, len(states))
-	for i := range states {
-		vs[i] = string(states[i])
-	}
-	return {{ $n.Receiver }}.Where(predicate.{{ $n.Name }}({{ $n.Package }}.EntityStateIn(vs...)))
+func ({{ $n.Receiver }} *{{ $n.Name }}Query) WhereEntityStateIn(states ...entity.EntityState)  ent.Query {
+	return {{ $n.Receiver }}.Where(predicate.{{ $n.Name }}({{ $n.Package }}.EntityStateIn(states...)))
 }
 {{- end }}
 {{ end }}

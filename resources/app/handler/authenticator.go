@@ -111,6 +111,7 @@ func Authenticator(next http.Handler) http.Handler {
 
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
+			return
 		}
 
 		adminUser, err := adminService.AdminUser.GetOne(iCtx, adminEnt.AdminUserWhereUniqueInput{Email: &userEmail})
@@ -135,6 +136,7 @@ func Authenticator(next http.Handler) http.Handler {
 
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
+			return
 		}
 
 		w.WriteHeader(http.StatusUnauthorized)

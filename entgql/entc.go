@@ -52,29 +52,13 @@ func init() {
 		return t.Annotations["Entity"] != nil && t.Annotations["Entity"].(map[string]any)["Owner"] == "User"
 	}
 	templateFuncMap["hasStateAnnotation"] = func(t *gen.Type) bool {
-		if stateAnnotation, ok := t.Annotations[annotations.EntityStateName]; ok {
-			var stateAnnotations annotations.State
-			if err := mapstructure.Decode(stateAnnotation, &stateAnnotations); err == nil {
-				return stateAnnotations.Enabled
-			}
+		var entityAnnotations annotations.Entity
+		err := mapstructure.Decode(t.Annotations["Entity"], &entityAnnotations)
+		if err != nil {
+			panic(err)
 		}
-		return false
-	}
-	templateFuncMap["hasEntityStateField"] = func(t *gen.Type) bool {
-		for _, f := range t.Fields {
-			if f.Name == "entity_state" {
-				return true
-			}
-		}
-		return false
-	}
-	templateFuncMap["isEntityStatePointer"] = func(t *gen.Type) bool {
-		for _, f := range t.Fields {
-			if f.Name == "entity_state" {
-				return f.Optional || (f.Type.RType != nil && f.Type.RType.IsPtr())
-			}
-		}
-		return false
+
+		return entityAnnotations.State.Enabled
 	}
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
@@ -260,10 +244,10 @@ func CreateLifecycleMethods() gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 			if err := next.Generate(g); err != nil {
-				return err
+				panic(err)
 			}
 			if err := runTemplate(errPrefix, "lifecycle.go.tmpl", "ent/lifecycle.go.tmpl", "./ent/lifecycle.go", g); err != nil {
-				return err
+				panic(err)
 			}
 			return runTemplate(errPrefix, "lifecycle_filter_methods.go.tmpl", "ent/lifecycle_filter_methods.go.tmpl", "./ent/lifecycle_filter_methods.go", g)
 		})

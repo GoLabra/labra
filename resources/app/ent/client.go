@@ -12,8 +12,11 @@ import (
 	"app/ent/migrate"
 
 	"app/ent/adminuser"
+	"app/ent/cycle"
 	"app/ent/file"
 	"app/ent/forpermission"
+	"app/ent/lifecyclenot"
+	"app/ent/miau"
 	"app/ent/role"
 	"app/ent/user"
 
@@ -32,10 +35,16 @@ type Client struct {
 	Schema *migrate.Schema
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// Cycle is the client for interacting with the Cycle builders.
+	Cycle *CycleClient
 	// File is the client for interacting with the File builders.
 	File *FileClient
 	// ForPermission is the client for interacting with the ForPermission builders.
 	ForPermission *ForPermissionClient
+	// LifeCycleNot is the client for interacting with the LifeCycleNot builders.
+	LifeCycleNot *LifeCycleNotClient
+	// Miau is the client for interacting with the Miau builders.
+	Miau *MiauClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
@@ -52,8 +61,11 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AdminUser = NewAdminUserClient(c.config)
+	c.Cycle = NewCycleClient(c.config)
 	c.File = NewFileClient(c.config)
 	c.ForPermission = NewForPermissionClient(c.config)
+	c.LifeCycleNot = NewLifeCycleNotClient(c.config)
+	c.Miau = NewMiauClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -149,8 +161,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:           ctx,
 		config:        cfg,
 		AdminUser:     NewAdminUserClient(cfg),
+		Cycle:         NewCycleClient(cfg),
 		File:          NewFileClient(cfg),
 		ForPermission: NewForPermissionClient(cfg),
+		LifeCycleNot:  NewLifeCycleNotClient(cfg),
+		Miau:          NewMiauClient(cfg),
 		Role:          NewRoleClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
@@ -173,8 +188,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:           ctx,
 		config:        cfg,
 		AdminUser:     NewAdminUserClient(cfg),
+		Cycle:         NewCycleClient(cfg),
 		File:          NewFileClient(cfg),
 		ForPermission: NewForPermissionClient(cfg),
+		LifeCycleNot:  NewLifeCycleNotClient(cfg),
+		Miau:          NewMiauClient(cfg),
 		Role:          NewRoleClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
@@ -205,21 +223,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AdminUser.Use(hooks...)
-	c.File.Use(hooks...)
-	c.ForPermission.Use(hooks...)
-	c.Role.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AdminUser, c.Cycle, c.File, c.ForPermission, c.LifeCycleNot, c.Miau, c.Role,
+		c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AdminUser.Intercept(interceptors...)
-	c.File.Intercept(interceptors...)
-	c.ForPermission.Intercept(interceptors...)
-	c.Role.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AdminUser, c.Cycle, c.File, c.ForPermission, c.LifeCycleNot, c.Miau, c.Role,
+		c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -227,10 +247,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AdminUserMutation:
 		return c.AdminUser.mutate(ctx, m)
+	case *CycleMutation:
+		return c.Cycle.mutate(ctx, m)
 	case *FileMutation:
 		return c.File.mutate(ctx, m)
 	case *ForPermissionMutation:
 		return c.ForPermission.mutate(ctx, m)
+	case *LifeCycleNotMutation:
+		return c.LifeCycleNot.mutate(ctx, m)
+	case *MiauMutation:
+		return c.Miau.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
 	case *UserMutation:
@@ -370,6 +396,203 @@ func (c *AdminUserClient) mutate(ctx context.Context, m *AdminUserMutation) (Val
 		return (&AdminUserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AdminUser mutation op: %q", m.Op())
+	}
+}
+
+// CycleClient is a client for the Cycle schema.
+type CycleClient struct {
+	config
+}
+
+// NewCycleClient returns a client for the Cycle from the given config.
+func NewCycleClient(c config) *CycleClient {
+	return &CycleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `cycle.Hooks(f(g(h())))`.
+func (c *CycleClient) Use(hooks ...Hook) {
+	c.hooks.Cycle = append(c.hooks.Cycle, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `cycle.Intercept(f(g(h())))`.
+func (c *CycleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Cycle = append(c.inters.Cycle, interceptors...)
+}
+
+// Create returns a builder for creating a Cycle entity.
+func (c *CycleClient) Create() *CycleCreate {
+	mutation := newCycleMutation(c.config, OpCreate)
+	return &CycleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Cycle entities.
+func (c *CycleClient) CreateBulk(builders ...*CycleCreate) *CycleCreateBulk {
+	return &CycleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CycleClient) MapCreateBulk(slice any, setFunc func(*CycleCreate, int)) *CycleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CycleCreateBulk{err: fmt.Errorf("calling to CycleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CycleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CycleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Cycle.
+func (c *CycleClient) Update() *CycleUpdate {
+	mutation := newCycleMutation(c.config, OpUpdate)
+	return &CycleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CycleClient) UpdateOne(_m *Cycle) *CycleUpdateOne {
+	mutation := newCycleMutation(c.config, OpUpdateOne, withCycle(_m))
+	return &CycleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CycleClient) UpdateOneID(id string) *CycleUpdateOne {
+	mutation := newCycleMutation(c.config, OpUpdateOne, withCycleID(id))
+	return &CycleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Cycle.
+func (c *CycleClient) Delete() *CycleDelete {
+	mutation := newCycleMutation(c.config, OpDelete)
+	return &CycleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CycleClient) DeleteOne(_m *Cycle) *CycleDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CycleClient) DeleteOneID(id string) *CycleDeleteOne {
+	builder := c.Delete().Where(cycle.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CycleDeleteOne{builder}
+}
+
+// Query returns a query builder for Cycle.
+func (c *CycleClient) Query() *CycleQuery {
+	return &CycleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCycle},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Cycle entity by its id.
+func (c *CycleClient) Get(ctx context.Context, id string) (*Cycle, error) {
+	return c.Query().Where(cycle.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CycleClient) GetX(ctx context.Context, id string) *Cycle {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreatedBy queries the created_by edge of a Cycle.
+func (c *CycleClient) QueryCreatedBy(_m *Cycle) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cycle.Table, cycle.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, cycle.CreatedByTable, cycle.CreatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdatedBy queries the updated_by edge of a Cycle.
+func (c *CycleClient) QueryUpdatedBy(_m *Cycle) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cycle.Table, cycle.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, cycle.UpdatedByTable, cycle.UpdatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdminCreatedBy queries the admin_created_by edge of a Cycle.
+func (c *CycleClient) QueryAdminCreatedBy(_m *Cycle) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cycle.Table, cycle.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, cycle.AdminCreatedByTable, cycle.AdminCreatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdminUpdatedBy queries the admin_updated_by edge of a Cycle.
+func (c *CycleClient) QueryAdminUpdatedBy(_m *Cycle) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cycle.Table, cycle.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, cycle.AdminUpdatedByTable, cycle.AdminUpdatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CycleClient) Hooks() []Hook {
+	return c.hooks.Cycle
+}
+
+// Interceptors returns the client interceptors.
+func (c *CycleClient) Interceptors() []Interceptor {
+	return c.inters.Cycle
+}
+
+func (c *CycleClient) mutate(ctx context.Context, m *CycleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CycleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CycleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CycleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CycleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Cycle mutation op: %q", m.Op())
 	}
 }
 
@@ -700,6 +923,400 @@ func (c *ForPermissionClient) mutate(ctx context.Context, m *ForPermissionMutati
 		return (&ForPermissionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ForPermission mutation op: %q", m.Op())
+	}
+}
+
+// LifeCycleNotClient is a client for the LifeCycleNot schema.
+type LifeCycleNotClient struct {
+	config
+}
+
+// NewLifeCycleNotClient returns a client for the LifeCycleNot from the given config.
+func NewLifeCycleNotClient(c config) *LifeCycleNotClient {
+	return &LifeCycleNotClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `lifecyclenot.Hooks(f(g(h())))`.
+func (c *LifeCycleNotClient) Use(hooks ...Hook) {
+	c.hooks.LifeCycleNot = append(c.hooks.LifeCycleNot, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `lifecyclenot.Intercept(f(g(h())))`.
+func (c *LifeCycleNotClient) Intercept(interceptors ...Interceptor) {
+	c.inters.LifeCycleNot = append(c.inters.LifeCycleNot, interceptors...)
+}
+
+// Create returns a builder for creating a LifeCycleNot entity.
+func (c *LifeCycleNotClient) Create() *LifeCycleNotCreate {
+	mutation := newLifeCycleNotMutation(c.config, OpCreate)
+	return &LifeCycleNotCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of LifeCycleNot entities.
+func (c *LifeCycleNotClient) CreateBulk(builders ...*LifeCycleNotCreate) *LifeCycleNotCreateBulk {
+	return &LifeCycleNotCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *LifeCycleNotClient) MapCreateBulk(slice any, setFunc func(*LifeCycleNotCreate, int)) *LifeCycleNotCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &LifeCycleNotCreateBulk{err: fmt.Errorf("calling to LifeCycleNotClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*LifeCycleNotCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &LifeCycleNotCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for LifeCycleNot.
+func (c *LifeCycleNotClient) Update() *LifeCycleNotUpdate {
+	mutation := newLifeCycleNotMutation(c.config, OpUpdate)
+	return &LifeCycleNotUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LifeCycleNotClient) UpdateOne(_m *LifeCycleNot) *LifeCycleNotUpdateOne {
+	mutation := newLifeCycleNotMutation(c.config, OpUpdateOne, withLifeCycleNot(_m))
+	return &LifeCycleNotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LifeCycleNotClient) UpdateOneID(id string) *LifeCycleNotUpdateOne {
+	mutation := newLifeCycleNotMutation(c.config, OpUpdateOne, withLifeCycleNotID(id))
+	return &LifeCycleNotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for LifeCycleNot.
+func (c *LifeCycleNotClient) Delete() *LifeCycleNotDelete {
+	mutation := newLifeCycleNotMutation(c.config, OpDelete)
+	return &LifeCycleNotDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *LifeCycleNotClient) DeleteOne(_m *LifeCycleNot) *LifeCycleNotDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *LifeCycleNotClient) DeleteOneID(id string) *LifeCycleNotDeleteOne {
+	builder := c.Delete().Where(lifecyclenot.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LifeCycleNotDeleteOne{builder}
+}
+
+// Query returns a query builder for LifeCycleNot.
+func (c *LifeCycleNotClient) Query() *LifeCycleNotQuery {
+	return &LifeCycleNotQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeLifeCycleNot},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a LifeCycleNot entity by its id.
+func (c *LifeCycleNotClient) Get(ctx context.Context, id string) (*LifeCycleNot, error) {
+	return c.Query().Where(lifecyclenot.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LifeCycleNotClient) GetX(ctx context.Context, id string) *LifeCycleNot {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreatedBy queries the created_by edge of a LifeCycleNot.
+func (c *LifeCycleNotClient) QueryCreatedBy(_m *LifeCycleNot) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(lifecyclenot.Table, lifecyclenot.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, lifecyclenot.CreatedByTable, lifecyclenot.CreatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdatedBy queries the updated_by edge of a LifeCycleNot.
+func (c *LifeCycleNotClient) QueryUpdatedBy(_m *LifeCycleNot) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(lifecyclenot.Table, lifecyclenot.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, lifecyclenot.UpdatedByTable, lifecyclenot.UpdatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdminCreatedBy queries the admin_created_by edge of a LifeCycleNot.
+func (c *LifeCycleNotClient) QueryAdminCreatedBy(_m *LifeCycleNot) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(lifecyclenot.Table, lifecyclenot.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, lifecyclenot.AdminCreatedByTable, lifecyclenot.AdminCreatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdminUpdatedBy queries the admin_updated_by edge of a LifeCycleNot.
+func (c *LifeCycleNotClient) QueryAdminUpdatedBy(_m *LifeCycleNot) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(lifecyclenot.Table, lifecyclenot.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, lifecyclenot.AdminUpdatedByTable, lifecyclenot.AdminUpdatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *LifeCycleNotClient) Hooks() []Hook {
+	return c.hooks.LifeCycleNot
+}
+
+// Interceptors returns the client interceptors.
+func (c *LifeCycleNotClient) Interceptors() []Interceptor {
+	return c.inters.LifeCycleNot
+}
+
+func (c *LifeCycleNotClient) mutate(ctx context.Context, m *LifeCycleNotMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LifeCycleNotCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LifeCycleNotUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LifeCycleNotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LifeCycleNotDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown LifeCycleNot mutation op: %q", m.Op())
+	}
+}
+
+// MiauClient is a client for the Miau schema.
+type MiauClient struct {
+	config
+}
+
+// NewMiauClient returns a client for the Miau from the given config.
+func NewMiauClient(c config) *MiauClient {
+	return &MiauClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `miau.Hooks(f(g(h())))`.
+func (c *MiauClient) Use(hooks ...Hook) {
+	c.hooks.Miau = append(c.hooks.Miau, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `miau.Intercept(f(g(h())))`.
+func (c *MiauClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Miau = append(c.inters.Miau, interceptors...)
+}
+
+// Create returns a builder for creating a Miau entity.
+func (c *MiauClient) Create() *MiauCreate {
+	mutation := newMiauMutation(c.config, OpCreate)
+	return &MiauCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Miau entities.
+func (c *MiauClient) CreateBulk(builders ...*MiauCreate) *MiauCreateBulk {
+	return &MiauCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MiauClient) MapCreateBulk(slice any, setFunc func(*MiauCreate, int)) *MiauCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MiauCreateBulk{err: fmt.Errorf("calling to MiauClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MiauCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MiauCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Miau.
+func (c *MiauClient) Update() *MiauUpdate {
+	mutation := newMiauMutation(c.config, OpUpdate)
+	return &MiauUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MiauClient) UpdateOne(_m *Miau) *MiauUpdateOne {
+	mutation := newMiauMutation(c.config, OpUpdateOne, withMiau(_m))
+	return &MiauUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MiauClient) UpdateOneID(id string) *MiauUpdateOne {
+	mutation := newMiauMutation(c.config, OpUpdateOne, withMiauID(id))
+	return &MiauUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Miau.
+func (c *MiauClient) Delete() *MiauDelete {
+	mutation := newMiauMutation(c.config, OpDelete)
+	return &MiauDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MiauClient) DeleteOne(_m *Miau) *MiauDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MiauClient) DeleteOneID(id string) *MiauDeleteOne {
+	builder := c.Delete().Where(miau.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MiauDeleteOne{builder}
+}
+
+// Query returns a query builder for Miau.
+func (c *MiauClient) Query() *MiauQuery {
+	return &MiauQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMiau},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Miau entity by its id.
+func (c *MiauClient) Get(ctx context.Context, id string) (*Miau, error) {
+	return c.Query().Where(miau.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MiauClient) GetX(ctx context.Context, id string) *Miau {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreatedBy queries the created_by edge of a Miau.
+func (c *MiauClient) QueryCreatedBy(_m *Miau) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(miau.Table, miau.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, miau.CreatedByTable, miau.CreatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdatedBy queries the updated_by edge of a Miau.
+func (c *MiauClient) QueryUpdatedBy(_m *Miau) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(miau.Table, miau.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, miau.UpdatedByTable, miau.UpdatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdminCreatedBy queries the admin_created_by edge of a Miau.
+func (c *MiauClient) QueryAdminCreatedBy(_m *Miau) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(miau.Table, miau.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, miau.AdminCreatedByTable, miau.AdminCreatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdminUpdatedBy queries the admin_updated_by edge of a Miau.
+func (c *MiauClient) QueryAdminUpdatedBy(_m *Miau) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(miau.Table, miau.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, miau.AdminUpdatedByTable, miau.AdminUpdatedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MiauClient) Hooks() []Hook {
+	return c.hooks.Miau
+}
+
+// Interceptors returns the client interceptors.
+func (c *MiauClient) Interceptors() []Interceptor {
+	return c.inters.Miau
+}
+
+func (c *MiauClient) mutate(ctx context.Context, m *MiauMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MiauCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MiauUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MiauUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MiauDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Miau mutation op: %q", m.Op())
 	}
 }
 
@@ -1116,10 +1733,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AdminUser, File, ForPermission, Role, User []ent.Hook
+		AdminUser, Cycle, File, ForPermission, LifeCycleNot, Miau, Role, User []ent.Hook
 	}
 	inters struct {
-		AdminUser, File, ForPermission, Role, User []ent.Interceptor
+		AdminUser, Cycle, File, ForPermission, LifeCycleNot, Miau, Role,
+		User []ent.Interceptor
 	}
 )
 

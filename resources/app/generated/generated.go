@@ -18,6 +18,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/GoLabra/labra/entgql/date"
 	ent1 "github.com/GoLabra/labra/entgql/ent"
+	"github.com/GoLabra/labra/entgql/entity"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -43,14 +44,20 @@ type Config struct {
 
 type ResolverRoot interface {
 	AdminUser() AdminUserResolver
+	Cycle() CycleResolver
 	File() FileResolver
 	ForPermission() ForPermissionResolver
+	LifeCycleNot() LifeCycleNotResolver
+	Miau() MiauResolver
 	Mutation() MutationResolver
 	Permission() PermissionResolver
 	Query() QueryResolver
 	Role() RoleResolver
 	User() UserResolver
+	CycleWhereInput() CycleWhereInputResolver
 	ForPermissionWhereInput() ForPermissionWhereInputResolver
+	LifeCycleNotWhereInput() LifeCycleNotWhereInputResolver
+	MiauWhereInput() MiauWhereInputResolver
 	RoleWhereInput() RoleWhereInputResolver
 	UserWhereInput() UserWhereInputResolver
 }
@@ -72,6 +79,29 @@ type ComplexityRoot struct {
 		Roles       func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		UpdatedBy   func(childComplexity int) int
+	}
+
+	Cycle struct {
+		AdminCreatedBy func(childComplexity int) int
+		AdminUpdatedBy func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		CreatedBy      func(childComplexity int) int
+		EntityState    func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
+		UpdatedBy      func(childComplexity int) int
+	}
+
+	CycleConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	CycleEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	File struct {
@@ -112,22 +142,93 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	LifeCycleNot struct {
+		AdminCreatedBy func(childComplexity int) int
+		AdminUpdatedBy func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		CreatedBy      func(childComplexity int) int
+		EntityState    func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
+		UpdatedBy      func(childComplexity int) int
+	}
+
+	LifeCycleNotConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	LifeCycleNotEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	Miau struct {
+		AdminCreatedBy func(childComplexity int) int
+		AdminUpdatedBy func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		CreatedBy      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
+		UpdatedBy      func(childComplexity int) int
+	}
+
+	MiauConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MiauEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	Mutation struct {
+		CreateCycle              func(childComplexity int, data ent.CreateCycleInput) int
 		CreateForPermission      func(childComplexity int, data ent.CreateForPermissionInput) int
+		CreateLifeCycleNot       func(childComplexity int, data ent.CreateLifeCycleNotInput) int
+		CreateManyCycles         func(childComplexity int, data []*ent.CreateCycleInput) int
 		CreateManyForPermissions func(childComplexity int, data []*ent.CreateForPermissionInput) int
+		CreateManyLifeCycleNots  func(childComplexity int, data []*ent.CreateLifeCycleNotInput) int
+		CreateManyMiaus          func(childComplexity int, data []*ent.CreateMiauInput) int
 		CreateManyUsers          func(childComplexity int, data []*ent.CreateUserInput) int
+		CreateMiau               func(childComplexity int, data ent.CreateMiauInput) int
 		CreateUser               func(childComplexity int, data ent.CreateUserInput) int
+		DeleteCycle              func(childComplexity int, where ent.CycleWhereUniqueInput) int
 		DeleteForPermission      func(childComplexity int, where ent.ForPermissionWhereUniqueInput) int
+		DeleteLifeCycleNot       func(childComplexity int, where ent.LifeCycleNotWhereUniqueInput) int
+		DeleteManyCycles         func(childComplexity int, where ent.CycleWhereInput) int
 		DeleteManyForPermissions func(childComplexity int, where ent.ForPermissionWhereInput) int
+		DeleteManyLifeCycleNots  func(childComplexity int, where ent.LifeCycleNotWhereInput) int
+		DeleteManyMiaus          func(childComplexity int, where ent.MiauWhereInput) int
 		DeleteManyUsers          func(childComplexity int, where ent.UserWhereInput) int
+		DeleteMiau               func(childComplexity int, where ent.MiauWhereUniqueInput) int
 		DeleteUser               func(childComplexity int, where ent.UserWhereUniqueInput) int
+		UpdateCycle              func(childComplexity int, where ent.CycleWhereUniqueInput, data ent.UpdateCycleInput) int
+		UpdateCycleState         func(childComplexity int, where ent.CycleWhereUniqueInput, state entity.EntityState) int
 		UpdateForPermission      func(childComplexity int, where ent.ForPermissionWhereUniqueInput, data ent.UpdateForPermissionInput) int
+		UpdateLifeCycleNot       func(childComplexity int, where ent.LifeCycleNotWhereUniqueInput, data ent.UpdateLifeCycleNotInput) int
+		UpdateLifeCycleNotState  func(childComplexity int, where ent.LifeCycleNotWhereUniqueInput, state entity.EntityState) int
+		UpdateManyCycles         func(childComplexity int, where ent.CycleWhereInput, data ent.UpdateCycleInput) int
 		UpdateManyForPermissions func(childComplexity int, where ent.ForPermissionWhereInput, data ent.UpdateForPermissionInput) int
+		UpdateManyLifeCycleNots  func(childComplexity int, where ent.LifeCycleNotWhereInput, data ent.UpdateLifeCycleNotInput) int
+		UpdateManyMiaus          func(childComplexity int, where ent.MiauWhereInput, data ent.UpdateMiauInput) int
 		UpdateManyUsers          func(childComplexity int, where ent.UserWhereInput, data ent.UpdateUserInput) int
+		UpdateMiau               func(childComplexity int, where ent.MiauWhereUniqueInput, data ent.UpdateMiauInput) int
 		UpdateUser               func(childComplexity int, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) int
+		UpsertCycle              func(childComplexity int, data ent.CreateCycleInput) int
 		UpsertForPermission      func(childComplexity int, data ent.CreateForPermissionInput) int
+		UpsertLifeCycleNot       func(childComplexity int, data ent.CreateLifeCycleNotInput) int
+		UpsertManyCycles         func(childComplexity int, data []*ent.CreateCycleInput) int
 		UpsertManyForPermissions func(childComplexity int, data []*ent.CreateForPermissionInput) int
+		UpsertManyLifeCycleNots  func(childComplexity int, data []*ent.CreateLifeCycleNotInput) int
+		UpsertManyMiaus          func(childComplexity int, data []*ent.CreateMiauInput) int
 		UpsertManyUsers          func(childComplexity int, data []*ent.CreateUserInput) int
+		UpsertMiau               func(childComplexity int, data ent.CreateMiauInput) int
 		UpsertUser               func(childComplexity int, data ent.CreateUserInput) int
 	}
 
@@ -150,8 +251,14 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Cycles                   func(childComplexity int, where *ent.CycleWhereInput, orderBy *ent.CycleOrder, skip *int, first *int, last *int) int
+		CyclesConnection         func(childComplexity int, where *ent.CycleWhereInput, orderBy *ent.CycleOrder, skip *int, first *int, last *int) int
 		ForPermissions           func(childComplexity int, where *ent.ForPermissionWhereInput, orderBy *ent.ForPermissionOrder, skip *int, first *int, last *int) int
 		ForPermissionsConnection func(childComplexity int, where *ent.ForPermissionWhereInput, orderBy *ent.ForPermissionOrder, skip *int, first *int, last *int) int
+		LifeCycleNots            func(childComplexity int, where *ent.LifeCycleNotWhereInput, orderBy *ent.LifeCycleNotOrder, skip *int, first *int, last *int) int
+		LifeCycleNotsConnection  func(childComplexity int, where *ent.LifeCycleNotWhereInput, orderBy *ent.LifeCycleNotOrder, skip *int, first *int, last *int) int
+		Miaus                    func(childComplexity int, where *ent.MiauWhereInput, orderBy *ent.MiauOrder, skip *int, first *int, last *int) int
+		MiausConnection          func(childComplexity int, where *ent.MiauWhereInput, orderBy *ent.MiauOrder, skip *int, first *int, last *int) int
 		Node                     func(childComplexity int, id string) int
 		Nodes                    func(childComplexity int, ids []string) int
 		Users                    func(childComplexity int, where *ent.UserWhereInput, orderBy *ent.UserOrder, skip *int, first *int, last *int) int
@@ -198,6 +305,10 @@ type AdminUserResolver interface {
 	CreatedBy(ctx context.Context, obj *ent1.AdminUser) (*ent1.AdminUser, error)
 	UpdatedBy(ctx context.Context, obj *ent1.AdminUser) (*ent1.AdminUser, error)
 }
+type CycleResolver interface {
+	AdminCreatedBy(ctx context.Context, obj *ent.Cycle) (*ent1.AdminUser, error)
+	AdminUpdatedBy(ctx context.Context, obj *ent.Cycle) (*ent1.AdminUser, error)
+}
 type FileResolver interface {
 	CreatedBy(ctx context.Context, obj *ent1.File) (*ent1.AdminUser, error)
 	UpdatedBy(ctx context.Context, obj *ent1.File) (*ent1.AdminUser, error)
@@ -206,7 +317,24 @@ type ForPermissionResolver interface {
 	AdminCreatedBy(ctx context.Context, obj *ent.ForPermission) (*ent1.AdminUser, error)
 	AdminUpdatedBy(ctx context.Context, obj *ent.ForPermission) (*ent1.AdminUser, error)
 }
+type LifeCycleNotResolver interface {
+	AdminCreatedBy(ctx context.Context, obj *ent.LifeCycleNot) (*ent1.AdminUser, error)
+	AdminUpdatedBy(ctx context.Context, obj *ent.LifeCycleNot) (*ent1.AdminUser, error)
+}
+type MiauResolver interface {
+	AdminCreatedBy(ctx context.Context, obj *ent.Miau) (*ent1.AdminUser, error)
+	AdminUpdatedBy(ctx context.Context, obj *ent.Miau) (*ent1.AdminUser, error)
+}
 type MutationResolver interface {
+	CreateCycle(ctx context.Context, data ent.CreateCycleInput) (*ent.Cycle, error)
+	CreateManyCycles(ctx context.Context, data []*ent.CreateCycleInput) ([]*ent.Cycle, error)
+	UpdateCycle(ctx context.Context, where ent.CycleWhereUniqueInput, data ent.UpdateCycleInput) (*ent.Cycle, error)
+	UpdateCycleState(ctx context.Context, where ent.CycleWhereUniqueInput, state entity.EntityState) (*ent.Cycle, error)
+	UpdateManyCycles(ctx context.Context, where ent.CycleWhereInput, data ent.UpdateCycleInput) (int, error)
+	UpsertCycle(ctx context.Context, data ent.CreateCycleInput) (*ent.Cycle, error)
+	UpsertManyCycles(ctx context.Context, data []*ent.CreateCycleInput) (int, error)
+	DeleteCycle(ctx context.Context, where ent.CycleWhereUniqueInput) (*ent.Cycle, error)
+	DeleteManyCycles(ctx context.Context, where ent.CycleWhereInput) (int, error)
 	CreateForPermission(ctx context.Context, data ent.CreateForPermissionInput) (*ent.ForPermission, error)
 	CreateManyForPermissions(ctx context.Context, data []*ent.CreateForPermissionInput) ([]*ent.ForPermission, error)
 	UpdateForPermission(ctx context.Context, where ent.ForPermissionWhereUniqueInput, data ent.UpdateForPermissionInput) (*ent.ForPermission, error)
@@ -215,6 +343,23 @@ type MutationResolver interface {
 	UpsertManyForPermissions(ctx context.Context, data []*ent.CreateForPermissionInput) (int, error)
 	DeleteForPermission(ctx context.Context, where ent.ForPermissionWhereUniqueInput) (*ent.ForPermission, error)
 	DeleteManyForPermissions(ctx context.Context, where ent.ForPermissionWhereInput) (int, error)
+	CreateLifeCycleNot(ctx context.Context, data ent.CreateLifeCycleNotInput) (*ent.LifeCycleNot, error)
+	CreateManyLifeCycleNots(ctx context.Context, data []*ent.CreateLifeCycleNotInput) ([]*ent.LifeCycleNot, error)
+	UpdateLifeCycleNot(ctx context.Context, where ent.LifeCycleNotWhereUniqueInput, data ent.UpdateLifeCycleNotInput) (*ent.LifeCycleNot, error)
+	UpdateLifeCycleNotState(ctx context.Context, where ent.LifeCycleNotWhereUniqueInput, state entity.EntityState) (*ent.LifeCycleNot, error)
+	UpdateManyLifeCycleNots(ctx context.Context, where ent.LifeCycleNotWhereInput, data ent.UpdateLifeCycleNotInput) (int, error)
+	UpsertLifeCycleNot(ctx context.Context, data ent.CreateLifeCycleNotInput) (*ent.LifeCycleNot, error)
+	UpsertManyLifeCycleNots(ctx context.Context, data []*ent.CreateLifeCycleNotInput) (int, error)
+	DeleteLifeCycleNot(ctx context.Context, where ent.LifeCycleNotWhereUniqueInput) (*ent.LifeCycleNot, error)
+	DeleteManyLifeCycleNots(ctx context.Context, where ent.LifeCycleNotWhereInput) (int, error)
+	CreateMiau(ctx context.Context, data ent.CreateMiauInput) (*ent.Miau, error)
+	CreateManyMiaus(ctx context.Context, data []*ent.CreateMiauInput) ([]*ent.Miau, error)
+	UpdateMiau(ctx context.Context, where ent.MiauWhereUniqueInput, data ent.UpdateMiauInput) (*ent.Miau, error)
+	UpdateManyMiaus(ctx context.Context, where ent.MiauWhereInput, data ent.UpdateMiauInput) (int, error)
+	UpsertMiau(ctx context.Context, data ent.CreateMiauInput) (*ent.Miau, error)
+	UpsertManyMiaus(ctx context.Context, data []*ent.CreateMiauInput) (int, error)
+	DeleteMiau(ctx context.Context, where ent.MiauWhereUniqueInput) (*ent.Miau, error)
+	DeleteManyMiaus(ctx context.Context, where ent.MiauWhereInput) (int, error)
 	CreateUser(ctx context.Context, data ent.CreateUserInput) (*ent.User, error)
 	CreateManyUsers(ctx context.Context, data []*ent.CreateUserInput) ([]*ent.User, error)
 	UpdateUser(ctx context.Context, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) (*ent.User, error)
@@ -231,8 +376,14 @@ type PermissionResolver interface {
 type QueryResolver interface {
 	Node(ctx context.Context, id string) (ent.Noder, error)
 	Nodes(ctx context.Context, ids []string) ([]ent.Noder, error)
+	Cycles(ctx context.Context, where *ent.CycleWhereInput, orderBy *ent.CycleOrder, skip *int, first *int, last *int) ([]*ent.Cycle, error)
+	CyclesConnection(ctx context.Context, where *ent.CycleWhereInput, orderBy *ent.CycleOrder, skip *int, first *int, last *int) (*ent.CycleConnection, error)
 	ForPermissions(ctx context.Context, where *ent.ForPermissionWhereInput, orderBy *ent.ForPermissionOrder, skip *int, first *int, last *int) ([]*ent.ForPermission, error)
 	ForPermissionsConnection(ctx context.Context, where *ent.ForPermissionWhereInput, orderBy *ent.ForPermissionOrder, skip *int, first *int, last *int) (*ent.ForPermissionConnection, error)
+	LifeCycleNots(ctx context.Context, where *ent.LifeCycleNotWhereInput, orderBy *ent.LifeCycleNotOrder, skip *int, first *int, last *int) ([]*ent.LifeCycleNot, error)
+	LifeCycleNotsConnection(ctx context.Context, where *ent.LifeCycleNotWhereInput, orderBy *ent.LifeCycleNotOrder, skip *int, first *int, last *int) (*ent.LifeCycleNotConnection, error)
+	Miaus(ctx context.Context, where *ent.MiauWhereInput, orderBy *ent.MiauOrder, skip *int, first *int, last *int) ([]*ent.Miau, error)
+	MiausConnection(ctx context.Context, where *ent.MiauWhereInput, orderBy *ent.MiauOrder, skip *int, first *int, last *int) (*ent.MiauConnection, error)
 	Users(ctx context.Context, where *ent.UserWhereInput, orderBy *ent.UserOrder, skip *int, first *int, last *int) ([]*ent.User, error)
 	UsersConnection(ctx context.Context, where *ent.UserWhereInput, orderBy *ent.UserOrder, skip *int, first *int, last *int) (*ent.UserConnection, error)
 }
@@ -249,10 +400,25 @@ type UserResolver interface {
 	DefaultRole(ctx context.Context, obj *ent.User) (*ent1.Role, error)
 }
 
+type CycleWhereInputResolver interface {
+	HasAdminCreatedByWith(ctx context.Context, obj *ent.CycleWhereInput, data []*ent1.AdminUserWhereInput) error
+
+	HasAdminUpdatedByWith(ctx context.Context, obj *ent.CycleWhereInput, data []*ent1.AdminUserWhereInput) error
+}
 type ForPermissionWhereInputResolver interface {
 	HasAdminCreatedByWith(ctx context.Context, obj *ent.ForPermissionWhereInput, data []*ent1.AdminUserWhereInput) error
 
 	HasAdminUpdatedByWith(ctx context.Context, obj *ent.ForPermissionWhereInput, data []*ent1.AdminUserWhereInput) error
+}
+type LifeCycleNotWhereInputResolver interface {
+	HasAdminCreatedByWith(ctx context.Context, obj *ent.LifeCycleNotWhereInput, data []*ent1.AdminUserWhereInput) error
+
+	HasAdminUpdatedByWith(ctx context.Context, obj *ent.LifeCycleNotWhereInput, data []*ent1.AdminUserWhereInput) error
+}
+type MiauWhereInputResolver interface {
+	HasAdminCreatedByWith(ctx context.Context, obj *ent.MiauWhereInput, data []*ent1.AdminUserWhereInput) error
+
+	HasAdminUpdatedByWith(ctx context.Context, obj *ent.MiauWhereInput, data []*ent1.AdminUserWhereInput) error
 }
 type RoleWhereInputResolver interface {
 	HasUserRolesWith(ctx context.Context, obj *ent1.RoleWhereInput, data []*ent.UserWhereInput) error
@@ -358,6 +524,93 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.AdminUser.UpdatedBy(childComplexity), true
+
+	case "Cycle.adminCreatedBy":
+		if e.complexity.Cycle.AdminCreatedBy == nil {
+			break
+		}
+
+		return e.complexity.Cycle.AdminCreatedBy(childComplexity), true
+	case "Cycle.adminUpdatedBy":
+		if e.complexity.Cycle.AdminUpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.Cycle.AdminUpdatedBy(childComplexity), true
+	case "Cycle.createdAt":
+		if e.complexity.Cycle.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Cycle.CreatedAt(childComplexity), true
+	case "Cycle.createdBy":
+		if e.complexity.Cycle.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.Cycle.CreatedBy(childComplexity), true
+	case "Cycle.entityState":
+		if e.complexity.Cycle.EntityState == nil {
+			break
+		}
+
+		return e.complexity.Cycle.EntityState(childComplexity), true
+	case "Cycle.id":
+		if e.complexity.Cycle.ID == nil {
+			break
+		}
+
+		return e.complexity.Cycle.ID(childComplexity), true
+	case "Cycle.name":
+		if e.complexity.Cycle.Name == nil {
+			break
+		}
+
+		return e.complexity.Cycle.Name(childComplexity), true
+	case "Cycle.updatedAt":
+		if e.complexity.Cycle.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Cycle.UpdatedAt(childComplexity), true
+	case "Cycle.updatedBy":
+		if e.complexity.Cycle.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.Cycle.UpdatedBy(childComplexity), true
+
+	case "CycleConnection.edges":
+		if e.complexity.CycleConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.CycleConnection.Edges(childComplexity), true
+	case "CycleConnection.pageInfo":
+		if e.complexity.CycleConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.CycleConnection.PageInfo(childComplexity), true
+	case "CycleConnection.totalCount":
+		if e.complexity.CycleConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.CycleConnection.TotalCount(childComplexity), true
+
+	case "CycleEdge.cursor":
+		if e.complexity.CycleEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.CycleEdge.Cursor(childComplexity), true
+	case "CycleEdge.node":
+		if e.complexity.CycleEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.CycleEdge.Node(childComplexity), true
 
 	case "File.caption":
 		if e.complexity.File.Caption == nil {
@@ -519,6 +772,185 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ForPermissionEdge.Node(childComplexity), true
 
+	case "LifeCycleNot.adminCreatedBy":
+		if e.complexity.LifeCycleNot.AdminCreatedBy == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.AdminCreatedBy(childComplexity), true
+	case "LifeCycleNot.adminUpdatedBy":
+		if e.complexity.LifeCycleNot.AdminUpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.AdminUpdatedBy(childComplexity), true
+	case "LifeCycleNot.createdAt":
+		if e.complexity.LifeCycleNot.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.CreatedAt(childComplexity), true
+	case "LifeCycleNot.createdBy":
+		if e.complexity.LifeCycleNot.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.CreatedBy(childComplexity), true
+	case "LifeCycleNot.entityState":
+		if e.complexity.LifeCycleNot.EntityState == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.EntityState(childComplexity), true
+	case "LifeCycleNot.id":
+		if e.complexity.LifeCycleNot.ID == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.ID(childComplexity), true
+	case "LifeCycleNot.name":
+		if e.complexity.LifeCycleNot.Name == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.Name(childComplexity), true
+	case "LifeCycleNot.updatedAt":
+		if e.complexity.LifeCycleNot.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.UpdatedAt(childComplexity), true
+	case "LifeCycleNot.updatedBy":
+		if e.complexity.LifeCycleNot.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNot.UpdatedBy(childComplexity), true
+
+	case "LifeCycleNotConnection.edges":
+		if e.complexity.LifeCycleNotConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNotConnection.Edges(childComplexity), true
+	case "LifeCycleNotConnection.pageInfo":
+		if e.complexity.LifeCycleNotConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNotConnection.PageInfo(childComplexity), true
+	case "LifeCycleNotConnection.totalCount":
+		if e.complexity.LifeCycleNotConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNotConnection.TotalCount(childComplexity), true
+
+	case "LifeCycleNotEdge.cursor":
+		if e.complexity.LifeCycleNotEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNotEdge.Cursor(childComplexity), true
+	case "LifeCycleNotEdge.node":
+		if e.complexity.LifeCycleNotEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.LifeCycleNotEdge.Node(childComplexity), true
+
+	case "Miau.adminCreatedBy":
+		if e.complexity.Miau.AdminCreatedBy == nil {
+			break
+		}
+
+		return e.complexity.Miau.AdminCreatedBy(childComplexity), true
+	case "Miau.adminUpdatedBy":
+		if e.complexity.Miau.AdminUpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.Miau.AdminUpdatedBy(childComplexity), true
+	case "Miau.createdAt":
+		if e.complexity.Miau.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Miau.CreatedAt(childComplexity), true
+	case "Miau.createdBy":
+		if e.complexity.Miau.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.Miau.CreatedBy(childComplexity), true
+	case "Miau.id":
+		if e.complexity.Miau.ID == nil {
+			break
+		}
+
+		return e.complexity.Miau.ID(childComplexity), true
+	case "Miau.name":
+		if e.complexity.Miau.Name == nil {
+			break
+		}
+
+		return e.complexity.Miau.Name(childComplexity), true
+	case "Miau.updatedAt":
+		if e.complexity.Miau.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Miau.UpdatedAt(childComplexity), true
+	case "Miau.updatedBy":
+		if e.complexity.Miau.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.Miau.UpdatedBy(childComplexity), true
+
+	case "MiauConnection.edges":
+		if e.complexity.MiauConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MiauConnection.Edges(childComplexity), true
+	case "MiauConnection.pageInfo":
+		if e.complexity.MiauConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MiauConnection.PageInfo(childComplexity), true
+	case "MiauConnection.totalCount":
+		if e.complexity.MiauConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MiauConnection.TotalCount(childComplexity), true
+
+	case "MiauEdge.cursor":
+		if e.complexity.MiauEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MiauEdge.Cursor(childComplexity), true
+	case "MiauEdge.node":
+		if e.complexity.MiauEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MiauEdge.Node(childComplexity), true
+
+	case "Mutation.createCycle":
+		if e.complexity.Mutation.CreateCycle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createCycle_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateCycle(childComplexity, args["data"].(ent.CreateCycleInput)), true
 	case "Mutation.createForPermission":
 		if e.complexity.Mutation.CreateForPermission == nil {
 			break
@@ -530,6 +962,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateForPermission(childComplexity, args["data"].(ent.CreateForPermissionInput)), true
+	case "Mutation.createLifeCycleNot":
+		if e.complexity.Mutation.CreateLifeCycleNot == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createLifeCycleNot_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateLifeCycleNot(childComplexity, args["data"].(ent.CreateLifeCycleNotInput)), true
+	case "Mutation.createManyCycles":
+		if e.complexity.Mutation.CreateManyCycles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createManyCycles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateManyCycles(childComplexity, args["data"].([]*ent.CreateCycleInput)), true
 	case "Mutation.createManyForPermissions":
 		if e.complexity.Mutation.CreateManyForPermissions == nil {
 			break
@@ -541,6 +995,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateManyForPermissions(childComplexity, args["data"].([]*ent.CreateForPermissionInput)), true
+	case "Mutation.createManyLifeCycleNots":
+		if e.complexity.Mutation.CreateManyLifeCycleNots == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createManyLifeCycleNots_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateManyLifeCycleNots(childComplexity, args["data"].([]*ent.CreateLifeCycleNotInput)), true
+	case "Mutation.createManyMiaus":
+		if e.complexity.Mutation.CreateManyMiaus == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createManyMiaus_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateManyMiaus(childComplexity, args["data"].([]*ent.CreateMiauInput)), true
 	case "Mutation.createManyUsers":
 		if e.complexity.Mutation.CreateManyUsers == nil {
 			break
@@ -552,6 +1028,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateManyUsers(childComplexity, args["data"].([]*ent.CreateUserInput)), true
+	case "Mutation.createMiau":
+		if e.complexity.Mutation.CreateMiau == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMiau_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMiau(childComplexity, args["data"].(ent.CreateMiauInput)), true
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
 			break
@@ -563,6 +1050,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["data"].(ent.CreateUserInput)), true
+	case "Mutation.deleteCycle":
+		if e.complexity.Mutation.DeleteCycle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteCycle_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteCycle(childComplexity, args["where"].(ent.CycleWhereUniqueInput)), true
 	case "Mutation.deleteForPermission":
 		if e.complexity.Mutation.DeleteForPermission == nil {
 			break
@@ -574,6 +1072,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteForPermission(childComplexity, args["where"].(ent.ForPermissionWhereUniqueInput)), true
+	case "Mutation.deleteLifeCycleNot":
+		if e.complexity.Mutation.DeleteLifeCycleNot == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteLifeCycleNot_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteLifeCycleNot(childComplexity, args["where"].(ent.LifeCycleNotWhereUniqueInput)), true
+	case "Mutation.deleteManyCycles":
+		if e.complexity.Mutation.DeleteManyCycles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteManyCycles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteManyCycles(childComplexity, args["where"].(ent.CycleWhereInput)), true
 	case "Mutation.deleteManyForPermissions":
 		if e.complexity.Mutation.DeleteManyForPermissions == nil {
 			break
@@ -585,6 +1105,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteManyForPermissions(childComplexity, args["where"].(ent.ForPermissionWhereInput)), true
+	case "Mutation.deleteManyLifeCycleNots":
+		if e.complexity.Mutation.DeleteManyLifeCycleNots == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteManyLifeCycleNots_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteManyLifeCycleNots(childComplexity, args["where"].(ent.LifeCycleNotWhereInput)), true
+	case "Mutation.deleteManyMiaus":
+		if e.complexity.Mutation.DeleteManyMiaus == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteManyMiaus_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteManyMiaus(childComplexity, args["where"].(ent.MiauWhereInput)), true
 	case "Mutation.deleteManyUsers":
 		if e.complexity.Mutation.DeleteManyUsers == nil {
 			break
@@ -596,6 +1138,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteManyUsers(childComplexity, args["where"].(ent.UserWhereInput)), true
+	case "Mutation.deleteMiau":
+		if e.complexity.Mutation.DeleteMiau == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMiau_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMiau(childComplexity, args["where"].(ent.MiauWhereUniqueInput)), true
 	case "Mutation.deleteUser":
 		if e.complexity.Mutation.DeleteUser == nil {
 			break
@@ -607,6 +1160,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteUser(childComplexity, args["where"].(ent.UserWhereUniqueInput)), true
+	case "Mutation.updateCycle":
+		if e.complexity.Mutation.UpdateCycle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCycle_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCycle(childComplexity, args["where"].(ent.CycleWhereUniqueInput), args["data"].(ent.UpdateCycleInput)), true
+	case "Mutation.updateCycleState":
+		if e.complexity.Mutation.UpdateCycleState == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCycleState_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCycleState(childComplexity, args["where"].(ent.CycleWhereUniqueInput), args["state"].(entity.EntityState)), true
 	case "Mutation.updateForPermission":
 		if e.complexity.Mutation.UpdateForPermission == nil {
 			break
@@ -618,6 +1193,39 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateForPermission(childComplexity, args["where"].(ent.ForPermissionWhereUniqueInput), args["data"].(ent.UpdateForPermissionInput)), true
+	case "Mutation.updateLifeCycleNot":
+		if e.complexity.Mutation.UpdateLifeCycleNot == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateLifeCycleNot_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateLifeCycleNot(childComplexity, args["where"].(ent.LifeCycleNotWhereUniqueInput), args["data"].(ent.UpdateLifeCycleNotInput)), true
+	case "Mutation.updateLifeCycleNotState":
+		if e.complexity.Mutation.UpdateLifeCycleNotState == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateLifeCycleNotState_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateLifeCycleNotState(childComplexity, args["where"].(ent.LifeCycleNotWhereUniqueInput), args["state"].(entity.EntityState)), true
+	case "Mutation.updateManyCycles":
+		if e.complexity.Mutation.UpdateManyCycles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateManyCycles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateManyCycles(childComplexity, args["where"].(ent.CycleWhereInput), args["data"].(ent.UpdateCycleInput)), true
 	case "Mutation.updateManyForPermissions":
 		if e.complexity.Mutation.UpdateManyForPermissions == nil {
 			break
@@ -629,6 +1237,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateManyForPermissions(childComplexity, args["where"].(ent.ForPermissionWhereInput), args["data"].(ent.UpdateForPermissionInput)), true
+	case "Mutation.updateManyLifeCycleNots":
+		if e.complexity.Mutation.UpdateManyLifeCycleNots == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateManyLifeCycleNots_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateManyLifeCycleNots(childComplexity, args["where"].(ent.LifeCycleNotWhereInput), args["data"].(ent.UpdateLifeCycleNotInput)), true
+	case "Mutation.updateManyMiaus":
+		if e.complexity.Mutation.UpdateManyMiaus == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateManyMiaus_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateManyMiaus(childComplexity, args["where"].(ent.MiauWhereInput), args["data"].(ent.UpdateMiauInput)), true
 	case "Mutation.updateManyUsers":
 		if e.complexity.Mutation.UpdateManyUsers == nil {
 			break
@@ -640,6 +1270,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateManyUsers(childComplexity, args["where"].(ent.UserWhereInput), args["data"].(ent.UpdateUserInput)), true
+	case "Mutation.updateMiau":
+		if e.complexity.Mutation.UpdateMiau == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMiau_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateMiau(childComplexity, args["where"].(ent.MiauWhereUniqueInput), args["data"].(ent.UpdateMiauInput)), true
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
 			break
@@ -651,6 +1292,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["where"].(ent.UserWhereUniqueInput), args["data"].(ent.UpdateUserInput)), true
+	case "Mutation.upsertCycle":
+		if e.complexity.Mutation.UpsertCycle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertCycle_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertCycle(childComplexity, args["data"].(ent.CreateCycleInput)), true
 	case "Mutation.upsertForPermission":
 		if e.complexity.Mutation.UpsertForPermission == nil {
 			break
@@ -662,6 +1314,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpsertForPermission(childComplexity, args["data"].(ent.CreateForPermissionInput)), true
+	case "Mutation.upsertLifeCycleNot":
+		if e.complexity.Mutation.UpsertLifeCycleNot == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertLifeCycleNot_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertLifeCycleNot(childComplexity, args["data"].(ent.CreateLifeCycleNotInput)), true
+	case "Mutation.upsertManyCycles":
+		if e.complexity.Mutation.UpsertManyCycles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertManyCycles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertManyCycles(childComplexity, args["data"].([]*ent.CreateCycleInput)), true
 	case "Mutation.upsertManyForPermissions":
 		if e.complexity.Mutation.UpsertManyForPermissions == nil {
 			break
@@ -673,6 +1347,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpsertManyForPermissions(childComplexity, args["data"].([]*ent.CreateForPermissionInput)), true
+	case "Mutation.upsertManyLifeCycleNots":
+		if e.complexity.Mutation.UpsertManyLifeCycleNots == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertManyLifeCycleNots_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertManyLifeCycleNots(childComplexity, args["data"].([]*ent.CreateLifeCycleNotInput)), true
+	case "Mutation.upsertManyMiaus":
+		if e.complexity.Mutation.UpsertManyMiaus == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertManyMiaus_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertManyMiaus(childComplexity, args["data"].([]*ent.CreateMiauInput)), true
 	case "Mutation.upsertManyUsers":
 		if e.complexity.Mutation.UpsertManyUsers == nil {
 			break
@@ -684,6 +1380,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpsertManyUsers(childComplexity, args["data"].([]*ent.CreateUserInput)), true
+	case "Mutation.upsertMiau":
+		if e.complexity.Mutation.UpsertMiau == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertMiau_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertMiau(childComplexity, args["data"].(ent.CreateMiauInput)), true
 	case "Mutation.upsertUser":
 		if e.complexity.Mutation.UpsertUser == nil {
 			break
@@ -770,6 +1477,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Permission.UpdatedBy(childComplexity), true
 
+	case "Query.cycles":
+		if e.complexity.Query.Cycles == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cycles_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Cycles(childComplexity, args["where"].(*ent.CycleWhereInput), args["orderBy"].(*ent.CycleOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+	case "Query.cyclesConnection":
+		if e.complexity.Query.CyclesConnection == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cyclesConnection_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CyclesConnection(childComplexity, args["where"].(*ent.CycleWhereInput), args["orderBy"].(*ent.CycleOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
 	case "Query.forPermissions":
 		if e.complexity.Query.ForPermissions == nil {
 			break
@@ -792,6 +1521,50 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.ForPermissionsConnection(childComplexity, args["where"].(*ent.ForPermissionWhereInput), args["orderBy"].(*ent.ForPermissionOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+	case "Query.lifeCycleNots":
+		if e.complexity.Query.LifeCycleNots == nil {
+			break
+		}
+
+		args, err := ec.field_Query_lifeCycleNots_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.LifeCycleNots(childComplexity, args["where"].(*ent.LifeCycleNotWhereInput), args["orderBy"].(*ent.LifeCycleNotOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+	case "Query.lifeCycleNotsConnection":
+		if e.complexity.Query.LifeCycleNotsConnection == nil {
+			break
+		}
+
+		args, err := ec.field_Query_lifeCycleNotsConnection_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.LifeCycleNotsConnection(childComplexity, args["where"].(*ent.LifeCycleNotWhereInput), args["orderBy"].(*ent.LifeCycleNotOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+	case "Query.miaus":
+		if e.complexity.Query.Miaus == nil {
+			break
+		}
+
+		args, err := ec.field_Query_miaus_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Miaus(childComplexity, args["where"].(*ent.MiauWhereInput), args["orderBy"].(*ent.MiauOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+	case "Query.miausConnection":
+		if e.complexity.Query.MiausConnection == nil {
+			break
+		}
+
+		args, err := ec.field_Query_miausConnection_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MiausConnection(childComplexity, args["where"].(*ent.MiauWhereInput), args["orderBy"].(*ent.MiauOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
 			break
@@ -989,36 +1762,63 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAdminUserWhereInput,
 		ec.unmarshalInputAdminUserWhereUniqueInput,
+		ec.unmarshalInputCreateCycleInput,
 		ec.unmarshalInputCreateFileInput,
 		ec.unmarshalInputCreateForPermissionInput,
+		ec.unmarshalInputCreateLifeCycleNotInput,
 		ec.unmarshalInputCreateManyAdminUserInput,
+		ec.unmarshalInputCreateManyCycleInput,
 		ec.unmarshalInputCreateManyFileInput,
 		ec.unmarshalInputCreateManyForPermissionInput,
+		ec.unmarshalInputCreateManyLifeCycleNotInput,
+		ec.unmarshalInputCreateManyMiauInput,
 		ec.unmarshalInputCreateManyRoleInput,
 		ec.unmarshalInputCreateManyUserInput,
+		ec.unmarshalInputCreateMiauInput,
 		ec.unmarshalInputCreateOneAdminUserInput,
+		ec.unmarshalInputCreateOneCycleInput,
 		ec.unmarshalInputCreateOneFileInput,
 		ec.unmarshalInputCreateOneForPermissionInput,
+		ec.unmarshalInputCreateOneLifeCycleNotInput,
+		ec.unmarshalInputCreateOneMiauInput,
 		ec.unmarshalInputCreateOneRoleInput,
 		ec.unmarshalInputCreateOneUserInput,
 		ec.unmarshalInputCreateUserInput,
+		ec.unmarshalInputCycleOrder,
+		ec.unmarshalInputCycleWhereInput,
+		ec.unmarshalInputCycleWhereUniqueInput,
 		ec.unmarshalInputFileWhereInput,
 		ec.unmarshalInputFileWhereUniqueInput,
 		ec.unmarshalInputForPermissionOrder,
 		ec.unmarshalInputForPermissionWhereInput,
 		ec.unmarshalInputForPermissionWhereUniqueInput,
+		ec.unmarshalInputLifeCycleNotOrder,
+		ec.unmarshalInputLifeCycleNotWhereInput,
+		ec.unmarshalInputLifeCycleNotWhereUniqueInput,
+		ec.unmarshalInputMiauOrder,
+		ec.unmarshalInputMiauWhereInput,
+		ec.unmarshalInputMiauWhereUniqueInput,
 		ec.unmarshalInputRoleOrder,
 		ec.unmarshalInputRoleWhereInput,
 		ec.unmarshalInputRoleWhereUniqueInput,
+		ec.unmarshalInputUpdateCycleInput,
 		ec.unmarshalInputUpdateForPermissionInput,
+		ec.unmarshalInputUpdateLifeCycleNotInput,
 		ec.unmarshalInputUpdateManyAdminUserInput,
+		ec.unmarshalInputUpdateManyCycleInput,
 		ec.unmarshalInputUpdateManyFileInput,
 		ec.unmarshalInputUpdateManyForPermissionInput,
+		ec.unmarshalInputUpdateManyLifeCycleNotInput,
+		ec.unmarshalInputUpdateManyMiauInput,
 		ec.unmarshalInputUpdateManyRoleInput,
 		ec.unmarshalInputUpdateManyUserInput,
+		ec.unmarshalInputUpdateMiauInput,
 		ec.unmarshalInputUpdateOneAdminUserInput,
+		ec.unmarshalInputUpdateOneCycleInput,
 		ec.unmarshalInputUpdateOneFileInput,
 		ec.unmarshalInputUpdateOneForPermissionInput,
+		ec.unmarshalInputUpdateOneLifeCycleNotInput,
+		ec.unmarshalInputUpdateOneMiauInput,
 		ec.unmarshalInputUpdateOneRoleInput,
 		ec.unmarshalInputUpdateOneUserInput,
 		ec.unmarshalInputUpdateUserInput,
@@ -1267,6 +2067,16 @@ input AdminUserWhereInput {
   idContainsFold: ID
 }
 """
+CreateCycleInput is used for create Cycle object.
+Input was generated by ent.
+"""
+input CreateCycleInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  entityState: EntityState
+}
+"""
 CreateForPermissionInput is used for create ForPermission object.
 Input was generated by ent.
 """
@@ -1276,6 +2086,25 @@ input CreateForPermissionInput {
   name: String
   age: Int
   isStupid: Boolean
+}
+"""
+CreateLifeCycleNotInput is used for create LifeCycleNot object.
+Input was generated by ent.
+"""
+input CreateLifeCycleNotInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  entityState: EntityState
+}
+"""
+CreateMiauInput is used for create Miau object.
+Input was generated by ent.
+"""
+input CreateMiauInput {
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
 }
 """
 CreateUserInput is used for create User object.
@@ -1292,6 +2121,172 @@ Define a Relay Cursor type:
 https://relay.dev/graphql/connections.htm#sec-Cursor
 """
 scalar Cursor
+type Cycle implements Node {
+  id: ID!
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  entityState: EntityState
+  createdBy: User
+  updatedBy: User
+  adminCreatedBy: AdminUser
+  adminUpdatedBy: AdminUser
+}
+"""
+A connection to a list of items.
+"""
+type CycleConnection {
+  """
+  A list of edges.
+  """
+  edges: [CycleEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type CycleEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Cycle
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
+Ordering options for Cycle connections
+"""
+input CycleOrder {
+  """
+  The ordering direction.
+  """
+  direction: OrderDirection! = ASC
+  """
+  The field by which to order Cycles.
+  """
+  field: CycleOrderField!
+}
+"""
+Properties by which Cycle connections can be ordered.
+"""
+enum CycleOrderField {
+  id
+  createdAt
+  updatedAt
+  name
+}
+"""
+CycleWhereInput is used for filtering Cycle objects.
+Input was generated by ent.
+"""
+input CycleWhereInput {
+  not: CycleWhereInput
+  and: [CycleWhereInput!]
+  or: [CycleWhereInput!]
+  """
+  id field predicates
+  """
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  idEqualFold: ID
+  idContainsFold: ID
+  """
+  created_at field predicates
+  """
+  createdAt: DateTime
+  createdAtNEQ: DateTime
+  createdAtIn: [DateTime!]
+  createdAtNotIn: [DateTime!]
+  createdAtGT: DateTime
+  createdAtGTE: DateTime
+  createdAtLT: DateTime
+  createdAtLTE: DateTime
+  createdAtIsNil: Boolean
+  createdAtNotNil: Boolean
+  """
+  updated_at field predicates
+  """
+  updatedAt: DateTime
+  updatedAtNEQ: DateTime
+  updatedAtIn: [DateTime!]
+  updatedAtNotIn: [DateTime!]
+  updatedAtGT: DateTime
+  updatedAtGTE: DateTime
+  updatedAtLT: DateTime
+  updatedAtLTE: DateTime
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """
+  name field predicates
+  """
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIsNil: Boolean
+  nameNotNil: Boolean
+  nameEqualFold: String
+  nameContainsFold: String
+  """
+  entity_state field predicates
+  """
+  entityState: EntityState
+  entityStateNEQ: EntityState
+  entityStateIn: [EntityState!]
+  entityStateNotIn: [EntityState!]
+  entityStateIsNil: Boolean
+  entityStateNotNil: Boolean
+  """
+  created_by edge predicates
+  """
+  hasCreatedBy: Boolean
+  hasCreatedByWith: [UserWhereInput!]
+  """
+  updated_by edge predicates
+  """
+  hasUpdatedBy: Boolean
+  hasUpdatedByWith: [UserWhereInput!]
+  """
+  admin_created_by edge predicates
+  """
+  hasAdminCreatedBy: Boolean
+  hasAdminCreatedByWith: [AdminUserWhereInput!]
+  """
+  admin_updated_by edge predicates
+  """
+  hasAdminUpdatedBy: Boolean
+  hasAdminUpdatedByWith: [AdminUserWhereInput!]
+}
+"""
+EntityState is enum for the field entity_state
+"""
+enum EntityState @goModel(model: "github.com/GoLabra/labra/entgql/entity.EntityState") {
+  DRAFT
+  ARCHIVED
+  PUBLISHED
+}
 type File implements Node {
   id: ID!
 }
@@ -1489,6 +2484,312 @@ input ForPermissionWhereInput {
   hasAdminUpdatedBy: Boolean
   hasAdminUpdatedByWith: [AdminUserWhereInput!]
 }
+type LifeCycleNot implements Node {
+  id: ID!
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  entityState: EntityState
+  createdBy: User
+  updatedBy: User
+  adminCreatedBy: AdminUser
+  adminUpdatedBy: AdminUser
+}
+"""
+A connection to a list of items.
+"""
+type LifeCycleNotConnection {
+  """
+  A list of edges.
+  """
+  edges: [LifeCycleNotEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type LifeCycleNotEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: LifeCycleNot
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
+Ordering options for LifeCycleNot connections
+"""
+input LifeCycleNotOrder {
+  """
+  The ordering direction.
+  """
+  direction: OrderDirection! = ASC
+  """
+  The field by which to order LifeCycleNots.
+  """
+  field: LifeCycleNotOrderField!
+}
+"""
+Properties by which LifeCycleNot connections can be ordered.
+"""
+enum LifeCycleNotOrderField {
+  id
+  createdAt
+  updatedAt
+  name
+}
+"""
+LifeCycleNotWhereInput is used for filtering LifeCycleNot objects.
+Input was generated by ent.
+"""
+input LifeCycleNotWhereInput {
+  not: LifeCycleNotWhereInput
+  and: [LifeCycleNotWhereInput!]
+  or: [LifeCycleNotWhereInput!]
+  """
+  id field predicates
+  """
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  idEqualFold: ID
+  idContainsFold: ID
+  """
+  created_at field predicates
+  """
+  createdAt: DateTime
+  createdAtNEQ: DateTime
+  createdAtIn: [DateTime!]
+  createdAtNotIn: [DateTime!]
+  createdAtGT: DateTime
+  createdAtGTE: DateTime
+  createdAtLT: DateTime
+  createdAtLTE: DateTime
+  createdAtIsNil: Boolean
+  createdAtNotNil: Boolean
+  """
+  updated_at field predicates
+  """
+  updatedAt: DateTime
+  updatedAtNEQ: DateTime
+  updatedAtIn: [DateTime!]
+  updatedAtNotIn: [DateTime!]
+  updatedAtGT: DateTime
+  updatedAtGTE: DateTime
+  updatedAtLT: DateTime
+  updatedAtLTE: DateTime
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """
+  name field predicates
+  """
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIsNil: Boolean
+  nameNotNil: Boolean
+  nameEqualFold: String
+  nameContainsFold: String
+  """
+  entity_state field predicates
+  """
+  entityState: EntityState
+  entityStateNEQ: EntityState
+  entityStateIn: [EntityState!]
+  entityStateNotIn: [EntityState!]
+  entityStateIsNil: Boolean
+  entityStateNotNil: Boolean
+  """
+  created_by edge predicates
+  """
+  hasCreatedBy: Boolean
+  hasCreatedByWith: [UserWhereInput!]
+  """
+  updated_by edge predicates
+  """
+  hasUpdatedBy: Boolean
+  hasUpdatedByWith: [UserWhereInput!]
+  """
+  admin_created_by edge predicates
+  """
+  hasAdminCreatedBy: Boolean
+  hasAdminCreatedByWith: [AdminUserWhereInput!]
+  """
+  admin_updated_by edge predicates
+  """
+  hasAdminUpdatedBy: Boolean
+  hasAdminUpdatedByWith: [AdminUserWhereInput!]
+}
+type Miau implements Node {
+  id: ID!
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  createdBy: User
+  updatedBy: User
+  adminCreatedBy: AdminUser
+  adminUpdatedBy: AdminUser
+}
+"""
+A connection to a list of items.
+"""
+type MiauConnection {
+  """
+  A list of edges.
+  """
+  edges: [MiauEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type MiauEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Miau
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
+Ordering options for Miau connections
+"""
+input MiauOrder {
+  """
+  The ordering direction.
+  """
+  direction: OrderDirection! = ASC
+  """
+  The field by which to order Miaus.
+  """
+  field: MiauOrderField!
+}
+"""
+Properties by which Miau connections can be ordered.
+"""
+enum MiauOrderField {
+  id
+  createdAt
+  updatedAt
+  name
+}
+"""
+MiauWhereInput is used for filtering Miau objects.
+Input was generated by ent.
+"""
+input MiauWhereInput {
+  not: MiauWhereInput
+  and: [MiauWhereInput!]
+  or: [MiauWhereInput!]
+  """
+  id field predicates
+  """
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  idEqualFold: ID
+  idContainsFold: ID
+  """
+  created_at field predicates
+  """
+  createdAt: DateTime
+  createdAtNEQ: DateTime
+  createdAtIn: [DateTime!]
+  createdAtNotIn: [DateTime!]
+  createdAtGT: DateTime
+  createdAtGTE: DateTime
+  createdAtLT: DateTime
+  createdAtLTE: DateTime
+  createdAtIsNil: Boolean
+  createdAtNotNil: Boolean
+  """
+  updated_at field predicates
+  """
+  updatedAt: DateTime
+  updatedAtNEQ: DateTime
+  updatedAtIn: [DateTime!]
+  updatedAtNotIn: [DateTime!]
+  updatedAtGT: DateTime
+  updatedAtGTE: DateTime
+  updatedAtLT: DateTime
+  updatedAtLTE: DateTime
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """
+  name field predicates
+  """
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIsNil: Boolean
+  nameNotNil: Boolean
+  nameEqualFold: String
+  nameContainsFold: String
+  """
+  created_by edge predicates
+  """
+  hasCreatedBy: Boolean
+  hasCreatedByWith: [UserWhereInput!]
+  """
+  updated_by edge predicates
+  """
+  hasUpdatedBy: Boolean
+  hasUpdatedByWith: [UserWhereInput!]
+  """
+  admin_created_by edge predicates
+  """
+  hasAdminCreatedBy: Boolean
+  hasAdminCreatedByWith: [AdminUserWhereInput!]
+  """
+  admin_updated_by edge predicates
+  """
+  hasAdminUpdatedBy: Boolean
+  hasAdminUpdatedByWith: [AdminUserWhereInput!]
+}
 """
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
@@ -1622,6 +2923,18 @@ input RoleWhereInput {
   hasUserRolesWith: [UserWhereInput!]
 }
 """
+UpdateCycleInput is used for update Cycle object.
+Input was generated by ent.
+"""
+input UpdateCycleInput {
+  createdAt: DateTime
+  clearCreatedAt: Boolean
+  updatedAt: DateTime
+  clearUpdatedAt: Boolean
+  name: String
+  clearName: Boolean
+}
+"""
 UpdateForPermissionInput is used for update ForPermission object.
 Input was generated by ent.
 """
@@ -1636,6 +2949,30 @@ input UpdateForPermissionInput {
   clearAge: Boolean
   isStupid: Boolean
   clearIsStupid: Boolean
+}
+"""
+UpdateLifeCycleNotInput is used for update LifeCycleNot object.
+Input was generated by ent.
+"""
+input UpdateLifeCycleNotInput {
+  createdAt: DateTime
+  clearCreatedAt: Boolean
+  updatedAt: DateTime
+  clearUpdatedAt: Boolean
+  name: String
+  clearName: Boolean
+}
+"""
+UpdateMiauInput is used for update Miau object.
+Input was generated by ent.
+"""
+input UpdateMiauInput {
+  createdAt: DateTime
+  clearCreatedAt: Boolean
+  updatedAt: DateTime
+  clearUpdatedAt: Boolean
+  name: String
+  clearName: Boolean
 }
 """
 UpdateUserInput is used for update User object.
@@ -1806,10 +3143,19 @@ scalar DateTime
 input AdminUserWhereUniqueInput {
   id: ID
 }
+input CycleWhereUniqueInput {
+  id: ID
+}
 input FileWhereUniqueInput {
   id: ID
 }
 input ForPermissionWhereUniqueInput {
+  id: ID
+}
+input LifeCycleNotWhereUniqueInput {
+  id: ID
+}
+input MiauWhereUniqueInput {
   id: ID
 }
 input RoleWhereUniqueInput {
@@ -1821,6 +3167,59 @@ input UserWhereUniqueInput {
   email: String
 }
 
+`, BuiltIn: false},
+	{Name: "../graphql/user.cycle.graphql", Input: `extend type Query {
+    cycles(where: CycleWhereInput, orderBy: CycleOrder, skip: Int, first: Int, last: Int): [Cycle!]
+    cyclesConnection(where: CycleWhereInput, orderBy: CycleOrder, skip: Int, first: Int, last: Int): CycleConnection!
+}
+extend type Mutation {
+    createCycle(data: CreateCycleInput!): Cycle!
+    createManyCycles(data: [CreateCycleInput!]!): [Cycle]!
+    updateCycle(where: CycleWhereUniqueInput!, data: UpdateCycleInput!): Cycle!
+    updateCycleState(where: CycleWhereUniqueInput!, state: EntityState!): Cycle!
+    updateManyCycles(where: CycleWhereInput!, data: UpdateCycleInput!): Int!
+    upsertCycle(data: CreateCycleInput!): Cycle!
+    upsertManyCycles(data: [CreateCycleInput!]!): Int!
+    deleteCycle(where: CycleWhereUniqueInput!): Cycle!
+    deleteManyCycles(where: CycleWhereInput!): Int!
+}
+extend input CreateCycleInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+    adminCreatedBy: CreateOneAdminUserInput
+    adminUpdatedBy: CreateOneAdminUserInput
+}
+extend input UpdateCycleInput {
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+    adminCreatedBy: UpdateOneAdminUserInput
+    adminUpdatedBy: UpdateOneAdminUserInput
+}
+
+input CreateOneCycleInput {
+    create: CreateCycleInput
+    connect: CycleWhereUniqueInput
+}
+
+input CreateManyCycleInput {
+    create: [CreateCycleInput!]
+    connect: [CycleWhereUniqueInput!]
+}
+
+
+input UpdateOneCycleInput {
+    create: CreateCycleInput
+    connect: CycleWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyCycleInput {
+    create: [CreateCycleInput!]
+    connect: [CycleWhereUniqueInput!]
+    delete: [CycleWhereUniqueInput!]
+    disconnect: [CycleWhereUniqueInput!]
+}
 `, BuiltIn: false},
 	{Name: "../graphql/user.for_permission.graphql", Input: `extend type Query {
     forPermissions(where: ForPermissionWhereInput, orderBy: ForPermissionOrder, skip: Int, first: Int, last: Int): [ForPermission!]
@@ -1872,6 +3271,111 @@ input UpdateManyForPermissionInput {
     connect: [ForPermissionWhereUniqueInput!]
     delete: [ForPermissionWhereUniqueInput!]
     disconnect: [ForPermissionWhereUniqueInput!]
+}
+`, BuiltIn: false},
+	{Name: "../graphql/user.life_cycle_not.graphql", Input: `extend type Query {
+    lifeCycleNots(where: LifeCycleNotWhereInput, orderBy: LifeCycleNotOrder, skip: Int, first: Int, last: Int): [LifeCycleNot!]
+    lifeCycleNotsConnection(where: LifeCycleNotWhereInput, orderBy: LifeCycleNotOrder, skip: Int, first: Int, last: Int): LifeCycleNotConnection!
+}
+extend type Mutation {
+    createLifeCycleNot(data: CreateLifeCycleNotInput!): LifeCycleNot!
+    createManyLifeCycleNots(data: [CreateLifeCycleNotInput!]!): [LifeCycleNot]!
+    updateLifeCycleNot(where: LifeCycleNotWhereUniqueInput!, data: UpdateLifeCycleNotInput!): LifeCycleNot!
+    updateLifeCycleNotState(where: LifeCycleNotWhereUniqueInput!, state: EntityState!): LifeCycleNot!
+    updateManyLifeCycleNots(where: LifeCycleNotWhereInput!, data: UpdateLifeCycleNotInput!): Int!
+    upsertLifeCycleNot(data: CreateLifeCycleNotInput!): LifeCycleNot!
+    upsertManyLifeCycleNots(data: [CreateLifeCycleNotInput!]!): Int!
+    deleteLifeCycleNot(where: LifeCycleNotWhereUniqueInput!): LifeCycleNot!
+    deleteManyLifeCycleNots(where: LifeCycleNotWhereInput!): Int!
+}
+extend input CreateLifeCycleNotInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+    adminCreatedBy: CreateOneAdminUserInput
+    adminUpdatedBy: CreateOneAdminUserInput
+}
+extend input UpdateLifeCycleNotInput {
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+    adminCreatedBy: UpdateOneAdminUserInput
+    adminUpdatedBy: UpdateOneAdminUserInput
+}
+
+input CreateOneLifeCycleNotInput {
+    create: CreateLifeCycleNotInput
+    connect: LifeCycleNotWhereUniqueInput
+}
+
+input CreateManyLifeCycleNotInput {
+    create: [CreateLifeCycleNotInput!]
+    connect: [LifeCycleNotWhereUniqueInput!]
+}
+
+
+input UpdateOneLifeCycleNotInput {
+    create: CreateLifeCycleNotInput
+    connect: LifeCycleNotWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyLifeCycleNotInput {
+    create: [CreateLifeCycleNotInput!]
+    connect: [LifeCycleNotWhereUniqueInput!]
+    delete: [LifeCycleNotWhereUniqueInput!]
+    disconnect: [LifeCycleNotWhereUniqueInput!]
+}
+`, BuiltIn: false},
+	{Name: "../graphql/user.miau.graphql", Input: `extend type Query {
+    miaus(where: MiauWhereInput, orderBy: MiauOrder, skip: Int, first: Int, last: Int): [Miau!]
+    miausConnection(where: MiauWhereInput, orderBy: MiauOrder, skip: Int, first: Int, last: Int): MiauConnection!
+}
+extend type Mutation {
+    createMiau(data: CreateMiauInput!): Miau!
+    createManyMiaus(data: [CreateMiauInput!]!): [Miau]!
+    updateMiau(where: MiauWhereUniqueInput!, data: UpdateMiauInput!): Miau!
+    updateManyMiaus(where: MiauWhereInput!, data: UpdateMiauInput!): Int!
+    upsertMiau(data: CreateMiauInput!): Miau!
+    upsertManyMiaus(data: [CreateMiauInput!]!): Int!
+    deleteMiau(where: MiauWhereUniqueInput!): Miau!
+    deleteManyMiaus(where: MiauWhereInput!): Int!
+}
+extend input CreateMiauInput {
+    createdBy: CreateOneUserInput
+    updatedBy: CreateOneUserInput
+    adminCreatedBy: CreateOneAdminUserInput
+    adminUpdatedBy: CreateOneAdminUserInput
+}
+extend input UpdateMiauInput {
+    createdBy: UpdateOneUserInput
+    updatedBy: UpdateOneUserInput
+    adminCreatedBy: UpdateOneAdminUserInput
+    adminUpdatedBy: UpdateOneAdminUserInput
+}
+
+input CreateOneMiauInput {
+    create: CreateMiauInput
+    connect: MiauWhereUniqueInput
+}
+
+input CreateManyMiauInput {
+    create: [CreateMiauInput!]
+    connect: [MiauWhereUniqueInput!]
+}
+
+
+input UpdateOneMiauInput {
+    create: CreateMiauInput
+    connect: MiauWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyMiauInput {
+    create: [CreateMiauInput!]
+    connect: [MiauWhereUniqueInput!]
+    delete: [MiauWhereUniqueInput!]
+    disconnect: [MiauWhereUniqueInput!]
 }
 `, BuiltIn: false},
 	{Name: "../graphql/user.user.graphql", Input: `extend type Query {
@@ -1941,10 +3445,43 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_createCycle_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateCycleInput2appᚋentᚐCreateCycleInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createForPermission_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateForPermissionInput2appᚋentᚐCreateForPermissionInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createLifeCycleNot_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateLifeCycleNotInput2appᚋentᚐCreateLifeCycleNotInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createManyCycles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateCycleInput2ᚕᚖappᚋentᚐCreateCycleInputᚄ)
 	if err != nil {
 		return nil, err
 	}
@@ -1963,10 +3500,43 @@ func (ec *executionContext) field_Mutation_createManyForPermissions_args(ctx con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createManyLifeCycleNots_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateLifeCycleNotInput2ᚕᚖappᚋentᚐCreateLifeCycleNotInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createManyMiaus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateMiauInput2ᚕᚖappᚋentᚐCreateMiauInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createManyUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateUserInput2ᚕᚖappᚋentᚐCreateUserInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createMiau_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateMiauInput2appᚋentᚐCreateMiauInput)
 	if err != nil {
 		return nil, err
 	}
@@ -1985,10 +3555,43 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteCycle_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCycleWhereUniqueInput2appᚋentᚐCycleWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteForPermission_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNForPermissionWhereUniqueInput2appᚋentᚐForPermissionWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteLifeCycleNot_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNLifeCycleNotWhereUniqueInput2appᚋentᚐLifeCycleNotWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteManyCycles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCycleWhereInput2appᚋentᚐCycleWhereInput)
 	if err != nil {
 		return nil, err
 	}
@@ -2007,10 +3610,43 @@ func (ec *executionContext) field_Mutation_deleteManyForPermissions_args(ctx con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteManyLifeCycleNots_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNLifeCycleNotWhereInput2appᚋentᚐLifeCycleNotWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteManyMiaus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNMiauWhereInput2appᚋentᚐMiauWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteManyUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNUserWhereInput2appᚋentᚐUserWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMiau_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNMiauWhereUniqueInput2appᚋentᚐMiauWhereUniqueInput)
 	if err != nil {
 		return nil, err
 	}
@@ -2029,6 +3665,38 @@ func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateCycleState_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCycleWhereUniqueInput2appᚋentᚐCycleWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "state", ec.unmarshalNEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState)
+	if err != nil {
+		return nil, err
+	}
+	args["state"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateCycle_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCycleWhereUniqueInput2appᚋentᚐCycleWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateCycleInput2appᚋentᚐUpdateCycleInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateForPermission_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -2038,6 +3706,54 @@ func (ec *executionContext) field_Mutation_updateForPermission_args(ctx context.
 	}
 	args["where"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateForPermissionInput2appᚋentᚐUpdateForPermissionInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateLifeCycleNotState_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNLifeCycleNotWhereUniqueInput2appᚋentᚐLifeCycleNotWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "state", ec.unmarshalNEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState)
+	if err != nil {
+		return nil, err
+	}
+	args["state"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateLifeCycleNot_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNLifeCycleNotWhereUniqueInput2appᚋentᚐLifeCycleNotWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateLifeCycleNotInput2appᚋentᚐUpdateLifeCycleNotInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateManyCycles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCycleWhereInput2appᚋentᚐCycleWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateCycleInput2appᚋentᚐUpdateCycleInput)
 	if err != nil {
 		return nil, err
 	}
@@ -2061,6 +3777,38 @@ func (ec *executionContext) field_Mutation_updateManyForPermissions_args(ctx con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateManyLifeCycleNots_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNLifeCycleNotWhereInput2appᚋentᚐLifeCycleNotWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateLifeCycleNotInput2appᚋentᚐUpdateLifeCycleNotInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateManyMiaus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNMiauWhereInput2appᚋentᚐMiauWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateMiauInput2appᚋentᚐUpdateMiauInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateManyUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -2070,6 +3818,22 @@ func (ec *executionContext) field_Mutation_updateManyUsers_args(ctx context.Cont
 	}
 	args["where"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateUserInput2appᚋentᚐUpdateUserInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateMiau_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNMiauWhereUniqueInput2appᚋentᚐMiauWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateMiauInput2appᚋentᚐUpdateMiauInput)
 	if err != nil {
 		return nil, err
 	}
@@ -2093,10 +3857,43 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_upsertCycle_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateCycleInput2appᚋentᚐCreateCycleInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_upsertForPermission_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateForPermissionInput2appᚋentᚐCreateForPermissionInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_upsertLifeCycleNot_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateLifeCycleNotInput2appᚋentᚐCreateLifeCycleNotInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_upsertManyCycles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateCycleInput2ᚕᚖappᚋentᚐCreateCycleInputᚄ)
 	if err != nil {
 		return nil, err
 	}
@@ -2115,10 +3912,43 @@ func (ec *executionContext) field_Mutation_upsertManyForPermissions_args(ctx con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_upsertManyLifeCycleNots_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateLifeCycleNotInput2ᚕᚖappᚋentᚐCreateLifeCycleNotInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_upsertManyMiaus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateMiauInput2ᚕᚖappᚋentᚐCreateMiauInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_upsertManyUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateUserInput2ᚕᚖappᚋentᚐCreateUserInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_upsertMiau_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateMiauInput2appᚋentᚐCreateMiauInput)
 	if err != nil {
 		return nil, err
 	}
@@ -2145,6 +3975,68 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_cyclesConnection_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOCycleWhereInput2ᚖappᚋentᚐCycleWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOCycleOrder2ᚖappᚋentᚐCycleOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "skip", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_cycles_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOCycleWhereInput2ᚖappᚋentᚐCycleWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOCycleOrder2ᚖappᚋentᚐCycleOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "skip", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
 	return args, nil
 }
 
@@ -2188,6 +4080,130 @@ func (ec *executionContext) field_Query_forPermissions_args(ctx context.Context,
 	}
 	args["where"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOForPermissionOrder2ᚖappᚋentᚐForPermissionOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "skip", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_lifeCycleNotsConnection_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOLifeCycleNotWhereInput2ᚖappᚋentᚐLifeCycleNotWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOLifeCycleNotOrder2ᚖappᚋentᚐLifeCycleNotOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "skip", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_lifeCycleNots_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOLifeCycleNotWhereInput2ᚖappᚋentᚐLifeCycleNotWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOLifeCycleNotOrder2ᚖappᚋentᚐLifeCycleNotOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "skip", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_miausConnection_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOMiauWhereInput2ᚖappᚋentᚐMiauWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOMiauOrder2ᚖappᚋentᚐMiauOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "skip", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["skip"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_miaus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOMiauWhereInput2ᚖappᚋentᚐMiauWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOMiauOrder2ᚖappᚋentᚐMiauOrder)
 	if err != nil {
 		return nil, err
 	}
@@ -2781,6 +4797,540 @@ func (ec *executionContext) fieldContext_AdminUser_defaultRole(_ context.Context
 				return ec.fieldContext_Role_permissions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Role", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_id(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_updatedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_name(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_entityState(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_entityState,
+		func(ctx context.Context) (any, error) {
+			return obj.EntityState, nil
+		},
+		nil,
+		ec.marshalOEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_entityState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type EntityState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_createdBy,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedBy(ctx)
+		},
+		nil,
+		ec.marshalOUser2ᚖappᚋentᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_updatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_updatedBy,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedBy(ctx)
+		},
+		nil,
+		ec.marshalOUser2ᚖappᚋentᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_updatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_adminCreatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_adminCreatedBy,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Cycle().AdminCreatedBy(ctx, obj)
+		},
+		nil,
+		ec.marshalOAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_adminCreatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "password":
+				return ec.fieldContext_AdminUser_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_AdminUser_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_AdminUser_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cycle_adminUpdatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Cycle) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Cycle_adminUpdatedBy,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Cycle().AdminUpdatedBy(ctx, obj)
+		},
+		nil,
+		ec.marshalOAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Cycle_adminUpdatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cycle",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "password":
+				return ec.fieldContext_AdminUser_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_AdminUser_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_AdminUser_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CycleConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.CycleConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CycleConnection_edges,
+		func(ctx context.Context) (any, error) {
+			return obj.Edges, nil
+		},
+		nil,
+		ec.marshalOCycleEdge2ᚕᚖappᚋentᚐCycleEdge,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CycleConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CycleConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_CycleEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_CycleEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CycleEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CycleConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.CycleConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CycleConnection_pageInfo,
+		func(ctx context.Context) (any, error) {
+			return obj.PageInfo, nil
+		},
+		nil,
+		ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CycleConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CycleConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CycleConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.CycleConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CycleConnection_totalCount,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalCount, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CycleConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CycleConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CycleEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.CycleEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CycleEdge_node,
+		func(ctx context.Context) (any, error) {
+			return obj.Node, nil
+		},
+		nil,
+		ec.marshalOCycle2ᚖappᚋentᚐCycle,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CycleEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CycleEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CycleEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.CycleEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CycleEdge_cursor,
+		func(ctx context.Context) (any, error) {
+			return obj.Cursor, nil
+		},
+		nil,
+		ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CycleEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CycleEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3722,6 +6272,1532 @@ func (ec *executionContext) fieldContext_ForPermissionEdge_cursor(_ context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _LifeCycleNot_id(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_updatedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_name(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_entityState(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_entityState,
+		func(ctx context.Context) (any, error) {
+			return obj.EntityState, nil
+		},
+		nil,
+		ec.marshalOEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_entityState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type EntityState does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_createdBy,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedBy(ctx)
+		},
+		nil,
+		ec.marshalOUser2ᚖappᚋentᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_updatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_updatedBy,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedBy(ctx)
+		},
+		nil,
+		ec.marshalOUser2ᚖappᚋentᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_updatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_adminCreatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_adminCreatedBy,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.LifeCycleNot().AdminCreatedBy(ctx, obj)
+		},
+		nil,
+		ec.marshalOAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_adminCreatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "password":
+				return ec.fieldContext_AdminUser_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_AdminUser_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_AdminUser_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNot_adminUpdatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNot_adminUpdatedBy,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.LifeCycleNot().AdminUpdatedBy(ctx, obj)
+		},
+		nil,
+		ec.marshalOAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNot_adminUpdatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNot",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "password":
+				return ec.fieldContext_AdminUser_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_AdminUser_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_AdminUser_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNotConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNotConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNotConnection_edges,
+		func(ctx context.Context) (any, error) {
+			return obj.Edges, nil
+		},
+		nil,
+		ec.marshalOLifeCycleNotEdge2ᚕᚖappᚋentᚐLifeCycleNotEdge,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNotConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNotConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_LifeCycleNotEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_LifeCycleNotEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNotEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNotConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNotConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNotConnection_pageInfo,
+		func(ctx context.Context) (any, error) {
+			return obj.PageInfo, nil
+		},
+		nil,
+		ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNotConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNotConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNotConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNotConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNotConnection_totalCount,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalCount, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNotConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNotConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNotEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNotEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNotEdge_node,
+		func(ctx context.Context) (any, error) {
+			return obj.Node, nil
+		},
+		nil,
+		ec.marshalOLifeCycleNot2ᚖappᚋentᚐLifeCycleNot,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNotEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNotEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LifeCycleNotEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.LifeCycleNotEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_LifeCycleNotEdge_cursor,
+		func(ctx context.Context) (any, error) {
+			return obj.Cursor, nil
+		},
+		nil,
+		ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_LifeCycleNotEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LifeCycleNotEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_id(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_updatedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_name(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_createdBy,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedBy(ctx)
+		},
+		nil,
+		ec.marshalOUser2ᚖappᚋentᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_updatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_updatedBy,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedBy(ctx)
+		},
+		nil,
+		ec.marshalOUser2ᚖappᚋentᚐUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_updatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_adminCreatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_adminCreatedBy,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Miau().AdminCreatedBy(ctx, obj)
+		},
+		nil,
+		ec.marshalOAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_adminCreatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "password":
+				return ec.fieldContext_AdminUser_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_AdminUser_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_AdminUser_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Miau_adminUpdatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Miau) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Miau_adminUpdatedBy,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Miau().AdminUpdatedBy(ctx, obj)
+		},
+		nil,
+		ec.marshalOAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Miau_adminUpdatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Miau",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "password":
+				return ec.fieldContext_AdminUser_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_AdminUser_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_AdminUser_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MiauConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.MiauConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MiauConnection_edges,
+		func(ctx context.Context) (any, error) {
+			return obj.Edges, nil
+		},
+		nil,
+		ec.marshalOMiauEdge2ᚕᚖappᚋentᚐMiauEdge,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MiauConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MiauConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_MiauEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_MiauEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MiauEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MiauConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.MiauConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MiauConnection_pageInfo,
+		func(ctx context.Context) (any, error) {
+			return obj.PageInfo, nil
+		},
+		nil,
+		ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MiauConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MiauConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MiauConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.MiauConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MiauConnection_totalCount,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalCount, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MiauConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MiauConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MiauEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.MiauEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MiauEdge_node,
+		func(ctx context.Context) (any, error) {
+			return obj.Node, nil
+		},
+		nil,
+		ec.marshalOMiau2ᚖappᚋentᚐMiau,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_MiauEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MiauEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Miau_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Miau_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Miau_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Miau_name(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Miau_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Miau_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Miau_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Miau_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Miau", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MiauEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.MiauEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_MiauEdge_cursor,
+		func(ctx context.Context) (any, error) {
+			return obj.Cursor, nil
+		},
+		nil,
+		ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_MiauEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MiauEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createCycle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createCycle,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateCycle(ctx, fc.Args["data"].(ent.CreateCycleInput))
+		},
+		nil,
+		ec.marshalNCycle2ᚖappᚋentᚐCycle,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createCycle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createCycle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createManyCycles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createManyCycles,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateManyCycles(ctx, fc.Args["data"].([]*ent.CreateCycleInput))
+		},
+		nil,
+		ec.marshalNCycle2ᚕᚖappᚋentᚐCycle,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createManyCycles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createManyCycles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateCycle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateCycle,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateCycle(ctx, fc.Args["where"].(ent.CycleWhereUniqueInput), fc.Args["data"].(ent.UpdateCycleInput))
+		},
+		nil,
+		ec.marshalNCycle2ᚖappᚋentᚐCycle,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCycle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCycle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateCycleState(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateCycleState,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateCycleState(ctx, fc.Args["where"].(ent.CycleWhereUniqueInput), fc.Args["state"].(entity.EntityState))
+		},
+		nil,
+		ec.marshalNCycle2ᚖappᚋentᚐCycle,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCycleState(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCycleState_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateManyCycles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateManyCycles,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateManyCycles(ctx, fc.Args["where"].(ent.CycleWhereInput), fc.Args["data"].(ent.UpdateCycleInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateManyCycles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateManyCycles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertCycle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_upsertCycle,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpsertCycle(ctx, fc.Args["data"].(ent.CreateCycleInput))
+		},
+		nil,
+		ec.marshalNCycle2ᚖappᚋentᚐCycle,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertCycle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertCycle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertManyCycles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_upsertManyCycles,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpsertManyCycles(ctx, fc.Args["data"].([]*ent.CreateCycleInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertManyCycles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertManyCycles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteCycle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteCycle,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteCycle(ctx, fc.Args["where"].(ent.CycleWhereUniqueInput))
+		},
+		nil,
+		ec.marshalNCycle2ᚖappᚋentᚐCycle,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteCycle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteCycle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteManyCycles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteManyCycles,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteManyCycles(ctx, fc.Args["where"].(ent.CycleWhereInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteManyCycles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteManyCycles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createForPermission(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4154,6 +8230,913 @@ func (ec *executionContext) fieldContext_Mutation_deleteManyForPermissions(ctx c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteManyForPermissions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createLifeCycleNot(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createLifeCycleNot,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateLifeCycleNot(ctx, fc.Args["data"].(ent.CreateLifeCycleNotInput))
+		},
+		nil,
+		ec.marshalNLifeCycleNot2ᚖappᚋentᚐLifeCycleNot,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createLifeCycleNot(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createLifeCycleNot_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createManyLifeCycleNots,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateManyLifeCycleNots(ctx, fc.Args["data"].([]*ent.CreateLifeCycleNotInput))
+		},
+		nil,
+		ec.marshalNLifeCycleNot2ᚕᚖappᚋentᚐLifeCycleNot,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createManyLifeCycleNots_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateLifeCycleNot(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateLifeCycleNot,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateLifeCycleNot(ctx, fc.Args["where"].(ent.LifeCycleNotWhereUniqueInput), fc.Args["data"].(ent.UpdateLifeCycleNotInput))
+		},
+		nil,
+		ec.marshalNLifeCycleNot2ᚖappᚋentᚐLifeCycleNot,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateLifeCycleNot(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateLifeCycleNot_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateLifeCycleNotState(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateLifeCycleNotState,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateLifeCycleNotState(ctx, fc.Args["where"].(ent.LifeCycleNotWhereUniqueInput), fc.Args["state"].(entity.EntityState))
+		},
+		nil,
+		ec.marshalNLifeCycleNot2ᚖappᚋentᚐLifeCycleNot,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateLifeCycleNotState(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateLifeCycleNotState_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateManyLifeCycleNots,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateManyLifeCycleNots(ctx, fc.Args["where"].(ent.LifeCycleNotWhereInput), fc.Args["data"].(ent.UpdateLifeCycleNotInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateManyLifeCycleNots_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertLifeCycleNot(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_upsertLifeCycleNot,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpsertLifeCycleNot(ctx, fc.Args["data"].(ent.CreateLifeCycleNotInput))
+		},
+		nil,
+		ec.marshalNLifeCycleNot2ᚖappᚋentᚐLifeCycleNot,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertLifeCycleNot(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertLifeCycleNot_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_upsertManyLifeCycleNots,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpsertManyLifeCycleNots(ctx, fc.Args["data"].([]*ent.CreateLifeCycleNotInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertManyLifeCycleNots_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteLifeCycleNot(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteLifeCycleNot,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteLifeCycleNot(ctx, fc.Args["where"].(ent.LifeCycleNotWhereUniqueInput))
+		},
+		nil,
+		ec.marshalNLifeCycleNot2ᚖappᚋentᚐLifeCycleNot,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteLifeCycleNot(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteLifeCycleNot_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteManyLifeCycleNots,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteManyLifeCycleNots(ctx, fc.Args["where"].(ent.LifeCycleNotWhereInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteManyLifeCycleNots(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteManyLifeCycleNots_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createMiau(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createMiau,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateMiau(ctx, fc.Args["data"].(ent.CreateMiauInput))
+		},
+		nil,
+		ec.marshalNMiau2ᚖappᚋentᚐMiau,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createMiau(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Miau_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Miau_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Miau_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Miau_name(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Miau_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Miau_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Miau_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Miau_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Miau", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createMiau_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createManyMiaus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createManyMiaus,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateManyMiaus(ctx, fc.Args["data"].([]*ent.CreateMiauInput))
+		},
+		nil,
+		ec.marshalNMiau2ᚕᚖappᚋentᚐMiau,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createManyMiaus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Miau_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Miau_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Miau_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Miau_name(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Miau_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Miau_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Miau_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Miau_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Miau", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createManyMiaus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateMiau(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateMiau,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateMiau(ctx, fc.Args["where"].(ent.MiauWhereUniqueInput), fc.Args["data"].(ent.UpdateMiauInput))
+		},
+		nil,
+		ec.marshalNMiau2ᚖappᚋentᚐMiau,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateMiau(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Miau_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Miau_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Miau_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Miau_name(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Miau_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Miau_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Miau_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Miau_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Miau", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateMiau_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateManyMiaus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateManyMiaus,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateManyMiaus(ctx, fc.Args["where"].(ent.MiauWhereInput), fc.Args["data"].(ent.UpdateMiauInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateManyMiaus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateManyMiaus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertMiau(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_upsertMiau,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpsertMiau(ctx, fc.Args["data"].(ent.CreateMiauInput))
+		},
+		nil,
+		ec.marshalNMiau2ᚖappᚋentᚐMiau,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertMiau(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Miau_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Miau_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Miau_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Miau_name(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Miau_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Miau_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Miau_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Miau_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Miau", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertMiau_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_upsertManyMiaus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_upsertManyMiaus,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpsertManyMiaus(ctx, fc.Args["data"].([]*ent.CreateMiauInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_upsertManyMiaus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_upsertManyMiaus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMiau(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteMiau,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteMiau(ctx, fc.Args["where"].(ent.MiauWhereUniqueInput))
+		},
+		nil,
+		ec.marshalNMiau2ᚖappᚋentᚐMiau,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMiau(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Miau_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Miau_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Miau_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Miau_name(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Miau_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Miau_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Miau_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Miau_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Miau", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMiau_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteManyMiaus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteManyMiaus,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteManyMiaus(ctx, fc.Args["where"].(ent.MiauWhereInput))
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteManyMiaus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteManyMiaus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5090,6 +10073,116 @@ func (ec *executionContext) fieldContext_Query_nodes(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_cycles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cycles,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Cycles(ctx, fc.Args["where"].(*ent.CycleWhereInput), fc.Args["orderBy"].(*ent.CycleOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+		},
+		nil,
+		ec.marshalOCycle2ᚕᚖappᚋentᚐCycleᚄ,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cycles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cycle_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Cycle_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Cycle_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Cycle_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_Cycle_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Cycle_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Cycle_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Cycle_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Cycle_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cycle", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_cycles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_cyclesConnection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cyclesConnection,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().CyclesConnection(ctx, fc.Args["where"].(*ent.CycleWhereInput), fc.Args["orderBy"].(*ent.CycleOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+		},
+		nil,
+		ec.marshalNCycleConnection2ᚖappᚋentᚐCycleConnection,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cyclesConnection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_CycleConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_CycleConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_CycleConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CycleConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_cyclesConnection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_forPermissions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -5196,6 +10289,224 @@ func (ec *executionContext) fieldContext_Query_forPermissionsConnection(ctx cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_forPermissionsConnection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_lifeCycleNots(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_lifeCycleNots,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().LifeCycleNots(ctx, fc.Args["where"].(*ent.LifeCycleNotWhereInput), fc.Args["orderBy"].(*ent.LifeCycleNotOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+		},
+		nil,
+		ec.marshalOLifeCycleNot2ᚕᚖappᚋentᚐLifeCycleNotᚄ,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_lifeCycleNots(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LifeCycleNot_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_LifeCycleNot_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_LifeCycleNot_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_LifeCycleNot_name(ctx, field)
+			case "entityState":
+				return ec.fieldContext_LifeCycleNot_entityState(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_LifeCycleNot_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_LifeCycleNot_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_LifeCycleNot_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_LifeCycleNot_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNot", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_lifeCycleNots_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_lifeCycleNotsConnection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_lifeCycleNotsConnection,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().LifeCycleNotsConnection(ctx, fc.Args["where"].(*ent.LifeCycleNotWhereInput), fc.Args["orderBy"].(*ent.LifeCycleNotOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+		},
+		nil,
+		ec.marshalNLifeCycleNotConnection2ᚖappᚋentᚐLifeCycleNotConnection,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_lifeCycleNotsConnection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_LifeCycleNotConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_LifeCycleNotConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_LifeCycleNotConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LifeCycleNotConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_lifeCycleNotsConnection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_miaus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_miaus,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Miaus(ctx, fc.Args["where"].(*ent.MiauWhereInput), fc.Args["orderBy"].(*ent.MiauOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+		},
+		nil,
+		ec.marshalOMiau2ᚕᚖappᚋentᚐMiauᚄ,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_miaus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Miau_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Miau_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Miau_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Miau_name(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Miau_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Miau_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_Miau_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_Miau_adminUpdatedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Miau", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_miaus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_miausConnection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_miausConnection,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().MiausConnection(ctx, fc.Args["where"].(*ent.MiauWhereInput), fc.Args["orderBy"].(*ent.MiauOrder), fc.Args["skip"].(*int), fc.Args["first"].(*int), fc.Args["last"].(*int))
+		},
+		nil,
+		ec.marshalNMiauConnection2ᚖappᚋentᚐMiauConnection,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_miausConnection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_MiauConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_MiauConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_MiauConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MiauConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_miausConnection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7955,6 +13266,82 @@ func (ec *executionContext) unmarshalInputAdminUserWhereUniqueInput(ctx context.
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateCycleInput(ctx context.Context, obj any) (ent.CreateCycleInput, error) {
+	var it ent.CreateCycleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "name", "entityState", "createdBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "entityState":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityState"))
+			data, err := ec.unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityState = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖappᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖappᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "adminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedBy"))
+			data, err := ec.unmarshalOCreateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminCreatedBy = data
+		case "adminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminUpdatedBy"))
+			data, err := ec.unmarshalOCreateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminUpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateFileInput(ctx context.Context, obj any) (ent1.CreateFileInput, error) {
 	var it ent1.CreateFileInput
 	asMap := map[string]any{}
@@ -8107,6 +13494,82 @@ func (ec *executionContext) unmarshalInputCreateForPermissionInput(ctx context.C
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateLifeCycleNotInput(ctx context.Context, obj any) (ent.CreateLifeCycleNotInput, error) {
+	var it ent.CreateLifeCycleNotInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "name", "entityState", "createdBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "entityState":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityState"))
+			data, err := ec.unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityState = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖappᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖappᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "adminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedBy"))
+			data, err := ec.unmarshalOCreateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminCreatedBy = data
+		case "adminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminUpdatedBy"))
+			data, err := ec.unmarshalOCreateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminUpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateManyAdminUserInput(ctx context.Context, obj any) (ent1.CreateManyAdminUserInput, error) {
 	var it ent1.CreateManyAdminUserInput
 	asMap := map[string]any{}
@@ -8124,6 +13587,40 @@ func (ec *executionContext) unmarshalInputCreateManyAdminUserInput(ctx context.C
 		case "connect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
 			data, err := ec.unmarshalOAdminUserWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateManyCycleInput(ctx context.Context, obj any) (ent.CreateManyCycleInput, error) {
+	var it ent.CreateManyCycleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateCycleInput2ᚕᚖappᚋentᚐCreateCycleInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOCycleWhereUniqueInput2ᚕᚖappᚋentᚐCycleWhereUniqueInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8202,6 +13699,74 @@ func (ec *executionContext) unmarshalInputCreateManyForPermissionInput(ctx conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateManyLifeCycleNotInput(ctx context.Context, obj any) (ent.CreateManyLifeCycleNotInput, error) {
+	var it ent.CreateManyLifeCycleNotInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateLifeCycleNotInput2ᚕᚖappᚋentᚐCreateLifeCycleNotInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOLifeCycleNotWhereUniqueInput2ᚕᚖappᚋentᚐLifeCycleNotWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateManyMiauInput(ctx context.Context, obj any) (ent.CreateManyMiauInput, error) {
+	var it ent.CreateManyMiauInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateMiauInput2ᚕᚖappᚋentᚐCreateMiauInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOMiauWhereUniqueInput2ᚕᚖappᚋentᚐMiauWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateManyRoleInput(ctx context.Context, obj any) (ent1.CreateManyRoleInput, error) {
 	var it ent1.CreateManyRoleInput
 	asMap := map[string]any{}
@@ -8263,6 +13828,75 @@ func (ec *executionContext) unmarshalInputCreateManyUserInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateMiauInput(ctx context.Context, obj any) (ent.CreateMiauInput, error) {
+	var it ent.CreateMiauInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "name", "createdBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖappᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOCreateOneUserInput2ᚖappᚋentᚐCreateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "adminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedBy"))
+			data, err := ec.unmarshalOCreateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminCreatedBy = data
+		case "adminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminUpdatedBy"))
+			data, err := ec.unmarshalOCreateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminUpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateOneAdminUserInput(ctx context.Context, obj any) (ent1.CreateOneAdminUserInput, error) {
 	var it ent1.CreateOneAdminUserInput
 	asMap := map[string]any{}
@@ -8280,6 +13914,40 @@ func (ec *executionContext) unmarshalInputCreateOneAdminUserInput(ctx context.Co
 		case "connect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
 			data, err := ec.unmarshalOAdminUserWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereUniqueInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateOneCycleInput(ctx context.Context, obj any) (ent.CreateOneCycleInput, error) {
+	var it ent.CreateOneCycleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateCycleInput2ᚖappᚋentᚐCreateCycleInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOCycleWhereUniqueInput2ᚖappᚋentᚐCycleWhereUniqueInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8348,6 +14016,74 @@ func (ec *executionContext) unmarshalInputCreateOneForPermissionInput(ctx contex
 		case "connect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
 			data, err := ec.unmarshalOForPermissionWhereUniqueInput2ᚖappᚋentᚐForPermissionWhereUniqueInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateOneLifeCycleNotInput(ctx context.Context, obj any) (ent.CreateOneLifeCycleNotInput, error) {
+	var it ent.CreateOneLifeCycleNotInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateLifeCycleNotInput2ᚖappᚋentᚐCreateLifeCycleNotInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOLifeCycleNotWhereUniqueInput2ᚖappᚋentᚐLifeCycleNotWhereUniqueInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateOneMiauInput(ctx context.Context, obj any) (ent.CreateOneMiauInput, error) {
+	var it ent.CreateOneMiauInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateMiauInput2ᚖappᚋentᚐCreateMiauInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOMiauWhereUniqueInput2ᚖappᚋentᚐMiauWhereUniqueInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8517,6 +14253,529 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.DefaultRole = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCycleOrder(ctx context.Context, obj any) (ent.CycleOrder, error) {
+	var it ent.CycleOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNCycleOrderField2ᚖappᚋentᚐCycleOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCycleWhereInput(ctx context.Context, obj any) (ent.CycleWhereInput, error) {
+	var it ent.CycleWhereInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameIsNil", "nameNotNil", "nameEqualFold", "nameContainsFold", "entityState", "entityStateNEQ", "entityStateIn", "entityStateNotIn", "entityStateIsNil", "entityStateNotNil", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith", "hasAdminCreatedBy", "hasAdminCreatedByWith", "hasAdminUpdatedBy", "hasAdminUpdatedByWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOCycleWhereInput2ᚖappᚋentᚐCycleWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOCycleWhereInput2ᚕᚖappᚋentᚐCycleWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOCycleWhereInput2ᚕᚖappᚋentᚐCycleWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "idNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNEQ = data
+		case "idIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDIn = data
+		case "idNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNotIn = data
+		case "idGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGT = data
+		case "idGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGTE = data
+		case "idLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLT = data
+		case "idLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLTE = data
+		case "idEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idEqualFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDEqualFold = data
+		case "idContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idContainsFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDContainsFold = data
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "createdAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNEQ = data
+		case "createdAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIn = data
+		case "createdAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotIn = data
+		case "createdAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGT = data
+		case "createdAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGTE = data
+		case "createdAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLT = data
+		case "createdAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLTE = data
+		case "createdAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIsNil = data
+		case "createdAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotNil = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "updatedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNEQ = data
+		case "updatedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIn = data
+		case "updatedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotIn = data
+		case "updatedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGT = data
+		case "updatedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGTE = data
+		case "updatedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLT = data
+		case "updatedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLTE = data
+		case "updatedAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIsNil = data
+		case "updatedAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotNil = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "nameNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNEQ = data
+		case "nameIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIn = data
+		case "nameNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotIn = data
+		case "nameGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGT = data
+		case "nameGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGTE = data
+		case "nameLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLT = data
+		case "nameLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLTE = data
+		case "nameContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContains = data
+		case "nameHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasPrefix = data
+		case "nameHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasSuffix = data
+		case "nameIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIsNil = data
+		case "nameNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotNil = data
+		case "nameEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameEqualFold = data
+		case "nameContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContainsFold = data
+		case "entityState":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityState"))
+			data, err := ec.unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityState = data
+		case "entityStateNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateNEQ"))
+			data, err := ec.unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateNEQ = data
+		case "entityStateIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateIn"))
+			data, err := ec.unmarshalOEntityState2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityStateᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateIn = data
+		case "entityStateNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateNotIn"))
+			data, err := ec.unmarshalOEntityState2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityStateᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateNotIn = data
+		case "entityStateIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateIsNil = data
+		case "entityStateNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateNotNil = data
+		case "hasCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedBy = data
+		case "hasCreatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖappᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedByWith = data
+		case "hasUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedBy = data
+		case "hasUpdatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖappᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedByWith = data
+		case "hasAdminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminCreatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAdminCreatedBy = data
+		case "hasAdminCreatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminCreatedByWith"))
+			data, err := ec.unmarshalOAdminUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.CycleWhereInput().HasAdminCreatedByWith(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "hasAdminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAdminUpdatedBy = data
+		case "hasAdminUpdatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminUpdatedByWith"))
+			data, err := ec.unmarshalOAdminUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.CycleWhereInput().HasAdminUpdatedByWith(ctx, &it, data); err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCycleWhereUniqueInput(ctx context.Context, obj any) (ent.CycleWhereUniqueInput, error) {
+	var it ent.CycleWhereUniqueInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
 		}
 	}
 
@@ -9240,6 +15499,1010 @@ func (ec *executionContext) unmarshalInputForPermissionWhereUniqueInput(ctx cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputLifeCycleNotOrder(ctx context.Context, obj any) (ent.LifeCycleNotOrder, error) {
+	var it ent.LifeCycleNotOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNLifeCycleNotOrderField2ᚖappᚋentᚐLifeCycleNotOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputLifeCycleNotWhereInput(ctx context.Context, obj any) (ent.LifeCycleNotWhereInput, error) {
+	var it ent.LifeCycleNotWhereInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameIsNil", "nameNotNil", "nameEqualFold", "nameContainsFold", "entityState", "entityStateNEQ", "entityStateIn", "entityStateNotIn", "entityStateIsNil", "entityStateNotNil", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith", "hasAdminCreatedBy", "hasAdminCreatedByWith", "hasAdminUpdatedBy", "hasAdminUpdatedByWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOLifeCycleNotWhereInput2ᚖappᚋentᚐLifeCycleNotWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOLifeCycleNotWhereInput2ᚕᚖappᚋentᚐLifeCycleNotWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOLifeCycleNotWhereInput2ᚕᚖappᚋentᚐLifeCycleNotWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "idNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNEQ = data
+		case "idIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDIn = data
+		case "idNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNotIn = data
+		case "idGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGT = data
+		case "idGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGTE = data
+		case "idLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLT = data
+		case "idLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLTE = data
+		case "idEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idEqualFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDEqualFold = data
+		case "idContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idContainsFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDContainsFold = data
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "createdAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNEQ = data
+		case "createdAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIn = data
+		case "createdAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotIn = data
+		case "createdAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGT = data
+		case "createdAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGTE = data
+		case "createdAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLT = data
+		case "createdAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLTE = data
+		case "createdAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIsNil = data
+		case "createdAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotNil = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "updatedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNEQ = data
+		case "updatedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIn = data
+		case "updatedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotIn = data
+		case "updatedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGT = data
+		case "updatedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGTE = data
+		case "updatedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLT = data
+		case "updatedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLTE = data
+		case "updatedAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIsNil = data
+		case "updatedAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotNil = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "nameNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNEQ = data
+		case "nameIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIn = data
+		case "nameNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotIn = data
+		case "nameGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGT = data
+		case "nameGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGTE = data
+		case "nameLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLT = data
+		case "nameLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLTE = data
+		case "nameContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContains = data
+		case "nameHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasPrefix = data
+		case "nameHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasSuffix = data
+		case "nameIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIsNil = data
+		case "nameNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotNil = data
+		case "nameEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameEqualFold = data
+		case "nameContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContainsFold = data
+		case "entityState":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityState"))
+			data, err := ec.unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityState = data
+		case "entityStateNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateNEQ"))
+			data, err := ec.unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateNEQ = data
+		case "entityStateIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateIn"))
+			data, err := ec.unmarshalOEntityState2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityStateᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateIn = data
+		case "entityStateNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateNotIn"))
+			data, err := ec.unmarshalOEntityState2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityStateᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateNotIn = data
+		case "entityStateIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateIsNil = data
+		case "entityStateNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityStateNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EntityStateNotNil = data
+		case "hasCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedBy = data
+		case "hasCreatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖappᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedByWith = data
+		case "hasUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedBy = data
+		case "hasUpdatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖappᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedByWith = data
+		case "hasAdminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminCreatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAdminCreatedBy = data
+		case "hasAdminCreatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminCreatedByWith"))
+			data, err := ec.unmarshalOAdminUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.LifeCycleNotWhereInput().HasAdminCreatedByWith(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "hasAdminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAdminUpdatedBy = data
+		case "hasAdminUpdatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminUpdatedByWith"))
+			data, err := ec.unmarshalOAdminUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.LifeCycleNotWhereInput().HasAdminUpdatedByWith(ctx, &it, data); err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputLifeCycleNotWhereUniqueInput(ctx context.Context, obj any) (ent.LifeCycleNotWhereUniqueInput, error) {
+	var it ent.LifeCycleNotWhereUniqueInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputMiauOrder(ctx context.Context, obj any) (ent.MiauOrder, error) {
+	var it ent.MiauOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNMiauOrderField2ᚖappᚋentᚐMiauOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputMiauWhereInput(ctx context.Context, obj any) (ent.MiauWhereInput, error) {
+	var it ent.MiauWhereInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameIsNil", "nameNotNil", "nameEqualFold", "nameContainsFold", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith", "hasAdminCreatedBy", "hasAdminCreatedByWith", "hasAdminUpdatedBy", "hasAdminUpdatedByWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOMiauWhereInput2ᚖappᚋentᚐMiauWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOMiauWhereInput2ᚕᚖappᚋentᚐMiauWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOMiauWhereInput2ᚕᚖappᚋentᚐMiauWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "idNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNEQ = data
+		case "idIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDIn = data
+		case "idNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNotIn = data
+		case "idGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGT = data
+		case "idGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGTE = data
+		case "idLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLT = data
+		case "idLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLTE = data
+		case "idEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idEqualFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDEqualFold = data
+		case "idContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idContainsFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDContainsFold = data
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "createdAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNEQ = data
+		case "createdAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIn = data
+		case "createdAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotIn = data
+		case "createdAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGT = data
+		case "createdAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGTE = data
+		case "createdAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLT = data
+		case "createdAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLTE = data
+		case "createdAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIsNil = data
+		case "createdAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotNil = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "updatedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNEQ"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNEQ = data
+		case "updatedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIn = data
+		case "updatedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotIn"))
+			data, err := ec.unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotIn = data
+		case "updatedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGT = data
+		case "updatedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGTE = data
+		case "updatedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLT"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLT = data
+		case "updatedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLTE"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLTE = data
+		case "updatedAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIsNil = data
+		case "updatedAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotNil = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "nameNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNEQ = data
+		case "nameIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIn = data
+		case "nameNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotIn = data
+		case "nameGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGT = data
+		case "nameGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGTE = data
+		case "nameLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLT = data
+		case "nameLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLTE = data
+		case "nameContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContains = data
+		case "nameHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasPrefix = data
+		case "nameHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasSuffix = data
+		case "nameIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIsNil = data
+		case "nameNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotNil = data
+		case "nameEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameEqualFold = data
+		case "nameContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContainsFold = data
+		case "hasCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedBy = data
+		case "hasCreatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖappᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasCreatedByWith = data
+		case "hasUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedBy = data
+		case "hasUpdatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUpdatedByWith"))
+			data, err := ec.unmarshalOUserWhereInput2ᚕᚖappᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasUpdatedByWith = data
+		case "hasAdminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminCreatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAdminCreatedBy = data
+		case "hasAdminCreatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminCreatedByWith"))
+			data, err := ec.unmarshalOAdminUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.MiauWhereInput().HasAdminCreatedByWith(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "hasAdminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAdminUpdatedBy = data
+		case "hasAdminUpdatedByWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAdminUpdatedByWith"))
+			data, err := ec.unmarshalOAdminUserWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.MiauWhereInput().HasAdminUpdatedByWith(ctx, &it, data); err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputMiauWhereUniqueInput(ctx context.Context, obj any) (ent.MiauWhereUniqueInput, error) {
+	var it ent.MiauWhereUniqueInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRoleOrder(ctx context.Context, obj any) (ent1.RoleOrder, error) {
 	var it ent1.RoleOrder
 	asMap := map[string]any{}
@@ -9530,6 +16793,96 @@ func (ec *executionContext) unmarshalInputRoleWhereUniqueInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateCycleInput(ctx context.Context, obj any) (ent.UpdateCycleInput, error) {
+	var it ent.UpdateCycleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "name", "clearName", "createdBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "clearCreatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCreatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "clearUpdatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUpdatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "clearName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearName"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearName = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖappᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖappᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "adminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedBy"))
+			data, err := ec.unmarshalOUpdateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminCreatedBy = data
+		case "adminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminUpdatedBy"))
+			data, err := ec.unmarshalOUpdateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminUpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateForPermissionInput(ctx context.Context, obj any) (ent.UpdateForPermissionInput, error) {
 	var it ent.UpdateForPermissionInput
 	asMap := map[string]any{}
@@ -9648,6 +17001,96 @@ func (ec *executionContext) unmarshalInputUpdateForPermissionInput(ctx context.C
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateLifeCycleNotInput(ctx context.Context, obj any) (ent.UpdateLifeCycleNotInput, error) {
+	var it ent.UpdateLifeCycleNotInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "name", "clearName", "createdBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "clearCreatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCreatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "clearUpdatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUpdatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "clearName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearName"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearName = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖappᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖappᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "adminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedBy"))
+			data, err := ec.unmarshalOUpdateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminCreatedBy = data
+		case "adminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminUpdatedBy"))
+			data, err := ec.unmarshalOUpdateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminUpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateManyAdminUserInput(ctx context.Context, obj any) (ent1.UpdateManyAdminUserInput, error) {
 	var it ent1.UpdateManyAdminUserInput
 	asMap := map[string]any{}
@@ -9672,6 +17115,54 @@ func (ec *executionContext) unmarshalInputUpdateManyAdminUserInput(ctx context.C
 		case "disconnect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
 			data, err := ec.unmarshalOAdminUserWhereUniqueInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Disconnect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateManyCycleInput(ctx context.Context, obj any) (ent.UpdateManyCycleInput, error) {
+	var it ent.UpdateManyCycleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "disconnect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateCycleInput2ᚕᚖappᚋentᚐCreateCycleInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOCycleWhereUniqueInput2ᚕᚖappᚋentᚐCycleWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOCycleWhereUniqueInput2ᚕᚖappᚋentᚐCycleWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
+		case "disconnect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
+			data, err := ec.unmarshalOCycleWhereUniqueInput2ᚕᚖappᚋentᚐCycleWhereUniqueInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9778,6 +17269,102 @@ func (ec *executionContext) unmarshalInputUpdateManyForPermissionInput(ctx conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateManyLifeCycleNotInput(ctx context.Context, obj any) (ent.UpdateManyLifeCycleNotInput, error) {
+	var it ent.UpdateManyLifeCycleNotInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "disconnect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateLifeCycleNotInput2ᚕᚖappᚋentᚐCreateLifeCycleNotInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOLifeCycleNotWhereUniqueInput2ᚕᚖappᚋentᚐLifeCycleNotWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOLifeCycleNotWhereUniqueInput2ᚕᚖappᚋentᚐLifeCycleNotWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
+		case "disconnect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
+			data, err := ec.unmarshalOLifeCycleNotWhereUniqueInput2ᚕᚖappᚋentᚐLifeCycleNotWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Disconnect = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateManyMiauInput(ctx context.Context, obj any) (ent.UpdateManyMiauInput, error) {
+	var it ent.UpdateManyMiauInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "disconnect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateMiauInput2ᚕᚖappᚋentᚐCreateMiauInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOMiauWhereUniqueInput2ᚕᚖappᚋentᚐMiauWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOMiauWhereUniqueInput2ᚕᚖappᚋentᚐMiauWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
+		case "disconnect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("disconnect"))
+			data, err := ec.unmarshalOMiauWhereUniqueInput2ᚕᚖappᚋentᚐMiauWhereUniqueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Disconnect = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateManyRoleInput(ctx context.Context, obj any) (ent1.UpdateManyRoleInput, error) {
 	var it ent1.UpdateManyRoleInput
 	asMap := map[string]any{}
@@ -9860,6 +17447,96 @@ func (ec *executionContext) unmarshalInputUpdateManyUserInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateMiauInput(ctx context.Context, obj any) (ent.UpdateMiauInput, error) {
+	var it ent.UpdateMiauInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "name", "clearName", "createdBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "clearCreatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCreatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalODateTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "clearUpdatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUpdatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUpdatedAt = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "clearName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearName"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearName = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖappᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOUpdateOneUserInput2ᚖappᚋentᚐUpdateOneUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "adminCreatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedBy"))
+			data, err := ec.unmarshalOUpdateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminCreatedBy = data
+		case "adminUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminUpdatedBy"))
+			data, err := ec.unmarshalOUpdateOneAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateOneAdminUserInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AdminUpdatedBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateOneAdminUserInput(ctx context.Context, obj any) (ent1.UpdateOneAdminUserInput, error) {
 	var it ent1.UpdateOneAdminUserInput
 	asMap := map[string]any{}
@@ -9881,6 +17558,54 @@ func (ec *executionContext) unmarshalInputUpdateOneAdminUserInput(ctx context.Co
 				return it, err
 			}
 			it.Connect = data
+		case "unset":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Unset = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateOneCycleInput(ctx context.Context, obj any) (ent.UpdateOneCycleInput, error) {
+	var it ent.UpdateOneCycleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "unset"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateCycleInput2ᚖappᚋentᚐCreateCycleInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOCycleWhereUniqueInput2ᚖappᚋentᚐCycleWhereUniqueInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
 		case "unset":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -9966,6 +17691,102 @@ func (ec *executionContext) unmarshalInputUpdateOneForPermissionInput(ctx contex
 		case "connect":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
 			data, err := ec.unmarshalOForPermissionWhereUniqueInput2ᚖappᚋentᚐForPermissionWhereUniqueInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
+		case "unset":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Unset = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateOneLifeCycleNotInput(ctx context.Context, obj any) (ent.UpdateOneLifeCycleNotInput, error) {
+	var it ent.UpdateOneLifeCycleNotInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "unset"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateLifeCycleNotInput2ᚖappᚋentᚐCreateLifeCycleNotInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOLifeCycleNotWhereUniqueInput2ᚖappᚋentᚐLifeCycleNotWhereUniqueInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Connect = data
+		case "delete":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Delete = data
+		case "unset":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unset"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Unset = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateOneMiauInput(ctx context.Context, obj any) (ent.UpdateOneMiauInput, error) {
+	var it ent.UpdateOneMiauInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"create", "connect", "delete", "unset"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "create":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			data, err := ec.unmarshalOCreateMiauInput2ᚖappᚋentᚐCreateMiauInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Create = data
+		case "connect":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("connect"))
+			data, err := ec.unmarshalOMiauWhereUniqueInput2ᚖappᚋentᚐMiauWhereUniqueInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10677,6 +18498,16 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Permission(ctx, sel, obj)
+	case *ent.Miau:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Miau(ctx, sel, obj)
+	case *ent.LifeCycleNot:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._LifeCycleNot(ctx, sel, obj)
 	case *ent.ForPermission:
 		if obj == nil {
 			return graphql.Null
@@ -10687,6 +18518,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._File(ctx, sel, obj)
+	case *ent.Cycle:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Cycle(ctx, sel, obj)
 	case *ent1.AdminUser:
 		if obj == nil {
 			return graphql.Null
@@ -10879,6 +18715,272 @@ func (ec *executionContext) _AdminUser(ctx context.Context, sel ast.SelectionSet
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cycleImplementors = []string{"Cycle", "Node"}
+
+func (ec *executionContext) _Cycle(ctx context.Context, sel ast.SelectionSet, obj *ent.Cycle) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cycleImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Cycle")
+		case "id":
+			out.Values[i] = ec._Cycle_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._Cycle_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Cycle_updatedAt(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Cycle_name(ctx, field, obj)
+		case "entityState":
+			out.Values[i] = ec._Cycle_entityState(ctx, field, obj)
+		case "createdBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Cycle_createdBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "updatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Cycle_updatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "adminCreatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Cycle_adminCreatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "adminUpdatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Cycle_adminUpdatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cycleConnectionImplementors = []string{"CycleConnection"}
+
+func (ec *executionContext) _CycleConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.CycleConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cycleConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CycleConnection")
+		case "edges":
+			out.Values[i] = ec._CycleConnection_edges(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._CycleConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._CycleConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cycleEdgeImplementors = []string{"CycleEdge"}
+
+func (ec *executionContext) _CycleEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.CycleEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cycleEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CycleEdge")
+		case "node":
+			out.Values[i] = ec._CycleEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._CycleEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11306,6 +19408,536 @@ func (ec *executionContext) _ForPermissionEdge(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var lifeCycleNotImplementors = []string{"LifeCycleNot", "Node"}
+
+func (ec *executionContext) _LifeCycleNot(ctx context.Context, sel ast.SelectionSet, obj *ent.LifeCycleNot) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, lifeCycleNotImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LifeCycleNot")
+		case "id":
+			out.Values[i] = ec._LifeCycleNot_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._LifeCycleNot_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._LifeCycleNot_updatedAt(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._LifeCycleNot_name(ctx, field, obj)
+		case "entityState":
+			out.Values[i] = ec._LifeCycleNot_entityState(ctx, field, obj)
+		case "createdBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LifeCycleNot_createdBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "updatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LifeCycleNot_updatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "adminCreatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LifeCycleNot_adminCreatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "adminUpdatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LifeCycleNot_adminUpdatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var lifeCycleNotConnectionImplementors = []string{"LifeCycleNotConnection"}
+
+func (ec *executionContext) _LifeCycleNotConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.LifeCycleNotConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, lifeCycleNotConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LifeCycleNotConnection")
+		case "edges":
+			out.Values[i] = ec._LifeCycleNotConnection_edges(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._LifeCycleNotConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._LifeCycleNotConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var lifeCycleNotEdgeImplementors = []string{"LifeCycleNotEdge"}
+
+func (ec *executionContext) _LifeCycleNotEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.LifeCycleNotEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, lifeCycleNotEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LifeCycleNotEdge")
+		case "node":
+			out.Values[i] = ec._LifeCycleNotEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._LifeCycleNotEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var miauImplementors = []string{"Miau", "Node"}
+
+func (ec *executionContext) _Miau(ctx context.Context, sel ast.SelectionSet, obj *ent.Miau) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, miauImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Miau")
+		case "id":
+			out.Values[i] = ec._Miau_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._Miau_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Miau_updatedAt(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Miau_name(ctx, field, obj)
+		case "createdBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Miau_createdBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "updatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Miau_updatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "adminCreatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Miau_adminCreatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "adminUpdatedBy":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Miau_adminUpdatedBy(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var miauConnectionImplementors = []string{"MiauConnection"}
+
+func (ec *executionContext) _MiauConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.MiauConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, miauConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MiauConnection")
+		case "edges":
+			out.Values[i] = ec._MiauConnection_edges(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._MiauConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._MiauConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var miauEdgeImplementors = []string{"MiauEdge"}
+
+func (ec *executionContext) _MiauEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.MiauEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, miauEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MiauEdge")
+		case "node":
+			out.Values[i] = ec._MiauEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._MiauEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -11325,6 +19957,69 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "createCycle":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createCycle(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createManyCycles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createManyCycles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateCycle":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCycle(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateCycleState":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCycleState(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateManyCycles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateManyCycles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertCycle":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertCycle(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertManyCycles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertManyCycles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteCycle":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteCycle(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteManyCycles":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteManyCycles(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createForPermission":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createForPermission(ctx, field)
@@ -11377,6 +20072,125 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteManyForPermissions":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteManyForPermissions(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createLifeCycleNot":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createLifeCycleNot(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createManyLifeCycleNots":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createManyLifeCycleNots(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateLifeCycleNot":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateLifeCycleNot(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateLifeCycleNotState":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateLifeCycleNotState(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateManyLifeCycleNots":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateManyLifeCycleNots(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertLifeCycleNot":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertLifeCycleNot(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertManyLifeCycleNots":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertManyLifeCycleNots(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteLifeCycleNot":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteLifeCycleNot(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteManyLifeCycleNots":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteManyLifeCycleNots(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createMiau":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createMiau(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createManyMiaus":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createManyMiaus(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateMiau":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateMiau(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateManyMiaus":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateManyMiaus(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertMiau":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertMiau(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "upsertManyMiaus":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_upsertManyMiaus(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMiau":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMiau(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteManyMiaus":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteManyMiaus(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -11720,6 +20534,47 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cycles":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cycles(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cyclesConnection":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cyclesConnection(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "forPermissions":
 			field := field
 
@@ -11749,6 +20604,88 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_forPermissionsConnection(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "lifeCycleNots":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_lifeCycleNots(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "lifeCycleNotsConnection":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_lifeCycleNotsConnection(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "miaus":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_miaus(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "miausConnection":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_miausConnection(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -12751,6 +21688,31 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreateCycleInput2appᚋentᚐCreateCycleInput(ctx context.Context, v any) (ent.CreateCycleInput, error) {
+	res, err := ec.unmarshalInputCreateCycleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateCycleInput2ᚕᚖappᚋentᚐCreateCycleInputᚄ(ctx context.Context, v any) ([]*ent.CreateCycleInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateCycleInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateCycleInput2ᚖappᚋentᚐCreateCycleInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateCycleInput2ᚖappᚋentᚐCreateCycleInput(ctx context.Context, v any) (*ent.CreateCycleInput, error) {
+	res, err := ec.unmarshalInputCreateCycleInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateFileInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateFileInput(ctx context.Context, v any) (*ent1.CreateFileInput, error) {
 	res, err := ec.unmarshalInputCreateFileInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -12778,6 +21740,56 @@ func (ec *executionContext) unmarshalNCreateForPermissionInput2ᚕᚖappᚋent�
 
 func (ec *executionContext) unmarshalNCreateForPermissionInput2ᚖappᚋentᚐCreateForPermissionInput(ctx context.Context, v any) (*ent.CreateForPermissionInput, error) {
 	res, err := ec.unmarshalInputCreateForPermissionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateLifeCycleNotInput2appᚋentᚐCreateLifeCycleNotInput(ctx context.Context, v any) (ent.CreateLifeCycleNotInput, error) {
+	res, err := ec.unmarshalInputCreateLifeCycleNotInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateLifeCycleNotInput2ᚕᚖappᚋentᚐCreateLifeCycleNotInputᚄ(ctx context.Context, v any) ([]*ent.CreateLifeCycleNotInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateLifeCycleNotInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateLifeCycleNotInput2ᚖappᚋentᚐCreateLifeCycleNotInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateLifeCycleNotInput2ᚖappᚋentᚐCreateLifeCycleNotInput(ctx context.Context, v any) (*ent.CreateLifeCycleNotInput, error) {
+	res, err := ec.unmarshalInputCreateLifeCycleNotInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateMiauInput2appᚋentᚐCreateMiauInput(ctx context.Context, v any) (ent.CreateMiauInput, error) {
+	res, err := ec.unmarshalInputCreateMiauInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateMiauInput2ᚕᚖappᚋentᚐCreateMiauInputᚄ(ctx context.Context, v any) ([]*ent.CreateMiauInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateMiauInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateMiauInput2ᚖappᚋentᚐCreateMiauInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateMiauInput2ᚖappᚋentᚐCreateMiauInput(ctx context.Context, v any) (*ent.CreateMiauInput, error) {
+	res, err := ec.unmarshalInputCreateMiauInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -12816,6 +21828,108 @@ func (ec *executionContext) marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCurso
 	return v
 }
 
+func (ec *executionContext) marshalNCycle2appᚋentᚐCycle(ctx context.Context, sel ast.SelectionSet, v ent.Cycle) graphql.Marshaler {
+	return ec._Cycle(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCycle2ᚕᚖappᚋentᚐCycle(ctx context.Context, sel ast.SelectionSet, v []*ent.Cycle) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCycle2ᚖappᚋentᚐCycle(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCycle2ᚖappᚋentᚐCycle(ctx context.Context, sel ast.SelectionSet, v *ent.Cycle) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Cycle(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCycleConnection2appᚋentᚐCycleConnection(ctx context.Context, sel ast.SelectionSet, v ent.CycleConnection) graphql.Marshaler {
+	return ec._CycleConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCycleConnection2ᚖappᚋentᚐCycleConnection(ctx context.Context, sel ast.SelectionSet, v *ent.CycleConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CycleConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCycleOrderField2ᚖappᚋentᚐCycleOrderField(ctx context.Context, v any) (*ent.CycleOrderField, error) {
+	var res = new(ent.CycleOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCycleOrderField2ᚖappᚋentᚐCycleOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.CycleOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalNCycleWhereInput2appᚋentᚐCycleWhereInput(ctx context.Context, v any) (ent.CycleWhereInput, error) {
+	res, err := ec.unmarshalInputCycleWhereInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCycleWhereInput2ᚖappᚋentᚐCycleWhereInput(ctx context.Context, v any) (*ent.CycleWhereInput, error) {
+	res, err := ec.unmarshalInputCycleWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCycleWhereUniqueInput2appᚋentᚐCycleWhereUniqueInput(ctx context.Context, v any) (ent.CycleWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputCycleWhereUniqueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCycleWhereUniqueInput2ᚖappᚋentᚐCycleWhereUniqueInput(ctx context.Context, v any) (*ent.CycleWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputCycleWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNDateTime2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
 	res, err := date.UnmarshalDateTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -12830,6 +21944,16 @@ func (ec *executionContext) marshalNDateTime2timeᚐTime(ctx context.Context, se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, v any) (entity.EntityState, error) {
+	var res entity.EntityState
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, sel ast.SelectionSet, v entity.EntityState) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNFileWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐFileWhereInput(ctx context.Context, v any) (*ent1.FileWhereInput, error) {
@@ -13022,6 +22146,210 @@ func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) marshalNLifeCycleNot2appᚋentᚐLifeCycleNot(ctx context.Context, sel ast.SelectionSet, v ent.LifeCycleNot) graphql.Marshaler {
+	return ec._LifeCycleNot(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNLifeCycleNot2ᚕᚖappᚋentᚐLifeCycleNot(ctx context.Context, sel ast.SelectionSet, v []*ent.LifeCycleNot) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOLifeCycleNot2ᚖappᚋentᚐLifeCycleNot(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalNLifeCycleNot2ᚖappᚋentᚐLifeCycleNot(ctx context.Context, sel ast.SelectionSet, v *ent.LifeCycleNot) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LifeCycleNot(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNLifeCycleNotConnection2appᚋentᚐLifeCycleNotConnection(ctx context.Context, sel ast.SelectionSet, v ent.LifeCycleNotConnection) graphql.Marshaler {
+	return ec._LifeCycleNotConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNLifeCycleNotConnection2ᚖappᚋentᚐLifeCycleNotConnection(ctx context.Context, sel ast.SelectionSet, v *ent.LifeCycleNotConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LifeCycleNotConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNLifeCycleNotOrderField2ᚖappᚋentᚐLifeCycleNotOrderField(ctx context.Context, v any) (*ent.LifeCycleNotOrderField, error) {
+	var res = new(ent.LifeCycleNotOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLifeCycleNotOrderField2ᚖappᚋentᚐLifeCycleNotOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.LifeCycleNotOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalNLifeCycleNotWhereInput2appᚋentᚐLifeCycleNotWhereInput(ctx context.Context, v any) (ent.LifeCycleNotWhereInput, error) {
+	res, err := ec.unmarshalInputLifeCycleNotWhereInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNLifeCycleNotWhereInput2ᚖappᚋentᚐLifeCycleNotWhereInput(ctx context.Context, v any) (*ent.LifeCycleNotWhereInput, error) {
+	res, err := ec.unmarshalInputLifeCycleNotWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNLifeCycleNotWhereUniqueInput2appᚋentᚐLifeCycleNotWhereUniqueInput(ctx context.Context, v any) (ent.LifeCycleNotWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputLifeCycleNotWhereUniqueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNLifeCycleNotWhereUniqueInput2ᚖappᚋentᚐLifeCycleNotWhereUniqueInput(ctx context.Context, v any) (*ent.LifeCycleNotWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputLifeCycleNotWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMiau2appᚋentᚐMiau(ctx context.Context, sel ast.SelectionSet, v ent.Miau) graphql.Marshaler {
+	return ec._Miau(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMiau2ᚕᚖappᚋentᚐMiau(ctx context.Context, sel ast.SelectionSet, v []*ent.Miau) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMiau2ᚖappᚋentᚐMiau(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMiau2ᚖappᚋentᚐMiau(ctx context.Context, sel ast.SelectionSet, v *ent.Miau) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Miau(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMiauConnection2appᚋentᚐMiauConnection(ctx context.Context, sel ast.SelectionSet, v ent.MiauConnection) graphql.Marshaler {
+	return ec._MiauConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMiauConnection2ᚖappᚋentᚐMiauConnection(ctx context.Context, sel ast.SelectionSet, v *ent.MiauConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MiauConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNMiauOrderField2ᚖappᚋentᚐMiauOrderField(ctx context.Context, v any) (*ent.MiauOrderField, error) {
+	var res = new(ent.MiauOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMiauOrderField2ᚖappᚋentᚐMiauOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.MiauOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalNMiauWhereInput2appᚋentᚐMiauWhereInput(ctx context.Context, v any) (ent.MiauWhereInput, error) {
+	res, err := ec.unmarshalInputMiauWhereInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNMiauWhereInput2ᚖappᚋentᚐMiauWhereInput(ctx context.Context, v any) (*ent.MiauWhereInput, error) {
+	res, err := ec.unmarshalInputMiauWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNMiauWhereUniqueInput2appᚋentᚐMiauWhereUniqueInput(ctx context.Context, v any) (ent.MiauWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputMiauWhereUniqueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNMiauWhereUniqueInput2ᚖappᚋentᚐMiauWhereUniqueInput(ctx context.Context, v any) (*ent.MiauWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputMiauWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNNode2ᚕappᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v []ent.Noder) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -13136,8 +22464,23 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNUpdateCycleInput2appᚋentᚐUpdateCycleInput(ctx context.Context, v any) (ent.UpdateCycleInput, error) {
+	res, err := ec.unmarshalInputUpdateCycleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateForPermissionInput2appᚋentᚐUpdateForPermissionInput(ctx context.Context, v any) (ent.UpdateForPermissionInput, error) {
 	res, err := ec.unmarshalInputUpdateForPermissionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateLifeCycleNotInput2appᚋentᚐUpdateLifeCycleNotInput(ctx context.Context, v any) (ent.UpdateLifeCycleNotInput, error) {
+	res, err := ec.unmarshalInputUpdateLifeCycleNotInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateMiauInput2appᚋentᚐUpdateMiauInput(ctx context.Context, v any) (ent.UpdateMiauInput, error) {
+	res, err := ec.unmarshalInputUpdateMiauInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -13637,6 +22980,32 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOCreateCycleInput2ᚕᚖappᚋentᚐCreateCycleInputᚄ(ctx context.Context, v any) ([]*ent.CreateCycleInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateCycleInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateCycleInput2ᚖappᚋentᚐCreateCycleInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCreateCycleInput2ᚖappᚋentᚐCreateCycleInput(ctx context.Context, v any) (*ent.CreateCycleInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateCycleInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOCreateFileInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateFileInputᚄ(ctx context.Context, v any) ([]*ent1.CreateFileInput, error) {
 	if v == nil {
 		return nil, nil
@@ -13689,6 +23058,32 @@ func (ec *executionContext) unmarshalOCreateForPermissionInput2ᚖappᚋentᚐCr
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOCreateLifeCycleNotInput2ᚕᚖappᚋentᚐCreateLifeCycleNotInputᚄ(ctx context.Context, v any) ([]*ent.CreateLifeCycleNotInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateLifeCycleNotInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateLifeCycleNotInput2ᚖappᚋentᚐCreateLifeCycleNotInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCreateLifeCycleNotInput2ᚖappᚋentᚐCreateLifeCycleNotInput(ctx context.Context, v any) (*ent.CreateLifeCycleNotInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateLifeCycleNotInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOCreateManyRoleInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateManyRoleInput(ctx context.Context, v any) (*ent1.CreateManyRoleInput, error) {
 	if v == nil {
 		return nil, nil
@@ -13702,6 +23097,32 @@ func (ec *executionContext) unmarshalOCreateManyUserInput2ᚖappᚋentᚐCreateM
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputCreateManyUserInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOCreateMiauInput2ᚕᚖappᚋentᚐCreateMiauInputᚄ(ctx context.Context, v any) ([]*ent.CreateMiauInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateMiauInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateMiauInput2ᚖappᚋentᚐCreateMiauInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCreateMiauInput2ᚖappᚋentᚐCreateMiauInput(ctx context.Context, v any) (*ent.CreateMiauInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateMiauInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -13771,6 +23192,168 @@ func (ec *executionContext) marshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCu
 	return v
 }
 
+func (ec *executionContext) marshalOCycle2ᚕᚖappᚋentᚐCycleᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Cycle) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCycle2ᚖappᚋentᚐCycle(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOCycle2ᚖappᚋentᚐCycle(ctx context.Context, sel ast.SelectionSet, v *ent.Cycle) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Cycle(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCycleEdge2ᚕᚖappᚋentᚐCycleEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CycleEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCycleEdge2ᚖappᚋentᚐCycleEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOCycleEdge2ᚖappᚋentᚐCycleEdge(ctx context.Context, sel ast.SelectionSet, v *ent.CycleEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CycleEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOCycleOrder2ᚖappᚋentᚐCycleOrder(ctx context.Context, v any) (*ent.CycleOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCycleOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOCycleWhereInput2ᚕᚖappᚋentᚐCycleWhereInputᚄ(ctx context.Context, v any) ([]*ent.CycleWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CycleWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCycleWhereInput2ᚖappᚋentᚐCycleWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCycleWhereInput2ᚖappᚋentᚐCycleWhereInput(ctx context.Context, v any) (*ent.CycleWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCycleWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOCycleWhereUniqueInput2ᚕᚖappᚋentᚐCycleWhereUniqueInputᚄ(ctx context.Context, v any) ([]*ent.CycleWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CycleWhereUniqueInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCycleWhereUniqueInput2ᚖappᚋentᚐCycleWhereUniqueInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCycleWhereUniqueInput2ᚖappᚋentᚐCycleWhereUniqueInput(ctx context.Context, v any) (*ent.CycleWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCycleWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalODateTime2ᚕtimeᚐTimeᚄ(ctx context.Context, v any) ([]time.Time, error) {
 	if v == nil {
 		return nil, nil
@@ -13823,6 +23406,97 @@ func (ec *executionContext) marshalODateTime2ᚖtimeᚐTime(ctx context.Context,
 	_ = ctx
 	res := date.MarshalDateTime(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, v any) (entity.EntityState, error) {
+	var res entity.EntityState
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, sel ast.SelectionSet, v entity.EntityState) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalOEntityState2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityStateᚄ(ctx context.Context, v any) ([]entity.EntityState, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]entity.EntityState, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOEntityState2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityStateᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.EntityState) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEntityState2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, v any) (*entity.EntityState, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(entity.EntityState)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, sel ast.SelectionSet, v *entity.EntityState) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOFileWhereInput2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐFileWhereInputᚄ(ctx context.Context, v any) ([]*ent1.FileWhereInput, error) {
@@ -14145,6 +23819,330 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	_ = ctx
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOLifeCycleNot2ᚕᚖappᚋentᚐLifeCycleNotᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.LifeCycleNot) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLifeCycleNot2ᚖappᚋentᚐLifeCycleNot(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOLifeCycleNot2ᚖappᚋentᚐLifeCycleNot(ctx context.Context, sel ast.SelectionSet, v *ent.LifeCycleNot) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._LifeCycleNot(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOLifeCycleNotEdge2ᚕᚖappᚋentᚐLifeCycleNotEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.LifeCycleNotEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOLifeCycleNotEdge2ᚖappᚋentᚐLifeCycleNotEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOLifeCycleNotEdge2ᚖappᚋentᚐLifeCycleNotEdge(ctx context.Context, sel ast.SelectionSet, v *ent.LifeCycleNotEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._LifeCycleNotEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOLifeCycleNotOrder2ᚖappᚋentᚐLifeCycleNotOrder(ctx context.Context, v any) (*ent.LifeCycleNotOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputLifeCycleNotOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOLifeCycleNotWhereInput2ᚕᚖappᚋentᚐLifeCycleNotWhereInputᚄ(ctx context.Context, v any) ([]*ent.LifeCycleNotWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.LifeCycleNotWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNLifeCycleNotWhereInput2ᚖappᚋentᚐLifeCycleNotWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOLifeCycleNotWhereInput2ᚖappᚋentᚐLifeCycleNotWhereInput(ctx context.Context, v any) (*ent.LifeCycleNotWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputLifeCycleNotWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOLifeCycleNotWhereUniqueInput2ᚕᚖappᚋentᚐLifeCycleNotWhereUniqueInputᚄ(ctx context.Context, v any) ([]*ent.LifeCycleNotWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.LifeCycleNotWhereUniqueInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNLifeCycleNotWhereUniqueInput2ᚖappᚋentᚐLifeCycleNotWhereUniqueInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOLifeCycleNotWhereUniqueInput2ᚖappᚋentᚐLifeCycleNotWhereUniqueInput(ctx context.Context, v any) (*ent.LifeCycleNotWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputLifeCycleNotWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMiau2ᚕᚖappᚋentᚐMiauᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Miau) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMiau2ᚖappᚋentᚐMiau(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMiau2ᚖappᚋentᚐMiau(ctx context.Context, sel ast.SelectionSet, v *ent.Miau) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Miau(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMiauEdge2ᚕᚖappᚋentᚐMiauEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.MiauEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMiauEdge2ᚖappᚋentᚐMiauEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMiauEdge2ᚖappᚋentᚐMiauEdge(ctx context.Context, sel ast.SelectionSet, v *ent.MiauEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MiauEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMiauOrder2ᚖappᚋentᚐMiauOrder(ctx context.Context, v any) (*ent.MiauOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMiauOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOMiauWhereInput2ᚕᚖappᚋentᚐMiauWhereInputᚄ(ctx context.Context, v any) ([]*ent.MiauWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.MiauWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNMiauWhereInput2ᚖappᚋentᚐMiauWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOMiauWhereInput2ᚖappᚋentᚐMiauWhereInput(ctx context.Context, v any) (*ent.MiauWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMiauWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOMiauWhereUniqueInput2ᚕᚖappᚋentᚐMiauWhereUniqueInputᚄ(ctx context.Context, v any) ([]*ent.MiauWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.MiauWhereUniqueInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNMiauWhereUniqueInput2ᚖappᚋentᚐMiauWhereUniqueInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOMiauWhereUniqueInput2ᚖappᚋentᚐMiauWhereUniqueInput(ctx context.Context, v any) (*ent.MiauWhereUniqueInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMiauWhereUniqueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalONode2appᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v ent.Noder) graphql.Marshaler {

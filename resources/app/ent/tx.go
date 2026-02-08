@@ -16,10 +16,16 @@ type Tx struct {
 	config
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// Cycle is the client for interacting with the Cycle builders.
+	Cycle *CycleClient
 	// File is the client for interacting with the File builders.
 	File *FileClient
 	// ForPermission is the client for interacting with the ForPermission builders.
 	ForPermission *ForPermissionClient
+	// LifeCycleNot is the client for interacting with the LifeCycleNot builders.
+	LifeCycleNot *LifeCycleNotClient
+	// Miau is the client for interacting with the Miau builders.
+	Miau *MiauClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
@@ -156,8 +162,11 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AdminUser = NewAdminUserClient(tx.config)
+	tx.Cycle = NewCycleClient(tx.config)
 	tx.File = NewFileClient(tx.config)
 	tx.ForPermission = NewForPermissionClient(tx.config)
+	tx.LifeCycleNot = NewLifeCycleNotClient(tx.config)
+	tx.Miau = NewMiauClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
