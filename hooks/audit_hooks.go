@@ -34,6 +34,12 @@ type LifecycleFilterMutation interface {
 	WhereEntityStateIn(states ...entity.EntityState)
 }
 
+// LifecycleMutationTargetsChecker is implemented by lifecycle-entity mutations for UpdateOne/DeleteOne.
+// permissionLifecycleAccess is one slice of allowed states per permission; empty slice means full access.
+type LifecycleMutationTargetsChecker interface {
+	TargetsAllowedByLifecycle(ctx context.Context) (*entity.EntityState, error)
+}
+
 // applyOwnerFilter applies the owner filter to any query that implements WhereAdminCreatedBy.
 // This uses the generated WhereAdminCreatedBy method from the ent template.
 func applyOwnerFilter(q ent.Query, adminUserID string) {
@@ -177,13 +183,22 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 
 		// For UpdateOne/DeleteOne: ensure each target row's state is allowed (check and reject).
 		if m.Op().Is(ent.OpUpdateOne | ent.OpDeleteOne) {
-			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityState.Enabled {
-				allowed, err := mutationTargetsAllowedByLifecycle(ctx, m, t, permissions)
+			if checker, ok := m.(LifecycleMutationTargetsChecker); ok {
+				lifecycleAccess := make(map[string]struct{})
+				for _, p := range permissions {
+					for _, s := range p.LifecycleAccess {
+						lifecycleAccess[s] = struct{}{}
+					}
+				}
+
+				entityState, err := checker.TargetsAllowedByLifecycle(ctx)
 				if err != nil {
 					return nil, fmt.Errorf("entity state check: %w", err)
 				}
-				if !allowed {
-					return nil, fmt.Errorf("Forbidden: you may not update or delete this %s in its current lifecycle state", entityName)
+				if entityState != nil {
+					if _, ok := lifecycleAccess[string(*entityState)]; !ok {
+						return nil, fmt.Errorf("Forbidden: you may not update or delete this %s in its current lifecycle state", entityName)
+					}
 				}
 			}
 		}
@@ -295,166 +310,4 @@ func getEntityNameFromQuery(q ent.Query) string {
 	}
 
 	return strcase.LowerFirstLetter(entityName)
-}
-
-// isMutationTargetArchived returns true if the mutation targets one or more rows whose entity_state is ARCHIVED.
-// entityType is the schema type name (e.g. "File", "User"). Uses reflection to call Client().<Type>.Get(ctx, id) and
-// then uses the LifecycleStateGetter interface to get the lifecycle state.
-func isMutationTargetArchived(ctx context.Context, m ent.Mutation, entityType string) (bool, error) {
-	// Get IDs from mutation (IDs(ctx) ([]string, error))
-	mv := reflect.ValueOf(m)
-	if mv.Kind() == reflect.Ptr {
-		mv = mv.Elem()
-	}
-	idsMethod := mv.Addr().MethodByName("IDs")
-	if !idsMethod.IsValid() {
-		return false, nil // no IDs method, skip check
-	}
-	outs := idsMethod.Call([]reflect.Value{reflect.ValueOf(ctx)})
-	if len(outs) != 2 {
-		return false, nil
-	}
-	idsSlice := outs[0].Interface().([]string)
-	if err := outs[1].Interface(); err != nil {
-		return false, err.(error)
-	}
-	if len(idsSlice) == 0 {
-		return false, nil
-	}
-
-	// Get client from mutation (Client() *Client)
-	clientMethod := mv.Addr().MethodByName("Client")
-	if !clientMethod.IsValid() {
-		return false, nil
-	}
-	clientOuts := clientMethod.Call(nil)
-	if len(clientOuts) == 0 || clientOuts[0].IsNil() {
-		return false, nil
-	}
-	client := clientOuts[0].Interface().(*ent.Client)
-
-	// Get the entity client (e.g. client.File)
-	clientVal := reflect.ValueOf(client).Elem()
-	entityClient := clientVal.FieldByName(entityType)
-	if !entityClient.IsValid() || entityClient.IsNil() {
-		return false, nil
-	}
-
-	// For each ID, call Get(ctx, id) and check lifecycle state using the interface
-	for _, id := range idsSlice {
-		getMethod := entityClient.MethodByName("Get")
-		if !getMethod.IsValid() {
-			continue
-		}
-		getOuts := getMethod.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(id)})
-		if len(getOuts) < 2 {
-			continue
-		}
-		if err := getOuts[1].Interface(); err != nil {
-			return false, err.(error)
-		}
-		nodeValue := getOuts[0]
-		if nodeValue.IsNil() {
-			continue
-		}
-
-		// Type assert to LifecycleStateGetter interface
-		node := nodeValue.Interface()
-		if getter, ok := node.(entity.LifecycleStateGetter); ok {
-			state := getter.GetLifecycleState()
-			if state == entity.EntityStateArchived {
-				return true, nil
-			}
-		}
-	}
-	return false, nil
-}
-
-// permissionAllowsState returns true if the permission allows the given lifecycle state.
-// Empty LifecycleAccess means full access; otherwise the state must be in the list.
-func permissionAllowsState(perm *ent.Permission, state entity.EntityState) bool {
-	if len(perm.LifecycleAccess) == 0 {
-		return true
-	}
-	s := string(state)
-	for _, allowed := range perm.LifecycleAccess {
-		if allowed == s {
-			return true
-		}
-	}
-	return false
-}
-
-// mutationTargetsAllowedByLifecycle loads each target row of the mutation, gets its lifecycle state,
-// and returns true only if every row's state is allowed by at least one of the given permissions.
-func mutationTargetsAllowedByLifecycle(ctx context.Context, m ent.Mutation, entityType string, permissions []*ent.Permission) (bool, error) {
-	mv := reflect.ValueOf(m)
-	if mv.Kind() == reflect.Ptr {
-		mv = mv.Elem()
-	}
-	idsMethod := mv.Addr().MethodByName("IDs")
-	if !idsMethod.IsValid() {
-		return true, nil
-	}
-	outs := idsMethod.Call([]reflect.Value{reflect.ValueOf(ctx)})
-	if len(outs) != 2 {
-		return true, nil
-	}
-	idsSlice := outs[0].Interface().([]string)
-	if err := outs[1].Interface(); err != nil {
-		return false, err.(error)
-	}
-	if len(idsSlice) == 0 {
-		return true, nil
-	}
-
-	clientMethod := mv.Addr().MethodByName("Client")
-	if !clientMethod.IsValid() {
-		return true, nil
-	}
-	clientOuts := clientMethod.Call(nil)
-	if len(clientOuts) == 0 || clientOuts[0].IsNil() {
-		return true, nil
-	}
-	client := clientOuts[0].Interface().(*ent.Client)
-	clientVal := reflect.ValueOf(client).Elem()
-	entityClient := clientVal.FieldByName(entityType)
-	if !entityClient.IsValid() || entityClient.IsNil() {
-		return true, nil
-	}
-
-	for _, id := range idsSlice {
-		getMethod := entityClient.MethodByName("Get")
-		if !getMethod.IsValid() {
-			continue
-		}
-		getOuts := getMethod.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(id)})
-		if len(getOuts) < 2 {
-			continue
-		}
-		if err := getOuts[1].Interface(); err != nil {
-			return false, err.(error)
-		}
-		nodeValue := getOuts[0]
-		if nodeValue.IsNil() {
-			continue
-		}
-		node := nodeValue.Interface()
-		getter, ok := node.(entity.LifecycleStateGetter)
-		if !ok {
-			continue
-		}
-		state := getter.GetLifecycleState()
-		allowed := false
-		for _, perm := range permissions {
-			if permissionAllowsState(perm, state) {
-				allowed = true
-				break
-			}
-		}
-		if !allowed {
-			return false, nil
-		}
-	}
-	return true, nil
 }

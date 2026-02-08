@@ -9,9 +9,11 @@ import (
 {{- end }}
 {{- end }}
 	"app/ent/predicate"
+	"context"
 
-	"github.com/GoLabra/labra/entgql/entity"
 	"entgo.io/ent"
+	"github.com/GoLabra/labra/constants"
+	"github.com/GoLabra/labra/entgql/entity"
 )
 
 {{ range $n := $.Nodes }}
@@ -27,6 +29,26 @@ func ({{ $n.Receiver }} *{{ $n.Name }}Query) WhereEntityStateIn(states ...entity
 // Used by mutate permission hook to enforce lifecycle_access on UpdateMany/DeleteMany.
 func (m *{{ $n.Name }}Mutation) WhereEntityStateIn(states ...entity.EntityState) {
 	m.Where(predicate.{{ $n.Name }}({{ $n.Package }}.EntityStateIn(states...)))
+}
+
+// TargetsAllowedByLifecycle reports whether every target of this mutation has an entity_state
+// allowed by at least one entry in permissionLifecycleAccess. Each inner slice is one permission's
+// allowed states; empty slice means full access. Used by the mutate permission hook for UpdateOne/DeleteOne.
+func (m *{{ $n.Name }}Mutation) TargetsAllowedByLifecycle(ctx context.Context) (*entity.EntityState, error) {
+	iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+	ids, err := m.IDs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, id := range ids {
+		node, err := m.Client().{{ $n.Name }}.Get(iCtx, id)
+		if err != nil {
+			return nil, err
+		}
+		
+		return &node.EntityState, nil
+	}
+	return nil, nil
 }
 {{- end }}
 {{ end }}
