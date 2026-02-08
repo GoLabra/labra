@@ -28,6 +28,12 @@ type LifecycleFilterQuery interface {
 	WhereEntityStateIn(states ...entity.EntityState) ent.Query
 }
 
+// LifecycleFilterMutation is an interface for mutations that support restricting by entity_state.
+// The WhereEntityStateIn method is generated for entities with lifecycle enabled (UpdateMany/DeleteMany).
+type LifecycleFilterMutation interface {
+	WhereEntityStateIn(states ...entity.EntityState)
+}
+
 // applyOwnerFilter applies the owner filter to any query that implements WhereAdminCreatedBy.
 // This uses the generated WhereAdminCreatedBy method from the ent template.
 func applyOwnerFilter(q ent.Query, adminUserID string) {
@@ -45,6 +51,17 @@ func applyLifecycleFilter(q ent.Query, allowedStates []entity.EntityState) {
 	}
 	if lq, ok := q.(LifecycleFilterQuery); ok {
 		lq.WhereEntityStateIn(allowedStates...)
+	}
+}
+
+// applyLifecycleFilterToMutation restricts the mutation to rows whose entity_state is in the allowed set.
+// Used for UpdateMany/DeleteMany so only allowed rows are affected.
+func applyLifecycleFilterToMutation(m ent.Mutation, allowedStates []entity.EntityState) {
+	if len(allowedStates) == 0 {
+		return
+	}
+	if lm, ok := m.(LifecycleFilterMutation); ok {
+		lm.WhereEntityStateIn(allowedStates...)
 	}
 }
 
@@ -158,9 +175,8 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 			return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 		}
 
-		// For Update/Delete on entities with lifecycle, ensure each target row's state is allowed by at least one permission.
-		// Empty lifecycle_access means full access; populated means only those states are allowed.
-		if m.Op().Is(ent.OpUpdateOne | ent.OpUpdate | ent.OpDeleteOne | ent.OpDelete) {
+		// For UpdateOne/DeleteOne: ensure each target row's state is allowed (check and reject).
+		if m.Op().Is(ent.OpUpdateOne | ent.OpDeleteOne) {
 			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityState.Enabled {
 				allowed, err := mutationTargetsAllowedByLifecycle(ctx, m, t, permissions)
 				if err != nil {
@@ -169,6 +185,14 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 				if !allowed {
 					return nil, fmt.Errorf("Forbidden: you may not update or delete this %s in its current lifecycle state", entityName)
 				}
+			}
+		}
+
+		// For UpdateMany/DeleteMany: add lifecycle condition to the mutation (only allowed rows are affected).
+		if m.Op().Is(ent.OpUpdate | ent.OpDelete) {
+			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityState.Enabled {
+				allowedStates := allowedStatesFromPermissions(permissions)
+				applyLifecycleFilterToMutation(m, allowedStates)
 			}
 		}
 

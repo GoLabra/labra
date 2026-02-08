@@ -22,5 +22,11 @@ import (
 func ({{ $n.Receiver }} *{{ $n.Name }}Query) WhereEntityStateIn(states ...entity.EntityState)  ent.Query {
 	return {{ $n.Receiver }}.Where(predicate.{{ $n.Name }}({{ $n.Package }}.EntityStateIn(states...)))
 }
+
+// WhereEntityStateIn restricts the mutation to rows whose entity_state is in the given list.
+// Used by mutate permission hook to enforce lifecycle_access on UpdateMany/DeleteMany.
+func (m *{{ $n.Name }}Mutation) WhereEntityStateIn(states ...entity.EntityState) {
+	m.Where(predicate.{{ $n.Name }}({{ $n.Package }}.EntityStateIn(states...)))
+}
 {{- end }}
 {{ end }}
