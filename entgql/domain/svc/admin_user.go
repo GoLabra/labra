@@ -17,18 +17,28 @@ func NewAdminUser(r *repo.Repository) *AdminUser {
 	return &AdminUser{repository: r}
 }
 
+// hashPasswordAdminUserUpdate hashes password only if present in Update input (Password != nil).
 func hashPasswordAdminUserUpdate(data *ent.UpdateAdminUserInput) error {
-
 	if data.Password == nil {
 		return nil
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*data.Password), 14)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*data.Password), bcryptCost)
 	if err != nil {
 		return fmt.Errorf("error hashing password: %w", err)
 	}
 
 	*data.Password = string(hashedPassword)
+	return nil
+}
+
+// hashPasswordAdminUserCreate hashes password in Create input (Password is required string).
+func hashPasswordAdminUserCreate(data *ent.CreateAdminUserInput) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcryptCost)
+	if err != nil {
+		return fmt.Errorf("error hashing password: %w", err)
+	}
+	data.Password = string(hashedPassword)
 	return nil
 }
 
@@ -53,6 +63,10 @@ func (s *AdminUser) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.AdminUse
 }
 
 func (s *AdminUser) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateAdminUserInput) (*ent.AdminUser, error) {
+	if err := hashPasswordAdminUserCreate(&data); err != nil {
+		return nil, err
+	}
+
 	createdInput, err := s.repository.AdminUser.CreateTx(ctx, tx, data)
 	if err != nil {
 		return nil, err
@@ -61,14 +75,9 @@ func (s *AdminUser) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateAdm
 }
 
 func (s *AdminUser) Create(ctx context.Context, data ent.CreateAdminUserInput) (*ent.AdminUser, error) {
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
-
-	if err != nil {
-		return nil, fmt.Errorf("error hashing password: %w", err)
+	if err := hashPasswordAdminUserCreate(&data); err != nil {
+		return nil, err
 	}
-
-	data.Password = string(hashedPassword)
 
 	createdInput, err := s.repository.AdminUser.Create(ctx, data)
 	if err != nil {
@@ -114,43 +123,33 @@ func (s *AdminUser) UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.Admi
 }
 
 func (s *AdminUser) Upsert(ctx context.Context, data ent.CreateAdminUserInput) (*ent.AdminUser, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
-	if err != nil {
-		return nil, fmt.Errorf("error hashing password: %w", err)
+	if err := hashPasswordAdminUserCreate(&data); err != nil {
+		return nil, err
 	}
-	data.Password = string(hashedPassword)
-
 	return s.repository.AdminUser.Upsert(ctx, data)
 }
 
 func (s *AdminUser) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.CreateAdminUserInput) (*ent.AdminUser, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), 14)
-	if err != nil {
-		return nil, fmt.Errorf("error hashing password: %w", err)
+	if err := hashPasswordAdminUserCreate(&data); err != nil {
+		return nil, err
 	}
-	data.Password = string(hashedPassword)
-
 	return s.repository.AdminUser.UpsertTx(ctx, tx, data)
 }
 
 func (s *AdminUser) UpsertMany(ctx context.Context, data []ent.CreateAdminUserInput) (int, error) {
 	for i := range data {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data[i].Password), 14)
-		if err != nil {
-			return 0, fmt.Errorf("error hashing password: %w", err)
+		if err := hashPasswordAdminUserCreate(&data[i]); err != nil {
+			return 0, err
 		}
-		data[i].Password = string(hashedPassword)
 	}
 	return s.repository.AdminUser.UpsertMany(ctx, data)
 }
 
 func (s *AdminUser) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateAdminUserInput) (int, error) {
 	for i := range data {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data[i].Password), 14)
-		if err != nil {
-			return 0, fmt.Errorf("error hashing password: %w", err)
+		if err := hashPasswordAdminUserCreate(&data[i]); err != nil {
+			return 0, err
 		}
-		data[i].Password = string(hashedPassword)
 	}
 	return s.repository.AdminUser.UpsertManyTx(ctx, tx, data)
 }
