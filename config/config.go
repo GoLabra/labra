@@ -26,6 +26,8 @@ type Config struct {
 	// Environment specifies which Infisical environment to fetch secrets from (dev, staging, prod)
 	Environment        string `env:"APP_ENVIRONMENT"`
 	CORSAllowedOrigins string `env:"CORS_ALLOWED_ORIGINS"`
+	// CSPPolicy allows overriding the Content-Security-Policy header per deployment.
+	CSPPolicy string `env:"CSP_POLICY"`
 }
 
 // Secrets holds sensitive credentials fetched from Infisical or environment variables.
@@ -73,6 +75,9 @@ func New() (*Config, error) {
 	}
 	if cfg.CORSAllowedOrigins == "" {
 		cfg.CORSAllowedOrigins = "http://localhost:3000"
+	}
+	if cfg.CSPPolicy == "" {
+		cfg.CSPPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'"
 	}
 
 	return cfg, nil
