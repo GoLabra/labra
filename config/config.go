@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
@@ -23,7 +24,8 @@ type Config struct {
 	FileStorageProvider  string `env:"FILE_STORAGE_PROVIDER"`
 	FileStoragePath      string `env:"FILE_STORAGE_PATH"`
 	// Environment specifies which Infisical environment to fetch secrets from (dev, staging, prod)
-	Environment string `env:"APP_ENVIRONMENT"`
+	Environment        string `env:"APP_ENVIRONMENT"`
+	CORSAllowedOrigins string `env:"CORS_ALLOWED_ORIGINS"`
 }
 
 // Secrets holds sensitive credentials fetched from Infisical or environment variables.
@@ -69,6 +71,9 @@ func New() (*Config, error) {
 	if cfg.Environment == "" {
 		cfg.Environment = "dev"
 	}
+	if cfg.CORSAllowedOrigins == "" {
+		cfg.CORSAllowedOrigins = "http://localhost:3000"
+	}
 
 	return cfg, nil
 }
@@ -101,4 +106,22 @@ func NewAppConfig(cfg *Config, secrets *Secrets) (*AppConfig, error) {
 		Config:  *cfg,
 		Secrets: *secrets,
 	}, nil
+}
+
+// CORSAllowedOriginsList parses CORS_ALLOWED_ORIGINS (comma-separated) into a list.
+func (c *Config) CORSAllowedOriginsList() []string {
+	raw := strings.TrimSpace(c.CORSAllowedOrigins)
+	if raw == "" {
+		return []string{"http://localhost:3000"}
+	}
+
+	parts := strings.Split(raw, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		o := strings.TrimSpace(p)
+		if o != "" {
+			out = append(out, o)
+		}
+	}
+	return out
 }

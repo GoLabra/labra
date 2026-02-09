@@ -134,8 +134,17 @@ func main() {
 	tokenAuth := jwtauth.New("HS256", []byte(appConfig.SecretKey), nil)
 
 	// Configure CORS
+	allowedOrigins := appConfig.Config.CORSAllowedOriginsList()
+
+	// Safety rail: never allow "*" when credentials are enabled
+	for _, o := range allowedOrigins {
+		if strings.TrimSpace(o) == "*" {
+			log.Fatal("invalid CORS config: wildcard '*' is not allowed when AllowCredentials is true")
+		}
+	}
+
 	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   allowedOrigins,
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
