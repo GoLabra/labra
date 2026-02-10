@@ -27,7 +27,10 @@ type Config struct {
 	Environment        string `env:"APP_ENVIRONMENT"`
 	CORSAllowedOrigins string `env:"CORS_ALLOWED_ORIGINS"`
 	// CSPPolicy allows overriding the Content-Security-Policy header per deployment.
-	CSPPolicy string `env:"CSP_POLICY"`
+	CSPPolicy              string `env:"CSP_POLICY"`
+	AuthLoginRateLimitRPM  int    `env:"AUTH_LOGIN_RATE_LIMIT_RPM"`
+	AuthSignupRateLimitRPM int    `env:"AUTH_SIGNUP_RATE_LIMIT_RPM"`
+	AuthAPIRateLimitRPM    int    `env:"AUTH_API_RATE_LIMIT_RPM"`
 }
 
 // Secrets holds sensitive credentials fetched from Infisical or environment variables.
@@ -78,6 +81,15 @@ func New() (*Config, error) {
 	}
 	if cfg.CSPPolicy == "" {
 		cfg.CSPPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'"
+	}
+	if cfg.AuthLoginRateLimitRPM == 0 {
+		cfg.AuthLoginRateLimitRPM = 10
+	}
+	if cfg.AuthSignupRateLimitRPM == 0 {
+		cfg.AuthSignupRateLimitRPM = 5
+	}
+	if cfg.AuthAPIRateLimitRPM == 0 {
+		cfg.AuthAPIRateLimitRPM = 100
 	}
 
 	return cfg, nil

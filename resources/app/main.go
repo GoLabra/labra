@@ -153,6 +153,11 @@ func main() {
 	router.Use(corsMiddleware.Handler)
 	router.Use(adminHandler.SecurityHeaders(&appConfig.Config))
 
+	// Rate limiters (per IP)
+	loginLimiter := adminHandler.NewIPRateLimiter(appConfig.Config.AuthLoginRateLimitRPM)
+	signupLimiter := adminHandler.NewIPRateLimiter(appConfig.Config.AuthSignupRateLimitRPM)
+	apiLimiter := adminHandler.NewIPRateLimiter(appConfig.Config.AuthAPIRateLimitRPM)
+
 	router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var ctx = r.Context()
@@ -185,6 +190,7 @@ func main() {
 		})
 		srv.Use(extension.Introspection{})
 
+		router.Use(apiLimiter.Middleware)
 		router.Use(jwtauth.Verifier(tokenAuth))
 		router.Use(handler.Authenticator)
 
@@ -193,11 +199,12 @@ func main() {
 	router.Group(func(router chi.Router) {
 		router.Use(jwtauth.Verifier(tokenAuth))
 		router.Use(handler.Authenticator)
+		router.Use(apiLimiter.Middleware)
 
 		router.Post("/change-session-role", handler.ChangeSessionRole)
 	})
 	router.Group(func(router chi.Router) {
-		router.Post("/login", handler.Login)
+		router.With(loginLimiter.Middleware).Post("/login", handler.Login)
 		router.Handle("/playground", adminHandler.Playground("GraphQL playground", "/query"))
 	})
 
@@ -220,6 +227,7 @@ func main() {
 		})
 		adminSrv.Use(extension.Introspection{})
 
+		router.Use(apiLimiter.Middleware)
 		router.Use(jwtauth.Verifier(tokenAuth))
 		router.Use(adminHandler.Authenticator)
 
@@ -228,12 +236,13 @@ func main() {
 	router.Group(func(router chi.Router) {
 		router.Use(jwtauth.Verifier(tokenAuth))
 		router.Use(adminHandler.Authenticator)
+		router.Use(apiLimiter.Middleware)
 
 		router.Post("/admin/change-session-role", adminHandler.ChangeSessionRole)
 	})
 	router.Group(func(router chi.Router) {
-		router.Post("/admin/login", adminHandler.Login)
-		router.Post("/admin/signup", adminHandler.Signup)
+		router.With(loginLimiter.Middleware).Post("/admin/login", adminHandler.Login)
+		router.With(signupLimiter.Middleware).Post("/admin/signup", adminHandler.Signup)
 		router.Mount("/labradmin", http.StripPrefix("/labradmin", adminHandler.ServeAdmin()))
 		router.Handle("/admin/playground", adminHandler.Playground("GraphQL playground", "/admin/query"))
 	})
