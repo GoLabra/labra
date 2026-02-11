@@ -18,19 +18,23 @@ const (
 // Sensitive credentials (DSN, SecretKey, CentrifugoKey) are managed separately via the secrets package.
 type Config struct {
 	DBDialect            string `env:"DB_DIALECT,required"`
-	ServerPort           string `env:"SERVER_PORT"`
-	EntSchemaPath        string `env:"ENT_SCHEMA_PATH"`
+	ServerPort           string `env:"SERVER_PORT" envDefault:"4000"`
+	EntSchemaPath        string `env:"ENT_SCHEMA_PATH" envDefault:"./ent/schema"`
 	CentrifugoApiAddress string `env:"CENTRIFUGO_API_ADDRESS,required"`
-	FileStorageProvider  string `env:"FILE_STORAGE_PROVIDER"`
-	FileStoragePath      string `env:"FILE_STORAGE_PATH"`
+	FileStorageProvider  string `env:"FILE_STORAGE_PROVIDER" envDefault:"local"`
+	FileStoragePath      string `env:"FILE_STORAGE_PATH" envDefault:"./storage"`
+
 	// Environment specifies which Infisical environment to fetch secrets from (dev, staging, prod)
-	Environment        string `env:"APP_ENVIRONMENT"`
-	CORSAllowedOrigins string `env:"CORS_ALLOWED_ORIGINS"`
+	Environment string `env:"APP_ENVIRONMENT" envDefault:"dev"`
+
+	CORSAllowedOrigins string `env:"CORS_ALLOWED_ORIGINS" envDefault:"http://localhost:3000"`
+
 	// CSPPolicy allows overriding the Content-Security-Policy header per deployment.
-	CSPPolicy              string `env:"CSP_POLICY"`
-	AuthLoginRateLimitRPM  int    `env:"AUTH_LOGIN_RATE_LIMIT_RPM"`
-	AuthSignupRateLimitRPM int    `env:"AUTH_SIGNUP_RATE_LIMIT_RPM"`
-	AuthAPIRateLimitRPM    int    `env:"AUTH_API_RATE_LIMIT_RPM"`
+	CSPPolicy string `env:"CSP_POLICY" envDefault:"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'"`
+
+	AuthLoginRateLimitRPM  int `env:"AUTH_LOGIN_RATE_LIMIT_RPM" envDefault:"10"`
+	AuthSignupRateLimitRPM int `env:"AUTH_SIGNUP_RATE_LIMIT_RPM" envDefault:"5"`
+	AuthAPIRateLimitRPM    int `env:"AUTH_API_RATE_LIMIT_RPM" envDefault:"100"`
 }
 
 // Secrets holds sensitive credentials fetched from Infisical or environment variables.
@@ -58,38 +62,6 @@ func New() (*Config, error) {
 	err := env.Parse(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse environment variables: %w", err)
-	}
-
-	// Set defaults for optional configuration if not provided
-	if cfg.ServerPort == "" {
-		cfg.ServerPort = "4000"
-	}
-	if cfg.EntSchemaPath == "" {
-		cfg.EntSchemaPath = "./ent/schema"
-	}
-	if cfg.FileStorageProvider == "" {
-		cfg.FileStorageProvider = "local"
-	}
-	if cfg.FileStoragePath == "" {
-		cfg.FileStoragePath = "./storage"
-	}
-	if cfg.Environment == "" {
-		cfg.Environment = "dev"
-	}
-	if cfg.CORSAllowedOrigins == "" {
-		cfg.CORSAllowedOrigins = "http://localhost:3000"
-	}
-	if cfg.CSPPolicy == "" {
-		cfg.CSPPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'"
-	}
-	if cfg.AuthLoginRateLimitRPM == 0 {
-		cfg.AuthLoginRateLimitRPM = 10
-	}
-	if cfg.AuthSignupRateLimitRPM == 0 {
-		cfg.AuthSignupRateLimitRPM = 5
-	}
-	if cfg.AuthAPIRateLimitRPM == 0 {
-		cfg.AuthAPIRateLimitRPM = 100
 	}
 
 	return cfg, nil
