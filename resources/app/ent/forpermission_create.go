@@ -26,179 +26,179 @@ type ForPermissionCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (fpc *ForPermissionCreate) SetCreatedAt(t time.Time) *ForPermissionCreate {
-	fpc.mutation.SetCreatedAt(t)
-	return fpc
+func (_c *ForPermissionCreate) SetCreatedAt(v time.Time) *ForPermissionCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableCreatedAt(t *time.Time) *ForPermissionCreate {
-	if t != nil {
-		fpc.SetCreatedAt(*t)
+func (_c *ForPermissionCreate) SetNillableCreatedAt(v *time.Time) *ForPermissionCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return fpc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (fpc *ForPermissionCreate) SetUpdatedAt(t time.Time) *ForPermissionCreate {
-	fpc.mutation.SetUpdatedAt(t)
-	return fpc
+func (_c *ForPermissionCreate) SetUpdatedAt(v time.Time) *ForPermissionCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableUpdatedAt(t *time.Time) *ForPermissionCreate {
-	if t != nil {
-		fpc.SetUpdatedAt(*t)
+func (_c *ForPermissionCreate) SetNillableUpdatedAt(v *time.Time) *ForPermissionCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return fpc
+	return _c
 }
 
 // SetName sets the "name" field.
-func (fpc *ForPermissionCreate) SetName(s string) *ForPermissionCreate {
-	fpc.mutation.SetName(s)
-	return fpc
+func (_c *ForPermissionCreate) SetName(v string) *ForPermissionCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableName(s *string) *ForPermissionCreate {
-	if s != nil {
-		fpc.SetName(*s)
+func (_c *ForPermissionCreate) SetNillableName(v *string) *ForPermissionCreate {
+	if v != nil {
+		_c.SetName(*v)
 	}
-	return fpc
+	return _c
 }
 
 // SetAge sets the "age" field.
-func (fpc *ForPermissionCreate) SetAge(i int) *ForPermissionCreate {
-	fpc.mutation.SetAge(i)
-	return fpc
+func (_c *ForPermissionCreate) SetAge(v int) *ForPermissionCreate {
+	_c.mutation.SetAge(v)
+	return _c
 }
 
 // SetNillableAge sets the "age" field if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableAge(i *int) *ForPermissionCreate {
-	if i != nil {
-		fpc.SetAge(*i)
+func (_c *ForPermissionCreate) SetNillableAge(v *int) *ForPermissionCreate {
+	if v != nil {
+		_c.SetAge(*v)
 	}
-	return fpc
+	return _c
 }
 
 // SetIsStupid sets the "is_stupid" field.
-func (fpc *ForPermissionCreate) SetIsStupid(b bool) *ForPermissionCreate {
-	fpc.mutation.SetIsStupid(b)
-	return fpc
+func (_c *ForPermissionCreate) SetIsStupid(v bool) *ForPermissionCreate {
+	_c.mutation.SetIsStupid(v)
+	return _c
 }
 
 // SetNillableIsStupid sets the "is_stupid" field if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableIsStupid(b *bool) *ForPermissionCreate {
-	if b != nil {
-		fpc.SetIsStupid(*b)
+func (_c *ForPermissionCreate) SetNillableIsStupid(v *bool) *ForPermissionCreate {
+	if v != nil {
+		_c.SetIsStupid(*v)
 	}
-	return fpc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (fpc *ForPermissionCreate) SetID(s string) *ForPermissionCreate {
-	fpc.mutation.SetID(s)
-	return fpc
+func (_c *ForPermissionCreate) SetID(v string) *ForPermissionCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableID(s *string) *ForPermissionCreate {
-	if s != nil {
-		fpc.SetID(*s)
+func (_c *ForPermissionCreate) SetNillableID(v *string) *ForPermissionCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return fpc
+	return _c
 }
 
 // SetCreatedByID sets the "created_by" edge to the User entity by ID.
-func (fpc *ForPermissionCreate) SetCreatedByID(id string) *ForPermissionCreate {
-	fpc.mutation.SetCreatedByID(id)
-	return fpc
+func (_c *ForPermissionCreate) SetCreatedByID(id string) *ForPermissionCreate {
+	_c.mutation.SetCreatedByID(id)
+	return _c
 }
 
 // SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableCreatedByID(id *string) *ForPermissionCreate {
+func (_c *ForPermissionCreate) SetNillableCreatedByID(id *string) *ForPermissionCreate {
 	if id != nil {
-		fpc = fpc.SetCreatedByID(*id)
+		_c = _c.SetCreatedByID(*id)
 	}
-	return fpc
+	return _c
 }
 
 // SetCreatedBy sets the "created_by" edge to the User entity.
-func (fpc *ForPermissionCreate) SetCreatedBy(u *User) *ForPermissionCreate {
-	return fpc.SetCreatedByID(u.ID)
+func (_c *ForPermissionCreate) SetCreatedBy(v *User) *ForPermissionCreate {
+	return _c.SetCreatedByID(v.ID)
 }
 
 // SetUpdatedByID sets the "updated_by" edge to the User entity by ID.
-func (fpc *ForPermissionCreate) SetUpdatedByID(id string) *ForPermissionCreate {
-	fpc.mutation.SetUpdatedByID(id)
-	return fpc
+func (_c *ForPermissionCreate) SetUpdatedByID(id string) *ForPermissionCreate {
+	_c.mutation.SetUpdatedByID(id)
+	return _c
 }
 
 // SetNillableUpdatedByID sets the "updated_by" edge to the User entity by ID if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableUpdatedByID(id *string) *ForPermissionCreate {
+func (_c *ForPermissionCreate) SetNillableUpdatedByID(id *string) *ForPermissionCreate {
 	if id != nil {
-		fpc = fpc.SetUpdatedByID(*id)
+		_c = _c.SetUpdatedByID(*id)
 	}
-	return fpc
+	return _c
 }
 
 // SetUpdatedBy sets the "updated_by" edge to the User entity.
-func (fpc *ForPermissionCreate) SetUpdatedBy(u *User) *ForPermissionCreate {
-	return fpc.SetUpdatedByID(u.ID)
+func (_c *ForPermissionCreate) SetUpdatedBy(v *User) *ForPermissionCreate {
+	return _c.SetUpdatedByID(v.ID)
 }
 
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID.
-func (fpc *ForPermissionCreate) SetAdminCreatedByID(id string) *ForPermissionCreate {
-	fpc.mutation.SetAdminCreatedByID(id)
-	return fpc
+func (_c *ForPermissionCreate) SetAdminCreatedByID(id string) *ForPermissionCreate {
+	_c.mutation.SetAdminCreatedByID(id)
+	return _c
 }
 
 // SetNillableAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableAdminCreatedByID(id *string) *ForPermissionCreate {
+func (_c *ForPermissionCreate) SetNillableAdminCreatedByID(id *string) *ForPermissionCreate {
 	if id != nil {
-		fpc = fpc.SetAdminCreatedByID(*id)
+		_c = _c.SetAdminCreatedByID(*id)
 	}
-	return fpc
+	return _c
 }
 
 // SetAdminCreatedBy sets the "admin_created_by" edge to the AdminUser entity.
-func (fpc *ForPermissionCreate) SetAdminCreatedBy(a *AdminUser) *ForPermissionCreate {
-	return fpc.SetAdminCreatedByID(a.ID)
+func (_c *ForPermissionCreate) SetAdminCreatedBy(v *AdminUser) *ForPermissionCreate {
+	return _c.SetAdminCreatedByID(v.ID)
 }
 
 // SetAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID.
-func (fpc *ForPermissionCreate) SetAdminUpdatedByID(id string) *ForPermissionCreate {
-	fpc.mutation.SetAdminUpdatedByID(id)
-	return fpc
+func (_c *ForPermissionCreate) SetAdminUpdatedByID(id string) *ForPermissionCreate {
+	_c.mutation.SetAdminUpdatedByID(id)
+	return _c
 }
 
 // SetNillableAdminUpdatedByID sets the "admin_updated_by" edge to the AdminUser entity by ID if the given value is not nil.
-func (fpc *ForPermissionCreate) SetNillableAdminUpdatedByID(id *string) *ForPermissionCreate {
+func (_c *ForPermissionCreate) SetNillableAdminUpdatedByID(id *string) *ForPermissionCreate {
 	if id != nil {
-		fpc = fpc.SetAdminUpdatedByID(*id)
+		_c = _c.SetAdminUpdatedByID(*id)
 	}
-	return fpc
+	return _c
 }
 
 // SetAdminUpdatedBy sets the "admin_updated_by" edge to the AdminUser entity.
-func (fpc *ForPermissionCreate) SetAdminUpdatedBy(a *AdminUser) *ForPermissionCreate {
-	return fpc.SetAdminUpdatedByID(a.ID)
+func (_c *ForPermissionCreate) SetAdminUpdatedBy(v *AdminUser) *ForPermissionCreate {
+	return _c.SetAdminUpdatedByID(v.ID)
 }
 
 // Mutation returns the ForPermissionMutation object of the builder.
-func (fpc *ForPermissionCreate) Mutation() *ForPermissionMutation {
-	return fpc.mutation
+func (_c *ForPermissionCreate) Mutation() *ForPermissionMutation {
+	return _c.mutation
 }
 
 // Save creates the ForPermission in the database.
-func (fpc *ForPermissionCreate) Save(ctx context.Context) (*ForPermission, error) {
-	fpc.defaults()
-	return withHooks(ctx, fpc.sqlSave, fpc.mutation, fpc.hooks)
+func (_c *ForPermissionCreate) Save(ctx context.Context) (*ForPermission, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (fpc *ForPermissionCreate) SaveX(ctx context.Context) *ForPermission {
-	v, err := fpc.Save(ctx)
+func (_c *ForPermissionCreate) SaveX(ctx context.Context) *ForPermission {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -206,45 +206,45 @@ func (fpc *ForPermissionCreate) SaveX(ctx context.Context) *ForPermission {
 }
 
 // Exec executes the query.
-func (fpc *ForPermissionCreate) Exec(ctx context.Context) error {
-	_, err := fpc.Save(ctx)
+func (_c *ForPermissionCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fpc *ForPermissionCreate) ExecX(ctx context.Context) {
-	if err := fpc.Exec(ctx); err != nil {
+func (_c *ForPermissionCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (fpc *ForPermissionCreate) defaults() {
-	if _, ok := fpc.mutation.CreatedAt(); !ok {
+func (_c *ForPermissionCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := forpermission.DefaultCreatedAt
-		fpc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := fpc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := forpermission.DefaultUpdatedAt
-		fpc.mutation.SetUpdatedAt(v)
+		_c.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := fpc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := forpermission.DefaultID()
-		fpc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (fpc *ForPermissionCreate) check() error {
+func (_c *ForPermissionCreate) check() error {
 	return nil
 }
 
-func (fpc *ForPermissionCreate) sqlSave(ctx context.Context) (*ForPermission, error) {
-	if err := fpc.check(); err != nil {
+func (_c *ForPermissionCreate) sqlSave(ctx context.Context) (*ForPermission, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := fpc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, fpc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -257,42 +257,42 @@ func (fpc *ForPermissionCreate) sqlSave(ctx context.Context) (*ForPermission, er
 			return nil, fmt.Errorf("unexpected ForPermission.ID type: %T", _spec.ID.Value)
 		}
 	}
-	fpc.mutation.id = &_node.ID
-	fpc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (fpc *ForPermissionCreate) createSpec() (*ForPermission, *sqlgraph.CreateSpec) {
+func (_c *ForPermissionCreate) createSpec() (*ForPermission, *sqlgraph.CreateSpec) {
 	var (
-		_node = &ForPermission{config: fpc.config}
+		_node = &ForPermission{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(forpermission.Table, sqlgraph.NewFieldSpec(forpermission.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = fpc.conflict
-	if id, ok := fpc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := fpc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(forpermission.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = &value
 	}
-	if value, ok := fpc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(forpermission.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = &value
 	}
-	if value, ok := fpc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(forpermission.FieldName, field.TypeString, value)
 		_node.Name = &value
 	}
-	if value, ok := fpc.mutation.Age(); ok {
+	if value, ok := _c.mutation.Age(); ok {
 		_spec.SetField(forpermission.FieldAge, field.TypeInt, value)
 		_node.Age = &value
 	}
-	if value, ok := fpc.mutation.IsStupid(); ok {
+	if value, ok := _c.mutation.IsStupid(); ok {
 		_spec.SetField(forpermission.FieldIsStupid, field.TypeBool, value)
 		_node.IsStupid = &value
 	}
-	if nodes := fpc.mutation.CreatedByIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.CreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -309,7 +309,7 @@ func (fpc *ForPermissionCreate) createSpec() (*ForPermission, *sqlgraph.CreateSp
 		_node.for_permission_created_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := fpc.mutation.UpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -326,7 +326,7 @@ func (fpc *ForPermissionCreate) createSpec() (*ForPermission, *sqlgraph.CreateSp
 		_node.for_permission_updated_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := fpc.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AdminCreatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -343,7 +343,7 @@ func (fpc *ForPermissionCreate) createSpec() (*ForPermission, *sqlgraph.CreateSp
 		_node.for_permission_admin_created_by = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := fpc.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AdminUpdatedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -379,10 +379,10 @@ func (fpc *ForPermissionCreate) createSpec() (*ForPermission, *sqlgraph.CreateSp
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (fpc *ForPermissionCreate) OnConflict(opts ...sql.ConflictOption) *ForPermissionUpsertOne {
-	fpc.conflict = opts
+func (_c *ForPermissionCreate) OnConflict(opts ...sql.ConflictOption) *ForPermissionUpsertOne {
+	_c.conflict = opts
 	return &ForPermissionUpsertOne{
-		create: fpc,
+		create: _c,
 	}
 }
 
@@ -392,10 +392,10 @@ func (fpc *ForPermissionCreate) OnConflict(opts ...sql.ConflictOption) *ForPermi
 //	client.ForPermission.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (fpc *ForPermissionCreate) OnConflictColumns(columns ...string) *ForPermissionUpsertOne {
-	fpc.conflict = append(fpc.conflict, sql.ConflictColumns(columns...))
+func (_c *ForPermissionCreate) OnConflictColumns(columns ...string) *ForPermissionUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &ForPermissionUpsertOne{
-		create: fpc,
+		create: _c,
 	}
 }
 
@@ -715,16 +715,16 @@ type ForPermissionCreateBulk struct {
 }
 
 // Save creates the ForPermission entities in the database.
-func (fpcb *ForPermissionCreateBulk) Save(ctx context.Context) ([]*ForPermission, error) {
-	if fpcb.err != nil {
-		return nil, fpcb.err
+func (_c *ForPermissionCreateBulk) Save(ctx context.Context) ([]*ForPermission, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(fpcb.builders))
-	nodes := make([]*ForPermission, len(fpcb.builders))
-	mutators := make([]Mutator, len(fpcb.builders))
-	for i := range fpcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*ForPermission, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := fpcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ForPermissionMutation)
@@ -738,12 +738,12 @@ func (fpcb *ForPermissionCreateBulk) Save(ctx context.Context) ([]*ForPermission
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, fpcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = fpcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, fpcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -763,7 +763,7 @@ func (fpcb *ForPermissionCreateBulk) Save(ctx context.Context) ([]*ForPermission
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, fpcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -771,8 +771,8 @@ func (fpcb *ForPermissionCreateBulk) Save(ctx context.Context) ([]*ForPermission
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (fpcb *ForPermissionCreateBulk) SaveX(ctx context.Context) []*ForPermission {
-	v, err := fpcb.Save(ctx)
+func (_c *ForPermissionCreateBulk) SaveX(ctx context.Context) []*ForPermission {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -780,14 +780,14 @@ func (fpcb *ForPermissionCreateBulk) SaveX(ctx context.Context) []*ForPermission
 }
 
 // Exec executes the query.
-func (fpcb *ForPermissionCreateBulk) Exec(ctx context.Context) error {
-	_, err := fpcb.Save(ctx)
+func (_c *ForPermissionCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (fpcb *ForPermissionCreateBulk) ExecX(ctx context.Context) {
-	if err := fpcb.Exec(ctx); err != nil {
+func (_c *ForPermissionCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -807,10 +807,10 @@ func (fpcb *ForPermissionCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (fpcb *ForPermissionCreateBulk) OnConflict(opts ...sql.ConflictOption) *ForPermissionUpsertBulk {
-	fpcb.conflict = opts
+func (_c *ForPermissionCreateBulk) OnConflict(opts ...sql.ConflictOption) *ForPermissionUpsertBulk {
+	_c.conflict = opts
 	return &ForPermissionUpsertBulk{
-		create: fpcb,
+		create: _c,
 	}
 }
 
@@ -820,10 +820,10 @@ func (fpcb *ForPermissionCreateBulk) OnConflict(opts ...sql.ConflictOption) *For
 //	client.ForPermission.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (fpcb *ForPermissionCreateBulk) OnConflictColumns(columns ...string) *ForPermissionUpsertBulk {
-	fpcb.conflict = append(fpcb.conflict, sql.ConflictColumns(columns...))
+func (_c *ForPermissionCreateBulk) OnConflictColumns(columns ...string) *ForPermissionUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &ForPermissionUpsertBulk{
-		create: fpcb,
+		create: _c,
 	}
 }
 

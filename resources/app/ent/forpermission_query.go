@@ -37,44 +37,44 @@ type ForPermissionQuery struct {
 }
 
 // Where adds a new predicate for the ForPermissionQuery builder.
-func (fpq *ForPermissionQuery) Where(ps ...predicate.ForPermission) *ForPermissionQuery {
-	fpq.predicates = append(fpq.predicates, ps...)
-	return fpq
+func (_q *ForPermissionQuery) Where(ps ...predicate.ForPermission) *ForPermissionQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (fpq *ForPermissionQuery) Limit(limit int) *ForPermissionQuery {
-	fpq.ctx.Limit = &limit
-	return fpq
+func (_q *ForPermissionQuery) Limit(limit int) *ForPermissionQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (fpq *ForPermissionQuery) Offset(offset int) *ForPermissionQuery {
-	fpq.ctx.Offset = &offset
-	return fpq
+func (_q *ForPermissionQuery) Offset(offset int) *ForPermissionQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (fpq *ForPermissionQuery) Unique(unique bool) *ForPermissionQuery {
-	fpq.ctx.Unique = &unique
-	return fpq
+func (_q *ForPermissionQuery) Unique(unique bool) *ForPermissionQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (fpq *ForPermissionQuery) Order(o ...forpermission.OrderOption) *ForPermissionQuery {
-	fpq.order = append(fpq.order, o...)
-	return fpq
+func (_q *ForPermissionQuery) Order(o ...forpermission.OrderOption) *ForPermissionQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryCreatedBy chains the current query on the "created_by" edge.
-func (fpq *ForPermissionQuery) QueryCreatedBy() *UserQuery {
-	query := (&UserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) QueryCreatedBy() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := fpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := fpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -83,20 +83,20 @@ func (fpq *ForPermissionQuery) QueryCreatedBy() *UserQuery {
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.CreatedByTable, forpermission.CreatedByColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(fpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryUpdatedBy chains the current query on the "updated_by" edge.
-func (fpq *ForPermissionQuery) QueryUpdatedBy() *UserQuery {
-	query := (&UserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) QueryUpdatedBy() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := fpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := fpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -105,20 +105,20 @@ func (fpq *ForPermissionQuery) QueryUpdatedBy() *UserQuery {
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.UpdatedByTable, forpermission.UpdatedByColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(fpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryAdminCreatedBy chains the current query on the "admin_created_by" edge.
-func (fpq *ForPermissionQuery) QueryAdminCreatedBy() *AdminUserQuery {
-	query := (&AdminUserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) QueryAdminCreatedBy() *AdminUserQuery {
+	query := (&AdminUserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := fpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := fpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -127,20 +127,20 @@ func (fpq *ForPermissionQuery) QueryAdminCreatedBy() *AdminUserQuery {
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.AdminCreatedByTable, forpermission.AdminCreatedByColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(fpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryAdminUpdatedBy chains the current query on the "admin_updated_by" edge.
-func (fpq *ForPermissionQuery) QueryAdminUpdatedBy() *AdminUserQuery {
-	query := (&AdminUserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) QueryAdminUpdatedBy() *AdminUserQuery {
+	query := (&AdminUserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := fpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := fpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -149,7 +149,7 @@ func (fpq *ForPermissionQuery) QueryAdminUpdatedBy() *AdminUserQuery {
 			sqlgraph.To(adminuser.Table, adminuser.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.AdminUpdatedByTable, forpermission.AdminUpdatedByColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(fpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -157,8 +157,8 @@ func (fpq *ForPermissionQuery) QueryAdminUpdatedBy() *AdminUserQuery {
 
 // First returns the first ForPermission entity from the query.
 // Returns a *NotFoundError when no ForPermission was found.
-func (fpq *ForPermissionQuery) First(ctx context.Context) (*ForPermission, error) {
-	nodes, err := fpq.Limit(1).All(setContextOp(ctx, fpq.ctx, ent.OpQueryFirst))
+func (_q *ForPermissionQuery) First(ctx context.Context) (*ForPermission, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -169,8 +169,8 @@ func (fpq *ForPermissionQuery) First(ctx context.Context) (*ForPermission, error
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (fpq *ForPermissionQuery) FirstX(ctx context.Context) *ForPermission {
-	node, err := fpq.First(ctx)
+func (_q *ForPermissionQuery) FirstX(ctx context.Context) *ForPermission {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -179,9 +179,9 @@ func (fpq *ForPermissionQuery) FirstX(ctx context.Context) *ForPermission {
 
 // FirstID returns the first ForPermission ID from the query.
 // Returns a *NotFoundError when no ForPermission ID was found.
-func (fpq *ForPermissionQuery) FirstID(ctx context.Context) (id string, err error) {
+func (_q *ForPermissionQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = fpq.Limit(1).IDs(setContextOp(ctx, fpq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -192,8 +192,8 @@ func (fpq *ForPermissionQuery) FirstID(ctx context.Context) (id string, err erro
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (fpq *ForPermissionQuery) FirstIDX(ctx context.Context) string {
-	id, err := fpq.FirstID(ctx)
+func (_q *ForPermissionQuery) FirstIDX(ctx context.Context) string {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -203,8 +203,8 @@ func (fpq *ForPermissionQuery) FirstIDX(ctx context.Context) string {
 // Only returns a single ForPermission entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one ForPermission entity is found.
 // Returns a *NotFoundError when no ForPermission entities are found.
-func (fpq *ForPermissionQuery) Only(ctx context.Context) (*ForPermission, error) {
-	nodes, err := fpq.Limit(2).All(setContextOp(ctx, fpq.ctx, ent.OpQueryOnly))
+func (_q *ForPermissionQuery) Only(ctx context.Context) (*ForPermission, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -219,8 +219,8 @@ func (fpq *ForPermissionQuery) Only(ctx context.Context) (*ForPermission, error)
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (fpq *ForPermissionQuery) OnlyX(ctx context.Context) *ForPermission {
-	node, err := fpq.Only(ctx)
+func (_q *ForPermissionQuery) OnlyX(ctx context.Context) *ForPermission {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -230,9 +230,9 @@ func (fpq *ForPermissionQuery) OnlyX(ctx context.Context) *ForPermission {
 // OnlyID is like Only, but returns the only ForPermission ID in the query.
 // Returns a *NotSingularError when more than one ForPermission ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (fpq *ForPermissionQuery) OnlyID(ctx context.Context) (id string, err error) {
+func (_q *ForPermissionQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = fpq.Limit(2).IDs(setContextOp(ctx, fpq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -247,8 +247,8 @@ func (fpq *ForPermissionQuery) OnlyID(ctx context.Context) (id string, err error
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (fpq *ForPermissionQuery) OnlyIDX(ctx context.Context) string {
-	id, err := fpq.OnlyID(ctx)
+func (_q *ForPermissionQuery) OnlyIDX(ctx context.Context) string {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -256,18 +256,18 @@ func (fpq *ForPermissionQuery) OnlyIDX(ctx context.Context) string {
 }
 
 // All executes the query and returns a list of ForPermissions.
-func (fpq *ForPermissionQuery) All(ctx context.Context) ([]*ForPermission, error) {
-	ctx = setContextOp(ctx, fpq.ctx, ent.OpQueryAll)
-	if err := fpq.prepareQuery(ctx); err != nil {
+func (_q *ForPermissionQuery) All(ctx context.Context) ([]*ForPermission, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*ForPermission, *ForPermissionQuery]()
-	return withInterceptors[[]*ForPermission](ctx, fpq, qr, fpq.inters)
+	return withInterceptors[[]*ForPermission](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (fpq *ForPermissionQuery) AllX(ctx context.Context) []*ForPermission {
-	nodes, err := fpq.All(ctx)
+func (_q *ForPermissionQuery) AllX(ctx context.Context) []*ForPermission {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -275,20 +275,20 @@ func (fpq *ForPermissionQuery) AllX(ctx context.Context) []*ForPermission {
 }
 
 // IDs executes the query and returns a list of ForPermission IDs.
-func (fpq *ForPermissionQuery) IDs(ctx context.Context) (ids []string, err error) {
-	if fpq.ctx.Unique == nil && fpq.path != nil {
-		fpq.Unique(true)
+func (_q *ForPermissionQuery) IDs(ctx context.Context) (ids []string, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, fpq.ctx, ent.OpQueryIDs)
-	if err = fpq.Select(forpermission.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(forpermission.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (fpq *ForPermissionQuery) IDsX(ctx context.Context) []string {
-	ids, err := fpq.IDs(ctx)
+func (_q *ForPermissionQuery) IDsX(ctx context.Context) []string {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -296,17 +296,17 @@ func (fpq *ForPermissionQuery) IDsX(ctx context.Context) []string {
 }
 
 // Count returns the count of the given query.
-func (fpq *ForPermissionQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, fpq.ctx, ent.OpQueryCount)
-	if err := fpq.prepareQuery(ctx); err != nil {
+func (_q *ForPermissionQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, fpq, querierCount[*ForPermissionQuery](), fpq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*ForPermissionQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (fpq *ForPermissionQuery) CountX(ctx context.Context) int {
-	count, err := fpq.Count(ctx)
+func (_q *ForPermissionQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -314,9 +314,9 @@ func (fpq *ForPermissionQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (fpq *ForPermissionQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, fpq.ctx, ent.OpQueryExist)
-	switch _, err := fpq.FirstID(ctx); {
+func (_q *ForPermissionQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -327,8 +327,8 @@ func (fpq *ForPermissionQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (fpq *ForPermissionQuery) ExistX(ctx context.Context) bool {
-	exist, err := fpq.Exist(ctx)
+func (_q *ForPermissionQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -337,68 +337,68 @@ func (fpq *ForPermissionQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the ForPermissionQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (fpq *ForPermissionQuery) Clone() *ForPermissionQuery {
-	if fpq == nil {
+func (_q *ForPermissionQuery) Clone() *ForPermissionQuery {
+	if _q == nil {
 		return nil
 	}
 	return &ForPermissionQuery{
-		config:             fpq.config,
-		ctx:                fpq.ctx.Clone(),
-		order:              append([]forpermission.OrderOption{}, fpq.order...),
-		inters:             append([]Interceptor{}, fpq.inters...),
-		predicates:         append([]predicate.ForPermission{}, fpq.predicates...),
-		withCreatedBy:      fpq.withCreatedBy.Clone(),
-		withUpdatedBy:      fpq.withUpdatedBy.Clone(),
-		withAdminCreatedBy: fpq.withAdminCreatedBy.Clone(),
-		withAdminUpdatedBy: fpq.withAdminUpdatedBy.Clone(),
+		config:             _q.config,
+		ctx:                _q.ctx.Clone(),
+		order:              append([]forpermission.OrderOption{}, _q.order...),
+		inters:             append([]Interceptor{}, _q.inters...),
+		predicates:         append([]predicate.ForPermission{}, _q.predicates...),
+		withCreatedBy:      _q.withCreatedBy.Clone(),
+		withUpdatedBy:      _q.withUpdatedBy.Clone(),
+		withAdminCreatedBy: _q.withAdminCreatedBy.Clone(),
+		withAdminUpdatedBy: _q.withAdminUpdatedBy.Clone(),
 		// clone intermediate query.
-		sql:  fpq.sql.Clone(),
-		path: fpq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithCreatedBy tells the query-builder to eager-load the nodes that are connected to
 // the "created_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (fpq *ForPermissionQuery) WithCreatedBy(opts ...func(*UserQuery)) *ForPermissionQuery {
-	query := (&UserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) WithCreatedBy(opts ...func(*UserQuery)) *ForPermissionQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	fpq.withCreatedBy = query
-	return fpq
+	_q.withCreatedBy = query
+	return _q
 }
 
 // WithUpdatedBy tells the query-builder to eager-load the nodes that are connected to
 // the "updated_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (fpq *ForPermissionQuery) WithUpdatedBy(opts ...func(*UserQuery)) *ForPermissionQuery {
-	query := (&UserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) WithUpdatedBy(opts ...func(*UserQuery)) *ForPermissionQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	fpq.withUpdatedBy = query
-	return fpq
+	_q.withUpdatedBy = query
+	return _q
 }
 
 // WithAdminCreatedBy tells the query-builder to eager-load the nodes that are connected to
 // the "admin_created_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (fpq *ForPermissionQuery) WithAdminCreatedBy(opts ...func(*AdminUserQuery)) *ForPermissionQuery {
-	query := (&AdminUserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) WithAdminCreatedBy(opts ...func(*AdminUserQuery)) *ForPermissionQuery {
+	query := (&AdminUserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	fpq.withAdminCreatedBy = query
-	return fpq
+	_q.withAdminCreatedBy = query
+	return _q
 }
 
 // WithAdminUpdatedBy tells the query-builder to eager-load the nodes that are connected to
 // the "admin_updated_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (fpq *ForPermissionQuery) WithAdminUpdatedBy(opts ...func(*AdminUserQuery)) *ForPermissionQuery {
-	query := (&AdminUserClient{config: fpq.config}).Query()
+func (_q *ForPermissionQuery) WithAdminUpdatedBy(opts ...func(*AdminUserQuery)) *ForPermissionQuery {
+	query := (&AdminUserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	fpq.withAdminUpdatedBy = query
-	return fpq
+	_q.withAdminUpdatedBy = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -415,10 +415,10 @@ func (fpq *ForPermissionQuery) WithAdminUpdatedBy(opts ...func(*AdminUserQuery))
 //		GroupBy(forpermission.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (fpq *ForPermissionQuery) GroupBy(field string, fields ...string) *ForPermissionGroupBy {
-	fpq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &ForPermissionGroupBy{build: fpq}
-	grbuild.flds = &fpq.ctx.Fields
+func (_q *ForPermissionQuery) GroupBy(field string, fields ...string) *ForPermissionGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &ForPermissionGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = forpermission.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -436,58 +436,58 @@ func (fpq *ForPermissionQuery) GroupBy(field string, fields ...string) *ForPermi
 //	client.ForPermission.Query().
 //		Select(forpermission.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (fpq *ForPermissionQuery) Select(fields ...string) *ForPermissionSelect {
-	fpq.ctx.Fields = append(fpq.ctx.Fields, fields...)
-	sbuild := &ForPermissionSelect{ForPermissionQuery: fpq}
+func (_q *ForPermissionQuery) Select(fields ...string) *ForPermissionSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &ForPermissionSelect{ForPermissionQuery: _q}
 	sbuild.label = forpermission.Label
-	sbuild.flds, sbuild.scan = &fpq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a ForPermissionSelect configured with the given aggregations.
-func (fpq *ForPermissionQuery) Aggregate(fns ...AggregateFunc) *ForPermissionSelect {
-	return fpq.Select().Aggregate(fns...)
+func (_q *ForPermissionQuery) Aggregate(fns ...AggregateFunc) *ForPermissionSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (fpq *ForPermissionQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range fpq.inters {
+func (_q *ForPermissionQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, fpq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range fpq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !forpermission.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if fpq.path != nil {
-		prev, err := fpq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		fpq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (fpq *ForPermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ForPermission, error) {
+func (_q *ForPermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ForPermission, error) {
 	var (
 		nodes       = []*ForPermission{}
-		withFKs     = fpq.withFKs
-		_spec       = fpq.querySpec()
+		withFKs     = _q.withFKs
+		_spec       = _q.querySpec()
 		loadedTypes = [4]bool{
-			fpq.withCreatedBy != nil,
-			fpq.withUpdatedBy != nil,
-			fpq.withAdminCreatedBy != nil,
-			fpq.withAdminUpdatedBy != nil,
+			_q.withCreatedBy != nil,
+			_q.withUpdatedBy != nil,
+			_q.withAdminCreatedBy != nil,
+			_q.withAdminUpdatedBy != nil,
 		}
 	)
-	if fpq.withCreatedBy != nil || fpq.withUpdatedBy != nil || fpq.withAdminCreatedBy != nil || fpq.withAdminUpdatedBy != nil {
+	if _q.withCreatedBy != nil || _q.withUpdatedBy != nil || _q.withAdminCreatedBy != nil || _q.withAdminUpdatedBy != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -497,56 +497,56 @@ func (fpq *ForPermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 		return (*ForPermission).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &ForPermission{config: fpq.config}
+		node := &ForPermission{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(fpq.modifiers) > 0 {
-		_spec.Modifiers = fpq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, fpq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := fpq.withCreatedBy; query != nil {
-		if err := fpq.loadCreatedBy(ctx, query, nodes, nil,
+	if query := _q.withCreatedBy; query != nil {
+		if err := _q.loadCreatedBy(ctx, query, nodes, nil,
 			func(n *ForPermission, e *User) { n.Edges.CreatedBy = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := fpq.withUpdatedBy; query != nil {
-		if err := fpq.loadUpdatedBy(ctx, query, nodes, nil,
+	if query := _q.withUpdatedBy; query != nil {
+		if err := _q.loadUpdatedBy(ctx, query, nodes, nil,
 			func(n *ForPermission, e *User) { n.Edges.UpdatedBy = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := fpq.withAdminCreatedBy; query != nil {
-		if err := fpq.loadAdminCreatedBy(ctx, query, nodes, nil,
+	if query := _q.withAdminCreatedBy; query != nil {
+		if err := _q.loadAdminCreatedBy(ctx, query, nodes, nil,
 			func(n *ForPermission, e *AdminUser) { n.Edges.AdminCreatedBy = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := fpq.withAdminUpdatedBy; query != nil {
-		if err := fpq.loadAdminUpdatedBy(ctx, query, nodes, nil,
+	if query := _q.withAdminUpdatedBy; query != nil {
+		if err := _q.loadAdminUpdatedBy(ctx, query, nodes, nil,
 			func(n *ForPermission, e *AdminUser) { n.Edges.AdminUpdatedBy = e }); err != nil {
 			return nil, err
 		}
 	}
-	for i := range fpq.loadTotal {
-		if err := fpq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (fpq *ForPermissionQuery) loadCreatedBy(ctx context.Context, query *UserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *User)) error {
+func (_q *ForPermissionQuery) loadCreatedBy(ctx context.Context, query *UserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *User)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*ForPermission)
 	for i := range nodes {
@@ -578,7 +578,7 @@ func (fpq *ForPermissionQuery) loadCreatedBy(ctx context.Context, query *UserQue
 	}
 	return nil
 }
-func (fpq *ForPermissionQuery) loadUpdatedBy(ctx context.Context, query *UserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *User)) error {
+func (_q *ForPermissionQuery) loadUpdatedBy(ctx context.Context, query *UserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *User)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*ForPermission)
 	for i := range nodes {
@@ -610,7 +610,7 @@ func (fpq *ForPermissionQuery) loadUpdatedBy(ctx context.Context, query *UserQue
 	}
 	return nil
 }
-func (fpq *ForPermissionQuery) loadAdminCreatedBy(ctx context.Context, query *AdminUserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *AdminUser)) error {
+func (_q *ForPermissionQuery) loadAdminCreatedBy(ctx context.Context, query *AdminUserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *AdminUser)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*ForPermission)
 	for i := range nodes {
@@ -642,7 +642,7 @@ func (fpq *ForPermissionQuery) loadAdminCreatedBy(ctx context.Context, query *Ad
 	}
 	return nil
 }
-func (fpq *ForPermissionQuery) loadAdminUpdatedBy(ctx context.Context, query *AdminUserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *AdminUser)) error {
+func (_q *ForPermissionQuery) loadAdminUpdatedBy(ctx context.Context, query *AdminUserQuery, nodes []*ForPermission, init func(*ForPermission), assign func(*ForPermission, *AdminUser)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*ForPermission)
 	for i := range nodes {
@@ -675,27 +675,27 @@ func (fpq *ForPermissionQuery) loadAdminUpdatedBy(ctx context.Context, query *Ad
 	return nil
 }
 
-func (fpq *ForPermissionQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := fpq.querySpec()
-	if len(fpq.modifiers) > 0 {
-		_spec.Modifiers = fpq.modifiers
+func (_q *ForPermissionQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = fpq.ctx.Fields
-	if len(fpq.ctx.Fields) > 0 {
-		_spec.Unique = fpq.ctx.Unique != nil && *fpq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, fpq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (fpq *ForPermissionQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *ForPermissionQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(forpermission.Table, forpermission.Columns, sqlgraph.NewFieldSpec(forpermission.FieldID, field.TypeString))
-	_spec.From = fpq.sql
-	if unique := fpq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if fpq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := fpq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, forpermission.FieldID)
 		for i := range fields {
@@ -704,20 +704,20 @@ func (fpq *ForPermissionQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := fpq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := fpq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := fpq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := fpq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -727,33 +727,33 @@ func (fpq *ForPermissionQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (fpq *ForPermissionQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(fpq.driver.Dialect())
+func (_q *ForPermissionQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(forpermission.Table)
-	columns := fpq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = forpermission.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if fpq.sql != nil {
-		selector = fpq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if fpq.ctx.Unique != nil && *fpq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range fpq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range fpq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := fpq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := fpq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -766,41 +766,41 @@ type ForPermissionGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (fpgb *ForPermissionGroupBy) Aggregate(fns ...AggregateFunc) *ForPermissionGroupBy {
-	fpgb.fns = append(fpgb.fns, fns...)
-	return fpgb
+func (_g *ForPermissionGroupBy) Aggregate(fns ...AggregateFunc) *ForPermissionGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (fpgb *ForPermissionGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, fpgb.build.ctx, ent.OpQueryGroupBy)
-	if err := fpgb.build.prepareQuery(ctx); err != nil {
+func (_g *ForPermissionGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ForPermissionQuery, *ForPermissionGroupBy](ctx, fpgb.build, fpgb, fpgb.build.inters, v)
+	return scanWithInterceptors[*ForPermissionQuery, *ForPermissionGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (fpgb *ForPermissionGroupBy) sqlScan(ctx context.Context, root *ForPermissionQuery, v any) error {
+func (_g *ForPermissionGroupBy) sqlScan(ctx context.Context, root *ForPermissionQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(fpgb.fns))
-	for _, fn := range fpgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*fpgb.flds)+len(fpgb.fns))
-		for _, f := range *fpgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*fpgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := fpgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -814,27 +814,27 @@ type ForPermissionSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (fps *ForPermissionSelect) Aggregate(fns ...AggregateFunc) *ForPermissionSelect {
-	fps.fns = append(fps.fns, fns...)
-	return fps
+func (_s *ForPermissionSelect) Aggregate(fns ...AggregateFunc) *ForPermissionSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (fps *ForPermissionSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, fps.ctx, ent.OpQuerySelect)
-	if err := fps.prepareQuery(ctx); err != nil {
+func (_s *ForPermissionSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ForPermissionQuery, *ForPermissionSelect](ctx, fps.ForPermissionQuery, fps, fps.inters, v)
+	return scanWithInterceptors[*ForPermissionQuery, *ForPermissionSelect](ctx, _s.ForPermissionQuery, _s, _s.inters, v)
 }
 
-func (fps *ForPermissionSelect) sqlScan(ctx context.Context, root *ForPermissionQuery, v any) error {
+func (_s *ForPermissionSelect) sqlScan(ctx context.Context, root *ForPermissionQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(fps.fns))
-	for _, fn := range fps.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*fps.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -842,7 +842,7 @@ func (fps *ForPermissionSelect) sqlScan(ctx context.Context, root *ForPermission
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := fps.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

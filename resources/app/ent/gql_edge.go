@@ -8,120 +8,98 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (r *ForPermission) CreatedBy(ctx context.Context) (*User, error) {
-	result, err := r.Edges.CreatedByOrErr()
-
+func (_m *ForPermission) CreatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.CreatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryCreatedBy().Only(ctx)
+		result, err = _m.QueryCreatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *ForPermission) UpdatedBy(ctx context.Context) (*User, error) {
-	result, err := r.Edges.UpdatedByOrErr()
-
+func (_m *ForPermission) UpdatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UpdatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryUpdatedBy().Only(ctx)
+		result, err = _m.QueryUpdatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *ForPermission) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
-	result, err := r.Edges.AdminCreatedByOrErr()
-
+func (_m *ForPermission) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminCreatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryAdminCreatedBy().Only(ctx)
+		result, err = _m.QueryAdminCreatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *ForPermission) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
-	result, err := r.Edges.AdminUpdatedByOrErr()
-
+func (_m *ForPermission) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminUpdatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryAdminUpdatedBy().Only(ctx)
+		result, err = _m.QueryAdminUpdatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *Role) UserRoles(ctx context.Context) (result []*User, err error) {
+func (_m *Role) UserRoles(ctx context.Context) (result []*User, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = r.NamedUserRoles(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = _m.NamedUserRoles(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = r.Edges.UserRolesOrErr()
+		result, err = _m.Edges.UserRolesOrErr()
 	}
-
 	if IsNotLoaded(err) {
-		result, err = r.QueryUserRoles().All(ctx)
+		result, err = _m.QueryUserRoles().All(ctx)
 	}
-
 	return result, err
 }
 
-func (r *User) CreatedBy(ctx context.Context) (*User, error) {
-	result, err := r.Edges.CreatedByOrErr()
-
+func (_m *User) CreatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.CreatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryCreatedBy().Only(ctx)
+		result, err = _m.QueryCreatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *User) UpdatedBy(ctx context.Context) (*User, error) {
-	result, err := r.Edges.UpdatedByOrErr()
-
+func (_m *User) UpdatedBy(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UpdatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryUpdatedBy().Only(ctx)
+		result, err = _m.QueryUpdatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *User) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
-	result, err := r.Edges.AdminCreatedByOrErr()
-
+func (_m *User) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminCreatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryAdminCreatedBy().Only(ctx)
+		result, err = _m.QueryAdminCreatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *User) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
-	result, err := r.Edges.AdminUpdatedByOrErr()
-
+func (_m *User) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
+	result, err := _m.Edges.AdminUpdatedByOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryAdminUpdatedBy().Only(ctx)
+		result, err = _m.QueryAdminUpdatedBy().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }
 
-func (r *User) Roles(ctx context.Context) (result []*Role, err error) {
+func (_m *User) Roles(ctx context.Context) (result []*Role, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = r.NamedRoles(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = _m.NamedRoles(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = r.Edges.RolesOrErr()
+		result, err = _m.Edges.RolesOrErr()
 	}
-
 	if IsNotLoaded(err) {
-		result, err = r.QueryRoles().All(ctx)
+		result, err = _m.QueryRoles().All(ctx)
 	}
-
 	return result, err
 }
 
-func (r *User) DefaultRole(ctx context.Context) (*Role, error) {
-	result, err := r.Edges.DefaultRoleOrErr()
-
+func (_m *User) DefaultRole(ctx context.Context) (*Role, error) {
+	result, err := _m.Edges.DefaultRoleOrErr()
 	if IsNotLoaded(err) {
-		result, err = r.QueryDefaultRole().Only(ctx)
+		result, err = _m.QueryDefaultRole().Only(ctx)
 	}
-
 	return result, MaskNotFound(err)
 }

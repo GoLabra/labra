@@ -23,24 +23,24 @@ type AdminUserCreate struct {
 }
 
 // SetID sets the "id" field.
-func (auc *AdminUserCreate) SetID(s string) *AdminUserCreate {
-	auc.mutation.SetID(s)
-	return auc
+func (_c *AdminUserCreate) SetID(v string) *AdminUserCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // Mutation returns the AdminUserMutation object of the builder.
-func (auc *AdminUserCreate) Mutation() *AdminUserMutation {
-	return auc.mutation
+func (_c *AdminUserCreate) Mutation() *AdminUserMutation {
+	return _c.mutation
 }
 
 // Save creates the AdminUser in the database.
-func (auc *AdminUserCreate) Save(ctx context.Context) (*AdminUser, error) {
-	return withHooks(ctx, auc.sqlSave, auc.mutation, auc.hooks)
+func (_c *AdminUserCreate) Save(ctx context.Context) (*AdminUser, error) {
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (auc *AdminUserCreate) SaveX(ctx context.Context) *AdminUser {
-	v, err := auc.Save(ctx)
+func (_c *AdminUserCreate) SaveX(ctx context.Context) *AdminUser {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -48,29 +48,29 @@ func (auc *AdminUserCreate) SaveX(ctx context.Context) *AdminUser {
 }
 
 // Exec executes the query.
-func (auc *AdminUserCreate) Exec(ctx context.Context) error {
-	_, err := auc.Save(ctx)
+func (_c *AdminUserCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (auc *AdminUserCreate) ExecX(ctx context.Context) {
-	if err := auc.Exec(ctx); err != nil {
+func (_c *AdminUserCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (auc *AdminUserCreate) check() error {
+func (_c *AdminUserCreate) check() error {
 	return nil
 }
 
-func (auc *AdminUserCreate) sqlSave(ctx context.Context) (*AdminUser, error) {
-	if err := auc.check(); err != nil {
+func (_c *AdminUserCreate) sqlSave(ctx context.Context) (*AdminUser, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := auc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, auc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -83,18 +83,18 @@ func (auc *AdminUserCreate) sqlSave(ctx context.Context) (*AdminUser, error) {
 			return nil, fmt.Errorf("unexpected AdminUser.ID type: %T", _spec.ID.Value)
 		}
 	}
-	auc.mutation.id = &_node.ID
-	auc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (auc *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
+func (_c *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	var (
-		_node = &AdminUser{config: auc.config}
+		_node = &AdminUser{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(adminuser.Table, sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = auc.conflict
-	if id, ok := auc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
@@ -111,10 +111,10 @@ func (auc *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 //			sql.ResolveWithNewValues(),
 //		).
 //		Exec(ctx)
-func (auc *AdminUserCreate) OnConflict(opts ...sql.ConflictOption) *AdminUserUpsertOne {
-	auc.conflict = opts
+func (_c *AdminUserCreate) OnConflict(opts ...sql.ConflictOption) *AdminUserUpsertOne {
+	_c.conflict = opts
 	return &AdminUserUpsertOne{
-		create: auc,
+		create: _c,
 	}
 }
 
@@ -124,10 +124,10 @@ func (auc *AdminUserCreate) OnConflict(opts ...sql.ConflictOption) *AdminUserUps
 //	client.AdminUser.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (auc *AdminUserCreate) OnConflictColumns(columns ...string) *AdminUserUpsertOne {
-	auc.conflict = append(auc.conflict, sql.ConflictColumns(columns...))
+func (_c *AdminUserCreate) OnConflictColumns(columns ...string) *AdminUserUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AdminUserUpsertOne{
-		create: auc,
+		create: _c,
 	}
 }
 
@@ -239,16 +239,16 @@ type AdminUserCreateBulk struct {
 }
 
 // Save creates the AdminUser entities in the database.
-func (aucb *AdminUserCreateBulk) Save(ctx context.Context) ([]*AdminUser, error) {
-	if aucb.err != nil {
-		return nil, aucb.err
+func (_c *AdminUserCreateBulk) Save(ctx context.Context) ([]*AdminUser, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(aucb.builders))
-	nodes := make([]*AdminUser, len(aucb.builders))
-	mutators := make([]Mutator, len(aucb.builders))
-	for i := range aucb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*AdminUser, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := aucb.builders[i]
+			builder := _c.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*AdminUserMutation)
 				if !ok {
@@ -261,12 +261,12 @@ func (aucb *AdminUserCreateBulk) Save(ctx context.Context) ([]*AdminUser, error)
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, aucb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = aucb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, aucb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -286,7 +286,7 @@ func (aucb *AdminUserCreateBulk) Save(ctx context.Context) ([]*AdminUser, error)
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, aucb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -294,8 +294,8 @@ func (aucb *AdminUserCreateBulk) Save(ctx context.Context) ([]*AdminUser, error)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (aucb *AdminUserCreateBulk) SaveX(ctx context.Context) []*AdminUser {
-	v, err := aucb.Save(ctx)
+func (_c *AdminUserCreateBulk) SaveX(ctx context.Context) []*AdminUser {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -303,14 +303,14 @@ func (aucb *AdminUserCreateBulk) SaveX(ctx context.Context) []*AdminUser {
 }
 
 // Exec executes the query.
-func (aucb *AdminUserCreateBulk) Exec(ctx context.Context) error {
-	_, err := aucb.Save(ctx)
+func (_c *AdminUserCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (aucb *AdminUserCreateBulk) ExecX(ctx context.Context) {
-	if err := aucb.Exec(ctx); err != nil {
+func (_c *AdminUserCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -325,10 +325,10 @@ func (aucb *AdminUserCreateBulk) ExecX(ctx context.Context) {
 //			sql.ResolveWithNewValues(),
 //		).
 //		Exec(ctx)
-func (aucb *AdminUserCreateBulk) OnConflict(opts ...sql.ConflictOption) *AdminUserUpsertBulk {
-	aucb.conflict = opts
+func (_c *AdminUserCreateBulk) OnConflict(opts ...sql.ConflictOption) *AdminUserUpsertBulk {
+	_c.conflict = opts
 	return &AdminUserUpsertBulk{
-		create: aucb,
+		create: _c,
 	}
 }
 
@@ -338,10 +338,10 @@ func (aucb *AdminUserCreateBulk) OnConflict(opts ...sql.ConflictOption) *AdminUs
 //	client.AdminUser.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (aucb *AdminUserCreateBulk) OnConflictColumns(columns ...string) *AdminUserUpsertBulk {
-	aucb.conflict = append(aucb.conflict, sql.ConflictColumns(columns...))
+func (_c *AdminUserCreateBulk) OnConflictColumns(columns ...string) *AdminUserUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AdminUserUpsertBulk{
-		create: aucb,
+		create: _c,
 	}
 }
 

@@ -14,7 +14,7 @@ var (
 )
 
 type Service struct {
-	// Node                  svc.Node
+	*CustomService
 	AdminUser              adminInterfaces.AdminUser
 	File              adminInterfaces.File
 	ForPermission              svc.ForPermission
@@ -24,21 +24,11 @@ type Service struct {
 
 func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service {
 	return &Service{
-		// Node:                  NewNode(repository),
-		//  <no value>
-		//  <no value>
+		CustomService: NewCustomService(repository),
         AdminUser:              adminSvc.NewAdminUser(adminRepo),
-		//  <no value>
-		//  <no value>
         File:              adminSvc.NewFile(adminRepo),
-		//  User
-		//  map[Caption:For Permission DisplayField:name Owner:User]
 		ForPermission:              NewForPermission(repository),
-		//  <no value>
-		//  <no value>
         Role:              adminSvc.NewRole(adminRepo),
-		//  User
-		//  map[Caption:User DisplayField:email Owner:User]
 		User:              NewUser(repository),
 	}
 }
