@@ -146,12 +146,13 @@ func main() {
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowCredentials: true,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type", "X-CSRF-Token", "X-CSRF-TOKEN"},
 	})
 	router := chi.NewRouter()
 	router.Use(corsMiddleware.Handler)
 	router.Use(adminHandler.SecurityHeaders(&appConfig.Config))
+	router.Use(adminHandler.CSRFMiddleware)
 
 	// Rate limiters (per IP)
 	loginLimiter := adminHandler.NewIPRateLimiter(appConfig.Config.AuthLoginRateLimitRPM)
