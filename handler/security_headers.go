@@ -7,25 +7,21 @@ import (
 	"github.com/GoLabra/labra/config"
 )
 
-const defaultCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'"
-
 // SecurityHeaders sets baseline HTTP security headers on every response.
 // HSTS is only set in production and only when the request is HTTPS (direct TLS or X-Forwarded-Proto=https).
 func SecurityHeaders(cfg *config.Config) func(http.Handler) http.Handler {
-	csp := defaultCSP
+	csp := ""
 	appEnv := ""
 
 	if cfg != nil {
 		appEnv = strings.TrimSpace(cfg.Environment)
-		if v := strings.TrimSpace(cfg.CSPPolicy); v != "" {
-			csp = v
-		}
+		csp = strings.TrimSpace(cfg.CSPPolicy)
 	}
 
-	// Prevent header injection via newline characters
-	if strings.ContainsAny(csp, "\r\n") {
-		csp = defaultCSP
-	}
+	// Prevent header injection via newline characters by stripping them.
+	// (No separate default here; config/envDefault already provides the default policy.)
+	csp = strings.ReplaceAll(csp, "\r", "")
+	csp = strings.ReplaceAll(csp, "\n", "")
 
 	isProd := strings.EqualFold(appEnv, "prod") || strings.EqualFold(appEnv, "production")
 
@@ -37,7 +33,9 @@ func SecurityHeaders(cfg *config.Config) func(http.Handler) http.Handler {
 			h.Set("X-Content-Type-Options", "nosniff")
 			h.Set("X-XSS-Protection", "0") // disabled in favor of CSP
 			h.Set("Referrer-Policy", "strict-origin-when-cross-origin")
-			h.Set("Content-Security-Policy", csp)
+			if csp != "" {
+				h.Set("Content-Security-Policy", csp)
+			}
 			h.Set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
 
 			// HSTS: production only, and only over HTTPS
