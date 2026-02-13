@@ -114,16 +114,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	secure := r.TLS != nil || strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https")
 
-	// JWT cookie (HttpOnly)
-	http.SetCookie(w, &http.Cookie{
-		Name:     "jwt",
-		Value:    signedToken,
-		Path:     "/",
-		Secure:   secure,
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-	})
-
 	// CSRF cookie (readable by JS) - double-submit cookie pattern
 	csrf, err := NewCSRFToken()
 	if err != nil {
@@ -131,6 +121,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	SetCSRFCookie(w, csrf, secure)
+
+	cookieDomain := ""
+	SetJWTCookie(w, r, signedToken, cookieDomain)
 
 	response, _ := json.Marshal(map[string]string{
 		"token": signedToken,
