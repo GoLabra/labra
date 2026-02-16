@@ -167,6 +167,26 @@ func Authenticator(next http.Handler) http.Handler {
 			return
 		}
 
+		// ✅ Validate: user must really have this role in the DB (default role OR extra roles).
+		first := 1
+		assigned, err := service.AdminUser.Get(iCtx, &ent.AdminUserWhereInput{
+			Or: []*ent.AdminUserWhereInput{
+				{ID: &user.ID, HasDefaultRoleWith: []*ent.RoleWhereInput{{ID: &role.ID}}},
+				{ID: &user.ID, HasRolesWith: []*ent.RoleWhereInput{{ID: &role.ID}}},
+			},
+		}, nil, nil, &first, nil)
+
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			log.Printf("error validating user role assignment: %v", err)
+			return
+		}
+		if len(assigned) == 0 {
+			w.WriteHeader(http.StatusUnauthorized)
+			log.Printf("role claim rejected: user is not assigned to role=%s", roleName)
+			return
+		}
+
 		// ✅ If this is a WS upgrade, optionally validate Centrifugo token too (if present).
 		if isWebSocketUpgrade(r) {
 			if err := validateCentrifugoTokenIfPresent(r, appConfig, user.Email, user.ID); err != nil {
