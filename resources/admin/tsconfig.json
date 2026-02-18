@@ -13,6 +13,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "types": ["node"],
+    "skipDefaultLibCheck": true,
     "plugins": [
       {
         "name": "next"
@@ -22,6 +24,12 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/features/content-manager/form-entry/content-manager-entry-role.sx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/features/content-manager/form-entry/content-manager-entry-role.sx"
+  ],
   "exclude": ["node_modules"]
 }

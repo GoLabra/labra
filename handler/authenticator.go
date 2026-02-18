@@ -40,10 +40,12 @@ func Authenticator(next http.Handler) http.Handler {
 		}
 
 		var tokenString string
+		usedCookieAuth := false
 
 		if token := r.Header.Get("Authorization"); token != "" {
 			tokenString = strings.TrimPrefix(token, "Bearer ")
 		} else if token, err := r.Cookie("jwt"); err == nil {
+			usedCookieAuth = true
 			tokenString = token.Value
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -108,6 +110,17 @@ func Authenticator(next http.Handler) http.Handler {
 
 		ctx = context.WithValue(ctx, constants.UserContextValue, user)
 		ctx = context.WithValue(ctx, constants.RoleContextValue, role)
+
+		// If auth came from cookie-based JWT, ensure CSRF cookie exists (double-submit cookie pattern).
+		if usedCookieAuth {
+			if _, err := r.Cookie("csrf_token"); err != nil {
+				csrf, err := NewCSRFToken()
+				if err == nil {
+					secure := r.TLS != nil || strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https")
+					SetCSRFCookie(w, csrf, secure)
+				}
+			}
+		}
 
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
