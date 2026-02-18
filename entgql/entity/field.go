@@ -31,7 +31,6 @@ const validateErrorMessageTemplate = "[Validate] field %s invalid: %w"
 var reservedFieldNames = map[string]bool{
 	"edges":       true, // Reserved by ent
 	"type":        true, // Go keyword
-	"id":          true,
 	"func":        true, // Go keyword
 	"var":         true, // Go keyword
 	"const":       true, // Go keyword
