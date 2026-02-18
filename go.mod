@@ -12,6 +12,7 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.6.0
+	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/iancoleman/strcase v0.3.0
 	github.com/infisical/go-sdk v0.6.5
@@ -25,6 +26,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.31
 	golang.org/x/crypto v0.47.0
 	golang.org/x/text v0.33.0
+	golang.org/x/time v0.14.0
 )
 
 require (
@@ -102,7 +104,6 @@ require (
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.41.0 // indirect
 	google.golang.org/api v0.260.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260120221211-b8f7ae30c516 // indirect

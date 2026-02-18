@@ -72,7 +72,7 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 
 		service, ok := ctx.Value(constants.AdminServiceContextValue).(*svc.Service)
 		if !ok {
-			return nil, fmt.Errorf(svc.ErrServiceNotSetInContext)
+			return nil, fmt.Errorf("%s", svc.ErrServiceNotSetInContext)
 		}
 
 		role, ok := ctx.Value(constants.RoleContextValue).(*ent.Role)

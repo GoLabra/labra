@@ -25,6 +25,9 @@ type AppStatusSubscriber struct {
 type EntitySubscriber struct {
 	Ctx  context.Context
 	Chan chan []*entity.Entity
+
+	// nil => allow all (e.g., SuperAdmin)
+	AllowedEntities map[string]struct{}
 }
 
 type AppStatus string
@@ -52,12 +55,34 @@ func (s *GraphqlSubscriptionClient) PublishAppStatusMessage(appStatus AppStatus)
 
 func (s *GraphqlSubscriptionClient) PublishEntities(entities []*entity.Entity) {
 	for i := 0; i < len(s.EntitySubscribers); i++ {
-		cgs := s.EntitySubscribers[i]
+		sub := s.EntitySubscribers[i]
+
 		select {
-		case <-cgs.Ctx.Done():
+		case <-sub.Ctx.Done():
 			s.EntitySubscribers = append(s.EntitySubscribers[:i], s.EntitySubscribers[i+1:]...)
 			i--
-		case cgs.Chan <- entities:
+			continue
+		default:
+		}
+
+		payload := entities
+
+		// If not nil => filter
+		if sub.AllowedEntities != nil {
+			filtered := make([]*entity.Entity, 0, len(entities))
+			for _, e := range entities {
+				if _, ok := sub.AllowedEntities[e.Name]; ok {
+					filtered = append(filtered, e)
+				}
+			}
+			payload = filtered
+		}
+
+		select {
+		case <-sub.Ctx.Done():
+			s.EntitySubscribers = append(s.EntitySubscribers[:i], s.EntitySubscribers[i+1:]...)
+			i--
+		case sub.Chan <- payload:
 		}
 	}
 }
