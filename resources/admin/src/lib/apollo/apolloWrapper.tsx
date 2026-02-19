@@ -19,7 +19,12 @@ import { setContext } from "@apollo/client/link/context";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
-import { STORAGE_KEY as JWT_STORAGE_KEY } from "@/core-features/auth/jwt-context";
+import { fromError, fromPromise } from "@apollo/client/link/utils";
+import {
+  clearAuthTokens,
+  getAccessToken,
+  refreshAdminAccessToken,
+} from "@/core-features/auth/token-storage";
 
 const getCookie = (name: string): string => {
   if (typeof document === "undefined") return "";
@@ -35,7 +40,7 @@ export type ApiType = "admin" | "user";
 export const ADMIN_CONTEXT = { clientName: "admin" };
 
 const getBearerToken = () => {
-  const token = localStorage?.getItem(JWT_STORAGE_KEY);
+  const token = getAccessToken();
   return token ? `Bearer ${token}` : "";
 };
 
@@ -195,6 +200,41 @@ function makeClient() {
 
   // Create error link
   const errorLink = onError((message: any) => {
+    const statusCode =
+      message?.networkError?.statusCode ?? message?.networkError?.response?.status;
+
+    if (statusCode === 401) {
+      const context = message?.operation?.getContext?.() ?? {};
+      const authHeader =
+        context?.headers?.authorization ?? context?.headers?.Authorization ?? "";
+
+      if (!authHeader || context?.authRefreshTried) {
+        clearAuthTokens();
+        return;
+      }
+
+      message.operation.setContext({ authRefreshTried: true });
+
+      return fromPromise(refreshAdminAccessToken(GRAPHQL_API_URL)).flatMap(
+        (nextAccessToken: string | null) => {
+          if (!nextAccessToken) {
+            clearAuthTokens();
+            return fromError(message.networkError ?? new Error("Unauthorized"));
+          }
+
+          const headers = message.operation.getContext().headers ?? {};
+          message.operation.setContext({
+            headers: {
+              ...headers,
+              authorization: `Bearer ${nextAccessToken}`,
+            },
+          });
+
+          return message.forward(message.operation);
+        },
+      );
+    }
+
     if (message.networkError) {
       addNotification({
         message: `Network error: ${message.networkError.message} (${GRAPHQL_QUERY_API_URL})`,

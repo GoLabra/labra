@@ -10,6 +10,15 @@ import { changeRoleQuery, signInQuery, superUserSignUpQuery } from '@/lib/apollo
 import { useMutation, useQuery, useLazyQuery, gql } from '@apollo/client';
 import { isJwtValid, getJwtSub } from '@/lib/utils/jwt';
 import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
+import { GRAPHQL_API_URL } from '@/config/CONST';
+import {
+    ACCESS_TOKEN_STORAGE_KEY,
+    clearAuthTokens,
+    getAccessToken,
+    refreshAdminAccessToken,
+    setAccessToken,
+    setAuthTokens,
+} from './token-storage';
 
 
 export const getMeDocument = gql`query getMe($where:AdminUserWhereInput!) {
@@ -23,7 +32,7 @@ export const getMeDocument = gql`query getMe($where:AdminUserWhereInput!) {
   }`
 
 
-export const STORAGE_KEY = 'accessToken';
+export const STORAGE_KEY = ACCESS_TOKEN_STORAGE_KEY;
 
 interface State {
     isInitialized: boolean;
@@ -136,7 +145,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     const initialize = useCallback(
         async (): Promise<void> => {
             try {
-                const accessToken = globalThis.localStorage.getItem(STORAGE_KEY);
+                const accessToken = getAccessToken();
 
                 if (isJwtValid(accessToken)) {
                     const meResponse = await me({ variables: { where: { email: getJwtSub(accessToken) } } });
@@ -148,17 +157,36 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                             user: meResponse.data.adminUsers[0]
                         }
                     });
-                } else {
+
+                    return;
+                }
+
+                const refreshedAccessToken = await refreshAdminAccessToken(GRAPHQL_API_URL);
+
+                if (isJwtValid(refreshedAccessToken)) {
+                    const meResponse = await me({ variables: { where: { email: getJwtSub(refreshedAccessToken) } } });
+
                     dispatch({
                         type: ActionType.INITIALIZE,
                         payload: {
-                            isAuthenticated: false,
-                            user: null
+                            isAuthenticated: true,
+                            user: meResponse.data.adminUsers[0]
                         }
                     });
+
+                    return;
                 }
+
+                dispatch({
+                    type: ActionType.INITIALIZE,
+                    payload: {
+                        isAuthenticated: false,
+                        user: null
+                    }
+                });
             } catch (err) {
                 console.error(err);
+                clearAuthTokens();
                 dispatch({
                     type: ActionType.INITIALIZE,
                     payload: {
@@ -167,12 +195,12 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                     }
                 });
             }
-        }, [dispatch]
+        }, [dispatch, me]
     );
 
     useEffect(() => {
         initialize();
-    }, []);
+    }, [initialize]);
 
     const signIn = useCallback(
         async (data: any): Promise<void> => {
@@ -185,7 +213,13 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
             });
 
             const accessToken = result.data.signIn.token;
-            localStorage.setItem(STORAGE_KEY, accessToken);
+            const refreshToken = result.data.signIn.refresh_token;
+
+            if (!accessToken || !refreshToken) {
+                throw new Error('Missing token pair from /admin/login');
+            }
+
+            setAuthTokens(accessToken, refreshToken);
 
             const meResponse = await me({ variables: { where: { email: getJwtSub(accessToken) } } });
             const {roles, ...user} = meResponse.data.adminUsers[0];
@@ -196,7 +230,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                     user: user
                 }
             });
-        }, [dispatch]);
+        }, [dispatch, me, signInRequest]);
 
     const changeRole = useCallback(
         async (role: string): Promise<void> => {
@@ -210,8 +244,11 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
             });
 
             const accessToken = result.data.changeRole.token;
-            localStorage.setItem(STORAGE_KEY, accessToken);
-        }, []);
+            if (!accessToken) {
+                throw new Error('Missing token from /admin/change-session-role');
+            }
+            setAccessToken(accessToken);
+        }, [changeRoleRequest]);
 
     const signUp = useCallback(
         async (data: any): Promise<void> => {
@@ -224,12 +261,12 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                 }
             });
         },
-        [dispatch]
+        [signUpRequest]
     );
 
     const signOut = useCallback(
         async (): Promise<void> => {
-            localStorage.removeItem(STORAGE_KEY);
+            clearAuthTokens();
             dispatch({ type: ActionType.SIGN_OUT });
         }, [dispatch]);
 

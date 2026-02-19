@@ -4,16 +4,20 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
+	"entgo.io/ent/dialect"
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
 	"github.com/GoLabra/labra/mocks"
 	"github.com/golang/mock/gomock"
+	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -189,6 +193,11 @@ func TestLogin(t *testing.T) {
 			}
 
 			ctx := tt.setupContext(mockAdminUser)
+			if tt.expectedStatus == http.StatusOK {
+				client := newTestAdminEntClient(t)
+				ctx = context.WithValue(ctx, constants.AdminEntClientContextValue, client)
+			}
+
 			req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(body)).WithContext(ctx)
 			req.Header.Set("Content-Type", "application/json")
 
@@ -208,6 +217,9 @@ func TestLogin(t *testing.T) {
 				if response["token"] == "" {
 					t.Error("expected token in response")
 				}
+				if response["refresh_token"] == "" {
+					t.Error("expected refresh_token in response")
+				}
 			}
 		})
 	}
@@ -216,4 +228,19 @@ func TestLogin(t *testing.T) {
 // Helper function to create string pointer
 func stringPtr(s string) *string {
 	return &s
+}
+
+func newTestAdminEntClient(t *testing.T) *ent.Client {
+	t.Helper()
+
+	dsn := fmt.Sprintf("file:login-test-%d?mode=memory&cache=shared&_fk=1", time.Now().UnixNano())
+	client, err := ent.Open(dialect.SQLite, dsn)
+	if err != nil {
+		t.Fatalf("failed to create test ent client: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = client.Close()
+	})
+
+	return client
 }
