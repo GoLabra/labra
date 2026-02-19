@@ -30,10 +30,10 @@ func TestLogin(t *testing.T) {
 			name: "successful login",
 			requestBody: LoginFormData{
 				Email:    "test@example.com",
-				Password: "password123",
+				Password: "hashed-password",
 			},
 			setupMocks: func(mockAdminUser *mocks.MockAdminUser) {
-				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("hashed-password"), bcrypt.DefaultCost)
 				user := CreateTestAdminUser("user-1", "test@example.com", string(hashedPassword))
 				role := CreateTestRole("role-1", "Admin")
 				testUser := CreateTestAdminUserWithDefaultRole(user, role)
@@ -63,7 +63,7 @@ func TestLogin(t *testing.T) {
 			name: "user not found",
 			requestBody: LoginFormData{
 				Email:    "nonexistent@example.com",
-				Password: "password123",
+				Password: "hashed-password",
 			},
 			setupMocks: func(mockAdminUser *mocks.MockAdminUser) {
 				mockAdminUser.EXPECT().
@@ -88,7 +88,7 @@ func TestLogin(t *testing.T) {
 				Password: "wrongpassword",
 			},
 			setupMocks: func(mockAdminUser *mocks.MockAdminUser) {
-				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("hashed-password"), bcrypt.DefaultCost)
 				user := CreateTestAdminUser("user-1", "test@example.com", string(hashedPassword))
 				role := CreateTestRole("role-1", "Admin")
 				testUser := CreateTestAdminUserWithDefaultRole(user, role)
@@ -129,7 +129,7 @@ func TestLogin(t *testing.T) {
 			name: "service not in context",
 			requestBody: LoginFormData{
 				Email:    "test@example.com",
-				Password: "password123",
+				Password: "hashed-password",
 			},
 			setupMocks: func(mockAdminUser *mocks.MockAdminUser) {
 				// No mocks needed
@@ -148,10 +148,10 @@ func TestLogin(t *testing.T) {
 			name: "config not in context",
 			requestBody: LoginFormData{
 				Email:    "test@example.com",
-				Password: "password123",
+				Password: "hashed-password",
 			},
 			setupMocks: func(mockAdminUser *mocks.MockAdminUser) {
-				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("hashed-password"), bcrypt.DefaultCost)
 				user := CreateTestAdminUser("user-1", "test@example.com", string(hashedPassword))
 				role := CreateTestRole("role-1", "Admin")
 				testUser := CreateTestAdminUserWithDefaultRole(user, role)

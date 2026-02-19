@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -28,28 +27,25 @@ type User interface {
 
 // TODO: 1. sanitize error messages; 2. move to api; 3. add logs;
 func Login(w http.ResponseWriter, r *http.Request) {
-	var (
-		loginFormData LoginFormData
-	)
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("error reading body: %v", err)
-		return
-	}
-	defer r.Body.Close()
-	err = json.Unmarshal(body, &loginFormData)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Printf("error unmarshaling body: %v", err)
-		return
-	}
-
 	service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(svc.ErrServiceNotSetInContext)
+		return
+	}
+
+	var loginFormData LoginFormData
+
+	if err := decodeJSONLimited(w, r, &loginFormData, MaxBodyLoginBytes); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("invalid request body: %v", err)
+		return
+	}
+
+	loginFormData.Sanitize()
+	if err := loginFormData.Validate(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("validation failed: %v", err)
 		return
 	}
 

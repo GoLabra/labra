@@ -2,9 +2,7 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/GoLabra/labra/constants"
@@ -28,24 +26,24 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		superAdminRole *ent.Role
 	)
 
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		fmt.Printf("error reading body: %v", err)
-		writeErrorResponse(w, "unable to read body", http.StatusInternalServerError)
-		return
-	}
-	defer r.Body.Close()
-	err = json.Unmarshal(body, &signupFormData)
-	if err != nil {
-		fmt.Printf("error unmarshaling body: %v", err)
-		writeErrorResponse(w, "unable to unmarshal body", http.StatusInternalServerError)
-		return
-	}
+	var err error
 
 	service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
 	if !ok {
 		fmt.Printf("error getting service: %v", err)
 		writeErrorResponse(w, "unable to get service", http.StatusInternalServerError)
+		return
+	}
+
+	if err := decodeJSONLimited(w, r, &signupFormData, MaxBodySignupBytes); err != nil {
+		// Keep existing behavior expected by tests
+		writeErrorResponse(w, "unable to unmarshal body", http.StatusInternalServerError)
+		return
+	}
+
+	signupFormData.Sanitize()
+	if err := signupFormData.Validate(); err != nil {
+		writeErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
