@@ -9,6 +9,7 @@ export const signInQuery = gql`
     mutation SignIn($input: SignInPayload!) {
         signIn( input: $input) @rest(type: "User", method: "POST", path: "/admin/login") {
             token
+            refresh_token
         }
     }
 `;

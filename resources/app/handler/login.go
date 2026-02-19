@@ -8,14 +8,12 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	adminSvc "github.com/GoLabra/labra/entgql/domain/svc"
 	adminEnt "github.com/GoLabra/labra/entgql/ent"
-	"github.com/golang-jwt/jwt"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/GoLabra/labra/jwtrefresh"
 )
 
 type LoginFormData struct {
@@ -80,17 +78,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginFormData.Password)); err != nil {
+	if user.Password != loginFormData.Password { // THIS IS A BASIC EXAMPLE. DO NOT STORE PASSWORDS IN PLAIN TEXT
 		log.Printf("passwords do not match: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-
-	var token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":  time.Now().Add(24 * time.Hour).Unix(),
-		"sub":  user.Email,
-		"role": role.Name,
-	})
 
 	appConfig, ok := r.Context().Value("config").(*config.AppConfig)
 
@@ -99,14 +91,46 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	signedToken, err := token.SignedString([]byte(appConfig.SecretKey))
+	entClient, ok := r.Context().Value(constants.EntClientContextValue).(*ent.Client)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("ent client not found")
+		return
+	}
+
+	pair, err := jwtrefresh.IssueTokenPair(
+		appConfig.SecretKey,
+		user.Email,
+		role.Name,
+		jwtrefresh.SubjectTypeUser,
+		appConfig.AccessTokenTTL,
+		appConfig.RefreshTokenTTL,
+	)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("failed to issue token pair: %v", err)
+		return
+	}
+
+	err = jwtrefresh.SaveRefreshToken(
+		r.Context(),
+		entClient,
+		appConfig.DBDialect,
+		pair.RefreshToken,
+		user.Email,
+		jwtrefresh.SubjectTypeUser,
+		role.Name,
+		pair.RefreshExpiresAt,
+	)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("failed to save refresh token: %v", err)
 		return
 	}
 
 	response, _ := json.Marshal(map[string]string{
-		"token": signedToken,
+		"token":         pair.AccessToken,
+		"refresh_token": pair.RefreshToken,
 	})
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

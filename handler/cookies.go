@@ -8,7 +8,7 @@ import (
 
 const (
 	jwtCookieName = "jwt"
-	jwtMaxAgeSecs = 60 * 60 * 24 // 24h
+	defaultJWTTTL = 24 * time.Hour
 )
 
 // Decide Secure based on TLS (direct https) OR reverse proxy header.
@@ -28,14 +28,25 @@ func jwtSameSiteMode() http.SameSite {
 }
 
 func SetJWTCookie(w http.ResponseWriter, r *http.Request, token string, domain string) {
+	SetJWTCookieWithTTL(w, r, token, domain, defaultJWTTTL)
+}
+
+func SetJWTCookieWithTTL(w http.ResponseWriter, r *http.Request, token string, domain string, ttl time.Duration) {
 	secure := isSecureRequest(r)
+	if ttl <= 0 {
+		ttl = defaultJWTTTL
+	}
+	maxAgeSeconds := int(ttl.Seconds())
+	if maxAgeSeconds <= 0 {
+		maxAgeSeconds = 1
+	}
 
 	c := &http.Cookie{
 		Name:     jwtCookieName,
 		Value:    token,
 		Path:     "/",
-		MaxAge:   jwtMaxAgeSecs,
-		Expires:  time.Now().Add(time.Duration(jwtMaxAgeSecs) * time.Second),
+		MaxAge:   maxAgeSeconds,
+		Expires:  time.Now().Add(ttl),
 		Secure:   secure,
 		HttpOnly: true,
 		SameSite: jwtSameSiteMode(),

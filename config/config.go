@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
@@ -37,8 +38,8 @@ type Config struct {
 	AuthAPIRateLimitRPM    int `env:"AUTH_API_RATE_LIMIT_RPM" envDefault:"100"`
 
 	// AccessToken and RefreshToken expiration times in minutes
-	AuthAccessTokenTTLMinutes int `env:"AUTH_ACCESS_TOKEN_TTL_MINUTES" envDefault:"20"`
-	AuthRefreshTokenTTLDays   int `env:"AUTH_REFRESH_TOKEN_TTL_DAYS" envDefault:"7"`
+	AccessTokenTTL  time.Duration `env:"ACCESS_TOKEN_TTL" envDefault:"15m"`
+	RefreshTokenTTL time.Duration `env:"REFRESH_TOKEN_TTL" envDefault:"168h"`
 }
 
 // Secrets holds sensitive credentials fetched from Infisical or environment variables.
