@@ -55,6 +55,8 @@ const (
 	ServiceContextValue             ContextKey = "service"
 	AdminRepositoryContextValue     ContextKey = "adminRepository"
 	AdminServiceContextValue        ContextKey = "adminService"
+	EntClientContextValue           ContextKey = "entClient"
+	AdminEntClientContextValue      ContextKey = "adminEntClient"
 	CentrifugeClientContextValue    ContextKey = "centrifugeClient"
 	UserContextValue                ContextKey = "user"
 	RoleContextValue                ContextKey = "role"

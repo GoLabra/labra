@@ -35,6 +35,10 @@ type Config struct {
 	AuthLoginRateLimitRPM  int `env:"AUTH_LOGIN_RATE_LIMIT_RPM" envDefault:"10"`
 	AuthSignupRateLimitRPM int `env:"AUTH_SIGNUP_RATE_LIMIT_RPM" envDefault:"5"`
 	AuthAPIRateLimitRPM    int `env:"AUTH_API_RATE_LIMIT_RPM" envDefault:"100"`
+
+	// AccessToken and RefreshToken expiration times in minutes
+	AuthAccessTokenTTLMinutes int `env:"AUTH_ACCESS_TOKEN_TTL_MINUTES" envDefault:"20"`
+	AuthRefreshTokenTTLDays   int `env:"AUTH_REFRESH_TOKEN_TTL_DAYS" envDefault:"7"`
 }
 
 // Secrets holds sensitive credentials fetched from Infisical or environment variables.
