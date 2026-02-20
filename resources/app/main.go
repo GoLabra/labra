@@ -203,6 +203,7 @@ func main() {
 		router.Use(apiLimiter.Middleware)
 
 		router.Post("/change-session-role", handler.ChangeSessionRole)
+		router.Post("/logout", handler.Logout)
 	})
 	router.Group(func(router chi.Router) {
 		router.With(loginLimiter.Middleware).Post("/login", handler.Login)
@@ -240,6 +241,7 @@ func main() {
 		router.Use(apiLimiter.Middleware)
 
 		router.Post("/admin/change-session-role", adminHandler.ChangeSessionRole)
+		router.Post("/admin/logout", adminHandler.Logout)
 	})
 	router.Group(func(router chi.Router) {
 		router.With(loginLimiter.Middleware).Post("/admin/login", adminHandler.Login)
