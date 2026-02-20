@@ -6,15 +6,21 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
+	"github.com/GoLabra/labra/jwtrefresh"
+	"github.com/GoLabra/labra/tokenrevocation"
 
 	jwt_hs "github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
+
+var tokenRevocationCleanupOnce sync.Once
 
 func isWebSocketUpgrade(r *http.Request) bool {
 	// RFC allows comma-separated values, so use Contains checks.
@@ -87,6 +93,24 @@ func validateCentrifugoTokenIfPresent(r *http.Request, appCfg *config.AppConfig,
 	return nil
 }
 
+func startTokenRevocationCleanupJob(adminEntClient *ent.Client) {
+	if adminEntClient == nil {
+		return
+	}
+
+	tokenRevocationCleanupOnce.Do(func() {
+		tokenrevocation.StartCleanupJob(
+			context.Background(),
+			adminEntClient,
+			adminEntClient.DialectName(),
+			time.Hour,
+			func(format string, args ...any) {
+				log.Printf(format, args...)
+			},
+		)
+	})
+}
+
 func Authenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
@@ -102,6 +126,9 @@ func Authenticator(next http.Handler) http.Handler {
 			log.Println("config not found")
 			return
 		}
+
+		adminEntClient, _ := r.Context().Value(constants.AdminEntClientContextValue).(*ent.Client)
+		startTokenRevocationCleanupJob(adminEntClient)
 
 		// ✅ DO NOT bypass auth for WebSocket upgrades.
 		tokenString := extractJWTFromRequest(r)
@@ -136,6 +163,53 @@ func Authenticator(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusUnauthorized)
 			log.Println("missing sub claim")
 			return
+		}
+
+		tokenType := claimStringValue(claims, jwtrefresh.ClaimType)
+		if tokenType != "" && tokenType != jwtrefresh.TokenTypeAccess {
+			w.WriteHeader(http.StatusUnauthorized)
+			log.Println("invalid token type")
+			return
+		}
+
+		issuedAt, err := claimUnixTime(claims, "iat")
+		if err != nil {
+			issuedAt = time.Time{}
+		}
+
+		subjectType := claimStringValue(claims, jwtrefresh.ClaimSubjectType)
+		if subjectType == "" {
+			subjectType = jwtrefresh.SubjectTypeAdmin
+		}
+
+		if adminEntClient != nil {
+			dialect := adminEntClient.DialectName()
+
+			tokenRevoked, err := tokenrevocation.IsTokenRevoked(r.Context(), adminEntClient, dialect, tokenString)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				log.Printf("failed checking token blacklist: %v", err)
+				return
+			}
+			if tokenRevoked {
+				w.WriteHeader(http.StatusUnauthorized)
+				log.Println("token is revoked")
+				return
+			}
+
+			if !issuedAt.IsZero() {
+				subjectRevoked, err := tokenrevocation.IsSubjectTokenRevoked(r.Context(), adminEntClient, dialect, userEmail, subjectType, issuedAt)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					log.Printf("failed checking subject revocation: %v", err)
+					return
+				}
+				if subjectRevoked {
+					w.WriteHeader(http.StatusUnauthorized)
+					log.Println("token invalidated by subject revocation")
+					return
+				}
+			}
 		}
 
 		// Use internal context for authentication operations (bypasses permission checks)

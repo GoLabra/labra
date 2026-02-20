@@ -6,6 +6,7 @@ import (
 
 	"github.com/GoLabra/labra/entgql/domain/repo"
 	"github.com/GoLabra/labra/entgql/ent"
+	"github.com/GoLabra/labra/jwtrefresh"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -40,6 +41,25 @@ func hashPasswordAdminUserCreate(data *ent.CreateAdminUserInput) error {
 	}
 	data.Password = string(hashedPassword)
 	return nil
+}
+
+func shouldRevokeAdminUserTokensOnUpdate(data ent.UpdateAdminUserInput) bool {
+	if data.Password != nil {
+		return true
+	}
+
+	// Any role assignment/default-role mutation must invalidate active access tokens.
+	if data.Roles != nil || data.DefaultRole != nil {
+		return true
+	}
+	if data.DefaultRoleID != nil || data.ClearDefaultRole {
+		return true
+	}
+	if data.ClearRoles || len(data.AddRoleIDs) > 0 || len(data.RemoveRoleIDs) > 0 {
+		return true
+	}
+
+	return false
 }
 
 func (s *AdminUser) Get(ctx context.Context, where *ent.AdminUserWhereInput, orderBy *ent.AdminUserOrder, skip *int, first *int, last *int) ([]*ent.AdminUser, error) {
@@ -95,31 +115,170 @@ func (s *AdminUser) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cre
 }
 
 func (s *AdminUser) Update(ctx context.Context, where ent.AdminUserWhereUniqueInput, data ent.UpdateAdminUserInput) (*ent.AdminUser, error) {
+	shouldRevoke := shouldRevokeAdminUserTokensOnUpdate(data)
+
+	var before *ent.AdminUser
+	var err error
+	if shouldRevoke {
+		before, err = s.repository.AdminUser.GetOne(ctx, where)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if err := hashPasswordAdminUserUpdate(&data); err != nil {
 		return nil, err
 	}
-	return s.repository.AdminUser.Update(ctx, where, data)
+
+	updated, err := s.repository.AdminUser.Update(ctx, where, data)
+	if err != nil {
+		return nil, err
+	}
+
+	if shouldRevoke {
+		subjects := []subjectRevocation{{
+			Email:       before.Email,
+			SubjectType: jwtrefresh.SubjectTypeAdmin,
+		}}
+
+		if data.Email != nil {
+			subjects = append(subjects, subjectRevocation{
+				Email:       *data.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+
+		if err := revokeSubjects(ctx, s.repository, subjects); err != nil {
+			return nil, err
+		}
+	}
+
+	return updated, nil
 }
 
 func (s *AdminUser) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereUniqueInput, data ent.UpdateAdminUserInput) (*ent.AdminUser, error) {
+	shouldRevoke := shouldRevokeAdminUserTokensOnUpdate(data)
+
+	var before *ent.AdminUser
+	var err error
+	if shouldRevoke {
+		before, err = s.repository.AdminUser.GetOneTx(ctx, tx, where)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if err := hashPasswordAdminUserUpdate(&data); err != nil {
 		return nil, err
 	}
-	return s.repository.AdminUser.UpdateTx(ctx, tx, where, data)
+
+	updated, err := s.repository.AdminUser.UpdateTx(ctx, tx, where, data)
+	if err != nil {
+		return nil, err
+	}
+
+	if shouldRevoke {
+		subjects := []subjectRevocation{{
+			Email:       before.Email,
+			SubjectType: jwtrefresh.SubjectTypeAdmin,
+		}}
+
+		if data.Email != nil {
+			subjects = append(subjects, subjectRevocation{
+				Email:       *data.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+
+		if err := revokeSubjects(ctx, s.repository, subjects); err != nil {
+			return nil, err
+		}
+	}
+
+	return updated, nil
 }
 
 func (s *AdminUser) UpdateMany(ctx context.Context, where ent.AdminUserWhereInput, data ent.UpdateAdminUserInput) (int, error) {
+	shouldRevoke := shouldRevokeAdminUserTokensOnUpdate(data)
+
+	var subjects []subjectRevocation
+	var err error
+	if shouldRevoke {
+		users, getErr := s.repository.AdminUser.Get(ctx, &where, nil, nil, nil, nil)
+		if getErr != nil {
+			return 0, getErr
+		}
+		for _, user := range users {
+			subjects = append(subjects, subjectRevocation{
+				Email:       user.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+	}
+
 	if err := hashPasswordAdminUserUpdate(&data); err != nil {
 		return 0, err
 	}
-	return s.repository.AdminUser.UpdateMany(ctx, where, data)
+
+	updatedRows, err := s.repository.AdminUser.UpdateMany(ctx, where, data)
+	if err != nil {
+		return 0, err
+	}
+
+	if shouldRevoke && updatedRows > 0 {
+		if data.Email != nil {
+			subjects = append(subjects, subjectRevocation{
+				Email:       *data.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+		if err := revokeSubjects(ctx, s.repository, subjects); err != nil {
+			return 0, err
+		}
+	}
+
+	return updatedRows, nil
 }
 
 func (s *AdminUser) UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereInput, data ent.UpdateAdminUserInput) (int, error) {
+	shouldRevoke := shouldRevokeAdminUserTokensOnUpdate(data)
+
+	var subjects []subjectRevocation
+	if shouldRevoke {
+		users, err := s.repository.AdminUser.GetTx(ctx, tx, &where, nil, nil, nil, nil)
+		if err != nil {
+			return 0, err
+		}
+		for _, user := range users {
+			subjects = append(subjects, subjectRevocation{
+				Email:       user.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+	}
+
 	if err := hashPasswordAdminUserUpdate(&data); err != nil {
 		return 0, err
 	}
-	return s.repository.AdminUser.UpdateManyTx(ctx, tx, where, data)
+
+	updatedRows, err := s.repository.AdminUser.UpdateManyTx(ctx, tx, where, data)
+	if err != nil {
+		return 0, err
+	}
+
+	if shouldRevoke && updatedRows > 0 {
+		if data.Email != nil {
+			subjects = append(subjects, subjectRevocation{
+				Email:       *data.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+		if err := revokeSubjects(ctx, s.repository, subjects); err != nil {
+			return 0, err
+		}
+	}
+
+	return updatedRows, nil
 }
 
 func (s *AdminUser) Upsert(ctx context.Context, data ent.CreateAdminUserInput) (*ent.AdminUser, error) {
@@ -155,17 +314,97 @@ func (s *AdminUser) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cre
 }
 
 func (s *AdminUser) Delete(ctx context.Context, where ent.AdminUserWhereUniqueInput) (*ent.AdminUser, error) {
-	return s.repository.AdminUser.Delete(ctx, where)
+	user, err := s.repository.AdminUser.GetOne(ctx, where)
+	if err != nil {
+		return nil, err
+	}
+
+	deleted, err := s.repository.AdminUser.Delete(ctx, where)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := revokeSubjects(ctx, s.repository, []subjectRevocation{{
+		Email:       user.Email,
+		SubjectType: jwtrefresh.SubjectTypeAdmin,
+	}}); err != nil {
+		return nil, err
+	}
+
+	return deleted, nil
 }
 
 func (s *AdminUser) DeleteTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereUniqueInput) (*ent.AdminUser, error) {
-	return s.repository.AdminUser.DeleteTx(ctx, tx, where)
+	user, err := s.repository.AdminUser.GetOneTx(ctx, tx, where)
+	if err != nil {
+		return nil, err
+	}
+
+	deleted, err := s.repository.AdminUser.DeleteTx(ctx, tx, where)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := revokeSubjects(ctx, s.repository, []subjectRevocation{{
+		Email:       user.Email,
+		SubjectType: jwtrefresh.SubjectTypeAdmin,
+	}}); err != nil {
+		return nil, err
+	}
+
+	return deleted, nil
 }
 
 func (s *AdminUser) DeleteMany(ctx context.Context, where ent.AdminUserWhereInput) (int, error) {
-	return s.repository.AdminUser.DeleteMany(ctx, where)
+	users, err := s.repository.AdminUser.Get(ctx, &where, nil, nil, nil, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	deletedRows, err := s.repository.AdminUser.DeleteMany(ctx, where)
+	if err != nil {
+		return 0, err
+	}
+
+	if deletedRows > 0 {
+		subjects := make([]subjectRevocation, 0, len(users))
+		for _, user := range users {
+			subjects = append(subjects, subjectRevocation{
+				Email:       user.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+		if err := revokeSubjects(ctx, s.repository, subjects); err != nil {
+			return 0, err
+		}
+	}
+
+	return deletedRows, nil
 }
 
 func (s *AdminUser) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereInput) (int, error) {
-	return s.repository.AdminUser.DeleteManyTx(ctx, tx, where)
+	users, err := s.repository.AdminUser.GetTx(ctx, tx, &where, nil, nil, nil, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	deletedRows, err := s.repository.AdminUser.DeleteManyTx(ctx, tx, where)
+	if err != nil {
+		return 0, err
+	}
+
+	if deletedRows > 0 {
+		subjects := make([]subjectRevocation, 0, len(users))
+		for _, user := range users {
+			subjects = append(subjects, subjectRevocation{
+				Email:       user.Email,
+				SubjectType: jwtrefresh.SubjectTypeAdmin,
+			})
+		}
+		if err := revokeSubjects(ctx, s.repository, subjects); err != nil {
+			return 0, err
+		}
+	}
+
+	return deletedRows, nil
 }

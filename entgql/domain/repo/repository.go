@@ -25,6 +25,7 @@ type Txer interface {
 }
 
 type Repository struct {
+	Client *ent.Client
 	// Node                  repo.Node
 	Tx         Txer
 	Permission repo.Permission
@@ -36,6 +37,7 @@ type Repository struct {
 
 func New(client *ent.Client) *Repository {
 	return &Repository{
+		Client: client,
 		// Node:                  NewNode(client),
 		Tx:         NewTx(client),
 		Permission: NewPermission(client),
