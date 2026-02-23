@@ -4,11 +4,7 @@ package ent
 
 import (
 	"app/ent/adminuser"
-	"app/ent/cycle"
 	"app/ent/file"
-	"app/ent/forpermission"
-	"app/ent/lifecyclenot"
-	"app/ent/miau"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -29,30 +25,10 @@ var adminuserImplementors = []string{"AdminUser", "Node"}
 // IsNode implements the Node interface check for GQLGen.
 func (*AdminUser) IsNode() {}
 
-var cycleImplementors = []string{"Cycle", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*Cycle) IsNode() {}
-
 var fileImplementors = []string{"File", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*File) IsNode() {}
-
-var forpermissionImplementors = []string{"ForPermission", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*ForPermission) IsNode() {}
-
-var lifecyclenotImplementors = []string{"LifeCycleNot", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*LifeCycleNot) IsNode() {}
-
-var miauImplementors = []string{"Miau", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*Miau) IsNode() {}
 
 var roleImplementors = []string{"Role", "Node"}
 
@@ -131,47 +107,11 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 			}
 		}
 		return query.Only(ctx)
-	case cycle.Table:
-		query := c.Cycle.Query().
-			Where(cycle.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, cycleImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
 	case file.Table:
 		query := c.File.Query().
 			Where(file.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, fileImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
-	case forpermission.Table:
-		query := c.ForPermission.Query().
-			Where(forpermission.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, forpermissionImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
-	case lifecyclenot.Table:
-		query := c.LifeCycleNot.Query().
-			Where(lifecyclenot.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, lifecyclenotImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
-	case miau.Table:
-		query := c.Miau.Query().
-			Where(miau.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, miauImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -283,74 +223,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 				*noder = node
 			}
 		}
-	case cycle.Table:
-		query := c.Cycle.Query().
-			Where(cycle.IDIn(ids...))
-		query, err := query.CollectFields(ctx, cycleImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
 	case file.Table:
 		query := c.File.Query().
 			Where(file.IDIn(ids...))
 		query, err := query.CollectFields(ctx, fileImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case forpermission.Table:
-		query := c.ForPermission.Query().
-			Where(forpermission.IDIn(ids...))
-		query, err := query.CollectFields(ctx, forpermissionImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case lifecyclenot.Table:
-		query := c.LifeCycleNot.Query().
-			Where(lifecyclenot.IDIn(ids...))
-		query, err := query.CollectFields(ctx, lifecyclenotImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case miau.Table:
-		query := c.Miau.Query().
-			Where(miau.IDIn(ids...))
-		query, err := query.CollectFields(ctx, miauImplementors...)
 		if err != nil {
 			return nil, err
 		}

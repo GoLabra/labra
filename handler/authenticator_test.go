@@ -45,14 +45,22 @@ func TestAuthenticator(t *testing.T) {
 				user := CreateTestAdminUser("user-1", "test@example.com", "hashed-password")
 				role := CreateTestRole("role-1", "Admin")
 
+				// 1) user lookup
 				mockAdminUser.EXPECT().
-					GetOne(gomock.Any(), ent.AdminUserWhereUniqueInput{Email: stringPtr("test@example.com")}).
+					GetOne(gomock.Any(), gomock.Any()).
 					Return(user, nil)
 
+				// 2) role lookup
 				mockRole.EXPECT().
-					GetOne(gomock.Any(), ent.RoleWhereUniqueInput{Name: stringPtr("Admin")}).
+					GetOne(gomock.Any(), gomock.Any()).
 					Return(role, nil)
+
+				// 3) role assignment validation (DB says: yes, user has role)
+				mockAdminUser.EXPECT().
+					Get(gomock.Any(), gomock.Any(), nil, nil, gomock.Any(), nil).
+					Return([]*ent.AdminUser{user}, nil)
 			},
+
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
 				cfg := &config.AppConfig{
 					Secrets: config.Secrets{SecretKey: secretKey},
@@ -91,13 +99,18 @@ func TestAuthenticator(t *testing.T) {
 				role := CreateTestRole("role-1", "Admin")
 
 				mockAdminUser.EXPECT().
-					GetOne(gomock.Any(), ent.AdminUserWhereUniqueInput{Email: stringPtr("test@example.com")}).
+					GetOne(gomock.Any(), gomock.Any()).
 					Return(user, nil)
 
 				mockRole.EXPECT().
-					GetOne(gomock.Any(), ent.RoleWhereUniqueInput{Name: stringPtr("Admin")}).
+					GetOne(gomock.Any(), gomock.Any()).
 					Return(role, nil)
+
+				mockAdminUser.EXPECT().
+					Get(gomock.Any(), gomock.Any(), nil, nil, gomock.Any(), nil).
+					Return([]*ent.AdminUser{user}, nil)
 			},
+
 			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
 				cfg := &config.AppConfig{
 					Secrets: config.Secrets{SecretKey: secretKey},
@@ -115,7 +128,50 @@ func TestAuthenticator(t *testing.T) {
 			nextCalled:     true,
 		},
 		{
-			name: "skip authentication for websocket upgrade",
+			name: "tampered role claim is rejected",
+			setupRequest: func() *http.Request {
+				token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+					"exp":  time.Now().Add(24 * time.Hour).Unix(),
+					"sub":  "test@example.com",
+					"role": "SuperAdmin", // attacker lies here
+				})
+				tokenString, _ := token.SignedString([]byte(secretKey))
+
+				req := httptest.NewRequest(http.MethodGet, "/query", nil)
+				req.Header.Set("Authorization", "Bearer "+tokenString)
+				return req
+			},
+			setupMocks: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) {
+				user := CreateTestAdminUser("user-1", "test@example.com", "hashed-password")
+				claimedRole := CreateTestRole("role-2", "SuperAdmin")
+
+				mockAdminUser.EXPECT().
+					GetOne(gomock.Any(), ent.AdminUserWhereUniqueInput{Email: stringPtr("test@example.com")}).
+					Return(user, nil)
+
+				mockRole.EXPECT().
+					GetOne(gomock.Any(), ent.RoleWhereUniqueInput{Name: stringPtr("SuperAdmin")}).
+					Return(claimedRole, nil)
+
+				// New validation call: DB says user does NOT have SuperAdmin
+				mockAdminUser.EXPECT().
+					Get(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+					Return([]*ent.AdminUser{}, nil)
+			},
+			setupContext: func(mockAdminUser *mocks.MockAdminUser, mockRole *mocks.MockRole) context.Context {
+				cfg := &config.AppConfig{Secrets: config.Secrets{SecretKey: secretKey}}
+				service := &svc.Service{AdminUser: mockAdminUser, Role: mockRole}
+				ctx := context.Background()
+				ctx = context.WithValue(ctx, constants.AdminServiceContextValue, service)
+				ctx = context.WithValue(ctx, "config", cfg)
+				return ctx
+			},
+			expectedStatus: http.StatusUnauthorized,
+			nextCalled:     false,
+		},
+
+		{
+			name: "websocket upgrade without token is unauthorized",
 			setupRequest: func() *http.Request {
 				req := httptest.NewRequest(http.MethodGet, "/query", nil)
 				req.Header.Set("Connection", "Upgrade")
@@ -138,8 +194,8 @@ func TestAuthenticator(t *testing.T) {
 				ctx = context.WithValue(ctx, "config", cfg)
 				return ctx
 			},
-			expectedStatus: http.StatusOK,
-			nextCalled:     true,
+			expectedStatus: http.StatusUnauthorized,
+			nextCalled:     false,
 		},
 		{
 			name: "no token provided",
@@ -377,15 +433,8 @@ func TestAuthenticator(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			nextCalled := false
-			testName := tt.name // Capture test name for use in closure
 			nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				nextCalled = true
-
-				// For websocket upgrade, user/role may not be in context (that's expected)
-				if testName == "skip authentication for websocket upgrade" {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
 
 				// Verify user and role are in context (only for authenticated requests)
 				user, userOk := r.Context().Value(constants.UserContextValue).(*ent.AdminUser)
@@ -393,7 +442,7 @@ func TestAuthenticator(t *testing.T) {
 
 				// For other authenticated requests, user and role should be in context
 				// Skip this check for websocket upgrade test
-				if tt.nextCalled && testName != "skip authentication for websocket upgrade" {
+				if tt.nextCalled {
 					if !userOk {
 						t.Error("expected user in context")
 					}

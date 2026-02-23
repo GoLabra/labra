@@ -19,242 +19,241 @@ import { ShortcutIconButton } from "@/shared/components/key-handler/with-click-s
 import { useAutoFocusFirstElementOnce } from "@/hooks/use-auto-focus-first-element-once";
 
 interface RelationViewerGridRootProps {
-	showId: boolean
-	rootEntryId: string;
-	viewRelationStore: ReturnType<typeof useViewRelationStore>
+    showId: boolean
+    rootEntryId: string;
+    viewRelationStore: ReturnType<typeof useViewRelationStore>
 }
 export const RelationViewerGridRoot = (props: RelationViewerGridRootProps) => {
 
-	const { push } = useRouter();
-	const oneViewRelationStore = useOneViewRelationStore(props.rootEntryId, props.viewRelationStore);
-	const { visibleEdge } = oneViewRelationStore;
+    const { push } = useRouter();
+    const oneViewRelationStore = useOneViewRelationStore(props.rootEntryId, props.viewRelationStore);
+    const { visibleEdge } = oneViewRelationStore;
 
-	const hasHistory = useMemo(() => oneViewRelationStore.edges.length > 1, [oneViewRelationStore.edges]);
+    const hasHistory = useMemo(() => oneViewRelationStore.edges.length > 1, [oneViewRelationStore.edges]);
 
-	const { entities: nameCaptionEntities } = useEntities();
-	const nameCaptionEntity = useMemo(() => nameCaptionEntities.find(i => i.name == visibleEdge?.entityName), [visibleEdge?.entityName, nameCaptionEntities]);
+    const { entities: nameCaptionEntities } = useEntities();
+    const nameCaptionEntity = useMemo(() => nameCaptionEntities.find(i => i.name == visibleEdge?.entityName), [visibleEdge?.entityName, nameCaptionEntities]);
 
-	const autoFocusHandler = useAutoFocusFirstElementOnce()
-	const hostRef = useRef<HTMLDivElement | null>(null);
+    const autoFocusHandler = useAutoFocusFirstElementOnce()
+    const hostRef = useRef<HTMLDivElement | null>(null);
 
-	const setHostRef = useCallback((instance: HTMLDivElement | null) => {
-		autoFocusHandler.setRef(instance);
-		hostRef.current = instance;
-	}, [autoFocusHandler.setRef]);
+    const setHostRef = useCallback((instance: HTMLDivElement | null) => {
+        autoFocusHandler.setRef(instance);
+        hostRef.current = instance;
+    }, [autoFocusHandler.setRef]);
 
-	const goBack = useCallback(() => {
-		oneViewRelationStore.goBack();
-		autoFocusHandler.focus();
-	}, [oneViewRelationStore.goBack]);
+    const goBack = useCallback(() => {
+        oneViewRelationStore.goBack();
+        autoFocusHandler.focus();
+    }, [oneViewRelationStore.goBack]);
 
-	const close = useCallback(() => {
-		oneViewRelationStore.close();
-	}, [oneViewRelationStore.close]);
+    const close = useCallback(() => {
+        oneViewRelationStore.close();
+    }, [oneViewRelationStore.close]);
 
 
-	useEffect(() => {
-		if(hostRef.current){
-			hostRef.current.focus();
-		}
-	}, [`${visibleEdge?.entityName}-${visibleEdge?.entryId}`]);
-	
-	if (!visibleEdge) {
-		return;
-	}
+    useEffect(() => {
+        if (hostRef.current) {
+            hostRef.current.focus();
+        }
+    }, [`${visibleEdge?.entityName}-${visibleEdge?.entryId}`]);
 
-	return (
-		<Box
-			ref={setHostRef} 
-			tabIndex={0}
-			sx={{
-				padding: '10px',
-				backgroundColor: 'var(--mui-palette-background-default)',
-				'&:focus': {
-					outline: 'none'
-				}
-			}}>
+    if (!visibleEdge) {
+        return;
+    }
 
-			<Box sx={{
-				position: 'relative',
-			}}>
+    return (
+        <Box
+            ref={setHostRef}
+            tabIndex={0}
+            sx={{
+                padding: '10px',
+                backgroundColor: 'var(--mui-palette-background-default)',
+                '&:focus': {
+                    outline: 'none'
+                }
+            }}>
 
-				<Stack direction="row" gap={1} alignItems="center" justifyContent="space-between">
-					<Stack direction="row" gap={1} alignItems="center">
+            <Box sx={{
+                position: 'relative',
+            }}>
 
-						<ShortcutIconButton 
-							shortcutKey={Key.b}
-							shortcutTarget={hostRef}
-							tooltip="Back"
-							aria-label="back" size="medium" onClick={goBack}>
-							<ArrowBackIcon fontSize="inherit" />
-						</ShortcutIconButton>
-						
+                <Stack direction="row" gap={1} alignItems="center" justifyContent="space-between">
+                    <Stack direction="row" gap={1} alignItems="center">
 
-						{hasHistory && (<Typography variant="h6">
-							{'.'.repeat(oneViewRelationStore.edges.length)} /
-						</Typography>)}
+                        <ShortcutIconButton
+                            shortcutKey={Key.b}
+                            shortcutTarget={hostRef}
+                            tooltip="Back"
+                            aria-label="back" size="medium" onClick={goBack}>
+                            <ArrowBackIcon fontSize="inherit" />
+                        </ShortcutIconButton>
 
-						<Stack direction="row" gap={1} alignItems="center">
 
-							<Typography variant="h6">
-								{nameCaptionEntity?.caption}
-							</Typography>
-							➝
-							<Typography variant="h6" sx={{ fontStyle: 'italic' }}>
-								{visibleEdge.edge.caption}
-							</Typography>
-							➝
-							<Link component={NextLink} href={`/content-manager/${visibleEdge?.edge.relatedEntity.name}`} color="inherit" >
-								<Typography variant="h6">
-									{visibleEdge.edge.relatedEntity.caption}
-								</Typography>
-							</Link>
+                        {hasHistory && (<Typography variant="h6">
+                            {'.'.repeat(oneViewRelationStore.edges.length)} /
+                        </Typography>)}
 
-						</Stack>
+                        <Stack direction="row" gap={1} alignItems="center">
 
-					</Stack>
+                            <Typography variant="h6">
+                                {nameCaptionEntity?.caption}
+                            </Typography>
+                            ➝
+                            <Typography variant="h6" sx={{ fontStyle: 'italic' }}>
+                                {visibleEdge.edge.caption}
+                            </Typography>
+                            ➝
+                            <Link component={NextLink} href={`/content-manager/${visibleEdge?.edge.relatedEntity.name}`} color="inherit" >
+                                <Typography variant="h6">
+                                    {visibleEdge.edge.relatedEntity.caption}
+                                </Typography>
+                            </Link>
 
-					<ShortcutIconButton 
-						shortcutKey={Key.Escape}
-						shortcutTarget={hostRef}
-						tooltip="Close"
-						aria-label="close" size="medium" onClick={close}>
-						<CloseIcon fontSize="inherit" />
-					</ShortcutIconButton>
+                        </Stack>
 
-				</Stack>
-				<br />
-					
-				<RoundPanelPlaceholder>
-					<RelationViewerGrid key={`${visibleEdge.entityName}-${visibleEdge.entryId}`} entityName={visibleEdge.entityName} entryId={visibleEdge.entryId} edge={visibleEdge.edge} showId={props.showId} openRelation={oneViewRelationStore.addEdge} />
-				</RoundPanelPlaceholder>
-				
-			</Box>
-		</Box>
-	)
+                    </Stack>
+
+                    <ShortcutIconButton
+                        shortcutKey={Key.Escape}
+                        shortcutTarget={hostRef}
+                        tooltip="Close"
+                        aria-label="close" size="medium" onClick={close}>
+                        <CloseIcon fontSize="inherit" />
+                    </ShortcutIconButton>
+
+                </Stack>
+                <br />
+
+                <RoundPanelPlaceholder>
+                    <RelationViewerGrid key={`${visibleEdge.entityName}-${visibleEdge.entryId}`} entityName={visibleEdge.entityName} entryId={visibleEdge.entryId} edge={visibleEdge.edge} showId={props.showId} openRelation={oneViewRelationStore.addEdge} />
+                </RoundPanelPlaceholder>
+
+            </Box>
+        </Box>
+    )
 }
 
 
 
 
 interface RelationViewerGridProps {
-	entityName: string;
-	entryId: string;
-	edge: Edge;
-	showId: boolean;
+    entityName: string;
+    entryId: string;
+    edge: Edge;
+    showId: boolean;
 
-	openRelation: (entityName: string, edge: Edge, entryId: string) => void;
+    openRelation: (entityName: string, edge: Edge, entryId: string) => void;
 }
 const RelationViewerGrid = (props: RelationViewerGridProps) => {
 
-	const { push } = useRouter();
+    const { push } = useRouter();
 
-	/*
-	entityName
-	├─ ☐ field_01
-	├─ ☐ field_02
-	├─ ☐ field_03
-	└─ ☐ EDGE_01
-		├─ ☑ field_01_01
-		├─ ☑ field_01_02
-		├─ ☑ field_01_03
-		└─ ☑ EDGE_01_01
-			├─ ☑ id
-			└─ ☑ [EDGE_01_01.relatedEntity.displayField.name]
-	*/
+    /*
+    entityName
+    ├─ ☐ field_01
+    ├─ ☐ field_02
+    ├─ ☐ field_03
+    └─ ☐ EDGE_01
+        ├─ ☑ field_01_01
+        ├─ ☑ field_01_02
+        ├─ ☑ field_01_03
+        └─ ☑ EDGE_01_01
+            ├─ ☑ id
+            └─ ☑ [EDGE_01_01.relatedEntity.displayField.name]
+    */
 
-	const fullEntity = useFullEntity({ entityName: props.edge.relatedEntity.name });
+    const fullEntity = useFullEntity({ entityName: props.edge.relatedEntity.name });
 
-	const relationData = useRelationContentManagerStore({
-		entityName: props.entityName,
-		entryId: props.entryId,
-		edge: props.edge,
-		fields: 'grid'
-	});
-	// const relationData = useGetEdgeValue({
-	// 	entityName: props.entityName,
-	// 	entryId: props.entryId,
-	// 	edge: props.edge,
-	// 	fields: 'allfields',
-	// 	edges: useMemo(() => ([
-	// 		...fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
-	// 			.filter(i => i.relationType !== 'ManyToOne')
-	// 			.filter(i => i.relationType !== 'Many')
-	// 			.map(i => ({
-	// 				name: i.name,
-	// 				fields: ['id', i.relatedEntity.displayField.name],
-	// 			})) ?? []
-	// 	]), [fullEntity?.edges])
-	//})
+    const relationData = useRelationContentManagerStore({
+        entityName: props.entityName,
+        entryId: props.entryId,
+        edge: props.edge,
+        fields: 'grid'
+    });
+    // const relationData = useGetEdgeValue({
+    // 	entityName: props.entityName,
+    // 	entryId: props.entryId,
+    // 	edge: props.edge,
+    // 	fields: 'allfields',
+    // 	edges: useMemo(() => ([
+    // 		...fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
+    // 			.filter(i => i.relationType !== 'ManyToOne')
+    // 			.filter(i => i.relationType !== 'Many')
+    // 			.map(i => ({
+    // 				name: i.name,
+    // 				fields: ['id', i.relatedEntity.displayField.name],
+    // 			})) ?? []
+    // 	]), [fullEntity?.edges])
+    //})
 
-	const gridData = useMemo(() => {
-		if(!relationData.data){
-			return null;
-		}
-		if(Array.isArray(relationData.data)){
-			return relationData.data;
-		}
-		return [relationData.data];
-	}, [relationData.data]);
+    const gridData = useMemo(() => {
+        if (!relationData.data) {
+            return null;
+        }
+        if (Array.isArray(relationData.data)) {
+            return relationData.data;
+        }
+        return [relationData.data];
+    }, [relationData.data]);
 
 
-	const headCells = useDynamicGridColumns({
-		entityName: fullEntity?.name ?? '',
-		fields: fullEntity?.fields,
-		edges: fullEntity?.edges,
-		displayFieldName: fullEntity?.displayField?.name ?? 'id',
-		openRelation: props.openRelation,
-		showId: props.showId
-	});
+    const headCells = useDynamicGridColumns({
+        entityName: fullEntity?.name ?? '',
+        fields: fullEntity?.fields,
+        edges: fullEntity?.edges,
+        displayFieldName: fullEntity?.displayField?.name ?? 'id',
+        openRelation: props.openRelation,
+        showId: props.showId
+    });
 
-	const gotoEntry = useCallback((entry: any) => {
-		const path = `/content-manager/${props.edge.relatedEntity.name}`;
+    const gotoEntry = useCallback((entry: any) => {
 
-		const filter: Filter = {
-			"id": {
-				operator: eqStringFoldOperator.name,
-				value: entry.id
-			}
-		}
+        const filter: Filter = {
+            "id": {
+                operator: eqStringFoldOperator.name,
+                value: entry.id
+            }
+        }
 
-		const withFilters = `${path}?f=${JSON.stringify(filter)}`;
-		push(withFilters);
-	}, []);
+        const withFilters = `/content-manager/?e=${props.edge.relatedEntity.name}&f=${JSON.stringify(filter)}`;
+        push(withFilters);
+    }, []);
 
-	// Row Actions
-	const actions: Action<unknown>[] = useMemo(() => [
-		{
-			id: 'goto',
-			render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => gotoEntry(field)}>
-				<ListItemIcon>
-					<DirectionsRunIcon />
-				</ListItemIcon>
-				Go To Entry
-			</MenuItem>)
-		},
-	], [gotoEntry]);
+    // Row Actions
+    const actions: Action<unknown>[] = useMemo(() => [
+        {
+            id: 'goto',
+            render: (field: unknown) => (<MenuItem id='edit-menu-item' key={`edit-${field}`} onClick={() => gotoEntry(field)}>
+                <ListItemIcon>
+                    <DirectionsRunIcon />
+                </ListItemIcon>
+                Go To Entry
+            </MenuItem>)
+        },
+    ], [gotoEntry]);
 
-	const gridPlugins = useGridPlugins(
-		CustomBodyCellContentRenderPlugin,
-		usePluginWithParams(PaddingPluggin, {}),
-		ColumnsFillRowSpacePlugin,
-		usePluginWithParams(RowActionsPlugin, {
-			actions: actions
-		}),
-		usePluginWithParams(EmptyDataPlugin, {
-			content: useMemo(() =><EmptyMessage />, [])
-		}),
-		usePluginWithParams(PinnedColumnsPlugin, {}),
-	)
+    const gridPlugins = useGridPlugins(
+        CustomBodyCellContentRenderPlugin,
+        usePluginWithParams(PaddingPluggin, {}),
+        ColumnsFillRowSpacePlugin,
+        usePluginWithParams(RowActionsPlugin, {
+            actions: actions
+        }),
+        usePluginWithParams(EmptyDataPlugin, {
+            content: useMemo(() => <EmptyMessage />, [])
+        }),
+        usePluginWithParams(PinnedColumnsPlugin, {}),
+    )
 
-	return (<MosaicDataTable
-		plugins={gridPlugins}
-		caption={`${props.entityName} Entry Viewer`}
-		items={gridData}
-		headCells={headCells}
-		sx={{
-			'--mui-palette-MosaicDataTable-background': 'var(--mui-palette-background-default)',
-			'--mui-palette-MosaicDataTable-highlight': 'color-mix(in srgb, rgb(var(--mui-palette-primary-mainChannel)), transparent 99%)'
-		}}
-	/>)
+    return (<MosaicDataTable
+        plugins={gridPlugins}
+        caption={`${props.entityName} Entry Viewer`}
+        items={gridData}
+        headCells={headCells}
+        sx={{
+            '--mui-palette-MosaicDataTable-background': 'var(--mui-palette-background-default)',
+            '--mui-palette-MosaicDataTable-highlight': 'color-mix(in srgb, rgb(var(--mui-palette-primary-mainChannel)), transparent 99%)'
+        }}
+    />)
 }

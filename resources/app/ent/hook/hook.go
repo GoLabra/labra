@@ -20,18 +20,6 @@ func (f AdminUserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminUserMutation", m)
 }
 
-// The CycleFunc type is an adapter to allow the use of ordinary
-// function as Cycle mutator.
-type CycleFunc func(context.Context, *ent.CycleMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f CycleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CycleMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CycleMutation", m)
-}
-
 // The FileFunc type is an adapter to allow the use of ordinary
 // function as File mutator.
 type FileFunc func(context.Context, *ent.FileMutation) (ent.Value, error)
@@ -42,42 +30,6 @@ func (f FileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileMutation", m)
-}
-
-// The ForPermissionFunc type is an adapter to allow the use of ordinary
-// function as ForPermission mutator.
-type ForPermissionFunc func(context.Context, *ent.ForPermissionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ForPermissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ForPermissionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ForPermissionMutation", m)
-}
-
-// The LifeCycleNotFunc type is an adapter to allow the use of ordinary
-// function as LifeCycleNot mutator.
-type LifeCycleNotFunc func(context.Context, *ent.LifeCycleNotMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f LifeCycleNotFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.LifeCycleNotMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LifeCycleNotMutation", m)
-}
-
-// The MiauFunc type is an adapter to allow the use of ordinary
-// function as Miau mutator.
-type MiauFunc func(context.Context, *ent.MiauMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f MiauFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.MiauMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MiauMutation", m)
 }
 
 // The RoleFunc type is an adapter to allow the use of ordinary

@@ -9,19 +9,5 @@ import (
 
 
 
-// GetLifecycleState returns the current lifecycle state of the Cycle entity.
-func (m *Cycle) GetLifecycleState() entity.EntityState {
-	return m.EntityState
-}
-
-
-
-
-// GetLifecycleState returns the current lifecycle state of the LifeCycleNot entity.
-func (m *LifeCycleNot) GetLifecycleState() entity.EntityState {
-	return m.EntityState
-}
-
-
 
 

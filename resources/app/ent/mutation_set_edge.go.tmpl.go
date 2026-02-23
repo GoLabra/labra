@@ -3,10 +3,6 @@
 package ent
 
 import (
-	"app/ent/cycle"
-	"app/ent/forpermission"
-	"app/ent/lifecyclenot"
-	"app/ent/miau"
 	"app/ent/user"
 	"fmt"
 )
@@ -21,90 +17,10 @@ func (m *AdminUserMutation) SetEdge(name, value string) error {
 
 // SetEdge sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema
-func (m *CycleMutation) SetEdge(name, value string) error {
-	switch name {
-	case cycle.EdgeCreatedBy:
-		m.SetCreatedByID(value)
-		return nil
-	case cycle.EdgeUpdatedBy:
-		m.SetUpdatedByID(value)
-		return nil
-	case cycle.EdgeAdminCreatedBy:
-		m.SetAdminCreatedByID(value)
-		return nil
-	case cycle.EdgeAdminUpdatedBy:
-		m.SetAdminUpdatedByID(value)
-		return nil
-	}
-	return fmt.Errorf("unknown Cycle edge %s", name)
-}
-
-// SetEdge sets the value of a field with the given name. It returns an error if
-// the edge is not defined in the schema
 func (m *FileMutation) SetEdge(name, value string) error {
 	switch name {
 	}
 	return fmt.Errorf("unknown File edge %s", name)
-}
-
-// SetEdge sets the value of a field with the given name. It returns an error if
-// the edge is not defined in the schema
-func (m *ForPermissionMutation) SetEdge(name, value string) error {
-	switch name {
-	case forpermission.EdgeCreatedBy:
-		m.SetCreatedByID(value)
-		return nil
-	case forpermission.EdgeUpdatedBy:
-		m.SetUpdatedByID(value)
-		return nil
-	case forpermission.EdgeAdminCreatedBy:
-		m.SetAdminCreatedByID(value)
-		return nil
-	case forpermission.EdgeAdminUpdatedBy:
-		m.SetAdminUpdatedByID(value)
-		return nil
-	}
-	return fmt.Errorf("unknown ForPermission edge %s", name)
-}
-
-// SetEdge sets the value of a field with the given name. It returns an error if
-// the edge is not defined in the schema
-func (m *LifeCycleNotMutation) SetEdge(name, value string) error {
-	switch name {
-	case lifecyclenot.EdgeCreatedBy:
-		m.SetCreatedByID(value)
-		return nil
-	case lifecyclenot.EdgeUpdatedBy:
-		m.SetUpdatedByID(value)
-		return nil
-	case lifecyclenot.EdgeAdminCreatedBy:
-		m.SetAdminCreatedByID(value)
-		return nil
-	case lifecyclenot.EdgeAdminUpdatedBy:
-		m.SetAdminUpdatedByID(value)
-		return nil
-	}
-	return fmt.Errorf("unknown LifeCycleNot edge %s", name)
-}
-
-// SetEdge sets the value of a field with the given name. It returns an error if
-// the edge is not defined in the schema
-func (m *MiauMutation) SetEdge(name, value string) error {
-	switch name {
-	case miau.EdgeCreatedBy:
-		m.SetCreatedByID(value)
-		return nil
-	case miau.EdgeUpdatedBy:
-		m.SetUpdatedByID(value)
-		return nil
-	case miau.EdgeAdminCreatedBy:
-		m.SetAdminCreatedByID(value)
-		return nil
-	case miau.EdgeAdminUpdatedBy:
-		m.SetAdminUpdatedByID(value)
-		return nil
-	}
-	return fmt.Errorf("unknown Miau edge %s", name)
 }
 
 // SetEdge sets the value of a field with the given name. It returns an error if

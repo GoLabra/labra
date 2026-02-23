@@ -3,8 +3,6 @@
 package ent
 
 import (
-	cycle "app/ent/cycle"
-	lifecyclenot "app/ent/lifecyclenot"
 	"app/ent/predicate"
 	"context"
 
@@ -14,74 +12,6 @@ import (
 )
 
 
-
-
-// WhereEntityStateIn restricts results to rows whose entity_state is in the given list.
-// Used by read permission hook to enforce lifecycle_access.
-func (_m *CycleQuery) WhereEntityStateIn(states ...entity.EntityState)  ent.Query {
-	return _m.Where(predicate.Cycle(cycle.EntityStateIn(states...)))
-}
-
-// WhereEntityStateIn restricts the mutation to rows whose entity_state is in the given list.
-// Used by mutate permission hook to enforce lifecycle_access on UpdateMany/DeleteMany.
-func (m *CycleMutation) WhereEntityStateIn(states ...entity.EntityState) {
-	m.Where(predicate.Cycle(cycle.EntityStateIn(states...)))
-}
-
-// TargetsAllowedByLifecycle reports whether every target of this mutation has an entity_state
-// allowed by at least one entry in permissionLifecycleAccess. Each inner slice is one permission's
-// allowed states; empty slice means full access. Used by the mutate permission hook for UpdateOne/DeleteOne.
-func (m *CycleMutation) TargetsAllowedByLifecycle(ctx context.Context) (*entity.EntityState, error) {
-	iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
-	ids, err := m.IDs(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, id := range ids {
-		node, err := m.Client().Cycle.Get(iCtx, id)
-		if err != nil {
-			return nil, err
-		}
-		
-		return &node.EntityState, nil
-	}
-	return nil, nil
-}
-
-
-
-
-// WhereEntityStateIn restricts results to rows whose entity_state is in the given list.
-// Used by read permission hook to enforce lifecycle_access.
-func (_m *LifeCycleNotQuery) WhereEntityStateIn(states ...entity.EntityState)  ent.Query {
-	return _m.Where(predicate.LifeCycleNot(lifecyclenot.EntityStateIn(states...)))
-}
-
-// WhereEntityStateIn restricts the mutation to rows whose entity_state is in the given list.
-// Used by mutate permission hook to enforce lifecycle_access on UpdateMany/DeleteMany.
-func (m *LifeCycleNotMutation) WhereEntityStateIn(states ...entity.EntityState) {
-	m.Where(predicate.LifeCycleNot(lifecyclenot.EntityStateIn(states...)))
-}
-
-// TargetsAllowedByLifecycle reports whether every target of this mutation has an entity_state
-// allowed by at least one entry in permissionLifecycleAccess. Each inner slice is one permission's
-// allowed states; empty slice means full access. Used by the mutate permission hook for UpdateOne/DeleteOne.
-func (m *LifeCycleNotMutation) TargetsAllowedByLifecycle(ctx context.Context) (*entity.EntityState, error) {
-	iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
-	ids, err := m.IDs(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, id := range ids {
-		node, err := m.Client().LifeCycleNot.Get(iCtx, id)
-		if err != nil {
-			return nil, err
-		}
-		
-		return &node.EntityState, nil
-	}
-	return nil, nil
-}
 
 
 

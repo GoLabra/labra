@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/GoLabra/labra/config"
@@ -110,6 +111,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	secure := r.TLS != nil || strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https")
+
+	// CSRF cookie (readable by JS) - double-submit cookie pattern
+	csrf, err := NewCSRFToken()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	SetCSRFCookie(w, csrf, secure)
+
+	cookieDomain := ""
+	SetJWTCookie(w, r, signedToken, cookieDomain)
 
 	response, _ := json.Marshal(map[string]string{
 		"token": signedToken,

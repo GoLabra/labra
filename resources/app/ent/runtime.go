@@ -3,84 +3,15 @@
 package ent
 
 import (
-	"app/ent/cycle"
-	"app/ent/forpermission"
-	"app/ent/lifecyclenot"
-	"app/ent/miau"
 	"app/ent/role"
 	"app/ent/schema"
 	"app/ent/user"
-	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	cycleFields := schema.Cycle{}.Fields()
-	_ = cycleFields
-	// cycleDescCreatedAt is the schema descriptor for created_at field.
-	cycleDescCreatedAt := cycleFields[1].Descriptor()
-	// cycle.DefaultCreatedAt holds the default value on creation for the created_at field.
-	cycle.DefaultCreatedAt = cycleDescCreatedAt.Default.(time.Time)
-	// cycleDescUpdatedAt is the schema descriptor for updated_at field.
-	cycleDescUpdatedAt := cycleFields[2].Descriptor()
-	// cycle.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	cycle.DefaultUpdatedAt = cycleDescUpdatedAt.Default.(time.Time)
-	// cycle.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	cycle.UpdateDefaultUpdatedAt = cycleDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// cycleDescID is the schema descriptor for id field.
-	cycleDescID := cycleFields[0].Descriptor()
-	// cycle.DefaultID holds the default value on creation for the id field.
-	cycle.DefaultID = cycleDescID.Default.(func() string)
-	forpermissionFields := schema.ForPermission{}.Fields()
-	_ = forpermissionFields
-	// forpermissionDescCreatedAt is the schema descriptor for created_at field.
-	forpermissionDescCreatedAt := forpermissionFields[1].Descriptor()
-	// forpermission.DefaultCreatedAt holds the default value on creation for the created_at field.
-	forpermission.DefaultCreatedAt = forpermissionDescCreatedAt.Default.(time.Time)
-	// forpermissionDescUpdatedAt is the schema descriptor for updated_at field.
-	forpermissionDescUpdatedAt := forpermissionFields[2].Descriptor()
-	// forpermission.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	forpermission.DefaultUpdatedAt = forpermissionDescUpdatedAt.Default.(time.Time)
-	// forpermission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	forpermission.UpdateDefaultUpdatedAt = forpermissionDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// forpermissionDescID is the schema descriptor for id field.
-	forpermissionDescID := forpermissionFields[0].Descriptor()
-	// forpermission.DefaultID holds the default value on creation for the id field.
-	forpermission.DefaultID = forpermissionDescID.Default.(func() string)
-	lifecyclenotFields := schema.LifeCycleNot{}.Fields()
-	_ = lifecyclenotFields
-	// lifecyclenotDescCreatedAt is the schema descriptor for created_at field.
-	lifecyclenotDescCreatedAt := lifecyclenotFields[1].Descriptor()
-	// lifecyclenot.DefaultCreatedAt holds the default value on creation for the created_at field.
-	lifecyclenot.DefaultCreatedAt = lifecyclenotDescCreatedAt.Default.(time.Time)
-	// lifecyclenotDescUpdatedAt is the schema descriptor for updated_at field.
-	lifecyclenotDescUpdatedAt := lifecyclenotFields[2].Descriptor()
-	// lifecyclenot.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	lifecyclenot.DefaultUpdatedAt = lifecyclenotDescUpdatedAt.Default.(time.Time)
-	// lifecyclenot.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	lifecyclenot.UpdateDefaultUpdatedAt = lifecyclenotDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// lifecyclenotDescID is the schema descriptor for id field.
-	lifecyclenotDescID := lifecyclenotFields[0].Descriptor()
-	// lifecyclenot.DefaultID holds the default value on creation for the id field.
-	lifecyclenot.DefaultID = lifecyclenotDescID.Default.(func() string)
-	miauFields := schema.Miau{}.Fields()
-	_ = miauFields
-	// miauDescCreatedAt is the schema descriptor for created_at field.
-	miauDescCreatedAt := miauFields[1].Descriptor()
-	// miau.DefaultCreatedAt holds the default value on creation for the created_at field.
-	miau.DefaultCreatedAt = miauDescCreatedAt.Default.(time.Time)
-	// miauDescUpdatedAt is the schema descriptor for updated_at field.
-	miauDescUpdatedAt := miauFields[2].Descriptor()
-	// miau.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	miau.DefaultUpdatedAt = miauDescUpdatedAt.Default.(time.Time)
-	// miau.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	miau.UpdateDefaultUpdatedAt = miauDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// miauDescID is the schema descriptor for id field.
-	miauDescID := miauFields[0].Descriptor()
-	// miau.DefaultID holds the default value on creation for the id field.
-	miau.DefaultID = miauDescID.Default.(func() string)
 	roleFields := schema.Role{}.Fields()
 	_ = roleFields
 	// roleDescName is the schema descriptor for name field.

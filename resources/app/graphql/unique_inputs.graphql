@@ -8,19 +8,7 @@ scalar DateTime
 input AdminUserWhereUniqueInput {
   id: ID
 }
-input CycleWhereUniqueInput {
-  id: ID
-}
 input FileWhereUniqueInput {
-  id: ID
-}
-input ForPermissionWhereUniqueInput {
-  id: ID
-}
-input LifeCycleNotWhereUniqueInput {
-  id: ID
-}
-input MiauWhereUniqueInput {
   id: ID
 }
 input RoleWhereUniqueInput {

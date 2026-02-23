@@ -11,6 +11,8 @@ import (
 	"sort"
 
 	"github.com/GoLabra/labra/cache"
+	"github.com/GoLabra/labra/constants"
+	"github.com/GoLabra/labra/entgql/ent"
 	"github.com/GoLabra/labra/entgql/entity"
 	gqlgen "github.com/GoLabra/labra/entgql/generated"
 	"github.com/GoLabra/labra/strcase"
@@ -162,10 +164,51 @@ func (r *subscriptionResolver) AppStatus(ctx context.Context) (<-chan subscripti
 // Entities is the resolver for the entities field.
 func (r *subscriptionResolver) Entities(ctx context.Context) (<-chan []*entity.Entity, error) {
 	c := make(chan []*entity.Entity)
-	r.SubscriptionClient.EntitySubscribers = append(r.SubscriptionClient.EntitySubscribers, subscription.EntitySubscriber{
-		Ctx:  ctx,
-		Chan: c,
-	})
+
+	role, ok := ctx.Value(constants.RoleContextValue).(*ent.Role)
+	if !ok || role == nil {
+		return nil, fmt.Errorf("role not found in context")
+	}
+
+	var allowed map[string]struct{} // nil means allow all
+
+	if role.Name != string(constants.SuperAdmin) {
+		// Query permissions using internal context (same pattern as hooks)
+		iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+
+		perms, err := r.Service.Permission.Get(
+			iCtx,
+			&ent.PermissionWhereInput{
+				HasRoleWith: []*ent.RoleWhereInput{
+					{Name: &role.Name},
+				},
+				OperationIn: []string{"Read", "Owner"},
+			},
+			nil, nil, nil, nil,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("permission lookup failed: %w", err)
+		}
+		if len(perms) == 0 {
+			return nil, fmt.Errorf("Forbidden: user lacks subscription read permissions")
+		}
+
+		allowed = map[string]struct{}{}
+		for _, p := range perms {
+			// Permission.Entity should match entity.Entity.Name
+			allowed[p.Entity] = struct{}{}
+		}
+	}
+
+	r.SubscriptionClient.EntitySubscribers = append(
+		r.SubscriptionClient.EntitySubscribers,
+		subscription.EntitySubscriber{
+			Ctx:             ctx,
+			Chan:            c,
+			AllowedEntities: allowed,
+		},
+	)
+
 	return c, nil
 }
 

@@ -18,50 +18,6 @@ var (
 		Columns:    AdminUsersColumns,
 		PrimaryKey: []*schema.Column{AdminUsersColumns[0]},
 	}
-	// CyclesColumns holds the columns for the "cycles" table.
-	CyclesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "name", Type: field.TypeString, Nullable: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
-		{Name: "entity_state", Type: field.TypeEnum, Nullable: true, Enums: []string{"DRAFT", "ARCHIVED", "PUBLISHED"}, Default: "DRAFT"},
-		{Name: "cycle_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "cycle_updated_by", Type: field.TypeString, Nullable: true},
-		{Name: "cycle_admin_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "cycle_admin_updated_by", Type: field.TypeString, Nullable: true},
-	}
-	// CyclesTable holds the schema information for the "cycles" table.
-	CyclesTable = &schema.Table{
-		Name:       "cycles",
-		Columns:    CyclesColumns,
-		PrimaryKey: []*schema.Column{CyclesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "cycles_users_created_by",
-				Columns:    []*schema.Column{CyclesColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "cycles_users_updated_by",
-				Columns:    []*schema.Column{CyclesColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "cycles_admin_users_admin_created_by",
-				Columns:    []*schema.Column{CyclesColumns[7]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "cycles_admin_users_admin_updated_by",
-				Columns:    []*schema.Column{CyclesColumns[8]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
 	// FilesColumns holds the columns for the "files" table.
 	FilesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -71,138 +27,6 @@ var (
 		Name:       "files",
 		Columns:    FilesColumns,
 		PrimaryKey: []*schema.Column{FilesColumns[0]},
-	}
-	// ForPermissionsColumns holds the columns for the "for_permissions" table.
-	ForPermissionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "name", Type: field.TypeString, Nullable: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
-		{Name: "age", Type: field.TypeInt, Nullable: true},
-		{Name: "is_stupid", Type: field.TypeBool, Nullable: true},
-		{Name: "for_permission_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "for_permission_updated_by", Type: field.TypeString, Nullable: true},
-		{Name: "for_permission_admin_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "for_permission_admin_updated_by", Type: field.TypeString, Nullable: true},
-	}
-	// ForPermissionsTable holds the schema information for the "for_permissions" table.
-	ForPermissionsTable = &schema.Table{
-		Name:       "for_permissions",
-		Columns:    ForPermissionsColumns,
-		PrimaryKey: []*schema.Column{ForPermissionsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "for_permissions_users_created_by",
-				Columns:    []*schema.Column{ForPermissionsColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "for_permissions_users_updated_by",
-				Columns:    []*schema.Column{ForPermissionsColumns[7]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "for_permissions_admin_users_admin_created_by",
-				Columns:    []*schema.Column{ForPermissionsColumns[8]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "for_permissions_admin_users_admin_updated_by",
-				Columns:    []*schema.Column{ForPermissionsColumns[9]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// LifeCycleNotsColumns holds the columns for the "life_cycle_nots" table.
-	LifeCycleNotsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "name", Type: field.TypeString, Nullable: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
-		{Name: "entity_state", Type: field.TypeEnum, Nullable: true, Enums: []string{"DRAFT", "ARCHIVED", "PUBLISHED"}, Default: "DRAFT"},
-		{Name: "life_cycle_not_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "life_cycle_not_updated_by", Type: field.TypeString, Nullable: true},
-		{Name: "life_cycle_not_admin_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "life_cycle_not_admin_updated_by", Type: field.TypeString, Nullable: true},
-	}
-	// LifeCycleNotsTable holds the schema information for the "life_cycle_nots" table.
-	LifeCycleNotsTable = &schema.Table{
-		Name:       "life_cycle_nots",
-		Columns:    LifeCycleNotsColumns,
-		PrimaryKey: []*schema.Column{LifeCycleNotsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "life_cycle_nots_users_created_by",
-				Columns:    []*schema.Column{LifeCycleNotsColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "life_cycle_nots_users_updated_by",
-				Columns:    []*schema.Column{LifeCycleNotsColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "life_cycle_nots_admin_users_admin_created_by",
-				Columns:    []*schema.Column{LifeCycleNotsColumns[7]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "life_cycle_nots_admin_users_admin_updated_by",
-				Columns:    []*schema.Column{LifeCycleNotsColumns[8]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// MiausColumns holds the columns for the "miaus" table.
-	MiausColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime", "postgres": "timestamp"}},
-		{Name: "name", Type: field.TypeString, Nullable: true, SchemaType: map[string]string{"mysql": "VARCHAR(255)", "postgres": "VARCHAR(255)"}},
-		{Name: "miau_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "miau_updated_by", Type: field.TypeString, Nullable: true},
-		{Name: "miau_admin_created_by", Type: field.TypeString, Nullable: true},
-		{Name: "miau_admin_updated_by", Type: field.TypeString, Nullable: true},
-	}
-	// MiausTable holds the schema information for the "miaus" table.
-	MiausTable = &schema.Table{
-		Name:       "miaus",
-		Columns:    MiausColumns,
-		PrimaryKey: []*schema.Column{MiausColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "miaus_users_created_by",
-				Columns:    []*schema.Column{MiausColumns[4]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "miaus_users_updated_by",
-				Columns:    []*schema.Column{MiausColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "miaus_admin_users_admin_created_by",
-				Columns:    []*schema.Column{MiausColumns[6]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "miaus_admin_users_admin_updated_by",
-				Columns:    []*schema.Column{MiausColumns[7]},
-				RefColumns: []*schema.Column{AdminUsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
@@ -292,11 +116,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AdminUsersTable,
-		CyclesTable,
 		FilesTable,
-		ForPermissionsTable,
-		LifeCycleNotsTable,
-		MiausTable,
 		RolesTable,
 		UsersTable,
 		UserRolesTable,
@@ -304,22 +124,6 @@ var (
 )
 
 func init() {
-	CyclesTable.ForeignKeys[0].RefTable = UsersTable
-	CyclesTable.ForeignKeys[1].RefTable = UsersTable
-	CyclesTable.ForeignKeys[2].RefTable = AdminUsersTable
-	CyclesTable.ForeignKeys[3].RefTable = AdminUsersTable
-	ForPermissionsTable.ForeignKeys[0].RefTable = UsersTable
-	ForPermissionsTable.ForeignKeys[1].RefTable = UsersTable
-	ForPermissionsTable.ForeignKeys[2].RefTable = AdminUsersTable
-	ForPermissionsTable.ForeignKeys[3].RefTable = AdminUsersTable
-	LifeCycleNotsTable.ForeignKeys[0].RefTable = UsersTable
-	LifeCycleNotsTable.ForeignKeys[1].RefTable = UsersTable
-	LifeCycleNotsTable.ForeignKeys[2].RefTable = AdminUsersTable
-	LifeCycleNotsTable.ForeignKeys[3].RefTable = AdminUsersTable
-	MiausTable.ForeignKeys[0].RefTable = UsersTable
-	MiausTable.ForeignKeys[1].RefTable = UsersTable
-	MiausTable.ForeignKeys[2].RefTable = AdminUsersTable
-	MiausTable.ForeignKeys[3].RefTable = AdminUsersTable
 	UsersTable.ForeignKeys[0].RefTable = UsersTable
 	UsersTable.ForeignKeys[1].RefTable = UsersTable
 	UsersTable.ForeignKeys[2].RefTable = AdminUsersTable
