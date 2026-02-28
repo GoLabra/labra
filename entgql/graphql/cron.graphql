@@ -1,0 +1,68 @@
+scalar Map
+
+input CronScheduleWhereUniqueInput {
+  id: ID
+  name: String
+}
+
+input CreateCronScheduleInput {
+  name: String!
+  expression: String!
+  handler: String!
+  handlerConfig: Map
+  enabled: Boolean = true
+  description: String
+  timeoutSeconds: Int = 300
+  retentionDays: Int = 30
+}
+
+input UpdateCronScheduleInput {
+  name: String
+  expression: String
+  handler: String
+  handlerConfig: Map
+  clearHandlerConfig: Boolean
+  enabled: Boolean
+  description: String
+  clearDescription: Boolean
+  timeoutSeconds: Int
+  retentionDays: Int
+}
+
+type CronSchedule {
+  id: ID!
+  name: String!
+  expression: String!
+  handler: String!
+  handlerConfig: Map
+  enabled: Boolean!
+  description: String
+  timeoutSeconds: Int!
+  retentionDays: Int!
+  createdAt: Time
+  updatedAt: Time
+}
+
+type CronJob {
+  id: ID!
+  startedAt: Time!
+  completedAt: Time
+  status: String!
+  error: String
+  recordsAffected: Int
+  durationMs: Int
+  createdAt: Time!
+  cronScheduleID: ID!
+}
+
+extend type Query {
+  cronSchedule(where: CronScheduleWhereUniqueInput!): CronSchedule
+  cronSchedules(enabled: Boolean, limit: Int = 50, offset: Int = 0): [CronSchedule!]!
+  cronJobs(scheduleID: ID, limit: Int = 100, offset: Int = 0): [CronJob!]!
+}
+
+extend type Mutation {
+  createCronSchedule(data: CreateCronScheduleInput!): CronSchedule!
+  updateCronSchedule(where: CronScheduleWhereUniqueInput!, data: UpdateCronScheduleInput!): CronSchedule!
+  deleteCronSchedule(where: CronScheduleWhereUniqueInput!): CronSchedule!
+}

@@ -40,6 +40,8 @@ type Config struct {
 	// AccessToken and RefreshToken expiration times in minutes
 	AccessTokenTTL  time.Duration `env:"ACCESS_TOKEN_TTL" envDefault:"15m"`
 	RefreshTokenTTL time.Duration `env:"REFRESH_TOKEN_TTL" envDefault:"168h"`
+
+	CronEnabled bool `env:"CRON_ENABLED" envDefault:"true"`
 }
 
 // Secrets holds sensitive credentials fetched from Infisical or environment variables.
