@@ -86,6 +86,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/oracle/oci-go-sdk/v65 v65.106.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/samborkent/uuidv7 v0.0.0-20231110121620-f2e19d87e48b // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
