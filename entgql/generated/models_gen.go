@@ -2,5 +2,68 @@
 
 package gqlgen
 
+import (
+	"time"
+)
+
+type CleanupExpiredTokensPayload struct {
+	Count int `json:"count"`
+}
+
+type CreateCronScheduleInput struct {
+	Name           string         `json:"name"`
+	Expression     string         `json:"expression"`
+	Handler        string         `json:"handler"`
+	HandlerConfig  map[string]any `json:"handlerConfig,omitempty"`
+	Enabled        *bool          `json:"enabled,omitempty"`
+	Description    *string        `json:"description,omitempty"`
+	TimeoutSeconds *int           `json:"timeoutSeconds,omitempty"`
+	RetentionDays  *int           `json:"retentionDays,omitempty"`
+}
+
+type CronJob struct {
+	ID              string     `json:"id"`
+	StartedAt       time.Time  `json:"startedAt"`
+	CompletedAt     *time.Time `json:"completedAt,omitempty"`
+	Status          string     `json:"status"`
+	Error           *string    `json:"error,omitempty"`
+	RecordsAffected *int       `json:"recordsAffected,omitempty"`
+	DurationMs      *int       `json:"durationMs,omitempty"`
+	CreatedAt       time.Time  `json:"createdAt"`
+	CronScheduleID  string     `json:"cronScheduleID"`
+}
+
+type CronSchedule struct {
+	ID             string         `json:"id"`
+	Name           string         `json:"name"`
+	Expression     string         `json:"expression"`
+	Handler        string         `json:"handler"`
+	HandlerConfig  map[string]any `json:"handlerConfig,omitempty"`
+	Enabled        bool           `json:"enabled"`
+	Description    *string        `json:"description,omitempty"`
+	TimeoutSeconds int            `json:"timeoutSeconds"`
+	RetentionDays  int            `json:"retentionDays"`
+	CreatedAt      *time.Time     `json:"createdAt,omitempty"`
+	UpdatedAt      *time.Time     `json:"updatedAt,omitempty"`
+}
+
+type CronScheduleWhereUniqueInput struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
 type Subscription struct {
+}
+
+type UpdateCronScheduleInput struct {
+	Name               *string        `json:"name,omitempty"`
+	Expression         *string        `json:"expression,omitempty"`
+	Handler            *string        `json:"handler,omitempty"`
+	HandlerConfig      map[string]any `json:"handlerConfig,omitempty"`
+	ClearHandlerConfig *bool          `json:"clearHandlerConfig,omitempty"`
+	Enabled            *bool          `json:"enabled,omitempty"`
+	Description        *string        `json:"description,omitempty"`
+	ClearDescription   *bool          `json:"clearDescription,omitempty"`
+	TimeoutSeconds     *int           `json:"timeoutSeconds,omitempty"`
+	RetentionDays      *int           `json:"retentionDays,omitempty"`
 }

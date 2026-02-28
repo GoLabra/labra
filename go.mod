@@ -19,9 +19,11 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/lestrrat-go/jwx/v2 v2.1.6
 	github.com/lucsky/cuid v1.2.1
+	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.23.0
 	github.com/onsi/gomega v1.36.2
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/samborkent/uuidv7 v0.0.0-20231110121620-f2e19d87e48b
 	github.com/vektah/gqlparser/v2 v2.5.31
 	golang.org/x/crypto v0.47.0
@@ -80,7 +82,6 @@ require (
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/oracle/oci-go-sdk/v65 v65.106.1 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect

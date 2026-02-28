@@ -1,0 +1,7 @@
+type CleanupExpiredTokensPayload {
+  count: Int!
+}
+
+extend type Mutation {
+  cleanupExpiredTokens: CleanupExpiredTokensPayload!
+}

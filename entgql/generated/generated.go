@@ -48,8 +48,16 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
+	AdminUserWhereInput() AdminUserWhereInputResolver
+	AdminUserWhereUniqueInput() AdminUserWhereUniqueInputResolver
+	CreateAdminUserInput() CreateAdminUserInputResolver
 	CreateRoleInput() CreateRoleInputResolver
+	CreateUserInput() CreateUserInputResolver
+	UpdateAdminUserInput() UpdateAdminUserInputResolver
 	UpdateRoleInput() UpdateRoleInputResolver
+	UpdateUserInput() UpdateUserInputResolver
+	UserWhereInput() UserWhereInputResolver
+	UserWhereUniqueInput() UserWhereUniqueInputResolver
 }
 
 type DirectiveRoot struct {
@@ -81,6 +89,36 @@ type ComplexityRoot struct {
 	AdminUserEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
+	}
+
+	CleanupExpiredTokensPayload struct {
+		Count func(childComplexity int) int
+	}
+
+	CronJob struct {
+		CompletedAt     func(childComplexity int) int
+		CreatedAt       func(childComplexity int) int
+		CronScheduleID  func(childComplexity int) int
+		DurationMs      func(childComplexity int) int
+		Error           func(childComplexity int) int
+		ID              func(childComplexity int) int
+		RecordsAffected func(childComplexity int) int
+		StartedAt       func(childComplexity int) int
+		Status          func(childComplexity int) int
+	}
+
+	CronSchedule struct {
+		CreatedAt      func(childComplexity int) int
+		Description    func(childComplexity int) int
+		Enabled        func(childComplexity int) int
+		Expression     func(childComplexity int) int
+		Handler        func(childComplexity int) int
+		HandlerConfig  func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		RetentionDays  func(childComplexity int) int
+		TimeoutSeconds func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 	}
 
 	Edge struct {
@@ -144,7 +182,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CleanupExpiredTokens  func(childComplexity int) int
 		CreateAdminUser       func(childComplexity int, data ent.CreateAdminUserInput) int
+		CreateCronSchedule    func(childComplexity int, data CreateCronScheduleInput) int
 		CreateEntity          func(childComplexity int, data entity.CreateEntityInput) int
 		CreateFile            func(childComplexity int, data ent.CreateFileInput) int
 		CreateManyAdminUsers  func(childComplexity int, data []*ent.CreateAdminUserInput) int
@@ -156,6 +196,7 @@ type ComplexityRoot struct {
 		CreateRole            func(childComplexity int, data ent.CreateRoleInput) int
 		CreateUser            func(childComplexity int, data ent.CreateUserInput) int
 		DeleteAdminUser       func(childComplexity int, where ent.AdminUserWhereUniqueInput) int
+		DeleteCronSchedule    func(childComplexity int, where CronScheduleWhereUniqueInput) int
 		DeleteEntity          func(childComplexity int, where entity.EntityWhereUniqueInput) int
 		DeleteFile            func(childComplexity int, where ent.FileWhereUniqueInput) int
 		DeleteManyAdminUsers  func(childComplexity int, where ent.AdminUserWhereInput) int
@@ -167,6 +208,7 @@ type ComplexityRoot struct {
 		DeleteRole            func(childComplexity int, where ent.RoleWhereUniqueInput) int
 		DeleteUser            func(childComplexity int, where ent.UserWhereUniqueInput) int
 		UpdateAdminUser       func(childComplexity int, where ent.AdminUserWhereUniqueInput, data ent.UpdateAdminUserInput) int
+		UpdateCronSchedule    func(childComplexity int, where CronScheduleWhereUniqueInput, data UpdateCronScheduleInput) int
 		UpdateEntity          func(childComplexity int, where entity.EntityWhereUniqueInput, data entity.UpdateEntityInput) int
 		UpdateFile            func(childComplexity int, where ent.FileWhereUniqueInput, data ent.UpdateFileInput) int
 		UpdateManyAdminUsers  func(childComplexity int, where ent.AdminUserWhereInput, data ent.UpdateAdminUserInput) int
@@ -197,15 +239,14 @@ type ComplexityRoot struct {
 	}
 
 	Permission struct {
-		AdminCreatedBy  func(childComplexity int) int
-		AdminUpdatedBy  func(childComplexity int) int
-		CreatedAt       func(childComplexity int) int
-		Entity          func(childComplexity int) int
-		ID              func(childComplexity int) int
-		LifecycleAccess func(childComplexity int) int
-		Operation       func(childComplexity int) int
-		Role            func(childComplexity int) int
-		UpdatedAt       func(childComplexity int) int
+		AdminCreatedBy func(childComplexity int) int
+		AdminUpdatedBy func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		Entity         func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Operation      func(childComplexity int) int
+		Role           func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 	}
 
 	PermissionConnection struct {
@@ -222,12 +263,14 @@ type ComplexityRoot struct {
 	Query struct {
 		AdminUsers            func(childComplexity int, where *ent.AdminUserWhereInput, orderBy *ent.AdminUserOrder, skip *int, first *int, last *int) int
 		AdminUsersConnection  func(childComplexity int, where *ent.AdminUserWhereInput, orderBy *ent.AdminUserOrder, skip *int, first *int, last *int) int
+		CronJobs              func(childComplexity int, scheduleID *string, limit *int, offset *int) int
+		CronSchedule          func(childComplexity int, where CronScheduleWhereUniqueInput) int
+		CronSchedules         func(childComplexity int, enabled *bool, limit *int, offset *int) int
 		Entities              func(childComplexity int) int
 		Entity                func(childComplexity int, where *entity.EntityWhereUniqueInput) int
 		Fields                func(childComplexity int) int
 		Files                 func(childComplexity int, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) int
 		FilesConnection       func(childComplexity int, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) int
-		Me                    func(childComplexity int) int
 		Node                  func(childComplexity int, id string) int
 		Nodes                 func(childComplexity int, ids []string) int
 		Permissions           func(childComplexity int, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) int
@@ -311,6 +354,9 @@ type MutationResolver interface {
 	UpsertManyAdminUsers(ctx context.Context, data []*ent.CreateAdminUserInput) (int, error)
 	DeleteAdminUser(ctx context.Context, where ent.AdminUserWhereUniqueInput) (*ent.AdminUser, error)
 	DeleteManyAdminUsers(ctx context.Context, where ent.AdminUserWhereInput) (int, error)
+	CreateCronSchedule(ctx context.Context, data CreateCronScheduleInput) (*CronSchedule, error)
+	UpdateCronSchedule(ctx context.Context, where CronScheduleWhereUniqueInput, data UpdateCronScheduleInput) (*CronSchedule, error)
+	DeleteCronSchedule(ctx context.Context, where CronScheduleWhereUniqueInput) (*CronSchedule, error)
 	CreateEntity(ctx context.Context, data entity.CreateEntityInput) (*entity.Entity, error)
 	UpdateEntity(ctx context.Context, where entity.EntityWhereUniqueInput, data entity.UpdateEntityInput) (*entity.Entity, error)
 	DeleteEntity(ctx context.Context, where entity.EntityWhereUniqueInput) (*entity.Entity, error)
@@ -338,6 +384,7 @@ type MutationResolver interface {
 	UpsertManyRoles(ctx context.Context, data []*ent.CreateRoleInput) (int, error)
 	DeleteRole(ctx context.Context, where ent.RoleWhereUniqueInput) (*ent.Role, error)
 	DeleteManyRoles(ctx context.Context, where ent.RoleWhereInput) (int, error)
+	CleanupExpiredTokens(ctx context.Context) (*CleanupExpiredTokensPayload, error)
 	CreateUser(ctx context.Context, data ent.CreateUserInput) (*ent.User, error)
 	CreateManyUsers(ctx context.Context, data []*ent.CreateUserInput) ([]*ent.User, error)
 	UpdateUser(ctx context.Context, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) (*ent.User, error)
@@ -352,12 +399,14 @@ type QueryResolver interface {
 	Nodes(ctx context.Context, ids []string) ([]ent.Noder, error)
 	AdminUsers(ctx context.Context, where *ent.AdminUserWhereInput, orderBy *ent.AdminUserOrder, skip *int, first *int, last *int) ([]*ent.AdminUser, error)
 	AdminUsersConnection(ctx context.Context, where *ent.AdminUserWhereInput, orderBy *ent.AdminUserOrder, skip *int, first *int, last *int) (*ent.AdminUserConnection, error)
+	CronSchedule(ctx context.Context, where CronScheduleWhereUniqueInput) (*CronSchedule, error)
+	CronSchedules(ctx context.Context, enabled *bool, limit *int, offset *int) ([]*CronSchedule, error)
+	CronJobs(ctx context.Context, scheduleID *string, limit *int, offset *int) ([]*CronJob, error)
 	Entities(ctx context.Context) ([]*entity.Entity, error)
 	Entity(ctx context.Context, where *entity.EntityWhereUniqueInput) (*entity.Entity, error)
 	Fields(ctx context.Context) ([]*entity.Field, error)
 	Files(ctx context.Context, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) ([]*ent.File, error)
 	FilesConnection(ctx context.Context, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) (*ent.FileConnection, error)
-	Me(ctx context.Context) (*ent.AdminUser, error)
 	Permissions(ctx context.Context, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) ([]*ent.Permission, error)
 	PermissionsConnection(ctx context.Context, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) (*ent.PermissionConnection, error)
 	Roles(ctx context.Context, where *ent.RoleWhereInput, orderBy *ent.RoleOrder, skip *int, first *int, last *int) ([]*ent.Role, error)
@@ -370,11 +419,61 @@ type SubscriptionResolver interface {
 	Entities(ctx context.Context) (<-chan []*entity.Entity, error)
 }
 
+type AdminUserWhereInputResolver interface {
+	Email(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailNeq(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailIn(ctx context.Context, obj *ent.AdminUserWhereInput, data []entity.Email) error
+	EmailNotIn(ctx context.Context, obj *ent.AdminUserWhereInput, data []entity.Email) error
+	EmailGt(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailGte(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailLt(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailLte(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailContains(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailHasPrefix(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailHasSuffix(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailEqualFold(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+	EmailContainsFold(ctx context.Context, obj *ent.AdminUserWhereInput, data *entity.Email) error
+}
+type AdminUserWhereUniqueInputResolver interface {
+	Email(ctx context.Context, obj *ent.AdminUserWhereUniqueInput, data *entity.Email) error
+}
+type CreateAdminUserInputResolver interface {
+	Email(ctx context.Context, obj *ent.CreateAdminUserInput, data entity.Email) error
+}
 type CreateRoleInputResolver interface {
-	UserRoles(ctx context.Context, obj *ent.CreateRoleInput, data *ent.CreateManyAdminUserInput) error
+	AdminUserRoleIDs(ctx context.Context, obj *ent.CreateRoleInput, data []string) error
+}
+type CreateUserInputResolver interface {
+	Email(ctx context.Context, obj *ent.CreateUserInput, data entity.Email) error
+}
+type UpdateAdminUserInputResolver interface {
+	Email(ctx context.Context, obj *ent.UpdateAdminUserInput, data *entity.Email) error
 }
 type UpdateRoleInputResolver interface {
-	UserRoles(ctx context.Context, obj *ent.UpdateRoleInput, data *ent.UpdateManyAdminUserInput) error
+	AddAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error
+	RemoveAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error
+	ClearAdminUserRoles(ctx context.Context, obj *ent.UpdateRoleInput, data *bool) error
+}
+type UpdateUserInputResolver interface {
+	Email(ctx context.Context, obj *ent.UpdateUserInput, data *entity.Email) error
+}
+type UserWhereInputResolver interface {
+	Email(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailNeq(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailIn(ctx context.Context, obj *ent.UserWhereInput, data []entity.Email) error
+	EmailNotIn(ctx context.Context, obj *ent.UserWhereInput, data []entity.Email) error
+	EmailGt(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailGte(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailLt(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailLte(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailContains(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailHasPrefix(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailHasSuffix(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailEqualFold(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+	EmailContainsFold(ctx context.Context, obj *ent.UserWhereInput, data *entity.Email) error
+}
+type UserWhereUniqueInputResolver interface {
+	Email(ctx context.Context, obj *ent.UserWhereUniqueInput, data *entity.Email) error
 }
 
 type executableSchema struct {
@@ -506,6 +605,135 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.AdminUserEdge.Node(childComplexity), true
+
+	case "CleanupExpiredTokensPayload.count":
+		if e.complexity.CleanupExpiredTokensPayload.Count == nil {
+			break
+		}
+
+		return e.complexity.CleanupExpiredTokensPayload.Count(childComplexity), true
+
+	case "CronJob.completedAt":
+		if e.complexity.CronJob.CompletedAt == nil {
+			break
+		}
+
+		return e.complexity.CronJob.CompletedAt(childComplexity), true
+	case "CronJob.createdAt":
+		if e.complexity.CronJob.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.CronJob.CreatedAt(childComplexity), true
+	case "CronJob.cronScheduleID":
+		if e.complexity.CronJob.CronScheduleID == nil {
+			break
+		}
+
+		return e.complexity.CronJob.CronScheduleID(childComplexity), true
+	case "CronJob.durationMs":
+		if e.complexity.CronJob.DurationMs == nil {
+			break
+		}
+
+		return e.complexity.CronJob.DurationMs(childComplexity), true
+	case "CronJob.error":
+		if e.complexity.CronJob.Error == nil {
+			break
+		}
+
+		return e.complexity.CronJob.Error(childComplexity), true
+	case "CronJob.id":
+		if e.complexity.CronJob.ID == nil {
+			break
+		}
+
+		return e.complexity.CronJob.ID(childComplexity), true
+	case "CronJob.recordsAffected":
+		if e.complexity.CronJob.RecordsAffected == nil {
+			break
+		}
+
+		return e.complexity.CronJob.RecordsAffected(childComplexity), true
+	case "CronJob.startedAt":
+		if e.complexity.CronJob.StartedAt == nil {
+			break
+		}
+
+		return e.complexity.CronJob.StartedAt(childComplexity), true
+	case "CronJob.status":
+		if e.complexity.CronJob.Status == nil {
+			break
+		}
+
+		return e.complexity.CronJob.Status(childComplexity), true
+
+	case "CronSchedule.createdAt":
+		if e.complexity.CronSchedule.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.CreatedAt(childComplexity), true
+	case "CronSchedule.description":
+		if e.complexity.CronSchedule.Description == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.Description(childComplexity), true
+	case "CronSchedule.enabled":
+		if e.complexity.CronSchedule.Enabled == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.Enabled(childComplexity), true
+	case "CronSchedule.expression":
+		if e.complexity.CronSchedule.Expression == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.Expression(childComplexity), true
+	case "CronSchedule.handler":
+		if e.complexity.CronSchedule.Handler == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.Handler(childComplexity), true
+	case "CronSchedule.handlerConfig":
+		if e.complexity.CronSchedule.HandlerConfig == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.HandlerConfig(childComplexity), true
+	case "CronSchedule.id":
+		if e.complexity.CronSchedule.ID == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.ID(childComplexity), true
+	case "CronSchedule.name":
+		if e.complexity.CronSchedule.Name == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.Name(childComplexity), true
+	case "CronSchedule.retentionDays":
+		if e.complexity.CronSchedule.RetentionDays == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.RetentionDays(childComplexity), true
+	case "CronSchedule.timeoutSeconds":
+		if e.complexity.CronSchedule.TimeoutSeconds == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.TimeoutSeconds(childComplexity), true
+	case "CronSchedule.updatedAt":
+		if e.complexity.CronSchedule.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.CronSchedule.UpdatedAt(childComplexity), true
 
 	case "Edge.belongsToCaption":
 		if e.complexity.Edge.BelongsToCaption == nil {
@@ -765,6 +993,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.FileEdge.Node(childComplexity), true
 
+	case "Mutation.cleanupExpiredTokens":
+		if e.complexity.Mutation.CleanupExpiredTokens == nil {
+			break
+		}
+
+		return e.complexity.Mutation.CleanupExpiredTokens(childComplexity), true
 	case "Mutation.createAdminUser":
 		if e.complexity.Mutation.CreateAdminUser == nil {
 			break
@@ -776,6 +1010,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateAdminUser(childComplexity, args["data"].(ent.CreateAdminUserInput)), true
+	case "Mutation.createCronSchedule":
+		if e.complexity.Mutation.CreateCronSchedule == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createCronSchedule_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateCronSchedule(childComplexity, args["data"].(CreateCronScheduleInput)), true
 	case "Mutation.createEntity":
 		if e.complexity.Mutation.CreateEntity == nil {
 			break
@@ -897,6 +1142,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteAdminUser(childComplexity, args["where"].(ent.AdminUserWhereUniqueInput)), true
+	case "Mutation.deleteCronSchedule":
+		if e.complexity.Mutation.DeleteCronSchedule == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteCronSchedule_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteCronSchedule(childComplexity, args["where"].(CronScheduleWhereUniqueInput)), true
 	case "Mutation.deleteEntity":
 		if e.complexity.Mutation.DeleteEntity == nil {
 			break
@@ -1018,6 +1274,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateAdminUser(childComplexity, args["where"].(ent.AdminUserWhereUniqueInput), args["data"].(ent.UpdateAdminUserInput)), true
+	case "Mutation.updateCronSchedule":
+		if e.complexity.Mutation.UpdateCronSchedule == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCronSchedule_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCronSchedule(childComplexity, args["where"].(CronScheduleWhereUniqueInput), args["data"].(UpdateCronScheduleInput)), true
 	case "Mutation.updateEntity":
 		if e.complexity.Mutation.UpdateEntity == nil {
 			break
@@ -1294,12 +1561,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Permission.ID(childComplexity), true
-	case "Permission.lifecycleAccess":
-		if e.complexity.Permission.LifecycleAccess == nil {
-			break
-		}
-
-		return e.complexity.Permission.LifecycleAccess(childComplexity), true
 	case "Permission.operation":
 		if e.complexity.Permission.Operation == nil {
 			break
@@ -1373,6 +1634,39 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.AdminUsersConnection(childComplexity, args["where"].(*ent.AdminUserWhereInput), args["orderBy"].(*ent.AdminUserOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+	case "Query.cronJobs":
+		if e.complexity.Query.CronJobs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cronJobs_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CronJobs(childComplexity, args["scheduleID"].(*string), args["limit"].(*int), args["offset"].(*int)), true
+	case "Query.cronSchedule":
+		if e.complexity.Query.CronSchedule == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cronSchedule_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CronSchedule(childComplexity, args["where"].(CronScheduleWhereUniqueInput)), true
+	case "Query.cronSchedules":
+		if e.complexity.Query.CronSchedules == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cronSchedules_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CronSchedules(childComplexity, args["enabled"].(*bool), args["limit"].(*int), args["offset"].(*int)), true
 	case "Query.entities":
 		if e.complexity.Query.Entities == nil {
 			break
@@ -1418,12 +1712,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.FilesConnection(childComplexity, args["where"].(*ent.FileWhereInput), args["orderBy"].(*ent.FileOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
-	case "Query.me":
-		if e.complexity.Query.Me == nil {
-			break
-		}
-
-		return e.complexity.Query.Me(childComplexity), true
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
 			break
@@ -1712,6 +2000,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAdminUserWhereInput,
 		ec.unmarshalInputAdminUserWhereUniqueInput,
 		ec.unmarshalInputCreateAdminUserInput,
+		ec.unmarshalInputCreateCronScheduleInput,
 		ec.unmarshalInputCreateEdgeInput,
 		ec.unmarshalInputCreateEntityInput,
 		ec.unmarshalInputCreateFieldInput,
@@ -1731,6 +2020,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreatePermissionInput,
 		ec.unmarshalInputCreateRoleInput,
 		ec.unmarshalInputCreateUserInput,
+		ec.unmarshalInputCronScheduleWhereUniqueInput,
 		ec.unmarshalInputEdgeWhereUniqueInput,
 		ec.unmarshalInputEntityConnectInput,
 		ec.unmarshalInputEntityWhereUniqueInput,
@@ -1738,7 +2028,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputFileOrder,
 		ec.unmarshalInputFileWhereInput,
 		ec.unmarshalInputFileWhereUniqueInput,
-		ec.unmarshalInputLifecycleInput,
 		ec.unmarshalInputPermissionOrder,
 		ec.unmarshalInputPermissionWhereInput,
 		ec.unmarshalInputPermissionWhereUniqueInput,
@@ -1746,6 +2035,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputRoleWhereInput,
 		ec.unmarshalInputRoleWhereUniqueInput,
 		ec.unmarshalInputUpdateAdminUserInput,
+		ec.unmarshalInputUpdateCronScheduleInput,
 		ec.unmarshalInputUpdateEdgeInput,
 		ec.unmarshalInputUpdateEntityInput,
 		ec.unmarshalInputUpdateFieldInput,
@@ -1940,6 +2230,75 @@ input UpdateManyAdminUserInput {
     disconnect: [AdminUserWhereUniqueInput!]
 }
 `, BuiltIn: false},
+	{Name: "../graphql/cron.graphql", Input: `scalar Map
+
+input CronScheduleWhereUniqueInput {
+  id: ID
+  name: String
+}
+
+input CreateCronScheduleInput {
+  name: String!
+  expression: String!
+  handler: String!
+  handlerConfig: Map
+  enabled: Boolean = true
+  description: String
+  timeoutSeconds: Int = 300
+  retentionDays: Int = 30
+}
+
+input UpdateCronScheduleInput {
+  name: String
+  expression: String
+  handler: String
+  handlerConfig: Map
+  clearHandlerConfig: Boolean
+  enabled: Boolean
+  description: String
+  clearDescription: Boolean
+  timeoutSeconds: Int
+  retentionDays: Int
+}
+
+type CronSchedule {
+  id: ID!
+  name: String!
+  expression: String!
+  handler: String!
+  handlerConfig: Map
+  enabled: Boolean!
+  description: String
+  timeoutSeconds: Int!
+  retentionDays: Int!
+  createdAt: Time
+  updatedAt: Time
+}
+
+type CronJob {
+  id: ID!
+  startedAt: Time!
+  completedAt: Time
+  status: String!
+  error: String
+  recordsAffected: Int
+  durationMs: Int
+  createdAt: Time!
+  cronScheduleID: ID!
+}
+
+extend type Query {
+  cronSchedule(where: CronScheduleWhereUniqueInput!): CronSchedule
+  cronSchedules(enabled: Boolean, limit: Int = 50, offset: Int = 0): [CronSchedule!]!
+  cronJobs(scheduleID: ID, limit: Int = 100, offset: Int = 0): [CronJob!]!
+}
+
+extend type Mutation {
+  createCronSchedule(data: CreateCronScheduleInput!): CronSchedule!
+  updateCronSchedule(where: CronScheduleWhereUniqueInput!, data: UpdateCronScheduleInput!): CronSchedule!
+  deleteCronSchedule(where: CronScheduleWhereUniqueInput!): CronSchedule!
+}
+`, BuiltIn: false},
 	{Name: "../graphql/entity.graphql", Input: `enum AppStatus {
     UP
     GENERATING
@@ -1981,7 +2340,6 @@ input CreateEntityInput {
     displayField: FieldWhereUniqueInput!
     fields: CreateManyFieldsInput
     edges: CreateManyEdgesInput
-    lifecycle: LifecycleInput
 }
 
 input UpdateEntityInput {
@@ -1989,7 +2347,6 @@ input UpdateEntityInput {
     displayField: FieldWhereUniqueInput
     fields: UpdateManyFieldsInput
     edges: UpdateManyEdgesInput
-    lifecycle: LifecycleInput
 }
 
 input EntityWhereUniqueInput {
@@ -2115,17 +2472,7 @@ input UpdateEdgeInput {
     required: Boolean
     private: Boolean
 }
-
-enum EntityState {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-}
-
-input LifecycleInput {
-    enabled: Boolean!
-    default: EntityState
-}`, BuiltIn: false},
+`, BuiltIn: false},
 	{Name: "../graphql/file.graphql", Input: `extend type Query {
     files(where: FileWhereInput, orderBy: FileOrder, skip: Int, first: Int, last: Int): [File!]
     filesConnection(where: FileWhereInput, orderBy: FileOrder, skip: Int, first: Int, last: Int): FileConnection!
@@ -2176,10 +2523,6 @@ input UpdateManyFileInput {
     connect: [FileWhereUniqueInput!]
     delete: [FileWhereUniqueInput!]
     disconnect: [FileWhereUniqueInput!]
-}
-`, BuiltIn: false},
-	{Name: "../graphql/me.graphql", Input: `extend type Query {
-    me: AdminUser!
 }
 `, BuiltIn: false},
 	{Name: "../graphql/permission.graphql", Input: `extend type Query {
@@ -2284,8 +2627,17 @@ input UpdateManyRoleInput {
     disconnect: [RoleWhereUniqueInput!]
 }
 `, BuiltIn: false},
-	{Name: "../graphql/schema.graphql", Input: `directive @goField(forceResolver: Boolean, name: String, omittable: Boolean) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
-directive @goModel(model: String, models: [String!], forceGenerate: Boolean) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+	{Name: "../graphql/schema.graphql", Input: `scalar Email
+directive @goField(
+  forceResolver: Boolean
+  name: String
+  omittable: Boolean
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+directive @goModel(
+  model: String
+  models: [String!]
+  forceGenerate: Boolean
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 type AdminUser implements Node {
   id: ID!
   name: String
@@ -2398,19 +2750,19 @@ input AdminUserWhereInput {
   """
   email field predicates
   """
-  email: String
-  emailNEQ: String
-  emailIn: [String!]
-  emailNotIn: [String!]
-  emailGT: String
-  emailGTE: String
-  emailLT: String
-  emailLTE: String
-  emailContains: String
-  emailHasPrefix: String
-  emailHasSuffix: String
-  emailEqualFold: String
-  emailContainsFold: String
+  email: Email
+  emailNEQ: Email
+  emailIn: [Email!]
+  emailNotIn: [Email!]
+  emailGT: Email
+  emailGTE: Email
+  emailLT: Email
+  emailLTE: Email
+  emailContains: Email
+  emailHasPrefix: Email
+  emailHasSuffix: Email
+  emailEqualFold: Email
+  emailContainsFold: Email
   """
   password field predicates
   """
@@ -2517,7 +2869,7 @@ Input was generated by ent.
 """
 input CreateAdminUserInput {
   name: String
-  email: String!
+  email: Email!
   password: String!
   firstName: String!
   lastName: String!
@@ -2550,7 +2902,6 @@ input CreatePermissionInput {
   updatedAt: DateTime
   entity: String!
   operation: String
-  lifecycleAccess: [String!]
   adminCreatedByID: ID
   adminUpdatedByID: ID
   roleID: ID
@@ -2570,7 +2921,7 @@ CreateUserInput is used for create User object.
 Input was generated by ent.
 """
 input CreateUserInput {
-  email: String!
+  email: Email!
   password: String!
   roleIDs: [ID!]
   defaultRoleID: ID
@@ -2846,7 +3197,6 @@ type Permission implements Node {
   updatedAt: DateTime
   entity: String!
   operation: String!
-  lifecycleAccess: [String!]
   adminCreatedBy: AdminUser
   adminUpdatedBy: AdminUser
   role: Role
@@ -3180,7 +3530,7 @@ Input was generated by ent.
 input UpdateAdminUserInput {
   name: String
   clearName: Boolean
-  email: String
+  email: Email
   password: String
   firstName: String
   lastName: String
@@ -3225,9 +3575,6 @@ input UpdatePermissionInput {
   clearUpdatedAt: Boolean
   entity: String
   operation: String
-  lifecycleAccess: [String!]
-  appendLifecycleAccess: [String!]
-  clearLifecycleAccess: Boolean
   adminCreatedByID: ID
   clearAdminCreatedBy: Boolean
   adminUpdatedByID: ID
@@ -3256,7 +3603,7 @@ UpdateUserInput is used for update User object.
 Input was generated by ent.
 """
 input UpdateUserInput {
-  email: String
+  email: Email
   password: String
   addRoleIDs: [ID!]
   removeRoleIDs: [ID!]
@@ -3349,19 +3696,19 @@ input UserWhereInput {
   """
   email field predicates
   """
-  email: String
-  emailNEQ: String
-  emailIn: [String!]
-  emailNotIn: [String!]
-  emailGT: String
-  emailGTE: String
-  emailLT: String
-  emailLTE: String
-  emailContains: String
-  emailHasPrefix: String
-  emailHasSuffix: String
-  emailEqualFold: String
-  emailContainsFold: String
+  email: Email
+  emailNEQ: Email
+  emailIn: [Email!]
+  emailNotIn: [Email!]
+  emailGT: Email
+  emailGTE: Email
+  emailLT: Email
+  emailLTE: Email
+  emailContains: Email
+  emailHasPrefix: Email
+  emailHasSuffix: Email
+  emailEqualFold: Email
+  emailContainsFold: Email
   """
   password field predicates
   """
@@ -3415,6 +3762,14 @@ input UserWhereInput {
 # scalar TimeOnly
 
 # scalar DateTime`, BuiltIn: false},
+	{Name: "../graphql/token_revocation.graphql", Input: `type CleanupExpiredTokensPayload {
+  count: Int!
+}
+
+extend type Mutation {
+  cleanupExpiredTokens: CleanupExpiredTokensPayload!
+}
+`, BuiltIn: false},
 	{Name: "../graphql/unique_inputs.graphql", Input: `# TODO find better location for this file
 
 scalar DateOnly
@@ -3424,7 +3779,7 @@ scalar TimeOnly
 scalar DateTime
 input AdminUserWhereUniqueInput {
   id: ID
-  email: String
+  email: Email
 }
 input FileWhereUniqueInput {
   id: ID
@@ -3439,9 +3794,8 @@ input RoleWhereUniqueInput {
 }
 input UserWhereUniqueInput {
   id: ID
-  email: String
+  email: Email
 }
-
 `, BuiltIn: false},
 	{Name: "../graphql/user.graphql", Input: `extend type Query {
     users(where: UserWhereInput, orderBy: UserOrder, skip: Int, first: Int, last: Int): [User!]
@@ -3511,6 +3865,17 @@ func (ec *executionContext) field_Mutation_createAdminUser_args(ctx context.Cont
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateAdminUserInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateAdminUserInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createCronSchedule_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNCreateCronScheduleInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCreateCronScheduleInput)
 	if err != nil {
 		return nil, err
 	}
@@ -3639,6 +4004,17 @@ func (ec *executionContext) field_Mutation_deleteAdminUser_args(ctx context.Cont
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteCronSchedule_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCronScheduleWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronScheduleWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteEntity_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3758,6 +4134,22 @@ func (ec *executionContext) field_Mutation_updateAdminUser_args(ctx context.Cont
 	}
 	args["where"] = arg0
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateAdminUserInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateAdminUserInput)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateCronSchedule_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCronScheduleWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronScheduleWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNUpdateCronScheduleInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐUpdateCronScheduleInput)
 	if err != nil {
 		return nil, err
 	}
@@ -4105,6 +4497,59 @@ func (ec *executionContext) field_Query_adminUsers_args(ctx context.Context, raw
 		return nil, err
 	}
 	args["last"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_cronJobs_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "scheduleID", ec.unmarshalOID2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["scheduleID"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_cronSchedule_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNCronScheduleWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronScheduleWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_cronSchedules_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "enabled", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["enabled"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "offset", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -5126,6 +5571,615 @@ func (ec *executionContext) fieldContext_AdminUserEdge_cursor(_ context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CleanupExpiredTokensPayload_count(ctx context.Context, field graphql.CollectedField, obj *CleanupExpiredTokensPayload) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CleanupExpiredTokensPayload_count,
+		func(ctx context.Context) (any, error) {
+			return obj.Count, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CleanupExpiredTokensPayload_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CleanupExpiredTokensPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_id(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_startedAt(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_startedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.StartedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_startedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_completedAt(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_completedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CompletedAt, nil
+		},
+		nil,
+		ec.marshalOTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_completedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_status(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_status,
+		func(ctx context.Context) (any, error) {
+			return obj.Status, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_error(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_error,
+		func(ctx context.Context) (any, error) {
+			return obj.Error, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_recordsAffected(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_recordsAffected,
+		func(ctx context.Context) (any, error) {
+			return obj.RecordsAffected, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_recordsAffected(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_durationMs(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_durationMs,
+		func(ctx context.Context) (any, error) {
+			return obj.DurationMs, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_durationMs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_createdAt(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronJob_cronScheduleID(ctx context.Context, field graphql.CollectedField, obj *CronJob) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronJob_cronScheduleID,
+		func(ctx context.Context) (any, error) {
+			return obj.CronScheduleID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronJob_cronScheduleID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronJob",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_id(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_name(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_expression(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_expression,
+		func(ctx context.Context) (any, error) {
+			return obj.Expression, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_expression(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_handler(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_handler,
+		func(ctx context.Context) (any, error) {
+			return obj.Handler, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_handler(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_handlerConfig(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_handlerConfig,
+		func(ctx context.Context) (any, error) {
+			return obj.HandlerConfig, nil
+		},
+		nil,
+		ec.marshalOMap2map,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_handlerConfig(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_enabled(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_enabled,
+		func(ctx context.Context) (any, error) {
+			return obj.Enabled, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_enabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_description(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_timeoutSeconds(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_timeoutSeconds,
+		func(ctx context.Context) (any, error) {
+			return obj.TimeoutSeconds, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_timeoutSeconds(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_retentionDays(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_retentionDays,
+		func(ctx context.Context) (any, error) {
+			return obj.RetentionDays, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_retentionDays(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_createdAt(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalOTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CronSchedule_updatedAt(ctx context.Context, field graphql.CollectedField, obj *CronSchedule) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CronSchedule_updatedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalOTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_CronSchedule_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CronSchedule",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7033,6 +8087,201 @@ func (ec *executionContext) fieldContext_Mutation_deleteManyAdminUsers(ctx conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createCronSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createCronSchedule,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateCronSchedule(ctx, fc.Args["data"].(CreateCronScheduleInput))
+		},
+		nil,
+		ec.marshalNCronSchedule2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createCronSchedule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CronSchedule_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CronSchedule_name(ctx, field)
+			case "expression":
+				return ec.fieldContext_CronSchedule_expression(ctx, field)
+			case "handler":
+				return ec.fieldContext_CronSchedule_handler(ctx, field)
+			case "handlerConfig":
+				return ec.fieldContext_CronSchedule_handlerConfig(ctx, field)
+			case "enabled":
+				return ec.fieldContext_CronSchedule_enabled(ctx, field)
+			case "description":
+				return ec.fieldContext_CronSchedule_description(ctx, field)
+			case "timeoutSeconds":
+				return ec.fieldContext_CronSchedule_timeoutSeconds(ctx, field)
+			case "retentionDays":
+				return ec.fieldContext_CronSchedule_retentionDays(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_CronSchedule_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_CronSchedule_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CronSchedule", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createCronSchedule_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateCronSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateCronSchedule,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateCronSchedule(ctx, fc.Args["where"].(CronScheduleWhereUniqueInput), fc.Args["data"].(UpdateCronScheduleInput))
+		},
+		nil,
+		ec.marshalNCronSchedule2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCronSchedule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CronSchedule_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CronSchedule_name(ctx, field)
+			case "expression":
+				return ec.fieldContext_CronSchedule_expression(ctx, field)
+			case "handler":
+				return ec.fieldContext_CronSchedule_handler(ctx, field)
+			case "handlerConfig":
+				return ec.fieldContext_CronSchedule_handlerConfig(ctx, field)
+			case "enabled":
+				return ec.fieldContext_CronSchedule_enabled(ctx, field)
+			case "description":
+				return ec.fieldContext_CronSchedule_description(ctx, field)
+			case "timeoutSeconds":
+				return ec.fieldContext_CronSchedule_timeoutSeconds(ctx, field)
+			case "retentionDays":
+				return ec.fieldContext_CronSchedule_retentionDays(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_CronSchedule_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_CronSchedule_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CronSchedule", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCronSchedule_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteCronSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteCronSchedule,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteCronSchedule(ctx, fc.Args["where"].(CronScheduleWhereUniqueInput))
+		},
+		nil,
+		ec.marshalNCronSchedule2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteCronSchedule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CronSchedule_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CronSchedule_name(ctx, field)
+			case "expression":
+				return ec.fieldContext_CronSchedule_expression(ctx, field)
+			case "handler":
+				return ec.fieldContext_CronSchedule_handler(ctx, field)
+			case "handlerConfig":
+				return ec.fieldContext_CronSchedule_handlerConfig(ctx, field)
+			case "enabled":
+				return ec.fieldContext_CronSchedule_enabled(ctx, field)
+			case "description":
+				return ec.fieldContext_CronSchedule_description(ctx, field)
+			case "timeoutSeconds":
+				return ec.fieldContext_CronSchedule_timeoutSeconds(ctx, field)
+			case "retentionDays":
+				return ec.fieldContext_CronSchedule_retentionDays(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_CronSchedule_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_CronSchedule_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CronSchedule", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteCronSchedule_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createEntity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -7703,8 +8952,6 @@ func (ec *executionContext) fieldContext_Mutation_createPermission(ctx context.C
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -7764,8 +9011,6 @@ func (ec *executionContext) fieldContext_Mutation_createManyPermissions(ctx cont
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -7825,8 +9070,6 @@ func (ec *executionContext) fieldContext_Mutation_updatePermission(ctx context.C
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -7927,8 +9170,6 @@ func (ec *executionContext) fieldContext_Mutation_upsertPermission(ctx context.C
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -8029,8 +9270,6 @@ func (ec *executionContext) fieldContext_Mutation_deletePermission(ctx context.C
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -8520,6 +9759,39 @@ func (ec *executionContext) fieldContext_Mutation_deleteManyRoles(ctx context.Co
 	if fc.Args, err = ec.field_Mutation_deleteManyRoles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_cleanupExpiredTokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_cleanupExpiredTokens,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Mutation().CleanupExpiredTokens(ctx)
+		},
+		nil,
+		ec.marshalNCleanupExpiredTokensPayload2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCleanupExpiredTokensPayload,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_cleanupExpiredTokens(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_CleanupExpiredTokensPayload_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CleanupExpiredTokensPayload", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -9213,35 +10485,6 @@ func (ec *executionContext) fieldContext_Permission_operation(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Permission_lifecycleAccess(ctx context.Context, field graphql.CollectedField, obj *ent.Permission) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Permission_lifecycleAccess,
-		func(ctx context.Context) (any, error) {
-			return obj.LifecycleAccess, nil
-		},
-		nil,
-		ec.marshalOString2ᚕstringᚄ,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Permission_lifecycleAccess(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Permission",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Permission_adminCreatedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Permission) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -9542,8 +10785,6 @@ func (ec *executionContext) fieldContext_PermissionEdge_node(_ context.Context, 
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -9780,6 +11021,197 @@ func (ec *executionContext) fieldContext_Query_adminUsersConnection(ctx context.
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_adminUsersConnection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_cronSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cronSchedule,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().CronSchedule(ctx, fc.Args["where"].(CronScheduleWhereUniqueInput))
+		},
+		nil,
+		ec.marshalOCronSchedule2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cronSchedule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CronSchedule_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CronSchedule_name(ctx, field)
+			case "expression":
+				return ec.fieldContext_CronSchedule_expression(ctx, field)
+			case "handler":
+				return ec.fieldContext_CronSchedule_handler(ctx, field)
+			case "handlerConfig":
+				return ec.fieldContext_CronSchedule_handlerConfig(ctx, field)
+			case "enabled":
+				return ec.fieldContext_CronSchedule_enabled(ctx, field)
+			case "description":
+				return ec.fieldContext_CronSchedule_description(ctx, field)
+			case "timeoutSeconds":
+				return ec.fieldContext_CronSchedule_timeoutSeconds(ctx, field)
+			case "retentionDays":
+				return ec.fieldContext_CronSchedule_retentionDays(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_CronSchedule_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_CronSchedule_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CronSchedule", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_cronSchedule_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_cronSchedules(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cronSchedules,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().CronSchedules(ctx, fc.Args["enabled"].(*bool), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+		},
+		nil,
+		ec.marshalNCronSchedule2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronScheduleᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cronSchedules(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CronSchedule_id(ctx, field)
+			case "name":
+				return ec.fieldContext_CronSchedule_name(ctx, field)
+			case "expression":
+				return ec.fieldContext_CronSchedule_expression(ctx, field)
+			case "handler":
+				return ec.fieldContext_CronSchedule_handler(ctx, field)
+			case "handlerConfig":
+				return ec.fieldContext_CronSchedule_handlerConfig(ctx, field)
+			case "enabled":
+				return ec.fieldContext_CronSchedule_enabled(ctx, field)
+			case "description":
+				return ec.fieldContext_CronSchedule_description(ctx, field)
+			case "timeoutSeconds":
+				return ec.fieldContext_CronSchedule_timeoutSeconds(ctx, field)
+			case "retentionDays":
+				return ec.fieldContext_CronSchedule_retentionDays(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_CronSchedule_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_CronSchedule_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CronSchedule", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_cronSchedules_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_cronJobs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cronJobs,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().CronJobs(ctx, fc.Args["scheduleID"].(*string), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
+		},
+		nil,
+		ec.marshalNCronJob2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronJobᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cronJobs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CronJob_id(ctx, field)
+			case "startedAt":
+				return ec.fieldContext_CronJob_startedAt(ctx, field)
+			case "completedAt":
+				return ec.fieldContext_CronJob_completedAt(ctx, field)
+			case "status":
+				return ec.fieldContext_CronJob_status(ctx, field)
+			case "error":
+				return ec.fieldContext_CronJob_error(ctx, field)
+			case "recordsAffected":
+				return ec.fieldContext_CronJob_recordsAffected(ctx, field)
+			case "durationMs":
+				return ec.fieldContext_CronJob_durationMs(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_CronJob_createdAt(ctx, field)
+			case "cronScheduleID":
+				return ec.fieldContext_CronJob_cronScheduleID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CronJob", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_cronJobs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -10059,63 +11491,6 @@ func (ec *executionContext) fieldContext_Query_filesConnection(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Query_me,
-		func(ctx context.Context) (any, error) {
-			return ec.resolvers.Query().Me(ctx)
-		},
-		nil,
-		ec.marshalNAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_AdminUser_id(ctx, field)
-			case "name":
-				return ec.fieldContext_AdminUser_name(ctx, field)
-			case "email":
-				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
-			case "firstName":
-				return ec.fieldContext_AdminUser_firstName(ctx, field)
-			case "lastName":
-				return ec.fieldContext_AdminUser_lastName(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_AdminUser_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
-			case "adminCreatedBy":
-				return ec.fieldContext_AdminUser_adminCreatedBy(ctx, field)
-			case "refAdminUpdatedBy":
-				return ec.fieldContext_AdminUser_refAdminUpdatedBy(ctx, field)
-			case "adminUpdatedBy":
-				return ec.fieldContext_AdminUser_adminUpdatedBy(ctx, field)
-			case "roles":
-				return ec.fieldContext_AdminUser_roles(ctx, field)
-			case "defaultRole":
-				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_permissions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -10151,8 +11526,6 @@ func (ec *executionContext) fieldContext_Query_permissions(ctx context.Context, 
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -10924,8 +12297,6 @@ func (ec *executionContext) fieldContext_Role_permissions(_ context.Context, fie
 				return ec.fieldContext_Permission_entity(ctx, field)
 			case "operation":
 				return ec.fieldContext_Permission_operation(ctx, field)
-			case "lifecycleAccess":
-				return ec.fieldContext_Permission_lifecycleAccess(ctx, field)
 			case "adminCreatedBy":
 				return ec.fieldContext_Permission_adminCreatedBy(ctx, field)
 			case "adminUpdatedBy":
@@ -13470,95 +14841,121 @@ func (ec *executionContext) unmarshalInputAdminUserWhereInput(ctx context.Contex
 			it.NameContainsFold = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.AdminUserWhereInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailNEQ"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailNEQ = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailNeq(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmailᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailIn = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailIn(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailNotIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmailᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailNotIn = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailNotIn(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailGT":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailGT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailGT = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailGt(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailGTE":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailGTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailGTE = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailGte(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailLT":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailLT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailLT = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailLt(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailLTE":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailLTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailLTE = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailLte(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailContains":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailContains"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailContains = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailContains(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailHasPrefix":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailHasPrefix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailHasPrefix = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailHasPrefix(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailHasSuffix":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailHasSuffix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailHasSuffix = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailHasSuffix(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailEqualFold":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailEqualFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailEqualFold = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailEqualFold(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailContainsFold":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailContainsFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailContainsFold = data
+			if err = ec.resolvers.AdminUserWhereInput().EmailContainsFold(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -14071,11 +15468,13 @@ func (ec *executionContext) unmarshalInputAdminUserWhereUniqueInput(ctx context.
 			it.ID = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.AdminUserWhereUniqueInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -14105,11 +15504,13 @@ func (ec *executionContext) unmarshalInputCreateAdminUserInput(ctx context.Conte
 			it.Name = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNEmail2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.CreateAdminUserInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -14193,6 +15594,92 @@ func (ec *executionContext) unmarshalInputCreateAdminUserInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateCronScheduleInput(ctx context.Context, obj any) (CreateCronScheduleInput, error) {
+	var it CreateCronScheduleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["enabled"]; !present {
+		asMap["enabled"] = true
+	}
+	if _, present := asMap["timeoutSeconds"]; !present {
+		asMap["timeoutSeconds"] = 300
+	}
+	if _, present := asMap["retentionDays"]; !present {
+		asMap["retentionDays"] = 30
+	}
+
+	fieldsInOrder := [...]string{"name", "expression", "handler", "handlerConfig", "enabled", "description", "timeoutSeconds", "retentionDays"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "expression":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expression"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Expression = data
+		case "handler":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("handler"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Handler = data
+		case "handlerConfig":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("handlerConfig"))
+			data, err := ec.unmarshalOMap2map(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HandlerConfig = data
+		case "enabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enabled"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Enabled = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "timeoutSeconds":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timeoutSeconds"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TimeoutSeconds = data
+		case "retentionDays":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("retentionDays"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RetentionDays = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateEdgeInput(ctx context.Context, obj any) (entity.CreateEdgeInput, error) {
 	var it entity.CreateEdgeInput
 	asMap := map[string]any{}
@@ -14262,7 +15749,7 @@ func (ec *executionContext) unmarshalInputCreateEntityInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"caption", "displayField", "fields", "edges", "lifecycle"}
+	fieldsInOrder := [...]string{"caption", "displayField", "fields", "edges"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14297,13 +15784,6 @@ func (ec *executionContext) unmarshalInputCreateEntityInput(ctx context.Context,
 				return it, err
 			}
 			it.Edges = data
-		case "lifecycle":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lifecycle"))
-			data, err := ec.unmarshalOLifecycleInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐLifecycleInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Lifecycle = data
 		}
 	}
 
@@ -14919,7 +16399,7 @@ func (ec *executionContext) unmarshalInputCreatePermissionInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "updatedAt", "entity", "operation", "lifecycleAccess", "adminCreatedByID", "adminUpdatedByID", "roleID", "adminCreatedBy", "adminUpdatedBy", "role"}
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "entity", "operation", "adminCreatedByID", "adminUpdatedByID", "roleID", "adminCreatedBy", "adminUpdatedBy", "role"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14954,13 +16434,6 @@ func (ec *executionContext) unmarshalInputCreatePermissionInput(ctx context.Cont
 				return it, err
 			}
 			it.Operation = data
-		case "lifecycleAccess":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lifecycleAccess"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.LifecycleAccess = data
 		case "adminCreatedByID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedByID"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
@@ -15036,7 +16509,9 @@ func (ec *executionContext) unmarshalInputCreateRoleInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-			it.AdminUserRoleIDs = data
+			if err = ec.resolvers.CreateRoleInput().AdminUserRoleIDs(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "userRoleIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userRoleIDs"))
 			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
@@ -15071,9 +16546,7 @@ func (ec *executionContext) unmarshalInputCreateRoleInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.CreateRoleInput().UserRoles(ctx, &it, data); err != nil {
-				return it, err
-			}
+			it.UserRoles = data
 		case "permissions":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("permissions"))
 			data, err := ec.unmarshalOCreateManyPermissionInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateManyPermissionInput(ctx, v)
@@ -15103,11 +16576,13 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		switch k {
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNEmail2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.CreateUserInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -15171,6 +16646,40 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.DefaultRole = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCronScheduleWhereUniqueInput(ctx context.Context, obj any) (CronScheduleWhereUniqueInput, error) {
+	var it CronScheduleWhereUniqueInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		}
 	}
 
@@ -16113,40 +17622,6 @@ func (ec *executionContext) unmarshalInputFileWhereUniqueInput(ctx context.Conte
 				return it, err
 			}
 			it.Caption = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputLifecycleInput(ctx context.Context, obj any) (entity.LifecycleInput, error) {
-	var it entity.LifecycleInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"enabled", "default"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "enabled":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enabled"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Enabled = data
-		case "default":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("default"))
-			data, err := ec.unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Default = data
 		}
 	}
 
@@ -17207,11 +18682,13 @@ func (ec *executionContext) unmarshalInputUpdateAdminUserInput(ctx context.Conte
 			it.ClearName = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.UpdateAdminUserInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17316,6 +18793,96 @@ func (ec *executionContext) unmarshalInputUpdateAdminUserInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateCronScheduleInput(ctx context.Context, obj any) (UpdateCronScheduleInput, error) {
+	var it UpdateCronScheduleInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "expression", "handler", "handlerConfig", "clearHandlerConfig", "enabled", "description", "clearDescription", "timeoutSeconds", "retentionDays"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "expression":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expression"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Expression = data
+		case "handler":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("handler"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Handler = data
+		case "handlerConfig":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("handlerConfig"))
+			data, err := ec.unmarshalOMap2map(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HandlerConfig = data
+		case "clearHandlerConfig":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearHandlerConfig"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearHandlerConfig = data
+		case "enabled":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enabled"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Enabled = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "clearDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearDescription"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearDescription = data
+		case "timeoutSeconds":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timeoutSeconds"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TimeoutSeconds = data
+		case "retentionDays":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("retentionDays"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RetentionDays = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateEdgeInput(ctx context.Context, obj any) (entity.UpdateEdgeInput, error) {
 	var it entity.UpdateEdgeInput
 	asMap := map[string]any{}
@@ -17364,7 +18931,7 @@ func (ec *executionContext) unmarshalInputUpdateEntityInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"caption", "displayField", "fields", "edges", "lifecycle"}
+	fieldsInOrder := [...]string{"caption", "displayField", "fields", "edges"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17399,13 +18966,6 @@ func (ec *executionContext) unmarshalInputUpdateEntityInput(ctx context.Context,
 				return it, err
 			}
 			it.Edges = data
-		case "lifecycle":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lifecycle"))
-			data, err := ec.unmarshalOLifecycleInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐLifecycleInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Lifecycle = data
 		}
 	}
 
@@ -18299,7 +19859,7 @@ func (ec *executionContext) unmarshalInputUpdatePermissionInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "entity", "operation", "lifecycleAccess", "appendLifecycleAccess", "clearLifecycleAccess", "adminCreatedByID", "clearAdminCreatedBy", "adminUpdatedByID", "clearAdminUpdatedBy", "roleID", "clearRole", "adminCreatedBy", "adminUpdatedBy", "role"}
+	fieldsInOrder := [...]string{"createdAt", "clearCreatedAt", "updatedAt", "clearUpdatedAt", "entity", "operation", "adminCreatedByID", "clearAdminCreatedBy", "adminUpdatedByID", "clearAdminUpdatedBy", "roleID", "clearRole", "adminCreatedBy", "adminUpdatedBy", "role"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18348,27 +19908,6 @@ func (ec *executionContext) unmarshalInputUpdatePermissionInput(ctx context.Cont
 				return it, err
 			}
 			it.Operation = data
-		case "lifecycleAccess":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lifecycleAccess"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.LifecycleAccess = data
-		case "appendLifecycleAccess":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appendLifecycleAccess"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AppendLifecycleAccess = data
-		case "clearLifecycleAccess":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLifecycleAccess"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClearLifecycleAccess = data
 		case "adminCreatedByID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("adminCreatedByID"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
@@ -18465,21 +20004,27 @@ func (ec *executionContext) unmarshalInputUpdateRoleInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-			it.AddAdminUserRoleIDs = data
+			if err = ec.resolvers.UpdateRoleInput().AddAdminUserRoleIDs(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "removeAdminUserRoleIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeAdminUserRoleIDs"))
 			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.RemoveAdminUserRoleIDs = data
+			if err = ec.resolvers.UpdateRoleInput().RemoveAdminUserRoleIDs(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "clearAdminUserRoles":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearAdminUserRoles"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ClearAdminUserRoles = data
+			if err = ec.resolvers.UpdateRoleInput().ClearAdminUserRoles(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "addUserRoleIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addUserRoleIDs"))
 			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
@@ -18542,9 +20087,7 @@ func (ec *executionContext) unmarshalInputUpdateRoleInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-			if err = ec.resolvers.UpdateRoleInput().UserRoles(ctx, &it, data); err != nil {
-				return it, err
-			}
+			it.UserRoles = data
 		case "permissions":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("permissions"))
 			data, err := ec.unmarshalOUpdateManyPermissionInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateManyPermissionInput(ctx, v)
@@ -18574,11 +20117,13 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		switch k {
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.UpdateUserInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -18814,95 +20359,121 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 			it.IDContainsFold = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.UserWhereInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailNEQ"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailNEQ = data
+			if err = ec.resolvers.UserWhereInput().EmailNeq(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmailᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailIn = data
+			if err = ec.resolvers.UserWhereInput().EmailIn(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailNotIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmailᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailNotIn = data
+			if err = ec.resolvers.UserWhereInput().EmailNotIn(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailGT":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailGT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailGT = data
+			if err = ec.resolvers.UserWhereInput().EmailGt(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailGTE":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailGTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailGTE = data
+			if err = ec.resolvers.UserWhereInput().EmailGte(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailLT":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailLT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailLT = data
+			if err = ec.resolvers.UserWhereInput().EmailLt(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailLTE":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailLTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailLTE = data
+			if err = ec.resolvers.UserWhereInput().EmailLte(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailContains":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailContains"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailContains = data
+			if err = ec.resolvers.UserWhereInput().EmailContains(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailHasPrefix":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailHasPrefix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailHasPrefix = data
+			if err = ec.resolvers.UserWhereInput().EmailHasPrefix(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailHasSuffix":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailHasSuffix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailHasSuffix = data
+			if err = ec.resolvers.UserWhereInput().EmailHasSuffix(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailEqualFold":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailEqualFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailEqualFold = data
+			if err = ec.resolvers.UserWhereInput().EmailEqualFold(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "emailContainsFold":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailContainsFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.EmailContainsFold = data
+			if err = ec.resolvers.UserWhereInput().EmailContainsFold(ctx, &it, data); err != nil {
+				return it, err
+			}
 		case "password":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -19107,11 +20678,13 @@ func (ec *executionContext) unmarshalInputUserWhereUniqueInput(ctx context.Conte
 			it.ID = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Email = data
+			if err = ec.resolvers.UserWhereUniqueInput().Email(ctx, &it, data); err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -19458,6 +21031,189 @@ func (ec *executionContext) _AdminUserEdge(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cleanupExpiredTokensPayloadImplementors = []string{"CleanupExpiredTokensPayload"}
+
+func (ec *executionContext) _CleanupExpiredTokensPayload(ctx context.Context, sel ast.SelectionSet, obj *CleanupExpiredTokensPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cleanupExpiredTokensPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CleanupExpiredTokensPayload")
+		case "count":
+			out.Values[i] = ec._CleanupExpiredTokensPayload_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cronJobImplementors = []string{"CronJob"}
+
+func (ec *executionContext) _CronJob(ctx context.Context, sel ast.SelectionSet, obj *CronJob) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cronJobImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CronJob")
+		case "id":
+			out.Values[i] = ec._CronJob_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "startedAt":
+			out.Values[i] = ec._CronJob_startedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "completedAt":
+			out.Values[i] = ec._CronJob_completedAt(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._CronJob_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._CronJob_error(ctx, field, obj)
+		case "recordsAffected":
+			out.Values[i] = ec._CronJob_recordsAffected(ctx, field, obj)
+		case "durationMs":
+			out.Values[i] = ec._CronJob_durationMs(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._CronJob_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "cronScheduleID":
+			out.Values[i] = ec._CronJob_cronScheduleID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cronScheduleImplementors = []string{"CronSchedule"}
+
+func (ec *executionContext) _CronSchedule(ctx context.Context, sel ast.SelectionSet, obj *CronSchedule) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cronScheduleImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CronSchedule")
+		case "id":
+			out.Values[i] = ec._CronSchedule_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._CronSchedule_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "expression":
+			out.Values[i] = ec._CronSchedule_expression(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "handler":
+			out.Values[i] = ec._CronSchedule_handler(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "handlerConfig":
+			out.Values[i] = ec._CronSchedule_handlerConfig(ctx, field, obj)
+		case "enabled":
+			out.Values[i] = ec._CronSchedule_enabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._CronSchedule_description(ctx, field, obj)
+		case "timeoutSeconds":
+			out.Values[i] = ec._CronSchedule_timeoutSeconds(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "retentionDays":
+			out.Values[i] = ec._CronSchedule_retentionDays(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._CronSchedule_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._CronSchedule_updatedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20214,6 +21970,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createCronSchedule":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createCronSchedule(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateCronSchedule":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCronSchedule(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteCronSchedule":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteCronSchedule(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createEntity":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createEntity(ctx, field)
@@ -20403,6 +22180,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "cleanupExpiredTokens":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_cleanupExpiredTokens(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUser(ctx, field)
@@ -20560,8 +22344,6 @@ func (ec *executionContext) _Permission(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "lifecycleAccess":
-			out.Values[i] = ec._Permission_lifecycleAccess(ctx, field, obj)
 		case "adminCreatedBy":
 			field := field
 
@@ -20872,6 +22654,69 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cronSchedule":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cronSchedule(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cronSchedules":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cronSchedules(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cronJobs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cronJobs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "entities":
 			field := field
 
@@ -20958,28 +22803,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_filesConnection(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "me":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_me(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -22272,6 +24095,20 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCleanupExpiredTokensPayload2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCleanupExpiredTokensPayload(ctx context.Context, sel ast.SelectionSet, v CleanupExpiredTokensPayload) graphql.Marshaler {
+	return ec._CleanupExpiredTokensPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCleanupExpiredTokensPayload2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCleanupExpiredTokensPayload(ctx context.Context, sel ast.SelectionSet, v *CleanupExpiredTokensPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CleanupExpiredTokensPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateAdminUserInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateAdminUserInput(ctx context.Context, v any) (ent.CreateAdminUserInput, error) {
 	res, err := ec.unmarshalInputCreateAdminUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -22295,6 +24132,11 @@ func (ec *executionContext) unmarshalNCreateAdminUserInput2ᚕᚖgithubᚗcomᚋ
 func (ec *executionContext) unmarshalNCreateAdminUserInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐCreateAdminUserInput(ctx context.Context, v any) (*ent.CreateAdminUserInput, error) {
 	res, err := ec.unmarshalInputCreateAdminUserInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateCronScheduleInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCreateCronScheduleInput(ctx context.Context, v any) (CreateCronScheduleInput, error) {
+	res, err := ec.unmarshalInputCreateCronScheduleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCreateEdgeInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐCreateEdgeInput(ctx context.Context, v any) (*entity.CreateEdgeInput, error) {
@@ -22412,6 +24254,123 @@ func (ec *executionContext) unmarshalNCreateUserInput2ᚖgithubᚗcomᚋGoLabra�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNCronJob2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronJobᚄ(ctx context.Context, sel ast.SelectionSet, v []*CronJob) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCronJob2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronJob(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCronJob2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronJob(ctx context.Context, sel ast.SelectionSet, v *CronJob) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CronJob(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCronSchedule2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule(ctx context.Context, sel ast.SelectionSet, v CronSchedule) graphql.Marshaler {
+	return ec._CronSchedule(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCronSchedule2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronScheduleᚄ(ctx context.Context, sel ast.SelectionSet, v []*CronSchedule) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCronSchedule2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCronSchedule2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule(ctx context.Context, sel ast.SelectionSet, v *CronSchedule) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CronSchedule(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCronScheduleWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronScheduleWhereUniqueInput(ctx context.Context, v any) (CronScheduleWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputCronScheduleWhereUniqueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, v any) (entgql.Cursor[string], error) {
 	var res entgql.Cursor[string]
 	err := res.UnmarshalGQL(v)
@@ -22456,6 +24415,23 @@ func (ec *executionContext) unmarshalNEdgeWhereUniqueInput2githubᚗcomᚋGoLabr
 func (ec *executionContext) unmarshalNEdgeWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEdgeWhereUniqueInput(ctx context.Context, v any) (*entity.EdgeWhereUniqueInput, error) {
 	res, err := ec.unmarshalInputEdgeWhereUniqueInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNEmail2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx context.Context, v any) (entity.Email, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := entity.Email(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNEmail2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx context.Context, sel ast.SelectionSet, v entity.Email) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNEntity2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntity(ctx context.Context, sel ast.SelectionSet, v entity.Entity) graphql.Marshaler {
@@ -22996,6 +24972,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 
 func (ec *executionContext) unmarshalNUpdateAdminUserInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐUpdateAdminUserInput(ctx context.Context, v any) (ent.UpdateAdminUserInput, error) {
 	res, err := ec.unmarshalInputUpdateAdminUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateCronScheduleInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐUpdateCronScheduleInput(ctx context.Context, v any) (UpdateCronScheduleInput, error) {
+	res, err := ec.unmarshalInputUpdateCronScheduleInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -23829,6 +25810,13 @@ func (ec *executionContext) unmarshalOCreateUserInput2ᚖgithubᚗcomᚋGoLabra�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOCronSchedule2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋgeneratedᚐCronSchedule(ctx context.Context, sel ast.SelectionSet, v *CronSchedule) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CronSchedule(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, v any) (*entgql.Cursor[string], error) {
 	if v == nil {
 		return nil, nil
@@ -23964,6 +25952,61 @@ func (ec *executionContext) unmarshalOEdgeWhereUniqueInput2ᚕᚖgithubᚗcomᚋ
 	return res, nil
 }
 
+func (ec *executionContext) unmarshalOEmail2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmailᚄ(ctx context.Context, v any) ([]entity.Email, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]entity.Email, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNEmail2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOEmail2ᚕgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmailᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.Email) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNEmail2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx context.Context, v any) (*entity.Email, error) {
+	if v == nil {
+		return nil, nil
+	}
+	tmp, err := graphql.UnmarshalString(v)
+	res := entity.Email(tmp)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOEmail2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEmail(ctx context.Context, sel ast.SelectionSet, v *entity.Email) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalString(string(*v))
+	return res
+}
+
 func (ec *executionContext) marshalOEntity2ᚕᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityᚄ(ctx context.Context, sel ast.SelectionSet, v []*entity.Entity) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -24016,22 +26059,6 @@ func (ec *executionContext) marshalOEntity2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋe
 		return graphql.Null
 	}
 	return ec._Entity(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, v any) (*entity.EntityState, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(entity.EntityState)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOEntityState2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityState(ctx context.Context, sel ast.SelectionSet, v *entity.EntityState) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
 }
 
 func (ec *executionContext) unmarshalOEntityWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐEntityWhereUniqueInput(ctx context.Context, v any) (*entity.EntityWhereUniqueInput, error) {
@@ -24403,12 +26430,22 @@ func (ec *executionContext) marshalOInt2ᚖint64(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalOLifecycleInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentityᚐLifecycleInput(ctx context.Context, v any) (*entity.LifecycleInput, error) {
+func (ec *executionContext) unmarshalOMap2map(ctx context.Context, v any) (map[string]any, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalInputLifecycleInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	res, err := graphql.UnmarshalMap(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]any) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalMap(v)
+	return res
 }
 
 func (ec *executionContext) marshalONode2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v ent.Noder) graphql.Marshaler {
