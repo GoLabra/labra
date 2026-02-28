@@ -3,12 +3,15 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"slices"
 	"strings"
+	"syscall"
 	"time"
 
 	"app/domain/repo"
@@ -32,6 +35,7 @@ import (
 	"github.com/GoLabra/labra/entgql/generator"
 	adminHandler "github.com/GoLabra/labra/handler"
 	"github.com/GoLabra/labra/hooks"
+	"github.com/GoLabra/labra/scheduler"
 	"github.com/GoLabra/labra/secrets"
 	"github.com/GoLabra/labra/subscription"
 	"github.com/GoLabra/labra/utils"
@@ -149,6 +153,12 @@ func main() {
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type", "X-CSRF-Token", "X-CSRF-TOKEN"},
 	})
+	adminExecSchema := adminGenerated.NewExecutableSchema(
+		adminGenerated.Config{
+			Resolvers: adminResolver,
+		},
+	)
+
 	router := chi.NewRouter()
 	router.Use(corsMiddleware.Handler)
 	router.Use(adminHandler.SecurityHeaders(&appConfig.Config))
@@ -211,11 +221,7 @@ func main() {
 
 	// ADMIN routes
 	router.Group(func(router chi.Router) {
-		adminSrv := gqlHandler.New(adminGenerated.NewExecutableSchema(
-			adminGenerated.Config{
-				Resolvers: adminResolver,
-			},
-		))
+		adminSrv := gqlHandler.New(adminExecSchema)
 
 		adminSrv.AddTransport(transport.POST{})
 		adminSrv.AddTransport(transport.GET{})
@@ -257,11 +263,46 @@ func main() {
 
 	graphqlSubscriptionClient.PublishAppStatusMessage(subscription.AppStatusUp)
 
-	err = server.ListenAndServe()
-
-	if err != nil {
-		panic(err)
+	var cronScheduler *scheduler.Scheduler
+	if appConfig.CronEnabled {
+		cronScheduler = scheduler.New(adminClient, adminExecSchema)
+		if err := cronScheduler.Start(ctx); err != nil {
+			log.Printf("failed to start scheduler: %v", err)
+		} else {
+			log.Println("scheduler started")
+		}
 	}
+
+	serverErr := make(chan error, 1)
+	go func() {
+		serverErr <- server.ListenAndServe()
+	}()
+
+	stopCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	select {
+	case err = <-serverErr:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			panic(err)
+		}
+	case <-stopCtx.Done():
+		log.Println("shutdown signal received")
+	}
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if cronScheduler != nil {
+		if stopErr := cronScheduler.Stop(shutdownCtx); stopErr != nil {
+			log.Printf("scheduler stop failed: %v", stopErr)
+		}
+	}
+
+	if err := server.Shutdown(shutdownCtx); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Printf("server shutdown error: %v", err)
+	}
+
 }
 
 func InitApp(drv *entsql.Driver, adminClient *adminEnt.Client, adminRepository *adminRepo.Repository, adminService *adminSvc.Service) (*ent.Client, *repo.Repository, *svc.Service, *resolvers.Resolver) {
@@ -303,7 +344,7 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 
 		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
 			m, ok := c.(*atlas.ModifyTable)
-			if ok && (m.T.Name == "admin_users" || m.T.Name == "files" || m.T.Name == "roles") {
+			if ok && (m.T.Name == "admin_users" || m.T.Name == "files" || m.T.Name == "roles" || m.T.Name == "cron_schedules" || m.T.Name == "cron_jobs") {
 				return true
 			}
 			return false
