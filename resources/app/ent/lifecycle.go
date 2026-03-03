@@ -2,9 +2,10 @@
 
 package ent
 
-import (
-	"github.com/GoLabra/labra/entgql/entity"
-)
+
+
+
+
 
 
 
