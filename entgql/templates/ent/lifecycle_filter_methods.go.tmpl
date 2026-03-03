@@ -8,12 +8,19 @@ import (
 	{{ $n.Package }} "app/ent/{{ $n.Package }}"
 {{- end }}
 {{- end }}
+
+
+{{- range $n := $.Nodes}}
+{{- if and (hasStateAnnotation $n)}}
 	"app/ent/predicate"
 	"context"
 
 	"entgo.io/ent"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/entity"
+	{{- break }}
+{{- end }}
+{{- end }}
 )
 
 {{ range $n := $.Nodes }}

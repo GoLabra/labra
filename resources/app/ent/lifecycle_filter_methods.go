@@ -3,12 +3,6 @@
 package ent
 
 import (
-	"app/ent/predicate"
-	"context"
-
-	"entgo.io/ent"
-	"github.com/GoLabra/labra/constants"
-	"github.com/GoLabra/labra/entgql/entity"
 )
 
 
