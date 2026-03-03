@@ -15,6 +15,13 @@ import (
 	"github.com/samborkent/uuidv7"
 )
 
+type Annotations struct {
+	Entgql struct {
+		Skip int
+	}
+	Edge annotations.Edge
+}
+
 func NewUUIDV7() string {
 	return uuidv7.New().String()
 }
@@ -103,13 +110,14 @@ func LoadSchema(config *config.AppConfig) {
 
 		edges := []entity.Edge{}
 		for _, edge := range node.Edges {
-			var edgeAnnotations annotations.Edge
-			if edge.Name == "ref_created_by" || edge.Name == "ref_updated_by" || edge.Name == "ref_admin_created_by" || edge.Name == "ref_admin_updated_by" {
-				continue
-			}
-			err := mapstructure.Decode(edge.Annotations["Edge"], &edgeAnnotations)
+			var annotations Annotations
+			err := mapstructure.Decode(edge.Annotations, &annotations)
 			if err != nil {
 				panic(err)
+			}
+			
+			if annotations.Entgql.Skip == 63 {
+				continue
 			}
 
 			required := !edge.Optional
@@ -121,11 +129,11 @@ func LoadSchema(config *config.AppConfig) {
 			edges = append(edges, entity.Edge{
 				Name:         strcase.ToLowerCamel(edge.Name),
 				EntName:      edge.Name,
-				Caption:      edgeAnnotations.Caption,
+				Caption:      annotations.Edge.Caption,
 				Required:     &required,
 				Type:         edge.Type.Name,
 				Ref:          ref,
-				RelationType: edgeAnnotations.RelationType,
+				RelationType: annotations.Edge.RelationType,
 			})
 		}
 		cache.Edge.Set(entityName, edges)
