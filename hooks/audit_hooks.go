@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"reflect"
 
+	"entgo.io/ent/dialect/sql"
+	"github.com/GoLabra/labra/cache"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
+	"github.com/GoLabra/labra/entgql/entity"
 	"github.com/GoLabra/labra/strcase"
 )
 
@@ -18,12 +21,76 @@ type QueryWithAdminCreatedBy interface {
 	WhereAdminCreatedBy(adminUserID string) ent.Query
 }
 
+// LifecycleFilterQuery is an interface for queries that support filtering by entity_state.
+// The WhereEntityStateIn method is generated for entities with lifecycle enabled.
+type LifecycleFilterQuery interface {
+	ent.Query
+	WhereEntityStateIn(states ...entity.EntityState) ent.Query
+}
+
+// LifecycleFilterMutation is an interface for mutations that support restricting by entity_state.
+// The WhereEntityStateIn method is generated for entities with lifecycle enabled (UpdateMany/DeleteMany).
+type LifecycleFilterMutation interface {
+	WhereEntityStateIn(states ...entity.EntityState)
+}
+
+// LifecycleMutationTargetsChecker is implemented by lifecycle-entity mutations for UpdateOne/DeleteOne.
+// permissionLifecycleAccess is one slice of allowed states per permission; empty slice means full access.
+type LifecycleMutationTargetsChecker interface {
+	TargetsAllowedByLifecycle(ctx context.Context) (*entity.EntityState, error)
+}
+
 // applyOwnerFilter applies the owner filter to any query that implements WhereAdminCreatedBy.
 // This uses the generated WhereAdminCreatedBy method from the ent template.
 func applyOwnerFilter(q ent.Query, adminUserID string) {
 	if ownerQuery, ok := q.(QueryWithAdminCreatedBy); ok {
 		ownerQuery.WhereAdminCreatedBy(adminUserID)
 	}
+}
+
+type WherePred func(*sql.Selector)
+
+// applyLifecycleFilter restricts the query to rows whose entity_state is in the allowed set.
+func applyLifecycleFilter(q ent.Query, allowedStates []entity.EntityState) {
+	if len(allowedStates) == 0 {
+		return
+	}
+	if lq, ok := q.(LifecycleFilterQuery); ok {
+		lq.WhereEntityStateIn(allowedStates...)
+	}
+}
+
+// applyLifecycleFilterToMutation restricts the mutation to rows whose entity_state is in the allowed set.
+// Used for UpdateMany/DeleteMany so only allowed rows are affected.
+func applyLifecycleFilterToMutation(m ent.Mutation, allowedStates []entity.EntityState) {
+	if len(allowedStates) == 0 {
+		return
+	}
+	if lm, ok := m.(LifecycleFilterMutation); ok {
+		lm.WhereEntityStateIn(allowedStates...)
+	}
+}
+
+// allowedStatesFromPermissions returns the union of states allowed by the given permissions.
+// Empty LifecycleAccess means all states. Returns nil when the union is all states (no filter needed).
+func allowedStatesFromPermissions(permissions []*ent.Permission) []entity.EntityState {
+	set := make(map[entity.EntityState]struct{})
+	for _, perm := range permissions {
+		if len(perm.LifecycleAccess) == 0 {
+			return nil // full access
+		}
+		for _, s := range perm.LifecycleAccess {
+			set[entity.EntityState(s)] = struct{}{}
+		}
+	}
+	if len(set) == 3 {
+		return nil
+	}
+	out := make([]entity.EntityState, 0, len(set))
+	for st := range set {
+		out = append(out, st)
+	}
+	return out
 }
 
 // CreatedByUpdatedByHook automatically sets created_by and updated_by fields
@@ -114,6 +181,36 @@ func EntityMutatePermission(next ent.Mutator) ent.Mutator {
 			return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 		}
 
+		// For UpdateOne/DeleteOne: ensure each target row's state is allowed (check and reject).
+		if m.Op().Is(ent.OpUpdateOne | ent.OpDeleteOne) {
+			if checker, ok := m.(LifecycleMutationTargetsChecker); ok {
+				lifecycleAccess := make(map[string]struct{})
+				for _, p := range permissions {
+					for _, s := range p.LifecycleAccess {
+						lifecycleAccess[s] = struct{}{}
+					}
+				}
+
+				entityState, err := checker.TargetsAllowedByLifecycle(ctx)
+				if err != nil {
+					return nil, fmt.Errorf("entity state check: %w", err)
+				}
+				if entityState != nil {
+					if _, ok := lifecycleAccess[string(*entityState)]; !ok {
+						return nil, fmt.Errorf("Forbidden: you may not update or delete this %s in its current lifecycle state", entityName)
+					}
+				}
+			}
+		}
+
+		// For UpdateMany/DeleteMany: add lifecycle condition to the mutation (only allowed rows are affected).
+		if m.Op().Is(ent.OpUpdate | ent.OpDelete) {
+			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityState.Enabled {
+				allowedStates := allowedStatesFromPermissions(permissions)
+				applyLifecycleFilterToMutation(m, allowedStates)
+			}
+		}
+
 		return next.Mutate(ctx, m)
 	})
 }
@@ -146,49 +243,52 @@ func EntityReadPermission() ent.Interceptor {
 			}
 
 			operationName := "Read"
-			// Use internal context for permission queries (bypasses permission checks)
 			iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
-			permissions, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
-				HasRoleWith: []*ent.RoleWhereInput{
-					{
-						Name: &role.Name,
-					},
-				},
-				Entity:    &entityName,
-				Operation: &operationName,
+			readPerms, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
+				HasRoleWith: []*ent.RoleWhereInput{{Name: &role.Name}},
+				Entity:      &entityName,
+				Operation:   &operationName,
 			}, nil, nil, nil, nil)
-
 			if err != nil {
 				return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 			}
 
-			if len(permissions) > 0 {
-				return next.Query(ctx, q)
-			}
-
-			// If there is an Owner permission for this entity and role, apply owner filter
 			ownerOperation := "Owner"
 			ownerPerms, err := service.Permission.Get(iCtx, &ent.PermissionWhereInput{
-				HasRoleWith: []*ent.RoleWhereInput{
-					{
-						Name: &role.Name,
-					},
-				},
-				Entity:    &entityName,
-				Operation: &ownerOperation,
+				HasRoleWith: []*ent.RoleWhereInput{{Name: &role.Name}},
+				Entity:      &entityName,
+				Operation:   &ownerOperation,
 			}, nil, nil, nil, nil)
-
-			if err != nil || len(ownerPerms) == 0 {
+			if err != nil {
 				return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 			}
 
-			adminUser, ok := ctx.Value(constants.UserContextValue).(*ent.AdminUser)
-			if !ok || adminUser == nil {
+			allowedByRead := len(readPerms) > 0
+			allowedByOwner := len(ownerPerms) > 0
+			if !allowedByRead && !allowedByOwner {
 				return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
 			}
 
-			// Apply owner filter using the generated WhereAdminCreatedBy method
-			applyOwnerFilter(q, adminUser.ID)
+			// Collect all permissions that grant access for lifecycle_access union
+			allPerms := make([]*ent.Permission, 0, len(readPerms)+len(ownerPerms))
+			if allowedByRead {
+				allPerms = append(allPerms, readPerms...)
+			}
+			if allowedByOwner {
+				allPerms = append(allPerms, ownerPerms...)
+			}
+			allowedStates := allowedStatesFromPermissions(allPerms)
+			if cachedEntity, ok := cache.Entity.Get(entityName); ok && cachedEntity.EntityState.Enabled && len(allowedStates) > 0 {
+				applyLifecycleFilter(q, allowedStates)
+			}
+
+			if allowedByOwner && !allowedByRead {
+				adminUser, ok := ctx.Value(constants.UserContextValue).(*ent.AdminUser)
+				if !ok || adminUser == nil {
+					return nil, fmt.Errorf("Forbidden: user lacks permissions for entity %s", entityName)
+				}
+				applyOwnerFilter(q, adminUser.ID)
+			}
 
 			return next.Query(ctx, q)
 		})

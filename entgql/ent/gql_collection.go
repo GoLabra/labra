@@ -15,18 +15,18 @@ import (
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (au *AdminUserQuery) CollectFields(ctx context.Context, satisfies ...string) (*AdminUserQuery, error) {
+func (_q *AdminUserQuery) CollectFields(ctx context.Context, satisfies ...string) (*AdminUserQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
-		return au, nil
+		return _q, nil
 	}
-	if err := au.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
-	return au, nil
+	return _q, nil
 }
 
-func (au *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (_q *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -40,23 +40,23 @@ func (au *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx 
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: au.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			au.withAdminCreatedBy = query
+			_q.withAdminCreatedBy = query
 
 		case "refAdminUpdatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: au.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			au.WithNamedRefAdminUpdatedBy(alias, func(wq *AdminUserQuery) {
+			_q.WithNamedRefAdminUpdatedBy(alias, func(wq *AdminUserQuery) {
 				*wq = *query
 			})
 
@@ -64,23 +64,23 @@ func (au *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx 
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: au.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			au.withAdminUpdatedBy = query
+			_q.withAdminUpdatedBy = query
 
 		case "roles":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&RoleClient{config: au.config}).Query()
+				query = (&RoleClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
 				return err
 			}
-			au.WithNamedRoles(alias, func(wq *RoleQuery) {
+			_q.WithNamedRoles(alias, func(wq *RoleQuery) {
 				*wq = *query
 			})
 
@@ -88,12 +88,12 @@ func (au *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx 
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&RoleClient{config: au.config}).Query()
+				query = (&RoleClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
 				return err
 			}
-			au.withDefaultRole = query
+			_q.withDefaultRole = query
 		case "name":
 			if _, ok := fieldSeen[adminuser.FieldName]; !ok {
 				selectedFields = append(selectedFields, adminuser.FieldName)
@@ -136,7 +136,7 @@ func (au *AdminUserQuery) collectField(ctx context.Context, oneNode bool, opCtx 
 		}
 	}
 	if !unknownSeen {
-		au.Select(selectedFields...)
+		_q.Select(selectedFields...)
 	}
 	return nil
 }
@@ -199,18 +199,18 @@ func newAdminUserPaginateArgs(rv map[string]any) *adminuserPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (f *FileQuery) CollectFields(ctx context.Context, satisfies ...string) (*FileQuery, error) {
+func (_q *FileQuery) CollectFields(ctx context.Context, satisfies ...string) (*FileQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
-		return f, nil
+		return _q, nil
 	}
-	if err := f.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
-	return f, nil
+	return _q, nil
 }
 
-func (f *FileQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (_q *FileQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -224,45 +224,45 @@ func (f *FileQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: f.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			f.withAdminCreatedBy = query
+			_q.withAdminCreatedBy = query
 
 		case "adminUpdatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: f.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			f.withAdminUpdatedBy = query
+			_q.withAdminUpdatedBy = query
 
 		case "createdBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: f.config}).Query()
+				query = (&UserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
-			f.withCreatedBy = query
+			_q.withCreatedBy = query
 
 		case "updatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: f.config}).Query()
+				query = (&UserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
-			f.withUpdatedBy = query
+			_q.withUpdatedBy = query
 		case "createdAt":
 			if _, ok := fieldSeen[file.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, file.FieldCreatedAt)
@@ -305,7 +305,7 @@ func (f *FileQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 		}
 	}
 	if !unknownSeen {
-		f.Select(selectedFields...)
+		_q.Select(selectedFields...)
 	}
 	return nil
 }
@@ -368,18 +368,18 @@ func newFilePaginateArgs(rv map[string]any) *filePaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (pe *PermissionQuery) CollectFields(ctx context.Context, satisfies ...string) (*PermissionQuery, error) {
+func (_q *PermissionQuery) CollectFields(ctx context.Context, satisfies ...string) (*PermissionQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
-		return pe, nil
+		return _q, nil
 	}
-	if err := pe.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
-	return pe, nil
+	return _q, nil
 }
 
-func (pe *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (_q *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -393,34 +393,34 @@ func (pe *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: pe.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			pe.withAdminCreatedBy = query
+			_q.withAdminCreatedBy = query
 
 		case "adminUpdatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: pe.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			pe.withAdminUpdatedBy = query
+			_q.withAdminUpdatedBy = query
 
 		case "role":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&RoleClient{config: pe.config}).Query()
+				query = (&RoleClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
 				return err
 			}
-			pe.withRole = query
+			_q.withRole = query
 		case "createdAt":
 			if _, ok := fieldSeen[permission.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, permission.FieldCreatedAt)
@@ -441,6 +441,11 @@ func (pe *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx
 				selectedFields = append(selectedFields, permission.FieldOperation)
 				fieldSeen[permission.FieldOperation] = struct{}{}
 			}
+		case "lifecycleAccess":
+			if _, ok := fieldSeen[permission.FieldLifecycleAccess]; !ok {
+				selectedFields = append(selectedFields, permission.FieldLifecycleAccess)
+				fieldSeen[permission.FieldLifecycleAccess] = struct{}{}
+			}
 		case "id":
 		case "__typename":
 		default:
@@ -448,7 +453,7 @@ func (pe *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx
 		}
 	}
 	if !unknownSeen {
-		pe.Select(selectedFields...)
+		_q.Select(selectedFields...)
 	}
 	return nil
 }
@@ -511,18 +516,18 @@ func newPermissionPaginateArgs(rv map[string]any) *permissionPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (r *RoleQuery) CollectFields(ctx context.Context, satisfies ...string) (*RoleQuery, error) {
+func (_q *RoleQuery) CollectFields(ctx context.Context, satisfies ...string) (*RoleQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
-		return r, nil
+		return _q, nil
 	}
-	if err := r.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
-	return r, nil
+	return _q, nil
 }
 
-func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (_q *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -536,34 +541,34 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: r.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			r.withAdminCreatedBy = query
+			_q.withAdminCreatedBy = query
 
 		case "adminUpdatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: r.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			r.withAdminUpdatedBy = query
+			_q.withAdminUpdatedBy = query
 
 		case "adminUserRoles":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: r.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			r.WithNamedAdminUserRoles(alias, func(wq *AdminUserQuery) {
+			_q.WithNamedAdminUserRoles(alias, func(wq *AdminUserQuery) {
 				*wq = *query
 			})
 
@@ -571,12 +576,12 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: r.config}).Query()
+				query = (&UserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
-			r.WithNamedUserRoles(alias, func(wq *UserQuery) {
+			_q.WithNamedUserRoles(alias, func(wq *UserQuery) {
 				*wq = *query
 			})
 
@@ -584,12 +589,12 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&PermissionClient{config: r.config}).Query()
+				query = (&PermissionClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, permissionImplementors)...); err != nil {
 				return err
 			}
-			r.WithNamedPermissions(alias, func(wq *PermissionQuery) {
+			_q.WithNamedPermissions(alias, func(wq *PermissionQuery) {
 				*wq = *query
 			})
 		case "name":
@@ -614,7 +619,7 @@ func (r *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 		}
 	}
 	if !unknownSeen {
-		r.Select(selectedFields...)
+		_q.Select(selectedFields...)
 	}
 	return nil
 }
@@ -677,18 +682,18 @@ func newRolePaginateArgs(rv map[string]any) *rolePaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) (*UserQuery, error) {
+func (_q *UserQuery) CollectFields(ctx context.Context, satisfies ...string) (*UserQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
-		return u, nil
+		return _q, nil
 	}
-	if err := u.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
-	return u, nil
+	return _q, nil
 }
 
-func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (_q *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -702,56 +707,56 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: u.config}).Query()
+				query = (&UserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
-			u.withCreatedBy = query
+			_q.withCreatedBy = query
 
 		case "updatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&UserClient{config: u.config}).Query()
+				query = (&UserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
-			u.withUpdatedBy = query
+			_q.withUpdatedBy = query
 
 		case "adminCreatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: u.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			u.withAdminCreatedBy = query
+			_q.withAdminCreatedBy = query
 
 		case "adminUpdatedBy":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&AdminUserClient{config: u.config}).Query()
+				query = (&AdminUserClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, adminuserImplementors)...); err != nil {
 				return err
 			}
-			u.withAdminUpdatedBy = query
+			_q.withAdminUpdatedBy = query
 
 		case "roles":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&RoleClient{config: u.config}).Query()
+				query = (&RoleClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
 				return err
 			}
-			u.WithNamedRoles(alias, func(wq *RoleQuery) {
+			_q.WithNamedRoles(alias, func(wq *RoleQuery) {
 				*wq = *query
 			})
 
@@ -759,12 +764,12 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&RoleClient{config: u.config}).Query()
+				query = (&RoleClient{config: _q.config}).Query()
 			)
 			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, roleImplementors)...); err != nil {
 				return err
 			}
-			u.withDefaultRole = query
+			_q.withDefaultRole = query
 		case "email":
 			if _, ok := fieldSeen[user.FieldEmail]; !ok {
 				selectedFields = append(selectedFields, user.FieldEmail)
@@ -782,7 +787,7 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 		}
 	}
 	if !unknownSeen {
-		u.Select(selectedFields...)
+		_q.Select(selectedFields...)
 	}
 	return nil
 }
@@ -869,7 +874,7 @@ func fieldArgs(ctx context.Context, whereInput any, path ...string) map[string]a
 func unmarshalArgs(ctx context.Context, whereInput any, args map[string]any) map[string]any {
 	for _, k := range []string{firstField, lastField} {
 		v, ok := args[k]
-		if !ok {
+		if !ok || v == nil {
 			continue
 		}
 		i, err := graphql.UnmarshalInt(v)

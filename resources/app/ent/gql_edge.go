@@ -8,38 +8,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (_m *ForPermission) CreatedBy(ctx context.Context) (*User, error) {
-	result, err := _m.Edges.CreatedByOrErr()
-	if IsNotLoaded(err) {
-		result, err = _m.QueryCreatedBy().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
-func (_m *ForPermission) UpdatedBy(ctx context.Context) (*User, error) {
-	result, err := _m.Edges.UpdatedByOrErr()
-	if IsNotLoaded(err) {
-		result, err = _m.QueryUpdatedBy().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
-func (_m *ForPermission) AdminCreatedBy(ctx context.Context) (*AdminUser, error) {
-	result, err := _m.Edges.AdminCreatedByOrErr()
-	if IsNotLoaded(err) {
-		result, err = _m.QueryAdminCreatedBy().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
-func (_m *ForPermission) AdminUpdatedBy(ctx context.Context) (*AdminUser, error) {
-	result, err := _m.Edges.AdminUpdatedByOrErr()
-	if IsNotLoaded(err) {
-		result, err = _m.QueryAdminUpdatedBy().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
 func (_m *Role) UserRoles(ctx context.Context) (result []*User, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = _m.NamedUserRoles(graphql.GetFieldContext(ctx).Field.Alias)

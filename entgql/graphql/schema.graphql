@@ -264,6 +264,7 @@ input CreatePermissionInput {
   updatedAt: DateTime
   entity: String!
   operation: String
+  lifecycleAccess: [String!]
   adminCreatedByID: ID
   adminUpdatedByID: ID
   roleID: ID
@@ -559,6 +560,7 @@ type Permission implements Node {
   updatedAt: DateTime
   entity: String!
   operation: String!
+  lifecycleAccess: [String!]
   adminCreatedBy: AdminUser
   adminUpdatedBy: AdminUser
   role: Role
@@ -937,6 +939,9 @@ input UpdatePermissionInput {
   clearUpdatedAt: Boolean
   entity: String
   operation: String
+  lifecycleAccess: [String!]
+  appendLifecycleAccess: [String!]
+  clearLifecycleAccess: Boolean
   adminCreatedByID: ID
   clearAdminCreatedBy: Boolean
   adminUpdatedByID: ID

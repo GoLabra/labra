@@ -134,6 +134,30 @@ func (Permission) Fields() []ent.Field {
 					AcceptedValues: []string{"Create", "Update", "Delete", "Read", ""},
 				},
 			),
+
+		field.Strings("lifecycle_access").
+			Optional().
+			Validate(func(vals []string) error {
+				acceptedValues := map[string]bool{}
+				for _, acceptedValue := range []string{"DRAFT", "PUBLISHED", "ARCHIVED"} {
+					acceptedValues[acceptedValue] = true
+				}
+
+				for _, val := range vals {
+					if accepted, ok := acceptedValues[val]; !accepted || !ok {
+						return fmt.Errorf("value \"%s\" is not an accepted value", val)
+					}
+				}
+				return nil
+			}).
+			Annotations(
+				entgql.Type("[String!]"),
+				annotations.Field{
+					Caption:        "Lifecycle Access",
+					Type:           entity.FieldTypeMultipleChoice,
+					AcceptedValues: []string{"DRAFT", "PUBLISHED", "ARCHIVED"},
+				},
+			),
 	}
 }
 

@@ -448,6 +448,7 @@ type CreatePermissionInput struct {
 	UpdatedAt        *time.Time
 	Entity           string
 	Operation        *string
+	LifecycleAccess  []string
 	AdminCreatedBy   *CreateOneAdminUserInput
 	AdminCreatedByID *string
 	AdminUpdatedBy   *CreateOneAdminUserInput
@@ -468,6 +469,9 @@ func (i *CreatePermissionInput) Mutate(m *PermissionMutation) {
 	if v := i.Operation; v != nil {
 		m.SetOperation(*v)
 	}
+	if v := i.LifecycleAccess; v != nil {
+		m.SetLifecycleAccess(v)
+	}
 	if v := i.AdminCreatedByID; v != nil {
 		m.SetAdminCreatedByID(*v)
 	}
@@ -487,21 +491,24 @@ func (c *PermissionCreate) SetInput(i CreatePermissionInput) *PermissionCreate {
 
 // UpdatePermissionInput represents a mutation input for updating permissions.
 type UpdatePermissionInput struct {
-	ClearCreatedAt      bool
-	CreatedAt           *time.Time
-	ClearUpdatedAt      bool
-	UpdatedAt           *time.Time
-	Entity              *string
-	Operation           *string
-	ClearAdminCreatedBy bool
-	AdminCreatedBy      *UpdateOneAdminUserInput
-	AdminCreatedByID    *string
-	ClearAdminUpdatedBy bool
-	AdminUpdatedBy      *UpdateOneAdminUserInput
-	AdminUpdatedByID    *string
-	ClearRole           bool
-	Role                *UpdateOneRoleInput
-	RoleID              *string
+	ClearCreatedAt        bool
+	CreatedAt             *time.Time
+	ClearUpdatedAt        bool
+	UpdatedAt             *time.Time
+	Entity                *string
+	Operation             *string
+	ClearLifecycleAccess  bool
+	LifecycleAccess       []string
+	AppendLifecycleAccess []string
+	ClearAdminCreatedBy   bool
+	AdminCreatedBy        *UpdateOneAdminUserInput
+	AdminCreatedByID      *string
+	ClearAdminUpdatedBy   bool
+	AdminUpdatedBy        *UpdateOneAdminUserInput
+	AdminUpdatedByID      *string
+	ClearRole             bool
+	Role                  *UpdateOneRoleInput
+	RoleID                *string
 }
 
 // Mutate applies the UpdatePermissionInput on the PermissionMutation builder.
@@ -523,6 +530,15 @@ func (i *UpdatePermissionInput) Mutate(m *PermissionMutation) {
 	}
 	if v := i.Operation; v != nil {
 		m.SetOperation(*v)
+	}
+	if i.ClearLifecycleAccess {
+		m.ClearLifecycleAccess()
+	}
+	if v := i.LifecycleAccess; v != nil {
+		m.SetLifecycleAccess(v)
+	}
+	if i.AppendLifecycleAccess != nil {
+		m.AppendLifecycleAccess(i.LifecycleAccess)
 	}
 	if i.ClearAdminCreatedBy {
 		m.ClearAdminCreatedBy()
@@ -563,7 +579,9 @@ type CreateRoleInput struct {
 	AdminCreatedByID *string
 	AdminUpdatedBy   *CreateOneAdminUserInput
 	AdminUpdatedByID *string
-	UserRoles        *CreateManyAdminUserInput
+	AdminUserRoles   *CreateManyAdminUserInput
+	AdminUserRoleIDs []string
+	UserRoles        *CreateManyUserInput
 	UserRoleIDs      []string
 	Permissions      *CreateManyPermissionInput
 	PermissionIDs    []string
@@ -577,6 +595,9 @@ func (i *CreateRoleInput) Mutate(m *RoleMutation) {
 	}
 	if v := i.AdminUpdatedByID; v != nil {
 		m.SetAdminUpdatedByID(*v)
+	}
+	if v := i.AdminUserRoleIDs; len(v) > 0 {
+		m.AddAdminUserRoleIDs(v...)
 	}
 	if v := i.UserRoleIDs; len(v) > 0 {
 		m.AddUserRoleIDs(v...)
@@ -594,21 +615,25 @@ func (c *RoleCreate) SetInput(i CreateRoleInput) *RoleCreate {
 
 // UpdateRoleInput represents a mutation input for updating roles.
 type UpdateRoleInput struct {
-	Name                *string
-	ClearAdminCreatedBy bool
-	AdminCreatedBy      *UpdateOneAdminUserInput
-	AdminCreatedByID    *string
-	ClearAdminUpdatedBy bool
-	AdminUpdatedBy      *UpdateOneAdminUserInput
-	AdminUpdatedByID    *string
-	ClearUserRoles      bool
-	UserRoles           *UpdateManyAdminUserInput
-	AddUserRoleIDs      []string
-	RemoveUserRoleIDs   []string
-	ClearPermissions    bool
-	Permissions         *UpdateManyPermissionInput
-	AddPermissionIDs    []string
-	RemovePermissionIDs []string
+	Name                   *string
+	ClearAdminCreatedBy    bool
+	AdminCreatedBy         *UpdateOneAdminUserInput
+	AdminCreatedByID       *string
+	ClearAdminUpdatedBy    bool
+	AdminUpdatedBy         *UpdateOneAdminUserInput
+	AdminUpdatedByID       *string
+	ClearAdminUserRoles    bool
+	AdminUserRoles         *UpdateManyAdminUserInput
+	AddAdminUserRoleIDs    []string
+	RemoveAdminUserRoleIDs []string
+	ClearUserRoles         bool
+	UserRoles              *UpdateManyUserInput
+	AddUserRoleIDs         []string
+	RemoveUserRoleIDs      []string
+	ClearPermissions       bool
+	Permissions            *UpdateManyPermissionInput
+	AddPermissionIDs       []string
+	RemovePermissionIDs    []string
 }
 
 // Mutate applies the UpdateRoleInput on the RoleMutation builder.
@@ -627,6 +652,15 @@ func (i *UpdateRoleInput) Mutate(m *RoleMutation) {
 	}
 	if v := i.AdminUpdatedByID; v != nil {
 		m.SetAdminUpdatedByID(*v)
+	}
+	if i.ClearAdminUserRoles {
+		m.ClearAdminUserRoles()
+	}
+	if v := i.AddAdminUserRoleIDs; len(v) > 0 {
+		m.AddAdminUserRoleIDs(v...)
+	}
+	if v := i.RemoveAdminUserRoleIDs; len(v) > 0 {
+		m.RemoveAdminUserRoleIDs(v...)
 	}
 	if i.ClearUserRoles {
 		m.ClearUserRoles()

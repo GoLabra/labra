@@ -26,14 +26,6 @@ func (m *FileMutation) AddEdges(name string, values []string) error {
 
 // AddEdges sets the value of a field with the given name. It returns an error if
 // the edge is not defined in the schema
-func (m *ForPermissionMutation) AddEdges(name string, values []string) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown ForPermission edge %s", name)
-}
-
-// AddEdges sets the value of a field with the given name. It returns an error if
-// the edge is not defined in the schema
 func (m *RoleMutation) AddEdges(name string, values []string) error {
 	switch name {
 	case role.EdgeUserRoles:

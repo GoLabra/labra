@@ -17,11 +17,17 @@ type CreateEdgeInput struct {
 	Ref              string
 }
 
+type LifecycleInput struct {
+	Enabled bool
+	Default *EntityState
+}
+
 type CreateEntityInput struct {
 	Caption      string
 	DisplayField FieldWhereUniqueInput
 	Fields       *CreateManyFieldsInput
 	Edges        *CreateManyEdgesInput
+	Lifecycle    *LifecycleInput
 }
 
 type CreateFieldInput struct {
@@ -75,6 +81,7 @@ type UpdateEntityInput struct {
 	DisplayField *FieldWhereUniqueInput
 	Fields       *UpdateManyFieldsInput
 	Edges        *UpdateManyEdgesInput
+	Lifecycle    *LifecycleInput
 }
 
 type UpdateFieldInput struct {

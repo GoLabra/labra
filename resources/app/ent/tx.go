@@ -18,8 +18,6 @@ type Tx struct {
 	AdminUser *AdminUserClient
 	// File is the client for interacting with the File builders.
 	File *FileClient
-	// ForPermission is the client for interacting with the ForPermission builders.
-	ForPermission *ForPermissionClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
@@ -157,7 +155,6 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.File = NewFileClient(tx.config)
-	tx.ForPermission = NewForPermissionClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

@@ -3,33 +3,15 @@
 package ent
 
 import (
-	"app/ent/forpermission"
 	"app/ent/role"
 	"app/ent/schema"
 	"app/ent/user"
-	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	forpermissionFields := schema.ForPermission{}.Fields()
-	_ = forpermissionFields
-	// forpermissionDescCreatedAt is the schema descriptor for created_at field.
-	forpermissionDescCreatedAt := forpermissionFields[1].Descriptor()
-	// forpermission.DefaultCreatedAt holds the default value on creation for the created_at field.
-	forpermission.DefaultCreatedAt = forpermissionDescCreatedAt.Default.(time.Time)
-	// forpermissionDescUpdatedAt is the schema descriptor for updated_at field.
-	forpermissionDescUpdatedAt := forpermissionFields[2].Descriptor()
-	// forpermission.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	forpermission.DefaultUpdatedAt = forpermissionDescUpdatedAt.Default.(time.Time)
-	// forpermission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	forpermission.UpdateDefaultUpdatedAt = forpermissionDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// forpermissionDescID is the schema descriptor for id field.
-	forpermissionDescID := forpermissionFields[0].Descriptor()
-	// forpermission.DefaultID holds the default value on creation for the id field.
-	forpermission.DefaultID = forpermissionDescID.Default.(func() string)
 	roleFields := schema.Role{}.Fields()
 	_ = roleFields
 	// roleDescName is the schema descriptor for name field.

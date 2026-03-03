@@ -17,7 +17,6 @@ type Service struct {
 	*CustomService
 	AdminUser              adminInterfaces.AdminUser
 	File              adminInterfaces.File
-	ForPermission              svc.ForPermission
 	Role              adminInterfaces.Role
 	User              svc.User
 }
@@ -27,7 +26,6 @@ func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service 
 		CustomService: NewCustomService(repository),
         AdminUser:              adminSvc.NewAdminUser(adminRepo),
         File:              adminSvc.NewFile(adminRepo),
-		ForPermission:              NewForPermission(repository),
         Role:              adminSvc.NewRole(adminRepo),
 		User:              NewUser(repository),
 	}

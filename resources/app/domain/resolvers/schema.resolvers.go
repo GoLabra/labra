@@ -14,42 +14,6 @@ import (
 	ent1 "github.com/GoLabra/labra/entgql/ent"
 )
 
-// AdminCreatedBy is the resolver for the AdminCreatedBy field.
-func (r *forPermissionResolver) AdminCreatedBy(ctx context.Context, obj *ent.ForPermission) (*ent1.AdminUser, error) {
-	relObj, err := obj.AdminCreatedBy(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("[forPermissionResolver.admin_created_by]: %w", err)
-	}
-	if relObj == nil {
-		return nil, nil
-	}
-
-	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
-	if err != nil {
-		return nil, fmt.Errorf("[forPermissionResolver. AdminCreatedBy]: %w", err)
-	}
-
-	return adminObj, nil
-}
-
-// AdminUpdatedBy is the resolver for the AdminUpdatedBy field.
-func (r *forPermissionResolver) AdminUpdatedBy(ctx context.Context, obj *ent.ForPermission) (*ent1.AdminUser, error) {
-	relObj, err := obj.AdminUpdatedBy(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("[forPermissionResolver.admin_updated_by]: %w", err)
-	}
-	if relObj == nil {
-		return nil, nil
-	}
-
-	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
-	if err != nil {
-		return nil, fmt.Errorf("[forPermissionResolver. AdminUpdatedBy]: %w", err)
-	}
-
-	return adminObj, nil
-}
-
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id string) (ent.Noder, error) {
 	panic(fmt.Errorf("not implemented: Node - node"))
@@ -143,16 +107,6 @@ func (r *userResolver) DefaultRole(ctx context.Context, obj *ent.User) (*ent1.Ro
 	return adminObj, nil
 }
 
-// HasAdminCreatedByWith is the resolver for the hasAdminCreatedByWith field.
-func (r *forPermissionWhereInputResolver) HasAdminCreatedByWith(ctx context.Context, obj *ent.ForPermissionWhereInput, data []*ent1.AdminUserWhereInput) error {
-	panic(fmt.Errorf("not implemented: HasAdminCreatedByWith - hasAdminCreatedByWith"))
-}
-
-// HasAdminUpdatedByWith is the resolver for the hasAdminUpdatedByWith field.
-func (r *forPermissionWhereInputResolver) HasAdminUpdatedByWith(ctx context.Context, obj *ent.ForPermissionWhereInput, data []*ent1.AdminUserWhereInput) error {
-	panic(fmt.Errorf("not implemented: HasAdminUpdatedByWith - hasAdminUpdatedByWith"))
-}
-
 // HasUserRolesWith is the resolver for the hasUserRolesWith field.
 func (r *roleWhereInputResolver) HasUserRolesWith(ctx context.Context, obj *ent1.RoleWhereInput, data []*ent.UserWhereInput) error {
 	panic(fmt.Errorf("not implemented: HasUserRolesWith - hasUserRolesWith"))
@@ -184,9 +138,6 @@ func (r *Resolver) AdminUser() generated.AdminUserResolver { return &adminUserRe
 // File returns generated.FileResolver implementation.
 func (r *Resolver) File() generated.FileResolver { return &fileResolver{r} }
 
-// ForPermission returns generated.ForPermissionResolver implementation.
-func (r *Resolver) ForPermission() generated.ForPermissionResolver { return &forPermissionResolver{r} }
-
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
@@ -195,11 +146,6 @@ func (r *Resolver) Role() generated.RoleResolver { return &roleResolver{r} }
 
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
-
-// ForPermissionWhereInput returns generated.ForPermissionWhereInputResolver implementation.
-func (r *Resolver) ForPermissionWhereInput() generated.ForPermissionWhereInputResolver {
-	return &forPermissionWhereInputResolver{r}
-}
 
 // RoleWhereInput returns generated.RoleWhereInputResolver implementation.
 func (r *Resolver) RoleWhereInput() generated.RoleWhereInputResolver {
@@ -213,10 +159,193 @@ func (r *Resolver) UserWhereInput() generated.UserWhereInputResolver {
 
 type adminUserResolver struct{ *Resolver }
 type fileResolver struct{ *Resolver }
-type forPermissionResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type roleResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-type forPermissionWhereInputResolver struct{ *Resolver }
 type roleWhereInputResolver struct{ *Resolver }
 type userWhereInputResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *cycleResolver) AdminCreatedBy(ctx context.Context, obj *ent.Cycle) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminCreatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[cycleResolver.admin_created_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[cycleResolver. AdminCreatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *cycleResolver) AdminUpdatedBy(ctx context.Context, obj *ent.Cycle) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminUpdatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[cycleResolver.admin_updated_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[cycleResolver. AdminUpdatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *forPermissionResolver) AdminCreatedBy(ctx context.Context, obj *ent.ForPermission) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminCreatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[forPermissionResolver.admin_created_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[forPermissionResolver. AdminCreatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *forPermissionResolver) AdminUpdatedBy(ctx context.Context, obj *ent.ForPermission) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminUpdatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[forPermissionResolver.admin_updated_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[forPermissionResolver. AdminUpdatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *lifeCycleNotResolver) AdminCreatedBy(ctx context.Context, obj *ent.LifeCycleNot) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminCreatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[lifeCycleNotResolver.admin_created_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[lifeCycleNotResolver. AdminCreatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *lifeCycleNotResolver) AdminUpdatedBy(ctx context.Context, obj *ent.LifeCycleNot) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminUpdatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[lifeCycleNotResolver.admin_updated_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[lifeCycleNotResolver. AdminUpdatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *miauResolver) AdminCreatedBy(ctx context.Context, obj *ent.Miau) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminCreatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[miauResolver.admin_created_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[miauResolver. AdminCreatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *miauResolver) AdminUpdatedBy(ctx context.Context, obj *ent.Miau) (*ent1.AdminUser, error) {
+	relObj, err := obj.AdminUpdatedBy(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[miauResolver.admin_updated_by]: %w", err)
+	}
+	if relObj == nil {
+		return nil, nil
+	}
+
+	adminObj, err := r.Service.AdminUser.GetOne(ctx, ent1.AdminUserWhereUniqueInput{ID: &relObj.ID})
+	if err != nil {
+		return nil, fmt.Errorf("[miauResolver. AdminUpdatedBy]: %w", err)
+	}
+
+	return adminObj, nil
+}
+func (r *cycleWhereInputResolver) HasAdminCreatedByWith(ctx context.Context, obj *ent.CycleWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminCreatedByWith - hasAdminCreatedByWith"))
+}
+func (r *cycleWhereInputResolver) HasAdminUpdatedByWith(ctx context.Context, obj *ent.CycleWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminUpdatedByWith - hasAdminUpdatedByWith"))
+}
+func (r *forPermissionWhereInputResolver) HasAdminCreatedByWith(ctx context.Context, obj *ent.ForPermissionWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminCreatedByWith - hasAdminCreatedByWith"))
+}
+func (r *forPermissionWhereInputResolver) HasAdminUpdatedByWith(ctx context.Context, obj *ent.ForPermissionWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminUpdatedByWith - hasAdminUpdatedByWith"))
+}
+func (r *lifeCycleNotWhereInputResolver) HasAdminCreatedByWith(ctx context.Context, obj *ent.LifeCycleNotWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminCreatedByWith - hasAdminCreatedByWith"))
+}
+func (r *lifeCycleNotWhereInputResolver) HasAdminUpdatedByWith(ctx context.Context, obj *ent.LifeCycleNotWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminUpdatedByWith - hasAdminUpdatedByWith"))
+}
+func (r *miauWhereInputResolver) HasAdminCreatedByWith(ctx context.Context, obj *ent.MiauWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminCreatedByWith - hasAdminCreatedByWith"))
+}
+func (r *miauWhereInputResolver) HasAdminUpdatedByWith(ctx context.Context, obj *ent.MiauWhereInput, data []*ent1.AdminUserWhereInput) error {
+	panic(fmt.Errorf("not implemented: HasAdminUpdatedByWith - hasAdminUpdatedByWith"))
+}
+func (r *Resolver) Cycle() generated.CycleResolver { return &cycleResolver{r} }
+func (r *Resolver) ForPermission() generated.ForPermissionResolver { return &forPermissionResolver{r} }
+func (r *Resolver) LifeCycleNot() generated.LifeCycleNotResolver { return &lifeCycleNotResolver{r} }
+func (r *Resolver) Miau() generated.MiauResolver { return &miauResolver{r} }
+func (r *Resolver) CycleWhereInput() generated.CycleWhereInputResolver {
+	return &cycleWhereInputResolver{r}
+}
+func (r *Resolver) ForPermissionWhereInput() generated.ForPermissionWhereInputResolver {
+	return &forPermissionWhereInputResolver{r}
+}
+func (r *Resolver) LifeCycleNotWhereInput() generated.LifeCycleNotWhereInputResolver {
+	return &lifeCycleNotWhereInputResolver{r}
+}
+func (r *Resolver) MiauWhereInput() generated.MiauWhereInputResolver {
+	return &miauWhereInputResolver{r}
+}
+type cycleResolver struct{ *Resolver }
+type forPermissionResolver struct{ *Resolver }
+type lifeCycleNotResolver struct{ *Resolver }
+type miauResolver struct{ *Resolver }
+type cycleWhereInputResolver struct{ *Resolver }
+type forPermissionWhereInputResolver struct{ *Resolver }
+type lifeCycleNotWhereInputResolver struct{ *Resolver }
+type miauWhereInputResolver struct{ *Resolver }
+*/

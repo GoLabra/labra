@@ -83,6 +83,10 @@ func init() {
 	permission.DefaultOperation = permissionDescOperation.Default.(string)
 	// permission.OperationValidator is a validator for the "operation" field. It is called by the builders before save.
 	permission.OperationValidator = permissionDescOperation.Validators[0].(func(string) error)
+	// permissionDescLifecycleAccess is the schema descriptor for lifecycle_access field.
+	permissionDescLifecycleAccess := permissionFields[5].Descriptor()
+	// permission.LifecycleAccessValidator is a validator for the "lifecycle_access" field. It is called by the builders before save.
+	permission.LifecycleAccessValidator = permissionDescLifecycleAccess.Validators[0].(func([]string) error)
 	// permissionDescID is the schema descriptor for id field.
 	permissionDescID := permissionFields[0].Descriptor()
 	// permission.DefaultID holds the default value on creation for the id field.

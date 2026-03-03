@@ -11,6 +11,7 @@ type Entity struct {
 	Caption          string
 	Owner            EntityOwner
 	DisplayFieldName string
+	EntityState      State
 }
 
 // Reserved names that cannot be used for entity names
@@ -128,5 +129,13 @@ func (f Entity) Equals(uniqueInput EntityWhereUniqueInput) bool {
 func (e *Entity) ApplyUpdateInput(data UpdateEntityInput) {
 	if data.Caption != nil {
 		e.Caption = *data.Caption
+	}
+	if data.Lifecycle != nil {
+		e.EntityState.Enabled = data.Lifecycle.Enabled
+		stateDefault := EntityStateDraft
+		if data.Lifecycle.Default != nil {
+			stateDefault = *data.Lifecycle.Default
+		}
+		e.EntityState.Default = stateDefault
 	}
 }

@@ -7,8 +7,12 @@ import (
 	{{- end }}
 	"fmt"
 	"app/ent"
-	
+	{{- if hasStateAnnotation $ }}
+
+	"github.com/GoLabra/labra/entgql/entity"
+	{{- end }}
 	{{- if not (ShouldSkip $ "mutation_create_input") }}
+
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/ext/mapstructure"
 	{{- end }}
@@ -272,8 +276,43 @@ func (r *{{$.Name}}) Update(ctx context.Context, where ent.{{$.Name}}WhereUnique
 	return updatedInput.Unwrap(), nil
 }
 
+{{- if hasStateAnnotation $ }}
+func (r *{{$.Name}}) UpdateState(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, state entity.EntityState) (*ent.{{$.Name}}, error) {
+	repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
+	if !ok {
+		return nil, errors.New(ErrRepositoryNotSetInContext)
+	}
+	tx, err := repository.Tx.Create(ctx)
+	if err != nil {
+		return nil, err
+	}
+	updated, err := repository.{{$.Name}}.UpdateStateTx(ctx, tx, where, state)
+	if err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return updated.Unwrap(), nil
+}
+
+func (r *{{$.Name}}) UpdateStateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, state entity.EntityState) (*ent.{{$.Name}}, error) {
+	query := tx.{{$.Name}}.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+	}
+	item, err := query.First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting item to update state: %v", err)
+	}
+	return tx.{{$.Name}}.UpdateOne(item).SetEntityState(state).Save(ctx)
+}
+{{- end }}
+
 func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
-	
+	var iCtx = context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+
     repository, ok := ctx.Value(constants.RepositoryContextValue).(*Repository)
 	if !ok {
 		return nil, errors.New(ErrRepositoryNotSetInContext)
@@ -284,7 +323,7 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	if err != nil {
 		return nil, fmt.Errorf("error applying unique where condition: %v", err)
 	}
-	item, err := query.First(ctx)
+	item, err := query.First(iCtx)
 	if err != nil {
 		return nil, fmt.Errorf("error getting item to update: %v", err)
 	}

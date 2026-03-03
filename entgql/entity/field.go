@@ -115,6 +115,7 @@ var validFieldTypes = map[string]bool{
 	string(FieldTypeJson):           true,
 	string(FieldTypeEnum):           true,
 	string(FieldTypeEnums):          true,
+	"EntityState":                   true,
 }
 
 // Field types that support AcceptedValues

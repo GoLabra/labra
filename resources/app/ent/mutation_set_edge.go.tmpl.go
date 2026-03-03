@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"app/ent/forpermission"
 	"app/ent/user"
 	"fmt"
 )
@@ -22,26 +21,6 @@ func (m *FileMutation) SetEdge(name, value string) error {
 	switch name {
 	}
 	return fmt.Errorf("unknown File edge %s", name)
-}
-
-// SetEdge sets the value of a field with the given name. It returns an error if
-// the edge is not defined in the schema
-func (m *ForPermissionMutation) SetEdge(name, value string) error {
-	switch name {
-	case forpermission.EdgeCreatedBy:
-		m.SetCreatedByID(value)
-		return nil
-	case forpermission.EdgeUpdatedBy:
-		m.SetUpdatedByID(value)
-		return nil
-	case forpermission.EdgeAdminCreatedBy:
-		m.SetAdminCreatedByID(value)
-		return nil
-	case forpermission.EdgeAdminUpdatedBy:
-		m.SetAdminUpdatedByID(value)
-		return nil
-	}
-	return fmt.Errorf("unknown ForPermission edge %s", name)
 }
 
 // SetEdge sets the value of a field with the given name. It returns an error if

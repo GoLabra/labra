@@ -205,7 +205,7 @@ func (e *EntityTemplateData) EditEdgesUpdate(edgesUpdateInput []*entity.UpdateOn
 	return nil
 }
 
-func (e *EntityTemplateData) AddDefaultFields() {
+func (e *EntityTemplateData) AddDefaultFields(lifecycle *entity.LifecycleInput) {
 	var nowDefaultValue = "now()"
 
 	e.Fields = append(e.Fields, entity.Field{
@@ -400,7 +400,16 @@ func ApplyEntityCreate(data entity.CreateEntityInput) (*EntityTemplateData, erro
 		Owner:   "User",
 	}
 
-	entityTemplateData.AddDefaultFields()
+	if data.Lifecycle != nil && data.Lifecycle.Enabled {
+		entityTemplateData.Entity.EntityState.Enabled = data.Lifecycle.Enabled
+		stateDefault := entity.EntityStateDraft
+		if data.Lifecycle.Default != nil {
+			stateDefault = *data.Lifecycle.Default
+		}
+		entityTemplateData.Entity.EntityState.Default = stateDefault
+	}
+
+	entityTemplateData.AddDefaultFields(data.Lifecycle)
 
 	if data.Fields != nil && data.Fields.Create != nil {
 		err = entityTemplateData.AddFieldsCreate(data.Fields.Create)

@@ -2193,6 +2193,8 @@ type PermissionMutation struct {
 	updated_at              *time.Time
 	entity                  *string
 	operation               *string
+	lifecycle_access        *[]string
+	appendlifecycle_access  []string
 	clearedFields           map[string]struct{}
 	admin_created_by        *string
 	clearedadmin_created_by bool
@@ -2479,6 +2481,71 @@ func (m *PermissionMutation) ResetOperation() {
 	m.operation = nil
 }
 
+// SetLifecycleAccess sets the "lifecycle_access" field.
+func (m *PermissionMutation) SetLifecycleAccess(s []string) {
+	m.lifecycle_access = &s
+	m.appendlifecycle_access = nil
+}
+
+// LifecycleAccess returns the value of the "lifecycle_access" field in the mutation.
+func (m *PermissionMutation) LifecycleAccess() (r []string, exists bool) {
+	v := m.lifecycle_access
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLifecycleAccess returns the old "lifecycle_access" field's value of the Permission entity.
+// If the Permission object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PermissionMutation) OldLifecycleAccess(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLifecycleAccess is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLifecycleAccess requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLifecycleAccess: %w", err)
+	}
+	return oldValue.LifecycleAccess, nil
+}
+
+// AppendLifecycleAccess adds s to the "lifecycle_access" field.
+func (m *PermissionMutation) AppendLifecycleAccess(s []string) {
+	m.appendlifecycle_access = append(m.appendlifecycle_access, s...)
+}
+
+// AppendedLifecycleAccess returns the list of values that were appended to the "lifecycle_access" field in this mutation.
+func (m *PermissionMutation) AppendedLifecycleAccess() ([]string, bool) {
+	if len(m.appendlifecycle_access) == 0 {
+		return nil, false
+	}
+	return m.appendlifecycle_access, true
+}
+
+// ClearLifecycleAccess clears the value of the "lifecycle_access" field.
+func (m *PermissionMutation) ClearLifecycleAccess() {
+	m.lifecycle_access = nil
+	m.appendlifecycle_access = nil
+	m.clearedFields[permission.FieldLifecycleAccess] = struct{}{}
+}
+
+// LifecycleAccessCleared returns if the "lifecycle_access" field was cleared in this mutation.
+func (m *PermissionMutation) LifecycleAccessCleared() bool {
+	_, ok := m.clearedFields[permission.FieldLifecycleAccess]
+	return ok
+}
+
+// ResetLifecycleAccess resets all changes to the "lifecycle_access" field.
+func (m *PermissionMutation) ResetLifecycleAccess() {
+	m.lifecycle_access = nil
+	m.appendlifecycle_access = nil
+	delete(m.clearedFields, permission.FieldLifecycleAccess)
+}
+
 // SetAdminCreatedByID sets the "admin_created_by" edge to the AdminUser entity by id.
 func (m *PermissionMutation) SetAdminCreatedByID(id string) {
 	m.admin_created_by = &id
@@ -2630,7 +2697,7 @@ func (m *PermissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PermissionMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, permission.FieldCreatedAt)
 	}
@@ -2642,6 +2709,9 @@ func (m *PermissionMutation) Fields() []string {
 	}
 	if m.operation != nil {
 		fields = append(fields, permission.FieldOperation)
+	}
+	if m.lifecycle_access != nil {
+		fields = append(fields, permission.FieldLifecycleAccess)
 	}
 	return fields
 }
@@ -2659,6 +2729,8 @@ func (m *PermissionMutation) Field(name string) (ent.Value, bool) {
 		return m.Entity()
 	case permission.FieldOperation:
 		return m.Operation()
+	case permission.FieldLifecycleAccess:
+		return m.LifecycleAccess()
 	}
 	return nil, false
 }
@@ -2676,6 +2748,8 @@ func (m *PermissionMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldEntity(ctx)
 	case permission.FieldOperation:
 		return m.OldOperation(ctx)
+	case permission.FieldLifecycleAccess:
+		return m.OldLifecycleAccess(ctx)
 	}
 	return nil, fmt.Errorf("unknown Permission field %s", name)
 }
@@ -2713,6 +2787,13 @@ func (m *PermissionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetOperation(v)
 		return nil
+	case permission.FieldLifecycleAccess:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLifecycleAccess(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Permission field %s", name)
 }
@@ -2749,6 +2830,9 @@ func (m *PermissionMutation) ClearedFields() []string {
 	if m.FieldCleared(permission.FieldUpdatedAt) {
 		fields = append(fields, permission.FieldUpdatedAt)
 	}
+	if m.FieldCleared(permission.FieldLifecycleAccess) {
+		fields = append(fields, permission.FieldLifecycleAccess)
+	}
 	return fields
 }
 
@@ -2769,6 +2853,9 @@ func (m *PermissionMutation) ClearField(name string) error {
 	case permission.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
+	case permission.FieldLifecycleAccess:
+		m.ClearLifecycleAccess()
+		return nil
 	}
 	return fmt.Errorf("unknown Permission nullable field %s", name)
 }
@@ -2788,6 +2875,9 @@ func (m *PermissionMutation) ResetField(name string) error {
 		return nil
 	case permission.FieldOperation:
 		m.ResetOperation()
+		return nil
+	case permission.FieldLifecycleAccess:
+		m.ResetLifecycleAccess()
 		return nil
 	}
 	return fmt.Errorf("unknown Permission field %s", name)

@@ -170,7 +170,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the User fields.
-func (u *User) assignValues(columns []string, values []any) error {
+func (_m *User) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -180,57 +180,57 @@ func (u *User) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				u.ID = value.String
+				_m.ID = value.String
 			}
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				u.Email = value.String
+				_m.Email = value.String
 			}
 		case user.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
-				u.Password = value.String
+				_m.Password = value.String
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_created_by", values[i])
 			} else if value.Valid {
-				u.user_created_by = new(string)
-				*u.user_created_by = value.String
+				_m.user_created_by = new(string)
+				*_m.user_created_by = value.String
 			}
 		case user.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_updated_by", values[i])
 			} else if value.Valid {
-				u.user_updated_by = new(string)
-				*u.user_updated_by = value.String
+				_m.user_updated_by = new(string)
+				*_m.user_updated_by = value.String
 			}
 		case user.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_admin_created_by", values[i])
 			} else if value.Valid {
-				u.user_admin_created_by = new(string)
-				*u.user_admin_created_by = value.String
+				_m.user_admin_created_by = new(string)
+				*_m.user_admin_created_by = value.String
 			}
 		case user.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_admin_updated_by", values[i])
 			} else if value.Valid {
-				u.user_admin_updated_by = new(string)
-				*u.user_admin_updated_by = value.String
+				_m.user_admin_updated_by = new(string)
+				*_m.user_admin_updated_by = value.String
 			}
 		case user.ForeignKeys[4]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_default_role", values[i])
 			} else if value.Valid {
-				u.user_default_role = new(string)
-				*u.user_default_role = value.String
+				_m.user_default_role = new(string)
+				*_m.user_default_role = value.String
 			}
 		default:
-			u.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -238,151 +238,151 @@ func (u *User) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the User.
 // This includes values selected through modifiers, order, etc.
-func (u *User) Value(name string) (ent.Value, error) {
-	return u.selectValues.Get(name)
+func (_m *User) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryRefCreatedBy queries the "ref_created_by" edge of the User entity.
-func (u *User) QueryRefCreatedBy() *UserQuery {
-	return NewUserClient(u.config).QueryRefCreatedBy(u)
+func (_m *User) QueryRefCreatedBy() *UserQuery {
+	return NewUserClient(_m.config).QueryRefCreatedBy(_m)
 }
 
 // QueryCreatedBy queries the "created_by" edge of the User entity.
-func (u *User) QueryCreatedBy() *UserQuery {
-	return NewUserClient(u.config).QueryCreatedBy(u)
+func (_m *User) QueryCreatedBy() *UserQuery {
+	return NewUserClient(_m.config).QueryCreatedBy(_m)
 }
 
 // QueryRefUpdatedBy queries the "ref_updated_by" edge of the User entity.
-func (u *User) QueryRefUpdatedBy() *UserQuery {
-	return NewUserClient(u.config).QueryRefUpdatedBy(u)
+func (_m *User) QueryRefUpdatedBy() *UserQuery {
+	return NewUserClient(_m.config).QueryRefUpdatedBy(_m)
 }
 
 // QueryUpdatedBy queries the "updated_by" edge of the User entity.
-func (u *User) QueryUpdatedBy() *UserQuery {
-	return NewUserClient(u.config).QueryUpdatedBy(u)
+func (_m *User) QueryUpdatedBy() *UserQuery {
+	return NewUserClient(_m.config).QueryUpdatedBy(_m)
 }
 
 // QueryAdminCreatedBy queries the "admin_created_by" edge of the User entity.
-func (u *User) QueryAdminCreatedBy() *AdminUserQuery {
-	return NewUserClient(u.config).QueryAdminCreatedBy(u)
+func (_m *User) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewUserClient(_m.config).QueryAdminCreatedBy(_m)
 }
 
 // QueryAdminUpdatedBy queries the "admin_updated_by" edge of the User entity.
-func (u *User) QueryAdminUpdatedBy() *AdminUserQuery {
-	return NewUserClient(u.config).QueryAdminUpdatedBy(u)
+func (_m *User) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewUserClient(_m.config).QueryAdminUpdatedBy(_m)
 }
 
 // QueryRoles queries the "roles" edge of the User entity.
-func (u *User) QueryRoles() *RoleQuery {
-	return NewUserClient(u.config).QueryRoles(u)
+func (_m *User) QueryRoles() *RoleQuery {
+	return NewUserClient(_m.config).QueryRoles(_m)
 }
 
 // QueryDefaultRole queries the "default_role" edge of the User entity.
-func (u *User) QueryDefaultRole() *RoleQuery {
-	return NewUserClient(u.config).QueryDefaultRole(u)
+func (_m *User) QueryDefaultRole() *RoleQuery {
+	return NewUserClient(_m.config).QueryDefaultRole(_m)
 }
 
 // Update returns a builder for updating this User.
 // Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (u *User) Update() *UserUpdateOne {
-	return NewUserClient(u.config).UpdateOne(u)
+func (_m *User) Update() *UserUpdateOne {
+	return NewUserClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the User entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (u *User) Unwrap() *User {
-	_tx, ok := u.config.driver.(*txDriver)
+func (_m *User) Unwrap() *User {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: User is not a transactional entity")
 	}
-	u.config.driver = _tx.drv
-	return u
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (u *User) String() string {
+func (_m *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("email=")
-	builder.WriteString(u.Email)
+	builder.WriteString(_m.Email)
 	builder.WriteString(", ")
 	builder.WriteString("password=")
-	builder.WriteString(u.Password)
+	builder.WriteString(_m.Password)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // NamedRefCreatedBy returns the RefCreatedBy named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (u *User) NamedRefCreatedBy(name string) ([]*User, error) {
-	if u.Edges.namedRefCreatedBy == nil {
+func (_m *User) NamedRefCreatedBy(name string) ([]*User, error) {
+	if _m.Edges.namedRefCreatedBy == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := u.Edges.namedRefCreatedBy[name]
+	nodes, ok := _m.Edges.namedRefCreatedBy[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (u *User) appendNamedRefCreatedBy(name string, edges ...*User) {
-	if u.Edges.namedRefCreatedBy == nil {
-		u.Edges.namedRefCreatedBy = make(map[string][]*User)
+func (_m *User) appendNamedRefCreatedBy(name string, edges ...*User) {
+	if _m.Edges.namedRefCreatedBy == nil {
+		_m.Edges.namedRefCreatedBy = make(map[string][]*User)
 	}
 	if len(edges) == 0 {
-		u.Edges.namedRefCreatedBy[name] = []*User{}
+		_m.Edges.namedRefCreatedBy[name] = []*User{}
 	} else {
-		u.Edges.namedRefCreatedBy[name] = append(u.Edges.namedRefCreatedBy[name], edges...)
+		_m.Edges.namedRefCreatedBy[name] = append(_m.Edges.namedRefCreatedBy[name], edges...)
 	}
 }
 
 // NamedRefUpdatedBy returns the RefUpdatedBy named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (u *User) NamedRefUpdatedBy(name string) ([]*User, error) {
-	if u.Edges.namedRefUpdatedBy == nil {
+func (_m *User) NamedRefUpdatedBy(name string) ([]*User, error) {
+	if _m.Edges.namedRefUpdatedBy == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := u.Edges.namedRefUpdatedBy[name]
+	nodes, ok := _m.Edges.namedRefUpdatedBy[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (u *User) appendNamedRefUpdatedBy(name string, edges ...*User) {
-	if u.Edges.namedRefUpdatedBy == nil {
-		u.Edges.namedRefUpdatedBy = make(map[string][]*User)
+func (_m *User) appendNamedRefUpdatedBy(name string, edges ...*User) {
+	if _m.Edges.namedRefUpdatedBy == nil {
+		_m.Edges.namedRefUpdatedBy = make(map[string][]*User)
 	}
 	if len(edges) == 0 {
-		u.Edges.namedRefUpdatedBy[name] = []*User{}
+		_m.Edges.namedRefUpdatedBy[name] = []*User{}
 	} else {
-		u.Edges.namedRefUpdatedBy[name] = append(u.Edges.namedRefUpdatedBy[name], edges...)
+		_m.Edges.namedRefUpdatedBy[name] = append(_m.Edges.namedRefUpdatedBy[name], edges...)
 	}
 }
 
 // NamedRoles returns the Roles named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (u *User) NamedRoles(name string) ([]*Role, error) {
-	if u.Edges.namedRoles == nil {
+func (_m *User) NamedRoles(name string) ([]*Role, error) {
+	if _m.Edges.namedRoles == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := u.Edges.namedRoles[name]
+	nodes, ok := _m.Edges.namedRoles[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (u *User) appendNamedRoles(name string, edges ...*Role) {
-	if u.Edges.namedRoles == nil {
-		u.Edges.namedRoles = make(map[string][]*Role)
+func (_m *User) appendNamedRoles(name string, edges ...*Role) {
+	if _m.Edges.namedRoles == nil {
+		_m.Edges.namedRoles = make(map[string][]*Role)
 	}
 	if len(edges) == 0 {
-		u.Edges.namedRoles[name] = []*Role{}
+		_m.Edges.namedRoles[name] = []*Role{}
 	} else {
-		u.Edges.namedRoles[name] = append(u.Edges.namedRoles[name], edges...)
+		_m.Edges.namedRoles[name] = append(_m.Edges.namedRoles[name], edges...)
 	}
 }
 

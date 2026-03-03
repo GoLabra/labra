@@ -11,6 +11,7 @@ const EntityName = "Entity"
 type Entity struct {
 	Caption      string
 	DisplayField string
+	State        entity.State
 	Owner        entity.EntityOwner
 }
 

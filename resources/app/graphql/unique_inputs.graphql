@@ -11,9 +11,6 @@ input AdminUserWhereUniqueInput {
 input FileWhereUniqueInput {
   id: ID
 }
-input ForPermissionWhereUniqueInput {
-  id: ID
-}
 input RoleWhereUniqueInput {
   id: ID
   name: String

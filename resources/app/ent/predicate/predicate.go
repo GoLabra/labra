@@ -12,9 +12,6 @@ type AdminUser func(*sql.Selector)
 // File is the predicate function for file builders.
 type File func(*sql.Selector)
 
-// ForPermission is the predicate function for forpermission builders.
-type ForPermission func(*sql.Selector)
-
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
 

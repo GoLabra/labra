@@ -134,7 +134,7 @@ func (*File) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the File fields.
-func (f *File) assignValues(columns []string, values []any) error {
+func (_m *File) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -144,82 +144,82 @@ func (f *File) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				f.ID = value.String
+				_m.ID = value.String
 			}
 		case file.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				f.CreatedAt = new(time.Time)
-				*f.CreatedAt = value.Time
+				_m.CreatedAt = new(time.Time)
+				*_m.CreatedAt = value.Time
 			}
 		case file.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				f.UpdatedAt = new(time.Time)
-				*f.UpdatedAt = value.Time
+				_m.UpdatedAt = new(time.Time)
+				*_m.UpdatedAt = value.Time
 			}
 		case file.FieldCaption:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field caption", values[i])
 			} else if value.Valid {
-				f.Caption = value.String
+				_m.Caption = value.String
 			}
 		case file.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				f.Name = value.String
+				_m.Name = value.String
 			}
 		case file.FieldMimeType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field mime_type", values[i])
 			} else if value.Valid {
-				f.MimeType = value.String
+				_m.MimeType = value.String
 			}
 		case file.FieldStorageFileName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field storage_file_name", values[i])
 			} else if value.Valid {
-				f.StorageFileName = value.String
+				_m.StorageFileName = value.String
 			}
 		case file.FieldSize:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
-				f.Size = value.Int64
+				_m.Size = value.Int64
 			}
 		case file.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field file_admin_created_by", values[i])
 			} else if value.Valid {
-				f.file_admin_created_by = new(string)
-				*f.file_admin_created_by = value.String
+				_m.file_admin_created_by = new(string)
+				*_m.file_admin_created_by = value.String
 			}
 		case file.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field file_admin_updated_by", values[i])
 			} else if value.Valid {
-				f.file_admin_updated_by = new(string)
-				*f.file_admin_updated_by = value.String
+				_m.file_admin_updated_by = new(string)
+				*_m.file_admin_updated_by = value.String
 			}
 		case file.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field file_created_by", values[i])
 			} else if value.Valid {
-				f.file_created_by = new(string)
-				*f.file_created_by = value.String
+				_m.file_created_by = new(string)
+				*_m.file_created_by = value.String
 			}
 		case file.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field file_updated_by", values[i])
 			} else if value.Valid {
-				f.file_updated_by = new(string)
-				*f.file_updated_by = value.String
+				_m.file_updated_by = new(string)
+				*_m.file_updated_by = value.String
 			}
 		default:
-			f.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -227,77 +227,77 @@ func (f *File) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the File.
 // This includes values selected through modifiers, order, etc.
-func (f *File) Value(name string) (ent.Value, error) {
-	return f.selectValues.Get(name)
+func (_m *File) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAdminCreatedBy queries the "admin_created_by" edge of the File entity.
-func (f *File) QueryAdminCreatedBy() *AdminUserQuery {
-	return NewFileClient(f.config).QueryAdminCreatedBy(f)
+func (_m *File) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewFileClient(_m.config).QueryAdminCreatedBy(_m)
 }
 
 // QueryAdminUpdatedBy queries the "admin_updated_by" edge of the File entity.
-func (f *File) QueryAdminUpdatedBy() *AdminUserQuery {
-	return NewFileClient(f.config).QueryAdminUpdatedBy(f)
+func (_m *File) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewFileClient(_m.config).QueryAdminUpdatedBy(_m)
 }
 
 // QueryCreatedBy queries the "created_by" edge of the File entity.
-func (f *File) QueryCreatedBy() *UserQuery {
-	return NewFileClient(f.config).QueryCreatedBy(f)
+func (_m *File) QueryCreatedBy() *UserQuery {
+	return NewFileClient(_m.config).QueryCreatedBy(_m)
 }
 
 // QueryUpdatedBy queries the "updated_by" edge of the File entity.
-func (f *File) QueryUpdatedBy() *UserQuery {
-	return NewFileClient(f.config).QueryUpdatedBy(f)
+func (_m *File) QueryUpdatedBy() *UserQuery {
+	return NewFileClient(_m.config).QueryUpdatedBy(_m)
 }
 
 // Update returns a builder for updating this File.
 // Note that you need to call File.Unwrap() before calling this method if this File
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (f *File) Update() *FileUpdateOne {
-	return NewFileClient(f.config).UpdateOne(f)
+func (_m *File) Update() *FileUpdateOne {
+	return NewFileClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the File entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (f *File) Unwrap() *File {
-	_tx, ok := f.config.driver.(*txDriver)
+func (_m *File) Unwrap() *File {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: File is not a transactional entity")
 	}
-	f.config.driver = _tx.drv
-	return f
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (f *File) String() string {
+func (_m *File) String() string {
 	var builder strings.Builder
 	builder.WriteString("File(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", f.ID))
-	if v := f.CreatedAt; v != nil {
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	if v := _m.CreatedAt; v != nil {
 		builder.WriteString("created_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := f.UpdatedAt; v != nil {
+	if v := _m.UpdatedAt; v != nil {
 		builder.WriteString("updated_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("caption=")
-	builder.WriteString(f.Caption)
+	builder.WriteString(_m.Caption)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(f.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("mime_type=")
-	builder.WriteString(f.MimeType)
+	builder.WriteString(_m.MimeType)
 	builder.WriteString(", ")
 	builder.WriteString("storage_file_name=")
-	builder.WriteString(f.StorageFileName)
+	builder.WriteString(_m.StorageFileName)
 	builder.WriteString(", ")
 	builder.WriteString("size=")
-	builder.WriteString(fmt.Sprintf("%v", f.Size))
+	builder.WriteString(fmt.Sprintf("%v", _m.Size))
 	builder.WriteByte(')')
 	return builder.String()
 }

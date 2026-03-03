@@ -8,6 +8,9 @@ extend type Mutation {
     create{{$.Node.Name}}(data: Create{{$.Node.Name}}Input!): {{$.Node.Name}}!
     createMany{{$.Node.Name | Plural}}(data: [Create{{$.Node.Name}}Input!]!): [{{$.Node.Name}}]!
     update{{$.Node.Name}}(where: {{$.Node.Name}}WhereUniqueInput!, data: Update{{$.Node.Name}}Input!): {{$.Node.Name}}!
+    {{- if hasStateAnnotation $.Node }}
+    update{{$.Node.Name}}State(where: {{$.Node.Name}}WhereUniqueInput!, state: EntityState!): {{$.Node.Name}}!
+    {{- end }}
     updateMany{{$.Node.Name | Plural}}(where: {{$.Node.Name}}WhereInput!, data: Update{{$.Node.Name}}Input!): Int!
     upsert{{$.Node.Name}}(data: Create{{$.Node.Name}}Input!): {{$.Node.Name}}!
     upsertMany{{$.Node.Name | Plural}}(data: [Create{{$.Node.Name}}Input!]!): Int!

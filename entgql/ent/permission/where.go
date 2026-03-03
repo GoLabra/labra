@@ -315,6 +315,16 @@ func OperationContainsFold(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldContainsFold(FieldOperation, v))
 }
 
+// LifecycleAccessIsNil applies the IsNil predicate on the "lifecycle_access" field.
+func LifecycleAccessIsNil() predicate.Permission {
+	return predicate.Permission(sql.FieldIsNull(FieldLifecycleAccess))
+}
+
+// LifecycleAccessNotNil applies the NotNil predicate on the "lifecycle_access" field.
+func LifecycleAccessNotNil() predicate.Permission {
+	return predicate.Permission(sql.FieldNotNull(FieldLifecycleAccess))
+}
+
 // HasAdminCreatedBy applies the HasEdge predicate on the "admin_created_by" edge.
 func HasAdminCreatedBy() predicate.Permission {
 	return predicate.Permission(func(s *sql.Selector) {

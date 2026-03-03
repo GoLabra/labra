@@ -5,7 +5,6 @@ package ent
 import (
 	"app/ent/adminuser"
 	"app/ent/file"
-	"app/ent/forpermission"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -30,11 +29,6 @@ var fileImplementors = []string{"File", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*File) IsNode() {}
-
-var forpermissionImplementors = []string{"ForPermission", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*ForPermission) IsNode() {}
 
 var roleImplementors = []string{"Role", "Node"}
 
@@ -118,15 +112,6 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 			Where(file.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, fileImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
-	case forpermission.Table:
-		query := c.ForPermission.Query().
-			Where(forpermission.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, forpermissionImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -242,22 +227,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 		query := c.File.Query().
 			Where(file.IDIn(ids...))
 		query, err := query.CollectFields(ctx, fileImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case forpermission.Table:
-		query := c.ForPermission.Query().
-			Where(forpermission.IDIn(ids...))
-		query, err := query.CollectFields(ctx, forpermissionImplementors...)
 		if err != nil {
 			return nil, err
 		}

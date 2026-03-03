@@ -13,7 +13,6 @@ import (
 
 	"app/ent/adminuser"
 	"app/ent/file"
-	"app/ent/forpermission"
 	"app/ent/role"
 	"app/ent/user"
 
@@ -34,8 +33,6 @@ type Client struct {
 	AdminUser *AdminUserClient
 	// File is the client for interacting with the File builders.
 	File *FileClient
-	// ForPermission is the client for interacting with the ForPermission builders.
-	ForPermission *ForPermissionClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
@@ -53,7 +50,6 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AdminUser = NewAdminUserClient(c.config)
 	c.File = NewFileClient(c.config)
-	c.ForPermission = NewForPermissionClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -146,13 +142,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		AdminUser:     NewAdminUserClient(cfg),
-		File:          NewFileClient(cfg),
-		ForPermission: NewForPermissionClient(cfg),
-		Role:          NewRoleClient(cfg),
-		User:          NewUserClient(cfg),
+		ctx:       ctx,
+		config:    cfg,
+		AdminUser: NewAdminUserClient(cfg),
+		File:      NewFileClient(cfg),
+		Role:      NewRoleClient(cfg),
+		User:      NewUserClient(cfg),
 	}, nil
 }
 
@@ -170,13 +165,12 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		AdminUser:     NewAdminUserClient(cfg),
-		File:          NewFileClient(cfg),
-		ForPermission: NewForPermissionClient(cfg),
-		Role:          NewRoleClient(cfg),
-		User:          NewUserClient(cfg),
+		ctx:       ctx,
+		config:    cfg,
+		AdminUser: NewAdminUserClient(cfg),
+		File:      NewFileClient(cfg),
+		Role:      NewRoleClient(cfg),
+		User:      NewUserClient(cfg),
 	}, nil
 }
 
@@ -207,7 +201,6 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.AdminUser.Use(hooks...)
 	c.File.Use(hooks...)
-	c.ForPermission.Use(hooks...)
 	c.Role.Use(hooks...)
 	c.User.Use(hooks...)
 }
@@ -217,7 +210,6 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.AdminUser.Intercept(interceptors...)
 	c.File.Intercept(interceptors...)
-	c.ForPermission.Intercept(interceptors...)
 	c.Role.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
@@ -229,8 +221,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AdminUser.mutate(ctx, m)
 	case *FileMutation:
 		return c.File.mutate(ctx, m)
-	case *ForPermissionMutation:
-		return c.ForPermission.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
 	case *UserMutation:
@@ -503,203 +493,6 @@ func (c *FileClient) mutate(ctx context.Context, m *FileMutation) (Value, error)
 		return (&FileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown File mutation op: %q", m.Op())
-	}
-}
-
-// ForPermissionClient is a client for the ForPermission schema.
-type ForPermissionClient struct {
-	config
-}
-
-// NewForPermissionClient returns a client for the ForPermission from the given config.
-func NewForPermissionClient(c config) *ForPermissionClient {
-	return &ForPermissionClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `forpermission.Hooks(f(g(h())))`.
-func (c *ForPermissionClient) Use(hooks ...Hook) {
-	c.hooks.ForPermission = append(c.hooks.ForPermission, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `forpermission.Intercept(f(g(h())))`.
-func (c *ForPermissionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ForPermission = append(c.inters.ForPermission, interceptors...)
-}
-
-// Create returns a builder for creating a ForPermission entity.
-func (c *ForPermissionClient) Create() *ForPermissionCreate {
-	mutation := newForPermissionMutation(c.config, OpCreate)
-	return &ForPermissionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of ForPermission entities.
-func (c *ForPermissionClient) CreateBulk(builders ...*ForPermissionCreate) *ForPermissionCreateBulk {
-	return &ForPermissionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *ForPermissionClient) MapCreateBulk(slice any, setFunc func(*ForPermissionCreate, int)) *ForPermissionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &ForPermissionCreateBulk{err: fmt.Errorf("calling to ForPermissionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*ForPermissionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &ForPermissionCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for ForPermission.
-func (c *ForPermissionClient) Update() *ForPermissionUpdate {
-	mutation := newForPermissionMutation(c.config, OpUpdate)
-	return &ForPermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ForPermissionClient) UpdateOne(_m *ForPermission) *ForPermissionUpdateOne {
-	mutation := newForPermissionMutation(c.config, OpUpdateOne, withForPermission(_m))
-	return &ForPermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ForPermissionClient) UpdateOneID(id string) *ForPermissionUpdateOne {
-	mutation := newForPermissionMutation(c.config, OpUpdateOne, withForPermissionID(id))
-	return &ForPermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for ForPermission.
-func (c *ForPermissionClient) Delete() *ForPermissionDelete {
-	mutation := newForPermissionMutation(c.config, OpDelete)
-	return &ForPermissionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ForPermissionClient) DeleteOne(_m *ForPermission) *ForPermissionDeleteOne {
-	return c.DeleteOneID(_m.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ForPermissionClient) DeleteOneID(id string) *ForPermissionDeleteOne {
-	builder := c.Delete().Where(forpermission.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ForPermissionDeleteOne{builder}
-}
-
-// Query returns a query builder for ForPermission.
-func (c *ForPermissionClient) Query() *ForPermissionQuery {
-	return &ForPermissionQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeForPermission},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a ForPermission entity by its id.
-func (c *ForPermissionClient) Get(ctx context.Context, id string) (*ForPermission, error) {
-	return c.Query().Where(forpermission.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ForPermissionClient) GetX(ctx context.Context, id string) *ForPermission {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryCreatedBy queries the created_by edge of a ForPermission.
-func (c *ForPermissionClient) QueryCreatedBy(_m *ForPermission) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forpermission.Table, forpermission.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.CreatedByTable, forpermission.CreatedByColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUpdatedBy queries the updated_by edge of a ForPermission.
-func (c *ForPermissionClient) QueryUpdatedBy(_m *ForPermission) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forpermission.Table, forpermission.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.UpdatedByTable, forpermission.UpdatedByColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAdminCreatedBy queries the admin_created_by edge of a ForPermission.
-func (c *ForPermissionClient) QueryAdminCreatedBy(_m *ForPermission) *AdminUserQuery {
-	query := (&AdminUserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forpermission.Table, forpermission.FieldID, id),
-			sqlgraph.To(adminuser.Table, adminuser.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.AdminCreatedByTable, forpermission.AdminCreatedByColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAdminUpdatedBy queries the admin_updated_by edge of a ForPermission.
-func (c *ForPermissionClient) QueryAdminUpdatedBy(_m *ForPermission) *AdminUserQuery {
-	query := (&AdminUserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forpermission.Table, forpermission.FieldID, id),
-			sqlgraph.To(adminuser.Table, adminuser.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, forpermission.AdminUpdatedByTable, forpermission.AdminUpdatedByColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *ForPermissionClient) Hooks() []Hook {
-	return c.hooks.ForPermission
-}
-
-// Interceptors returns the client interceptors.
-func (c *ForPermissionClient) Interceptors() []Interceptor {
-	return c.inters.ForPermission
-}
-
-func (c *ForPermissionClient) mutate(ctx context.Context, m *ForPermissionMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ForPermissionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ForPermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ForPermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ForPermissionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown ForPermission mutation op: %q", m.Op())
 	}
 }
 
@@ -1116,10 +909,10 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AdminUser, File, ForPermission, Role, User []ent.Hook
+		AdminUser, File, Role, User []ent.Hook
 	}
 	inters struct {
-		AdminUser, File, ForPermission, Role, User []ent.Interceptor
+		AdminUser, File, Role, User []ent.Interceptor
 	}
 )
 

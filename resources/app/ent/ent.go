@@ -5,7 +5,6 @@ package ent
 import (
 	"app/ent/adminuser"
 	"app/ent/file"
-	"app/ent/forpermission"
 	"app/ent/role"
 	"app/ent/user"
 	"context"
@@ -77,11 +76,10 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			adminuser.Table:     adminuser.ValidColumn,
-			file.Table:          file.ValidColumn,
-			forpermission.Table: forpermission.ValidColumn,
-			role.Table:          role.ValidColumn,
-			user.Table:          user.ValidColumn,
+			adminuser.Table: adminuser.ValidColumn,
+			file.Table:      file.ValidColumn,
+			role.Table:      role.ValidColumn,
+			user.Table:      user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

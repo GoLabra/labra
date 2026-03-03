@@ -3,7 +3,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -50,6 +49,15 @@ func init() {
 	templateFuncMap["ShouldSkip"] = utils.ShouldSkip
 	templateFuncMap["Ignore"] = func(t *gen.Type) bool {
 		return t.Annotations["Entity"] == nil || t.Annotations["Entity"].(map[string]any)["Owner"] != "User"
+	}
+	templateFuncMap["hasStateAnnotation"] = func(t *gen.Type) bool {
+		var entityAnnotations annotations.Entity
+		err := mapstructure.Decode(t.Annotations["Entity"], &entityAnnotations)
+		if err != nil {
+			panic(err)
+		}
+
+		return entityAnnotations.State.Enabled
 	}
 
 	os.MkdirAll("./domain/repo", os.ModePerm)
@@ -106,18 +114,9 @@ func main() {
 		},
 		Hooks: []gen.Hook{
 			CleanupUserFiles(),
-			CreateGraphqlUniqueInputs(),
-			CreateEntUniqueInputs(),
-			CreateGraphqlSchema(),
-			CreateServiceInterface(),
-			CreateRepositoryInterface(),
-			CreateTxRepo(),
-			CreateRepository(),
-			CreateRepositories(),
-			CreateService(),
-			CreateServices(),
-			CreateResolverFile(),
-			CreateResolvers(),
+			RunGraphTemplates(),
+			RunNodeTemplates(),
+			CreateLifecycleMethods(),
 		},
 		Target:  "./ent",
 		Package: "app/ent",
@@ -165,34 +164,90 @@ func DeleteUserFilesFromDirectory(directoryName, fileExtension string) {
 	}
 }
 
-func CreateEntUniqueInputs() gen.Hook {
-	errFormat := "[CreateEntUniqueInputs] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			tmpl, err := templates.LoadTemplate("gql_where_unique_input.go.tmpl", "ent/gql_where_unique_input.go.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-			}
-
-			f, err := os.Create("./ent/gql_where_unique_input.go")
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating file: %w", err))
-			}
-
-			err = tmpl.Execute(f, g)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-			}
-
-			f.Close()
-			return next.Generate(g)
-		})
+func runTemplate(errPrefix, tmplName, tmplPath, outPath string, data interface{}) error {
+	tmpl, err := templates.LoadTemplate(tmplName, tmplPath, templateFuncMap)
+	if err != nil {
+		return fmt.Errorf("%s %w", errPrefix, err)
 	}
+	f, err := os.Create(outPath)
+	if err != nil {
+		return fmt.Errorf("%s %w", errPrefix, err)
+	}
+	defer f.Close()
+	if err := tmpl.Execute(f, data); err != nil {
+		return fmt.Errorf("%s %w", errPrefix, err)
+	}
+	return nil
 }
 
-func CreateGraphqlUniqueInputs() gen.Hook {
-	errFormat := "[CreateGraphqlUniqueInputs] %w"
+func entityAnnotationForNode(node *gen.Type) (annotations.Entity, bool) {
+	var entityAnnotation annotations.Entity
+	if err := mapstructure.Decode(node.Annotations[annotations.EntityName], &entityAnnotation); err != nil {
+		return annotations.Entity{}, false
+	}
+	return entityAnnotation, true
+}
+
+func outputFileName(node *gen.Type, owner entity.EntityOwner, suffix string) string {
+	base := strcase.ToSnake(node.Name)
+	if owner == entity.EntityOwnerUser {
+		base = "user." + base
+	}
+	return base + suffix
+}
+
+func buildCreateInputsForNode(n *gen.Type) map[string]map[string]string {
+	createInputs := map[string]map[string]string{}
+	for _, e := range n.Edges {
+		inputName := fmt.Sprintf("Create%sWithout%sInput", e.Type.Name, n.Name)
+		if e.Ref == nil || e.Ref.Optional {
+			continue
+		}
+		if _, ok := createInputs[inputName]; ok {
+			continue
+		}
+		if e.Name == "ref_created_by" || e.Name == "ref_updated_by" {
+			continue
+		}
+		oneInputName := fmt.Sprintf("CreateOne%sWithout%sInput", e.Type.Name, n.Name)
+		manyInputName := fmt.Sprintf("CreateMany%sWithout%sInput", e.Type.Name, n.Name)
+		createInputs[oneInputName] = map[string]string{
+			"connect": fmt.Sprintf("%sWhereUniqueInput", e.Type.Name),
+			"create":  inputName,
+		}
+		createInputs[manyInputName] = map[string]string{
+			"connect": fmt.Sprintf("[%sWhereUniqueInput!]", e.Type.Name),
+			"create":  fmt.Sprintf("[%s!]", inputName),
+		}
+		createInputs[inputName] = map[string]string{}
+		for _, f := range e.Type.Fields {
+			scalar := mapScalar(f)
+			if !f.Optional {
+				scalar += "!"
+			}
+			createInputs[inputName][strcase.ToLowerCamel(f.Name)] = scalar
+		}
+		for _, ee := range e.Type.Edges {
+			if ee.Unique {
+				if ee.Ref == nil || ee.Ref.Optional {
+					createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateOne%sInput", ee.Type.Name)
+				} else {
+					createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateOne%sWithout%sInput", ee.Type.Name, e.Type.Name)
+				}
+			} else {
+				if ee.Ref == nil || ee.Ref.Optional {
+					createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateMany%sInput", ee.Type.Name)
+				} else {
+					createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateMany%sWithout%sInput", ee.Type.Name, e.Type.Name)
+				}
+			}
+		}
+	}
+	return createInputs
+}
+
+func RunGraphTemplates() gen.Hook {
+	errPrefix := "[RunGraphTemplates]"
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 			t := TemplateData{
@@ -206,485 +261,63 @@ func CreateGraphqlUniqueInputs() gen.Hook {
 					"map[string]interface {}": "Map",
 				},
 			}
-
-			tmpl, err := templates.LoadTemplate("unique_inputs.graphql.tmpl", "graphql/unique_inputs.graphql.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
+			if err := runTemplate(errPrefix, "unique_inputs.graphql.tmpl", "graphql/unique_inputs.graphql.tmpl", "./graphql/unique_inputs.graphql", t); err != nil {
+				return err
 			}
-
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating folder: %w", err))
+			if err := runTemplate(errPrefix, "gql_where_unique_input.go.tmpl", "ent/gql_where_unique_input.go.tmpl", "./ent/gql_where_unique_input.go", g); err != nil {
+				return err
 			}
-
-			f, err := os.Create("./graphql/unique_inputs.graphql")
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating file: %w", err))
+			if err := runTemplate(errPrefix, "repository.go.tmpl", "repo/repository.go.tmpl", "./domain/repo/repository.go", g); err != nil {
+				return err
 			}
-
-			err = tmpl.Execute(f, t)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
+			if err := runTemplate(errPrefix, "service.go.tmpl", "svc/service.go.tmpl", "./domain/svc/service.go", g); err != nil {
+				return err
 			}
-
-			f.Close()
+			if err := runTemplate(errPrefix, "resolver.go.tmpl", "resolver/resolver.go.tmpl", "./domain/resolvers/resolver.go", nil); err != nil {
+				return err
+			}
+			if err := runTemplate(errPrefix, "tx.go.tmpl", "repo/tx.go.tmpl", "./domain/repo/tx.go", g); err != nil {
+				return err
+			}
 			return next.Generate(g)
 		})
 	}
 }
 
-func CreateGraphqlSchema() gen.Hook {
-	errFormat := "[CreateGraphqlSchema] %w"
+func RunNodeTemplates() gen.Hook {
+	errPrefix := "[RunNodeTemplates]"
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
-			for _, n := range g.Nodes {
-
-				if n.Annotations["Entity"] == nil || n.Annotations["Entity"].(map[string]any)["Owner"] != "User" {
+			for _, node := range g.Nodes {
+				entityAnnotation, ok := entityAnnotationForNode(node)
+				if !ok || entityAnnotation.Owner != entity.EntityOwnerUser {
 					continue
 				}
+				baseName := outputFileName(node, entityAnnotation.Owner, "")
 
-				var createInputs = map[string]map[string]string{}
-				var entityAnnotation = annotations.Entity{}
-
-				err := mapstructure.Decode(n.Annotations[annotations.EntityName], &entityAnnotation)
-
-				if err != nil {
-					panic(err) // TODO @David do something
-				}
-
-				for _, e := range n.Edges {
-					var inputName = fmt.Sprintf("Create%sWithout%sInput", e.Type.Name, n.Name)
-					if e.Ref == nil || e.Ref.Optional {
-						continue
-					}
-					if _, ok := createInputs[inputName]; ok {
-						continue
-					}
-					if e.Name == "ref_created_by" || e.Name == "ref_updated_by" {
-						continue
-					}
-
-					var oneInputName = fmt.Sprintf("CreateOne%sWithout%sInput", e.Type.Name, n.Name)
-					var manyInputName = fmt.Sprintf("CreateMany%sWithout%sInput", e.Type.Name, n.Name)
-					createInputs[oneInputName] = map[string]string{
-						"connect": fmt.Sprintf("%sWhereUniqueInput", e.Type.Name),
-						"create":  inputName,
-					}
-					createInputs[manyInputName] = map[string]string{
-						"connect": fmt.Sprintf("[%sWhereUniqueInput!]", e.Type.Name),
-						"create":  fmt.Sprintf("[%s!]", inputName),
-					}
-
-					createInputs[inputName] = map[string]string{}
-					for _, f := range e.Type.Fields {
-						scalar := mapScalar(f)
-						if !f.Optional {
-							scalar += "!"
-						}
-						createInputs[inputName][strcase.ToLowerCamel(f.Name)] = scalar
-					}
-					for _, ee := range e.Type.Edges {
-						if ee.Unique {
-							if ee.Ref == nil || ee.Ref.Optional {
-								createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateOne%sInput", ee.Type.Name)
-							} else {
-								createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateOne%sWithout%sInput", ee.Type.Name, e.Type.Name)
-							}
-						} else {
-							if ee.Ref == nil || ee.Ref.Optional {
-								createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateMany%sInput", ee.Type.Name)
-							} else {
-								createInputs[inputName][strcase.ToLowerCamel(ee.Name)] = fmt.Sprintf("CreateMany%sWithout%sInput", ee.Type.Name, e.Type.Name)
-							}
-						}
-					}
-				}
-
-				fileName := strcase.ToSnake(n.Name) + ".graphql"
-
-				if entityAnnotation.Owner == entity.EntityOwnerUser {
-					fileName = "user." + fileName
-				}
-
-				if _, err := os.Stat("./graphql/" + fileName); err == nil {
-					//continue
-				} else if !errors.Is(err, os.ErrNotExist) {
-					return fmt.Errorf(errFormat, fmt.Errorf("error checking if file already exists: %w", err))
-				}
-
-				tmpl, err := templates.LoadTemplate("entity.graphql.tmpl", "graphql/entity.graphql.tmpl", templateFuncMap)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-				}
-
-				f, err := os.Create("./graphql/" + fileName)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
-				}
-
-				err = tmpl.Execute(f, struct {
+				createInputs := buildCreateInputsForNode(node)
+				if err := runTemplate(errPrefix, "entity.graphql.tmpl", "graphql/entity.graphql.tmpl", "./graphql/"+baseName+".graphql", struct {
 					Node         *gen.Type
 					CreateInputs map[string]map[string]string
-				}{n, createInputs})
-				if err != nil {
-					f.Close()
+				}{node, createInputs}); err != nil {
+					return err
 				}
-
-				f.Close()
+				if err := runTemplate(errPrefix, "entity.go.tmpl", "repo/*", "./domain/repo/"+baseName+".go", node); err != nil {
+					return err
+				}
+				if err := runTemplate(errPrefix, "entity.go.tmpl", "svc/entity.go.tmpl", "./domain/svc/"+baseName+".go", node); err != nil {
+					return err
+				}
+				if err := runTemplate(errPrefix, "interface.go.tmpl", "svc/interface.go.tmpl", "./interfaces/svc/"+baseName+".go", node); err != nil {
+					return err
+				}
+				if err := runTemplate(errPrefix, "interface.go.tmpl", "repo/interface.go.tmpl", "./interfaces/repo/"+baseName+".go", node); err != nil {
+					return err
+				}
+				if err := runTemplate(errPrefix, "entity.resolver.go.tmpl", "resolver/entity.resolver.go.tmpl", "./domain/resolvers/"+baseName+".resolvers.go", node); err != nil {
+					return err
+				}
 			}
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateRepository() gen.Hook {
-	errFormat := "[CreateRepository] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			tmpl, err := templates.LoadTemplate("repository.go.tmpl", "repo/repository.go.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-			}
-
-			f, err := os.Create("./domain/repo/repository.go")
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating repository file: %w", err))
-			}
-
-			err = tmpl.Execute(f, g)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-			}
-			f.Close()
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateRepositories() gen.Hook {
-	errFormat := "[CreateRepositories] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			for _, node := range g.Nodes {
-				var entityAnnotation = annotations.Entity{}
-
-				err := mapstructure.Decode(node.Annotations[annotations.EntityName], &entityAnnotation)
-
-				if err != nil {
-					panic(err) // TODO treat errir
-				}
-
-				if entityAnnotation.Owner != entity.EntityOwnerUser {
-					continue
-				}
-
-				fileName := strcase.ToSnake(node.Name) + ".go"
-
-				if entityAnnotation.Owner == entity.EntityOwnerUser {
-					fileName = "user." + fileName
-				}
-
-				if _, err := os.Stat("./domain/repo/" + fileName); err == nil {
-					// continue
-				} else if !errors.Is(err, os.ErrNotExist) {
-					return fmt.Errorf(errFormat, fmt.Errorf("error checking if file already exists: %w", err))
-				}
-
-				tmpl, err := templates.LoadTemplate("entity.go.tmpl", "repo/*", templateFuncMap)
-
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-				}
-
-				f, err := os.Create("./domain/repo/" + fileName)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
-				}
-
-				err = tmpl.Execute(f, node)
-				if err != nil {
-					f.Close()
-					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-				}
-
-				f.Close()
-			}
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateService() gen.Hook {
-	errFormat := "[CreateService] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			tmpl, err := templates.LoadTemplate("service.go.tmpl", "svc/service.go.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-			}
-
-			f, err := os.Create("./domain/svc/service.go")
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error creating service file: %w", err))
-			}
-
-			err = tmpl.Execute(f, g)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-			}
-			f.Close()
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateServices() gen.Hook {
-	errFormat := "[CreateServices] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			for _, node := range g.Nodes {
-
-				var entityAnnotation = annotations.Entity{}
-
-				err := mapstructure.Decode(node.Annotations[annotations.EntityName], &entityAnnotation)
-
-				if err != nil {
-					panic(err) // TODO treat errir
-				}
-
-				if entityAnnotation.Owner != entity.EntityOwnerUser {
-					continue
-				}
-
-				fileName := strcase.ToSnake(node.Name) + ".go"
-
-				if entityAnnotation.Owner == entity.EntityOwnerUser {
-					fileName = "user." + fileName
-				}
-
-				if _, err := os.Stat("./domain/svc/" + fileName); err == nil {
-					// continue
-				} else if !errors.Is(err, os.ErrNotExist) {
-					return fmt.Errorf(errFormat, fmt.Errorf("error checking if file already exists: %w", err))
-				}
-
-				tmpl, err := templates.LoadTemplate("entity.go.tmpl", "svc/entity.go.tmpl", templateFuncMap)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-				}
-
-				f, err := os.Create("./domain/svc/" + fileName)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
-				}
-
-				err = tmpl.Execute(f, node)
-				if err != nil {
-					f.Close()
-					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-				}
-				f.Close()
-			}
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateServiceInterface() gen.Hook {
-	errFormat := "[CreateServiceInterface] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			for _, node := range g.Nodes {
-				var entityAnnotation = annotations.Entity{}
-
-				err := mapstructure.Decode(node.Annotations[annotations.EntityName], &entityAnnotation)
-
-				if err != nil {
-					panic(err) // TODO treat errir
-				}
-
-				if entityAnnotation.Owner != "User" {
-					continue
-				}
-
-				fileName := strcase.ToSnake(node.Name) + ".go"
-
-				if entityAnnotation.Owner == entity.EntityOwnerUser {
-					fileName = "user." + fileName
-				}
-
-				if _, err := os.Stat("./interfaces/svc/" + fileName); err == nil {
-					// continue
-				} else if !errors.Is(err, os.ErrNotExist) {
-					return fmt.Errorf(errFormat, fmt.Errorf("error checking if file already exists: %w", err))
-				}
-				tmpl, err := templates.LoadTemplate("interface.go.tmpl", "svc/interface.go.tmpl", templateFuncMap)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-				}
-
-				f, err := os.Create("./interfaces/svc/" + fileName)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
-				}
-
-				err = tmpl.Execute(f, node)
-				if err != nil {
-					f.Close()
-					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-				}
-				f.Close()
-			}
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateRepositoryInterface() gen.Hook {
-	errFormat := "[CreateRepositoryInterface] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			for _, node := range g.Nodes {
-				var entityAnnotation = annotations.Entity{}
-
-				err := mapstructure.Decode(node.Annotations[annotations.EntityName], &entityAnnotation)
-
-				if err != nil {
-					panic(err) // TODO treat errir
-				}
-
-				if entityAnnotation.Owner != entity.EntityOwnerUser {
-					continue
-				}
-
-				fileName := strcase.ToSnake(node.Name) + ".go"
-
-				if entityAnnotation.Owner == entity.EntityOwnerUser {
-					fileName = "user." + fileName
-				}
-
-				if _, err := os.Stat("./interfaces/repo/" + fileName); err == nil {
-					// continue
-				} else if !errors.Is(err, os.ErrNotExist) {
-					return fmt.Errorf(errFormat, fmt.Errorf("error checking if file already exists: %w", err))
-				}
-
-				tmpl, err := templates.LoadTemplate("interface.go.tmpl", "repo/interface.go.tmpl", templateFuncMap)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-				}
-
-				f, err := os.Create("./interfaces/repo/" + fileName)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
-				}
-
-				err = tmpl.Execute(f, node)
-				if err != nil {
-					f.Close()
-					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-				}
-				f.Close()
-			}
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateResolvers() gen.Hook {
-	errFormat := "[CreateResolvers] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			for _, node := range g.Nodes {
-				var entityAnnotation = annotations.Entity{}
-
-				err := mapstructure.Decode(node.Annotations[annotations.EntityName], &entityAnnotation)
-
-				if err != nil {
-					panic(err) // TODO treat errir
-				}
-
-				if entityAnnotation.Owner != entity.EntityOwnerUser {
-					continue
-				}
-
-				fileName := strcase.ToSnake(node.Name) + ".resolvers.go"
-
-				if entityAnnotation.Owner == entity.EntityOwnerUser {
-					fileName = "user." + fileName
-				}
-
-				if _, err := os.Stat("./domain/resolvers/" + fileName); err == nil {
-					// continue
-				} else if !errors.Is(err, os.ErrNotExist) {
-					return fmt.Errorf(errFormat, fmt.Errorf("error checking if file already exists: %w", err))
-				}
-
-				tmpl, err := templates.LoadTemplate("entity.resolver.go.tmpl", "resolver/entity.resolver.go.tmpl", templateFuncMap)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-				}
-
-				f, err := os.Create("./domain/resolvers/" + fileName)
-				if err != nil {
-					return fmt.Errorf(errFormat, fmt.Errorf("error creating graphql file: %w", err))
-				}
-
-				err = tmpl.Execute(f, node)
-				if err != nil {
-					f.Close()
-					return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-				}
-				f.Close()
-			}
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateResolverFile() gen.Hook {
-	errFormat := "[CreateResolverFile] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			f, _ := os.Create("./domain/resolvers/resolver.go")
-
-			tmpl, err := templates.LoadTemplate("resolver.go.tmpl", "resolver/resolver.go.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-			}
-
-			err = tmpl.Execute(f, nil)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-			}
-
-			f.Close()
-			return next.Generate(g)
-		})
-	}
-}
-
-func CreateTxRepo() gen.Hook {
-	errFormat := "[CreateTxRepo] %w"
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			f, err := os.Create("./domain/repo/tx.go")
-
-			tmpl, err := templates.LoadTemplate("tx.go.tmpl", "repo/tx.go.tmpl", templateFuncMap)
-			if err != nil {
-				return fmt.Errorf(errFormat, fmt.Errorf("error parsing template file: %w", err))
-			}
-
-			err = tmpl.Execute(f, g)
-			if err != nil {
-				f.Close()
-				return fmt.Errorf(errFormat, fmt.Errorf("error executing template: %w", err))
-			}
-
-			f.Close()
 			return next.Generate(g)
 		})
 	}
@@ -871,6 +504,21 @@ func CreateInputs(nodes []*gen.Type) map[string]map[string]string {
 		}
 	}
 	return createInputs
+}
+
+func CreateLifecycleMethods() gen.Hook {
+	errPrefix := "[CreateLifecycleMethods]"
+	return func(next gen.Generator) gen.Generator {
+		return gen.GenerateFunc(func(g *gen.Graph) error {
+			if err := next.Generate(g); err != nil {
+				panic(err)
+			}
+			if err := runTemplate(errPrefix, "lifecycle.go.tmpl", "ent/lifecycle.go.tmpl", "./ent/lifecycle.go", g); err != nil {
+				panic(err)
+			}
+			return runTemplate(errPrefix, "lifecycle_filter_methods.go.tmpl", "ent/lifecycle_filter_methods.go.tmpl", "./ent/lifecycle_filter_methods.go", g)
+		})
+	}
 }
 
 func GoInputName(isCreate bool, node *gen.Type, edge *gen.Edge) string {

@@ -21,7 +21,7 @@ type {{$.Entity.EntName}} struct {
 }
 
 func ({{$.Entity.EntName}}) Annotations() []schema.Annotation {
-	return []schema.Annotation{
+	annotationsList := []schema.Annotation{
 		entgql.MultiOrder(),
 		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
@@ -29,8 +29,17 @@ func ({{$.Entity.EntName}}) Annotations() []schema.Annotation {
 			Caption: "{{$.Entity.Caption}}",
 			Owner:   entity.EntityOwnerUser,
             DisplayField: "{{$.Entity.DisplayFieldName}}",
+            {{- if $.Entity.EntityState.Enabled }}
+            State: entity.State{
+                Enabled: true,
+                {{- if $.Entity.EntityState.Default }}
+                Default: "{{$.Entity.EntityState.Default}}",
+                {{- end }}
+            },
+            {{- end }}
 		},
 	}
+	return annotationsList
 }
 
 // Fields of the  {{$.Entity.EntName}}.
@@ -72,6 +81,9 @@ func ({{$.Entity.EntName}}) Fields() []ent.Field {
         {{- else if eq $f.Type "Json" }}
             {{template "Json" $f}}
         {{- end }}
+        {{- end }}
+        {{- if $.Entity.EntityState.Enabled }}
+        {{template "EntityState" $.Entity.EntityState}}
         {{- end }}
 	}
 }

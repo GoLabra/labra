@@ -32,18 +32,6 @@ func (f FileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileMutation", m)
 }
 
-// The ForPermissionFunc type is an adapter to allow the use of ordinary
-// function as ForPermission mutator.
-type ForPermissionFunc func(context.Context, *ent.ForPermissionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ForPermissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ForPermissionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ForPermissionMutation", m)
-}
-
 // The RoleFunc type is an adapter to allow the use of ordinary
 // function as Role mutator.
 type RoleFunc func(context.Context, *ent.RoleMutation) (ent.Value, error)

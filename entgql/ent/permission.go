@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -27,6 +28,8 @@ type Permission struct {
 	Entity string `json:"entity,omitempty"`
 	// Operation holds the value of the "operation" field.
 	Operation string `json:"operation,omitempty"`
+	// LifecycleAccess holds the value of the "lifecycle_access" field.
+	LifecycleAccess []string `json:"lifecycle_access,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PermissionQuery when eager-loading is set.
 	Edges                       PermissionEdges `json:"edges"`
@@ -89,6 +92,8 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case permission.FieldLifecycleAccess:
+			values[i] = new([]byte)
 		case permission.FieldID, permission.FieldEntity, permission.FieldOperation:
 			values[i] = new(sql.NullString)
 		case permission.FieldCreatedAt, permission.FieldUpdatedAt:
@@ -108,7 +113,7 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Permission fields.
-func (pe *Permission) assignValues(columns []string, values []any) error {
+func (_m *Permission) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -118,57 +123,65 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
-				pe.ID = value.String
+				_m.ID = value.String
 			}
 		case permission.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pe.CreatedAt = new(time.Time)
-				*pe.CreatedAt = value.Time
+				_m.CreatedAt = new(time.Time)
+				*_m.CreatedAt = value.Time
 			}
 		case permission.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				pe.UpdatedAt = new(time.Time)
-				*pe.UpdatedAt = value.Time
+				_m.UpdatedAt = new(time.Time)
+				*_m.UpdatedAt = value.Time
 			}
 		case permission.FieldEntity:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field entity", values[i])
 			} else if value.Valid {
-				pe.Entity = value.String
+				_m.Entity = value.String
 			}
 		case permission.FieldOperation:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field operation", values[i])
 			} else if value.Valid {
-				pe.Operation = value.String
+				_m.Operation = value.String
+			}
+		case permission.FieldLifecycleAccess:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field lifecycle_access", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.LifecycleAccess); err != nil {
+					return fmt.Errorf("unmarshal field lifecycle_access: %w", err)
+				}
 			}
 		case permission.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field permission_admin_created_by", values[i])
 			} else if value.Valid {
-				pe.permission_admin_created_by = new(string)
-				*pe.permission_admin_created_by = value.String
+				_m.permission_admin_created_by = new(string)
+				*_m.permission_admin_created_by = value.String
 			}
 		case permission.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field permission_admin_updated_by", values[i])
 			} else if value.Valid {
-				pe.permission_admin_updated_by = new(string)
-				*pe.permission_admin_updated_by = value.String
+				_m.permission_admin_updated_by = new(string)
+				*_m.permission_admin_updated_by = value.String
 			}
 		case permission.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field permission_role", values[i])
 			} else if value.Valid {
-				pe.permission_role = new(string)
-				*pe.permission_role = value.String
+				_m.permission_role = new(string)
+				*_m.permission_role = value.String
 			}
 		default:
-			pe.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -176,63 +189,66 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Permission.
 // This includes values selected through modifiers, order, etc.
-func (pe *Permission) Value(name string) (ent.Value, error) {
-	return pe.selectValues.Get(name)
+func (_m *Permission) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAdminCreatedBy queries the "admin_created_by" edge of the Permission entity.
-func (pe *Permission) QueryAdminCreatedBy() *AdminUserQuery {
-	return NewPermissionClient(pe.config).QueryAdminCreatedBy(pe)
+func (_m *Permission) QueryAdminCreatedBy() *AdminUserQuery {
+	return NewPermissionClient(_m.config).QueryAdminCreatedBy(_m)
 }
 
 // QueryAdminUpdatedBy queries the "admin_updated_by" edge of the Permission entity.
-func (pe *Permission) QueryAdminUpdatedBy() *AdminUserQuery {
-	return NewPermissionClient(pe.config).QueryAdminUpdatedBy(pe)
+func (_m *Permission) QueryAdminUpdatedBy() *AdminUserQuery {
+	return NewPermissionClient(_m.config).QueryAdminUpdatedBy(_m)
 }
 
 // QueryRole queries the "role" edge of the Permission entity.
-func (pe *Permission) QueryRole() *RoleQuery {
-	return NewPermissionClient(pe.config).QueryRole(pe)
+func (_m *Permission) QueryRole() *RoleQuery {
+	return NewPermissionClient(_m.config).QueryRole(_m)
 }
 
 // Update returns a builder for updating this Permission.
 // Note that you need to call Permission.Unwrap() before calling this method if this Permission
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (pe *Permission) Update() *PermissionUpdateOne {
-	return NewPermissionClient(pe.config).UpdateOne(pe)
+func (_m *Permission) Update() *PermissionUpdateOne {
+	return NewPermissionClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Permission entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (pe *Permission) Unwrap() *Permission {
-	_tx, ok := pe.config.driver.(*txDriver)
+func (_m *Permission) Unwrap() *Permission {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Permission is not a transactional entity")
 	}
-	pe.config.driver = _tx.drv
-	return pe
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (pe *Permission) String() string {
+func (_m *Permission) String() string {
 	var builder strings.Builder
 	builder.WriteString("Permission(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", pe.ID))
-	if v := pe.CreatedAt; v != nil {
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	if v := _m.CreatedAt; v != nil {
 		builder.WriteString("created_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := pe.UpdatedAt; v != nil {
+	if v := _m.UpdatedAt; v != nil {
 		builder.WriteString("updated_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("entity=")
-	builder.WriteString(pe.Entity)
+	builder.WriteString(_m.Entity)
 	builder.WriteString(", ")
 	builder.WriteString("operation=")
-	builder.WriteString(pe.Operation)
+	builder.WriteString(_m.Operation)
+	builder.WriteString(", ")
+	builder.WriteString("lifecycle_access=")
+	builder.WriteString(fmt.Sprintf("%v", _m.LifecycleAccess))
 	builder.WriteByte(')')
 	return builder.String()
 }

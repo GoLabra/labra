@@ -16,26 +16,31 @@ import (
 	"github.com/GoLabra/labra/entgql/entity"
 )
 
-// ForPermission holds the schema definition for the  ForPermission entity.
-type ForPermission struct {
+// LifeCycleNot holds the schema definition for the  LifeCycleNot entity.
+type LifeCycleNot struct {
 	ent.Schema
 }
 
-func (ForPermission) Annotations() []schema.Annotation {
-	return []schema.Annotation{
+func (LifeCycleNot) Annotations() []schema.Annotation {
+	annotationsList := []schema.Annotation{
 		entgql.MultiOrder(),
 		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		annotations.Entity{
-			Caption:      "For Permission",
+			Caption:      "LifeCycleNot",
 			Owner:        entity.EntityOwnerUser,
 			DisplayField: "name",
+			State: entity.State{
+				Enabled: true,
+				Default: "DRAFT",
+			},
 		},
 	}
+	return annotationsList
 }
 
-// Fields of the  ForPermission.
-func (ForPermission) Fields() []ent.Field {
+// Fields of the  LifeCycleNot.
+func (LifeCycleNot) Fields() []ent.Field {
 	return []ent.Field{
 
 		field.String("id").DefaultFunc(cuid.New).Annotations(
@@ -118,32 +123,19 @@ func (ForPermission) Fields() []ent.Field {
 				},
 			),
 
-		field.Int("age").
+		field.Enum("entity_state").
+			GoType(entity.EntityState("")).
 			Optional().
-			Nillable().
+			Default("DRAFT").
 			Annotations(
-				entgql.OrderField("age"),
-				annotations.Field{
-					Caption: "Age",
-					Type:    entity.FieldTypeInteger,
-				},
-			),
-
-		field.Bool("is_stupid").
-			Optional().
-			Nillable().
-			Annotations(
-				entgql.OrderField("isStupid"),
-				annotations.Field{
-					Caption: "Is Stupid",
-					Type:    entity.FieldTypeBoolean,
-				},
+				entgql.Type("EntityState"),
+				entgql.Skip(entgql.SkipMutationUpdateInput),
 			),
 	}
 }
 
-// Edges of the ForPermission.
-func (ForPermission) Edges() []ent.Edge {
+// Edges of the LifeCycleNot.
+func (LifeCycleNot) Edges() []ent.Edge {
 	return []ent.Edge{
 
 		edge.To("created_by", User.Type).

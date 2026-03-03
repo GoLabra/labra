@@ -3,7 +3,11 @@ package svc
 import (
 	"context"
 	"app/ent"
-    "app/domain/repo"
+	"app/domain/repo"
+	{{- if hasStateAnnotation $ }}
+
+	"github.com/GoLabra/labra/entgql/entity"
+	{{- end }}
 )
 
 type {{$.Name}} struct {
@@ -63,6 +67,12 @@ func (s *{{$.Name}}) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
 func (s *{{$.Name}}) Update(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	return s.repository.{{$.Name}}.Update(ctx, where, data)
 }
+
+{{- if hasStateAnnotation $ }}
+func (s *{{$.Name}}) UpdateState(ctx context.Context, where ent.{{$.Name}}WhereUniqueInput, state entity.EntityState) (*ent.{{$.Name}}, error) {
+	return s.repository.{{$.Name}}.UpdateState(ctx, where, state)
+}
+{{- end }}
 
 func (s *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Name}}WhereUniqueInput, data ent.Update{{$.Name}}Input) (*ent.{{$.Name}}, error) {
 	return s.repository.{{$.Name}}.UpdateTx(ctx, tx, where, data)

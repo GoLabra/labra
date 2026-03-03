@@ -224,16 +224,26 @@ func (r *Role) CreateTx(ctx context.Context, tx *ent.Tx, data ent.CreateRoleInpu
 		}
 	}
 	if data.UserRoles != nil {
-
 		if data.UserRoles.Connect != nil {
 			for _, connect := range data.UserRoles.Connect {
-				toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *connect)
+				toConnect, err := repository.User.GetOneTx(ctx, tx, *connect)
 
 				if err != nil {
 					return nil, err
 				}
 
 				data.UserRoleIDs = append(data.UserRoleIDs, toConnect.ID)
+			}
+		}
+		if data.AdminUserRoles.Connect != nil {
+			for _, connect := range data.AdminUserRoles.Connect {
+				toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *connect)
+
+				if err != nil {
+					return nil, err
+				}
+
+				data.AdminUserRoleIDs = append(data.AdminUserRoleIDs, toConnect.ID)
 			}
 		}
 		if data.UserRoles.Create != nil {
@@ -439,10 +449,9 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 		}
 	}
 	if data.UserRoles != nil {
-
 		if data.UserRoles.Connect != nil {
 			for _, connect := range data.UserRoles.Connect {
-				toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *connect)
+				toConnect, err := repository.User.GetOneTx(ctx, tx, *connect)
 
 				if err != nil {
 					return nil, err
@@ -451,15 +460,35 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 				data.AddUserRoleIDs = append(data.AddUserRoleIDs, toConnect.ID)
 			}
 		}
+		if data.AdminUserRoles.Connect != nil {
+			for _, connect := range data.AdminUserRoles.Connect {
+				toConnect, err := repository.AdminUser.GetOneTx(ctx, tx, *connect)
+
+				if err != nil {
+					return nil, err
+				}
+
+				data.AddAdminUserRoleIDs = append(data.AddAdminUserRoleIDs, toConnect.ID)
+			}
+		}
 		if data.UserRoles.Disconnect != nil {
 			for _, disconnect := range data.UserRoles.Disconnect {
-				toDisconnect, err := repository.AdminUser.GetOneTx(ctx, tx, *disconnect)
+				toDisconnect, err := repository.User.GetOneTx(ctx, tx, *disconnect)
 
 				if err != nil {
 					return nil, err
 				}
 
 				data.RemoveUserRoleIDs = append(data.RemoveUserRoleIDs, toDisconnect.ID)
+			}
+			for _, disconnect := range data.AdminUserRoles.Disconnect {
+				toDisconnect, err := repository.AdminUser.GetOneTx(ctx, tx, *disconnect)
+
+				if err != nil {
+					return nil, err
+				}
+
+				data.RemoveAdminUserRoleIDs = append(data.RemoveAdminUserRoleIDs, toDisconnect.ID)
 			}
 		}
 		if data.UserRoles.Create != nil {
@@ -481,6 +510,15 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 		}
 		if data.UserRoles.Delete != nil {
 			for _, delete := range data.UserRoles.Delete {
+				_, err := repository.User.DeleteTx(ctx, tx, *delete)
+
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		if data.AdminUserRoles.Delete != nil {
+			for _, delete := range data.AdminUserRoles.Delete {
 				_, err := repository.AdminUser.DeleteTx(ctx, tx, *delete)
 
 				if err != nil {

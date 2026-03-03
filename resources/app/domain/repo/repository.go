@@ -31,7 +31,6 @@ type Repository struct {
 	Tx   Txer
 	AdminUser              adminInterfaces.AdminUser
 	File              adminInterfaces.File
-	ForPermission              repo.ForPermission
 	Role              adminInterfaces.Role
 	User              repo.User
 }
@@ -42,7 +41,6 @@ func New(client *ent.Client, adminClient *adminEnt.Client) *Repository {
 		Tx:   NewTx(client),
         AdminUser:              adminRepo.NewAdminUser(adminClient),
         File:              adminRepo.NewFile(adminClient),
-        ForPermission:              NewForPermission(client),
         Role:              adminRepo.NewRole(adminClient),
         User:              NewUser(client),
 	}
