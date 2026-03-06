@@ -275,6 +275,21 @@ func (mr *MockAdminUserMockRecorder) UpdateManyTx(ctx, tx, where, data interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateManyTx", reflect.TypeOf((*MockAdminUser)(nil).UpdateManyTx), ctx, tx, where, data)
 }
 
+// UpdatePassword mocks base method.
+func (m *MockAdminUser) UpdatePassword(ctx context.Context, where ent.AdminUserWhereUniqueInput, password string) (*ent.AdminUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePassword", ctx, where, password)
+	ret0, _ := ret[0].(*ent.AdminUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword.
+func (mr *MockAdminUserMockRecorder) UpdatePassword(ctx, where, password interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockAdminUser)(nil).UpdatePassword), ctx, where, password)
+}
+
 // UpdateTx mocks base method.
 func (m *MockAdminUser) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereUniqueInput, data ent.UpdateAdminUserInput) (*ent.AdminUser, error) {
 	m.ctrl.T.Helper()

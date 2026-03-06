@@ -24,10 +24,13 @@
 				annotations.Field{
 					Caption:   "{{$.Caption}}",
 					Type: entity.FieldTypeSingleChoice,
-					{{- if $.Private }}
-					Private: {{$.Private}},
-					{{- end }}
-					AcceptedValues: []string{ {{ StringsJoin $.AcceptedValues }} },
+				{{- if $.Private }}
+				Private: {{$.Private}},
+				{{- end }}
+				AcceptedValues: []string{ {{ StringsJoin $.AcceptedValues }} },
 				},
+				{{- if $.Private }}
+				entgql.Skip(entgql.SkipType, entgql.SkipMutationUpdateInput),
+				{{- end }}
 			),
 {{- end}}

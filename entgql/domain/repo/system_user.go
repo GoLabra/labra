@@ -879,3 +879,17 @@ func (r *AdminUser) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.Admi
 	}
 	return deletedRows, nil
 }
+
+func (r *AdminUser) UpdatePassword(ctx context.Context, where ent.AdminUserWhereUniqueInput, hashedPassword string) (*ent.AdminUser, error) {
+	iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+	query := r.client.AdminUser.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+	}
+	item, err := query.First(iCtx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting admin user: %v", err)
+	}
+	return r.client.AdminUser.UpdateOne(item).SetPassword(hashedPassword).Save(ctx)
+}

@@ -12,11 +12,14 @@
                     Caption:   "{{$.Caption}}",
                     Type: entity.FieldTypeJson,
                     {{- if $.Private }}
-					Private: {{$.Private}},
-					{{- end }}
+				Private: {{$.Private}},
+				{{- end }}
                     {{- if $.DefaultValue }}
                     DefaultValue: `{{$.DefaultValue}}`,
                     {{- end }}
                 },
+				{{- if $.Private }}
+				entgql.Skip(entgql.SkipType, entgql.SkipMutationUpdateInput),
+				{{- end }}
             ),
 {{- end}}

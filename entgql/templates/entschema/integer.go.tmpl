@@ -31,5 +31,8 @@
                     Private: {{$.Private}},
                     {{- end }}
 				},
+				{{- if $.Private }}
+				entgql.Skip(entgql.SkipType, entgql.SkipMutationUpdateInput),
+				{{- end }}
             ),
 {{- end}}

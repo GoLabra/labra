@@ -154,6 +154,14 @@ func (s *AdminUser) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cre
 	return s.repository.AdminUser.UpsertManyTx(ctx, tx, data)
 }
 
+func (s *AdminUser) UpdatePassword(ctx context.Context, where ent.AdminUserWhereUniqueInput, password string) (*ent.AdminUser, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+	if err != nil {
+		return nil, fmt.Errorf("error hashing password: %w", err)
+	}
+	return s.repository.AdminUser.UpdatePassword(ctx, where, string(hashedPassword))
+}
+
 func (s *AdminUser) Delete(ctx context.Context, where ent.AdminUserWhereUniqueInput) (*ent.AdminUser, error) {
 	return s.repository.AdminUser.Delete(ctx, where)
 }

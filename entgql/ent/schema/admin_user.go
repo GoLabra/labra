@@ -67,7 +67,9 @@ func (AdminUser) Fields() []ent.Field {
 
 		field.String("password").
 			NotEmpty().
+			Sensitive().
 			Annotations(
+				entgql.Skip(entgql.SkipType, entgql.SkipMutationUpdateInput),
 				annotations.Field{
 					Caption: "Password",
 					Type:    entity.FieldTypeShortText,
