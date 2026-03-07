@@ -1,15 +1,15 @@
 'use client'
 
-import { AuthContext, AuthContextType as JwtAuthContextType } from './jwt-context';
+import { AuthContext as JwtAuthContext, AuthContextType as JwtAuthContextType } from './jwt-context';
+import { AuthContext as CookieAuthContext, AuthContextType as CookieAuthContextType } from './cookie-context';
 import { useContext } from 'react';
-import { gql } from "@apollo/client";
 
 
 type AuthContextType =
     //   | AmplifyAuthContextType
     //   | Auth0AuthContextType
     //   | FirebaseAuthContextType
-    //   | 
-    JwtAuthContextType;
+    | CookieAuthContextType
+    | JwtAuthContextType;
 
-export const useAuth = <T = AuthContextType>() => useContext(AuthContext) as T;
+export const useAuth = <T = AuthContextType>() => useContext(CookieAuthContext) as T;

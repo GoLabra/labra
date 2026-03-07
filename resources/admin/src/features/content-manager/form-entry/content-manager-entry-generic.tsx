@@ -10,126 +10,156 @@ import { BasicAuditTrail } from "@/shared/components/basic-audit-trail";
 import { Id } from "@/shared/components/id";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogContent, Stack, Button } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Field, useForm } from "react-hook-form";
 import { useContentManagerFormSchema } from "../use-content-manager-form-schema";
 import { Form } from "@/core-features/dynamic-form2/dynamic-form";
 import { ShortcutButton, useWithClickShortcut } from "@/shared/components/key-handler/with-click-shortcut";
 import { Key } from "@/shared/components/key-handler/types";
 import { DialogContentWithAutofocus } from "@/core-features/dynamic-dialog/src/dialog-content-with-autofocus";
+import { z } from "zod";
 
 export const ContentManagerEntryGeneric = forwardRef<ChainDialogContentRef, ContentManagerEntryDialogContentProps>((props, ref) => {
 
-	const myDialogContext = useMyDialogContext();
-	const fullEntity = useFullEntity({ entityName: props.entityName });
-	const formSchema = useContentManagerFormSchema(fullEntity);
+    const myDialogContext = useMyDialogContext();
+    const fullEntity = useFullEntity({ entityName: props.entityName });
+    const formSchema = useContentManagerFormSchema(fullEntity);
 
-	const saveHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers:'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSave)()});
+    const saveHandler = useWithClickShortcut({ keyToHandle: Key.Enter, target: myDialogContext.dialogRef, modifiers: 'Ctrl', forceInEditable: true, cancelledShortcutBubble: true, onClick: (e) => formMethods.handleSubmit(onSave)() });
 
-	const id = useMemo(() => {
+    const id = useMemo(() => {
 
-		if(myDialogContext.openMode === FormOpenMode.New){
-			return null
-		}
-		return myDialogContext.editId;
-	}, [props.defaultValue]);
+        if (myDialogContext.openMode === FormOpenMode.New) {
+            return null
+        }
+        return myDialogContext.editId;
+    }, [props.defaultValue]);
 
-	const displayValue = useMemo(() => {
-		if (!fullEntity) {
-			return null;
-		}
+    const displayValue = useMemo(() => {
+        if (!fullEntity) {
+            return null;
+        }
 
-		const displayFieldProperty = fullEntity?.displayField?.name;
-		if (!displayFieldProperty) {
-			return null;
-		}
+        const displayFieldProperty = fullEntity?.displayField?.name;
+        if (!displayFieldProperty) {
+            return null;
+        }
 
-		if (displayFieldProperty == 'id') {
-			return null;
-		}
+        if (displayFieldProperty == 'id') {
+            return null;
+        }
 
-		return props.defaultValue?.[displayFieldProperty];
-	}, [fullEntity, props.defaultValue]);
+        return props.defaultValue?.[displayFieldProperty];
+    }, [fullEntity, props.defaultValue]);
 
-	const upperValueAsFieldValues = useMemo(() => {
-		return Object.fromEntries(
-			Object.entries(myDialogContext.upperResults ?? {}).map(([key, value]) => {
-				return [key, value];
-			}))
-	}, [myDialogContext.upperResults]);
+    const upperValueAsFieldValues = useMemo(() => {
+        return Object.fromEntries(
+            Object.entries(myDialogContext.upperResults ?? {}).map(([key, value]) => {
+                return [key, value];
+            }))
+    }, [myDialogContext.upperResults]);
 
-	const defaultValue = useMemo(() => {
-		return {
-			...formSchema.convertFromRawValue(formSchema.schemaDefaultValue),
-			...formSchema.convertFromRawValue(props.defaultValue),
-			//...formSchema.convertFromRawValue(upperValueAsFieldValues
-		};
+    const defaultValue = useMemo(() => {
+        return {
+            ...formSchema.convertFromRawValue(formSchema.schemaDefaultValue),
+            ...formSchema.convertFromRawValue(props.defaultValue),
+            //...formSchema.convertFromRawValue(upperValueAsFieldValues
+        };
 
-	}, [props.defaultValue, upperValueAsFieldValues, formSchema.convertFromRawValue]);
+    }, [props.defaultValue, upperValueAsFieldValues, formSchema.convertFromRawValue]);
 
-	const formMethods = useForm({
-		resolver: zodResolver(formSchema.schema),
-		mode: 'all',
-		defaultValues: defaultValue
-	});
+    const schema = useMemo(() => {
+        const fieldsSchema = formSchema.fieldsDescriptors.filter(i => {
+            if (myDialogContext.openMode === FormOpenMode.New) {
+                return true;
+            }
+            return !("field" in i && i.field.private)
+        })
+            .reduce((acc: any, field) => {
+                acc = {
+                    ...acc,
+                    [field.name]: field.schema
+                }
+                return acc;
+            }, {} as Record<string, z.ZodTypeAny>);
 
-	const onSave = useCallback((formData: any) => {
-		myDialogContext.closeWithResults(formData);
-	}, [myDialogContext.closeWithResults]);
+        return z.object(fieldsSchema);
+    }, [formSchema.fieldsDescriptors]);
 
-	const header = useMemo(() => {
-		const fEntityName = fullEntity?.caption ?? props.entityName;
-		if (!displayValue) {
-			return fEntityName;
-		}
-		return `${fEntityName}: ${displayValue}`;
-	}, [displayValue, fullEntity?.caption, props.entityName]);
+    const formMethods = useForm({
+        resolver: zodResolver(schema),
+        mode: 'all',
+        defaultValues: defaultValue
+    });
 
-	useImperativeHandle(ref, () => ({
-		enterPressed: () => {
-			formMethods.handleSubmit(onSave)();
-		}
-	}));
+    const onSave = useCallback((formData: any) => {
+        myDialogContext.closeWithResults(formData);
+    }, [myDialogContext.closeWithResults]);
 
-	return (
-		<>
-			<DynamicDialogHeader>
-				{header}
-			</DynamicDialogHeader>
-			<DialogContentWithAutofocus>
-				<Stack
-					gap={2}>
+    const header = useMemo(() => {
+        const fEntityName = fullEntity?.caption ?? props.entityName;
+        if (!displayValue) {
+            return fEntityName;
+        }
+        return `${fEntityName}: ${displayValue}`;
+    }, [displayValue, fullEntity?.caption, props.entityName]);
 
-					{!!id && <Id value={id} rootProps={{
-						marginLeft: 'auto',
-					}} />}
+    useImperativeHandle(ref, () => ({
+        enterPressed: () => {
+            formMethods.handleSubmit(onSave)();
+        }
+    }));
 
-					<Form methods={formMethods} onSubmit={formMethods.handleSubmit(console.log)} >
-						<Stack gap={1.5} >
-							{formSchema.fields}
-						</Stack>
-					</Form>
+    const fields = useMemo(() => {
+        return formSchema.fieldsDescriptors
+            .filter(i => {
+                if (myDialogContext.openMode === FormOpenMode.New) {
+                    return true;
+                }
+                return !("field" in i && i.field.private)
+            })
+            .map(field => field.input);
+    }, [formSchema.fieldsDescriptors]);
 
-					{myDialogContext.openMode !== FormOpenMode.New && <BasicAuditTrail defaultValues={props.defaultValue} />}
+    return (
+        <>
+            <DynamicDialogHeader>
+                {header}
+            </DynamicDialogHeader>
+            <DialogContentWithAutofocus>
+                <Stack
+                    gap={2}>
 
-				</Stack>
-			</DialogContentWithAutofocus>
-			<DynamicDialogFooter>
-				<Stack
-					direction="row"
-					gap={1}>
+                    {!!id && <Id value={id} rootProps={{
+                        marginLeft: 'auto',
+                    }} />}
 
-						<ShortcutButton
-							{...saveHandler}
-							color="primary"
-							variant="contained"
-							>
-							Save
-						</ShortcutButton>
+                    <Form methods={formMethods} onSubmit={formMethods.handleSubmit(console.log)} >
+                        <Stack gap={1.5} >
+                            {fields}
+                        </Stack>
+                    </Form>
 
-				</Stack>
-			</DynamicDialogFooter>
-		</>
-	)
+                    {myDialogContext.openMode !== FormOpenMode.New && <BasicAuditTrail defaultValues={props.defaultValue} />}
+
+                </Stack>
+            </DialogContentWithAutofocus>
+            <DynamicDialogFooter>
+                <Stack
+                    direction="row"
+                    gap={1}>
+
+                    <ShortcutButton
+                        {...saveHandler}
+                        color="primary"
+                        variant="contained"
+                    >
+                        Save
+                    </ShortcutButton>
+
+                </Stack>
+            </DynamicDialogFooter>
+        </>
+    )
 });
 
 ContentManagerEntryGeneric.displayName = 'ContentManagerEntryGeneric';
