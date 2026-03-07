@@ -23,6 +23,7 @@ type User interface {
     UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateUserInput) (int, error)
     UpdateMany(ctx context.Context, where ent.UserWhereInput, data ent.UpdateUserInput) (int, error)
     UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereInput, data ent.UpdateUserInput) (int, error)
+    UpdatePassword(ctx context.Context, where ent.UserWhereUniqueInput, hashedPassword string) (*ent.User, error)
     Delete(ctx context.Context, where ent.UserWhereUniqueInput) (*ent.User, error)
     DeleteTx(ctx context.Context, tx *ent.Tx, where ent.UserWhereUniqueInput) (*ent.User, error)
     DeleteMany(ctx context.Context, where ent.UserWhereInput) (int, error)

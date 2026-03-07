@@ -66,7 +66,6 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		LastName    func(childComplexity int) int
 		Name        func(childComplexity int) int
-		Password    func(childComplexity int) int
 		Roles       func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		UpdatedBy   func(childComplexity int) int
@@ -87,14 +86,16 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateManyUsers func(childComplexity int, data []*ent.CreateUserInput) int
-		CreateUser      func(childComplexity int, data ent.CreateUserInput) int
-		DeleteManyUsers func(childComplexity int, where ent.UserWhereInput) int
-		DeleteUser      func(childComplexity int, where ent.UserWhereUniqueInput) int
-		UpdateManyUsers func(childComplexity int, where ent.UserWhereInput, data ent.UpdateUserInput) int
-		UpdateUser      func(childComplexity int, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) int
-		UpsertManyUsers func(childComplexity int, data []*ent.CreateUserInput) int
-		UpsertUser      func(childComplexity int, data ent.CreateUserInput) int
+		CreateManyUsers         func(childComplexity int, data []*ent.CreateUserInput) int
+		CreateUser              func(childComplexity int, data ent.CreateUserInput) int
+		DeleteManyUsers         func(childComplexity int, where ent.UserWhereInput) int
+		DeleteUser              func(childComplexity int, where ent.UserWhereUniqueInput) int
+		UpdateAdminUserPassword func(childComplexity int, where ent1.AdminUserWhereUniqueInput, password string) int
+		UpdateManyUsers         func(childComplexity int, where ent.UserWhereInput, data ent.UpdateUserInput) int
+		UpdateUser              func(childComplexity int, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) int
+		UpdateUserPassword      func(childComplexity int, where ent.UserWhereUniqueInput, password string) int
+		UpsertManyUsers         func(childComplexity int, data []*ent.CreateUserInput) int
+		UpsertUser              func(childComplexity int, data ent.CreateUserInput) int
 	}
 
 	PageInfo struct {
@@ -116,6 +117,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Me              func(childComplexity int) int
 		Node            func(childComplexity int, id string) int
 		Nodes           func(childComplexity int, ids []string) int
 		Users           func(childComplexity int, where *ent.UserWhereInput, orderBy *ent.UserOrder, skip *int, first *int, last *int) int
@@ -141,7 +143,6 @@ type ComplexityRoot struct {
 		DefaultRole    func(childComplexity int) int
 		Email          func(childComplexity int) int
 		ID             func(childComplexity int) int
-		Password       func(childComplexity int) int
 		Roles          func(childComplexity int) int
 		UpdatedBy      func(childComplexity int) int
 	}
@@ -167,6 +168,8 @@ type FileResolver interface {
 	UpdatedBy(ctx context.Context, obj *ent1.File) (*ent1.AdminUser, error)
 }
 type MutationResolver interface {
+	UpdateAdminUserPassword(ctx context.Context, where ent1.AdminUserWhereUniqueInput, password string) (*ent1.AdminUser, error)
+	UpdateUserPassword(ctx context.Context, where ent.UserWhereUniqueInput, password string) (*ent.User, error)
 	CreateUser(ctx context.Context, data ent.CreateUserInput) (*ent.User, error)
 	CreateManyUsers(ctx context.Context, data []*ent.CreateUserInput) ([]*ent.User, error)
 	UpdateUser(ctx context.Context, where ent.UserWhereUniqueInput, data ent.UpdateUserInput) (*ent.User, error)
@@ -183,6 +186,7 @@ type PermissionResolver interface {
 type QueryResolver interface {
 	Node(ctx context.Context, id string) (ent.Noder, error)
 	Nodes(ctx context.Context, ids []string) ([]ent.Noder, error)
+	Me(ctx context.Context) (*ent.User, error)
 	Users(ctx context.Context, where *ent.UserWhereInput, orderBy *ent.UserOrder, skip *int, first *int, last *int) ([]*ent.User, error)
 	UsersConnection(ctx context.Context, where *ent.UserWhereInput, orderBy *ent.UserOrder, skip *int, first *int, last *int) (*ent.UserConnection, error)
 }
@@ -279,12 +283,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.AdminUser.Name(childComplexity), true
-	case "AdminUser.password":
-		if e.complexity.AdminUser.Password == nil {
-			break
-		}
-
-		return e.complexity.AdminUser.Password(childComplexity), true
 	case "AdminUser.roles":
 		if e.complexity.AdminUser.Roles == nil {
 			break
@@ -415,6 +413,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteUser(childComplexity, args["where"].(ent.UserWhereUniqueInput)), true
+	case "Mutation.updateAdminUserPassword":
+		if e.complexity.Mutation.UpdateAdminUserPassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAdminUserPassword_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAdminUserPassword(childComplexity, args["where"].(ent1.AdminUserWhereUniqueInput), args["password"].(string)), true
 	case "Mutation.updateManyUsers":
 		if e.complexity.Mutation.UpdateManyUsers == nil {
 			break
@@ -437,6 +446,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["where"].(ent.UserWhereUniqueInput), args["data"].(ent.UpdateUserInput)), true
+	case "Mutation.updateUserPassword":
+		if e.complexity.Mutation.UpdateUserPassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUserPassword_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUserPassword(childComplexity, args["where"].(ent.UserWhereUniqueInput), args["password"].(string)), true
 	case "Mutation.upsertManyUsers":
 		if e.complexity.Mutation.UpsertManyUsers == nil {
 			break
@@ -534,6 +554,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Permission.UpdatedBy(childComplexity), true
 
+	case "Query.me":
+		if e.complexity.Query.Me == nil {
+			break
+		}
+
+		return e.complexity.Query.Me(childComplexity), true
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
 			break
@@ -670,12 +696,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.ID(childComplexity), true
-	case "User.password":
-		if e.complexity.User.Password == nil {
-			break
-		}
-
-		return e.complexity.User.Password(childComplexity), true
 	case "User.roles":
 		if e.complexity.User.Roles == nil {
 			break
@@ -929,7 +949,6 @@ input UpdateManyRoleInput {
 extend type AdminUser {
   name: String
   email: String!
-  password: String!
   firstName: String!
   lastName: String!
   createdAt: Time
@@ -971,7 +990,18 @@ type Permission implements Node {
   updatedBy: AdminUser
   role: Role
 }
+extend type Mutation {
+    updateAdminUserPassword(where: AdminUserWhereUniqueInput!, password: String!): AdminUser!
+}
 scalar Time`, BuiltIn: false},
+	{Name: "../graphql/me.graphql", Input: `extend type Query {
+    me: User!
+}
+`, BuiltIn: false},
+	{Name: "../graphql/password_mutations.graphql", Input: `extend type Mutation {
+    updateUserPassword(where: UserWhereUniqueInput!, password: String!): User!
+}
+`, BuiltIn: false},
 	{Name: "../graphql/schema.graphql", Input: `directive @goField(forceResolver: Boolean, name: String, omittable: Boolean) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 directive @goModel(model: String, models: [String!], forceGenerate: Boolean) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 type AdminUser implements Node {
@@ -1177,7 +1207,6 @@ Input was generated by ent.
 """
 input UpdateUserInput {
   email: String
-  password: String
   addRoleIDs: [ID!]
   removeRoleIDs: [ID!]
   clearRoles: Boolean
@@ -1187,7 +1216,6 @@ input UpdateUserInput {
 type User implements Node {
   id: ID!
   email: String!
-  password: String!
   createdBy: User
   updatedBy: User
   adminCreatedBy: AdminUser
@@ -1282,22 +1310,6 @@ input UserWhereInput {
   emailHasSuffix: String
   emailEqualFold: String
   emailContainsFold: String
-  """
-  password field predicates
-  """
-  password: String
-  passwordNEQ: String
-  passwordIn: [String!]
-  passwordNotIn: [String!]
-  passwordGT: String
-  passwordGTE: String
-  passwordLT: String
-  passwordLTE: String
-  passwordContains: String
-  passwordHasPrefix: String
-  passwordHasSuffix: String
-  passwordEqualFold: String
-  passwordContainsFold: String
   """
   created_by edge predicates
   """
@@ -1464,6 +1476,22 @@ func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateAdminUserPassword_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNAdminUserWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "password", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["password"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateManyUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1477,6 +1505,22 @@ func (ec *executionContext) field_Mutation_updateManyUsers_args(ctx context.Cont
 		return nil, err
 	}
 	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUserPassword_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalNUserWhereUniqueInput2appᚋentᚐUserWhereUniqueInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "password", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["password"] = arg1
 	return args, nil
 }
 
@@ -1752,35 +1796,6 @@ func (ec *executionContext) fieldContext_AdminUser_email(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _AdminUser_password(ctx context.Context, field graphql.CollectedField, obj *ent1.AdminUser) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_AdminUser_password,
-		func(ctx context.Context) (any, error) {
-			return obj.Password, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_AdminUser_password(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AdminUser",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _AdminUser_firstName(ctx context.Context, field graphql.CollectedField, obj *ent1.AdminUser) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1927,8 +1942,6 @@ func (ec *executionContext) fieldContext_AdminUser_createdBy(_ context.Context, 
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -1982,8 +1995,6 @@ func (ec *executionContext) fieldContext_AdminUser_updatedBy(_ context.Context, 
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -2396,8 +2407,6 @@ func (ec *executionContext) fieldContext_File_createdBy(_ context.Context, field
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -2451,8 +2460,6 @@ func (ec *executionContext) fieldContext_File_updatedBy(_ context.Context, field
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -2472,6 +2479,130 @@ func (ec *executionContext) fieldContext_File_updatedBy(_ context.Context, field
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateAdminUserPassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateAdminUserPassword,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateAdminUserPassword(ctx, fc.Args["where"].(ent1.AdminUserWhereUniqueInput), fc.Args["password"].(string))
+		},
+		nil,
+		ec.marshalNAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateAdminUserPassword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_AdminUser_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_AdminUser_updatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateAdminUserPassword_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateUserPassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateUserPassword,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateUserPassword(ctx, fc.Args["where"].(ent.UserWhereUniqueInput), fc.Args["password"].(string))
+		},
+		nil,
+		ec.marshalNUser2ᚖappᚋentᚐUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUserPassword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUserPassword_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2505,8 +2636,6 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -2566,8 +2695,6 @@ func (ec *executionContext) fieldContext_Mutation_createManyUsers(ctx context.Co
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -2627,8 +2754,6 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -2729,8 +2854,6 @@ func (ec *executionContext) fieldContext_Mutation_upsertUser(ctx context.Context
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -2831,8 +2954,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -3195,8 +3316,6 @@ func (ec *executionContext) fieldContext_Permission_createdBy(_ context.Context,
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -3250,8 +3369,6 @@ func (ec *executionContext) fieldContext_Permission_updatedBy(_ context.Context,
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -3406,6 +3523,53 @@ func (ec *executionContext) fieldContext_Query_nodes(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_me,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().Me(ctx)
+		},
+		nil,
+		ec.marshalNUser2ᚖappᚋentᚐUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_User_updatedBy(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_User_adminCreatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_User_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_User_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3435,8 +3599,6 @@ func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field 
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -3710,8 +3872,6 @@ func (ec *executionContext) fieldContext_Role_userRoles(_ context.Context, field
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -3819,8 +3979,6 @@ func (ec *executionContext) fieldContext_Role_createdBy(_ context.Context, field
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -3874,8 +4032,6 @@ func (ec *executionContext) fieldContext_Role_updatedBy(_ context.Context, field
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -3929,8 +4085,6 @@ func (ec *executionContext) fieldContext_Role_AdminUserRoles(_ context.Context, 
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -4059,35 +4213,6 @@ func (ec *executionContext) fieldContext_User_email(_ context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_User_password,
-		func(ctx context.Context) (any, error) {
-			return obj.Password, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_User_password(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _User_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4116,8 +4241,6 @@ func (ec *executionContext) fieldContext_User_createdBy(_ context.Context, field
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -4165,8 +4288,6 @@ func (ec *executionContext) fieldContext_User_updatedBy(_ context.Context, field
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -4216,8 +4337,6 @@ func (ec *executionContext) fieldContext_User_adminCreatedBy(_ context.Context, 
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -4271,8 +4390,6 @@ func (ec *executionContext) fieldContext_User_adminUpdatedBy(_ context.Context, 
 				return ec.fieldContext_AdminUser_name(ctx, field)
 			case "email":
 				return ec.fieldContext_AdminUser_email(ctx, field)
-			case "password":
-				return ec.fieldContext_AdminUser_password(ctx, field)
 			case "firstName":
 				return ec.fieldContext_AdminUser_firstName(ctx, field)
 			case "lastName":
@@ -4525,8 +4642,6 @@ func (ec *executionContext) fieldContext_UserEdge_node(_ context.Context, field 
 				return ec.fieldContext_User_id(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "updatedBy":
@@ -7339,7 +7454,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "password", "addRoleIDs", "removeRoleIDs", "clearRoles", "defaultRoleID", "clearDefaultRole", "refCreatedBy", "createdBy", "refUpdatedBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy", "roles", "defaultRole"}
+	fieldsInOrder := [...]string{"email", "addRoleIDs", "removeRoleIDs", "clearRoles", "defaultRoleID", "clearDefaultRole", "refCreatedBy", "createdBy", "refUpdatedBy", "updatedBy", "adminCreatedBy", "adminUpdatedBy", "roles", "defaultRole"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7353,13 +7468,6 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Email = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
 		case "addRoleIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addRoleIDs"))
 			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
@@ -7502,7 +7610,7 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "password", "passwordNEQ", "passwordIn", "passwordNotIn", "passwordGT", "passwordGTE", "passwordLT", "passwordLTE", "passwordContains", "passwordHasPrefix", "passwordHasSuffix", "passwordEqualFold", "passwordContainsFold", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith", "hasAdminCreatedBy", "hasAdminCreatedByWith", "hasAdminUpdatedBy", "hasAdminUpdatedByWith", "hasRoles", "hasRolesWith", "hasDefaultRole", "hasDefaultRoleWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "hasCreatedBy", "hasCreatedByWith", "hasUpdatedBy", "hasUpdatedByWith", "hasAdminCreatedBy", "hasAdminCreatedByWith", "hasAdminUpdatedBy", "hasAdminUpdatedByWith", "hasRoles", "hasRolesWith", "hasDefaultRole", "hasDefaultRoleWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7691,97 +7799,6 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.EmailContainsFold = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		case "passwordNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordNEQ"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordNEQ = data
-		case "passwordIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordIn = data
-		case "passwordNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordNotIn"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordNotIn = data
-		case "passwordGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordGT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordGT = data
-		case "passwordGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordGTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordGTE = data
-		case "passwordLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordLT"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordLT = data
-		case "passwordLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordLTE"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordLTE = data
-		case "passwordContains":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordContains"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordContains = data
-		case "passwordHasPrefix":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordHasPrefix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordHasPrefix = data
-		case "passwordHasSuffix":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordHasSuffix"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordHasSuffix = data
-		case "passwordEqualFold":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordEqualFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordEqualFold = data
-		case "passwordContainsFold":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passwordContainsFold"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PasswordContainsFold = data
 		case "hasCreatedBy":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCreatedBy"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -7980,11 +7997,6 @@ func (ec *executionContext) _AdminUser(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._AdminUser_name(ctx, field, obj)
 		case "email":
 			out.Values[i] = ec._AdminUser_email(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "password":
-			out.Values[i] = ec._AdminUser_password(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -8312,6 +8324,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "updateAdminUserPassword":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateAdminUserPassword(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateUserPassword":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserPassword(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUser(ctx, field)
@@ -8651,6 +8677,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "me":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_me(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "users":
 			field := field
 
@@ -8954,11 +9002,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "password":
-			out.Values[i] = ec._User_password(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -9605,6 +9648,10 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAdminUser2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser(ctx context.Context, sel ast.SelectionSet, v ent1.AdminUser) graphql.Marshaler {
+	return ec._AdminUser(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser(ctx context.Context, sel ast.SelectionSet, v *ent1.AdminUser) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -9618,6 +9665,11 @@ func (ec *executionContext) marshalNAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabra�
 func (ec *executionContext) unmarshalNAdminUserWhereInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereInput(ctx context.Context, v any) (*ent1.AdminUserWhereInput, error) {
 	res, err := ec.unmarshalInputAdminUserWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAdminUserWhereUniqueInput2githubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereUniqueInput(ctx context.Context, v any) (ent1.AdminUserWhereUniqueInput, error) {
+	res, err := ec.unmarshalInputAdminUserWhereUniqueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNAdminUserWhereUniqueInput2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUserWhereUniqueInput(ctx context.Context, v any) (*ent1.AdminUserWhereUniqueInput, error) {

@@ -7,7 +7,6 @@ package resolvers
 
 import (
 	"app/ent"
-	"app/generated"
 	"context"
 )
 
@@ -68,11 +67,6 @@ func (r *queryResolver) Users(ctx context.Context, where *ent.UserWhereInput, or
 func (r *queryResolver) UsersConnection(ctx context.Context, where *ent.UserWhereInput, orderBy *ent.UserOrder, skip *int, first *int, last *int) (*ent.UserConnection, error) {
 	return r.Service.User.Connection(ctx, where, orderBy, skip, first, last)
 }
-
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
-
-type mutationResolver struct{ *Resolver }
 
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have

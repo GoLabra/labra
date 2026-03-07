@@ -89,7 +89,6 @@ func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
 // UpdateUserInput represents a mutation input for updating users.
 type UpdateUserInput struct {
 	Email                 *string
-	Password              *string
 	ClearRefCreatedBy     bool
 	RefCreatedBy          *UpdateManyUserInput
 	AddRefCreatedByIDs    []string
@@ -123,9 +122,6 @@ type UpdateUserInput struct {
 func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	if v := i.Email; v != nil {
 		m.SetEmail(*v)
-	}
-	if v := i.Password; v != nil {
-		m.SetPassword(*v)
 	}
 	if i.ClearRefCreatedBy {
 		m.ClearRefCreatedBy()

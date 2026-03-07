@@ -299,11 +299,6 @@ func (_q *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 				selectedFields = append(selectedFields, user.FieldEmail)
 				fieldSeen[user.FieldEmail] = struct{}{}
 			}
-		case "password":
-			if _, ok := fieldSeen[user.FieldPassword]; !ok {
-				selectedFields = append(selectedFields, user.FieldPassword)
-				fieldSeen[user.FieldPassword] = struct{}{}
-			}
 		case "id":
 		case "__typename":
 		default:

@@ -21,7 +21,7 @@ type User struct {
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
-	Password string `json:"password,omitempty"`
+	Password string `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges                 UserEdges `json:"edges"`
@@ -308,8 +308,7 @@ func (_m *User) String() string {
 	builder.WriteString("email=")
 	builder.WriteString(_m.Email)
 	builder.WriteString(", ")
-	builder.WriteString("password=")
-	builder.WriteString(_m.Password)
+	builder.WriteString("password=<sensitive>")
 	builder.WriteByte(')')
 	return builder.String()
 }

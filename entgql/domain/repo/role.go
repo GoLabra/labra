@@ -83,7 +83,7 @@ func (r *Role) GetOne(ctx context.Context, where ent.RoleWhereUniqueInput) (*ent
 	query := r.client.Role.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -130,7 +130,7 @@ func (r *Role) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 	query := tx.Role.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -312,7 +312,7 @@ func (r *Role) CreateMany(ctx context.Context, data []ent.CreateRoleInput) ([]*e
 	}
 	createdItems, err := r.client.Role.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -324,7 +324,7 @@ func (r *Role) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateRo
 	}
 	createdItems, err := tx.Role.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -366,11 +366,11 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 	query := tx.Role.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to update: %v", err)
+		return nil, fmt.Errorf("error getting item to update: %w", err)
 	}
 	created_byToDelete := ent.UserWhereUniqueInput{}
 	if data.AdminCreatedBy != nil {
@@ -581,7 +581,7 @@ func (r *Role) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 
 	updatedInput, err := tx.Role.UpdateOne(item).SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error updating item: %v", err)
+		return nil, fmt.Errorf("error updating item: %w", err)
 	}
 	if data.AdminCreatedBy != nil && data.AdminCreatedBy.Delete != nil && *data.AdminCreatedBy.Delete {
 		_, err := repository.User.DeleteTx(ctx, tx, created_byToDelete)
@@ -634,21 +634,21 @@ func (r *Role) Upsert(ctx context.Context, data ent.CreateRoleInput) (upsertedRo
 		var where ent.RoleWhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 		err = r.client.Role.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+			return nil, fmt.Errorf("error upserting item: %w", err)
 		}
 		upsertedRole, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		return upsertedRole, nil
 	}
 	upsertedRole, err = r.client.Role.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upsertedRole, nil
 }
@@ -658,21 +658,21 @@ func (r *Role) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.CreateRoleInpu
 		var where ent.RoleWhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 		err = tx.Role.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+			return nil, fmt.Errorf("error upserting item: %w", err)
 		}
 		upsertedRole, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		return upsertedRole, nil
 	}
 	upsertedRole, err = tx.Role.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upsertedRole, nil
 }
@@ -684,7 +684,7 @@ func (r *Role) UpsertMany(ctx context.Context, data []ent.CreateRoleInput) (int,
 	}
 	err := r.client.Role.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -696,7 +696,7 @@ func (r *Role) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateRo
 	}
 	err := tx.Role.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -705,16 +705,16 @@ func (r *Role) Delete(ctx context.Context, where ent.RoleWhereUniqueInput) (*ent
 	query := r.client.Role.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = r.client.Role.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }
@@ -723,16 +723,16 @@ func (r *Role) DeleteTx(ctx context.Context, tx *ent.Tx, where ent.RoleWhereUniq
 	query := tx.Role.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = tx.Role.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }

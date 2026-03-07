@@ -33,6 +33,11 @@ func (r *fileResolver) UpdatedBy(ctx context.Context, obj *ent.File) (*ent.Admin
 	panic(fmt.Errorf("not implemented: UpdatedBy - updatedBy"))
 }
 
+// UpdateAdminUserPassword is the resolver for the updateAdminUserPassword field.
+func (r *mutationResolver) UpdateAdminUserPassword(ctx context.Context, where ent.AdminUserWhereUniqueInput, password string) (*ent.AdminUser, error) {
+	return r.Service.AdminUser.UpdatePassword(ctx, where, password)
+}
+
 // CreatedBy is the resolver for the createdBy field.
 func (r *permissionResolver) CreatedBy(ctx context.Context, obj *ent.Permission) (*ent.AdminUser, error) {
 	panic(fmt.Errorf("not implemented: CreatedBy - createdBy"))
@@ -53,7 +58,11 @@ func (r *roleResolver) UpdatedBy(ctx context.Context, obj *ent.Role) (*ent.Admin
 	panic(fmt.Errorf("not implemented: UpdatedBy - updatedBy"))
 }
 
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
 // Permission returns generated.PermissionResolver implementation.
 func (r *Resolver) Permission() generated.PermissionResolver { return &permissionResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type permissionResolver struct{ *Resolver }

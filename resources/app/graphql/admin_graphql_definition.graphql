@@ -72,7 +72,6 @@ input UpdateManyRoleInput {
 extend type AdminUser {
   name: String
   email: String!
-  password: String!
   firstName: String!
   lastName: String!
   createdAt: Time
@@ -113,5 +112,8 @@ type Permission implements Node {
   createdBy: AdminUser
   updatedBy: AdminUser
   role: Role
+}
+extend type Mutation {
+    updateAdminUserPassword(where: AdminUserWhereUniqueInput!, password: String!): AdminUser!
 }
 scalar Time
