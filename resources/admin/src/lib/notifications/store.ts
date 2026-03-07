@@ -24,6 +24,9 @@ export const addNotification = (notification: Omit<NotificationMessage, 'id' | '
         read: false,
     };
     notificationsVar([newNotification, ...notificationsVar()]);
+    if (!enqueueSnackbar) {
+        return;
+    }
     enqueueSnackbar(newNotification.message, { variant: newNotification.type });
     return newNotification;
 };

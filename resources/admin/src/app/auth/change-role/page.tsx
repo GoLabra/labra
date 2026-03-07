@@ -38,25 +38,27 @@ export default function AuthPage() {
 
     const auth = useAuth<AuthContextType>();
     const accessToken = globalThis.localStorage.getItem(STORAGE_KEY);
-    const roles = useQuery<any>(getMeRoles, { variables: { where: { email: getJwtSub(accessToken) } },
-                                            fetchPolicy: 'network-only',
-											context: ADMIN_CONTEXT });
+    const roles = useQuery<any>(getMeRoles, {
+        variables: { where: { email: getJwtSub(accessToken) } },
+        fetchPolicy: 'network-only',
+        context: ADMIN_CONTEXT
+    });
 
     const router = useRouter();
     const searchParams = useSearchParams();
     const returnTo = searchParams.get('returnTo') || undefined;
-    
+
 
     const currentRole = useMemo(() => getJwtRole(globalThis.localStorage.getItem("accessToken")), []);
 
-    const roleOptions = useMemo(() => roles.data?.adminUsers[0].roles?.map((i:any) => ({
+    const roleOptions = useMemo(() => roles.data?.adminUsers[0].roles?.map((i: any) => ({
         label: i.name,
         value: i.name
     })) ?? [], [roles.data?.adminUsers[0].roles]);
 
     const methods = useForm({
         resolver: zodResolver(schema),
-        defaultValues: useMemo(() => ({ role: currentRole}), [currentRole])
+        defaultValues: useMemo(() => ({ role: currentRole }), [currentRole])
     });
 
     const onSubmit = useCallback(async (data: any) => {
@@ -99,7 +101,7 @@ export default function AuthPage() {
                     fullWidth
                     sx={{ mt: 3 }}
                     variant="contained"
-					disabled={methods.formState.isSubmitting}
+                    disabled={methods.formState.isSubmitting}
                 >
                     Login with role
                 </Button>

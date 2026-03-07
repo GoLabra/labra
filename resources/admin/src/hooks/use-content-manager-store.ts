@@ -10,211 +10,212 @@ import { RunQuery, useLgQuery } from "./use-lg-query";
 import { FilterOperators, GplFilter, LGQuery } from "lg-query";
 
 interface UseGridContentManagerStoreparams {
-	fullEntity?: FullEntity;
-	searchState: ContentManagerSearchState;
+    fullEntity?: FullEntity;
+    searchState: ContentManagerSearchState;
 }
 export const useContentManagerStore = (params: UseGridContentManagerStoreparams): UsersStore => {
 
-    const { name:entityName } = params.fullEntity ?? {};
+    const { name: entityName } = params.fullEntity ?? {};
 
-	const client = useApolloClient();
+    const client = useApolloClient();
 
-	const fields = useMemo(() => params.fullEntity?.fields.map(i => i.name), [params.fullEntity?.fields]);
-	const edges = useMemo(() => params.fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
-													.filter(i => i.relationType !== 'OneToMany')
-													.filter(i => i.relationType !== 'Many'), [params.fullEntity?.edges]);
+    const fields = useMemo(() => params.fullEntity?.fields.filter(i => i.private != true)
+        .map(i => i.name), [params.fullEntity?.fields]);
+    const edges = useMemo(() => params.fullEntity?.edges.filter(i => i.relationType !== 'ManyToMany')
+        .filter(i => i.relationType !== 'OneToMany')
+        .filter(i => i.relationType !== 'Many'), [params.fullEntity?.edges]);
 
-	const dataQuery = useMemo(() => {
+    const dataQuery = useMemo(() => {
 
-		if(params.fullEntity?.loading ?? true){
-			return null;
-		}
+        if (params.fullEntity?.loading ?? true) {
+            return null;
+        }
 
-		if(!fields || !edges){
-			return null;
-		}
+        if (!fields || !edges) {
+            return null;
+        }
 
-		let query = LGQuery.from<any>(params.fullEntity!.name)
-							.select( ...fields)
-		// add edges							
-		query = edges.reduce((query: LGQuery<any>, edge) => {
-			return query.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
-		}, query);
+        let query = LGQuery.from<any>(params.fullEntity!.name)
+            .select(...fields)
+        // add edges							
+        query = edges.reduce((query: LGQuery<any>, edge) => {
+            return query.include(edge.name, q => q.select('id', edge.relatedEntity.displayField.name));
+        }, query);
 
-		// add filters
-		if(Object.entries(params.searchState.filter).length){
-			query = query.where(
-				GplFilter.and(
-					...Object.entries(params.searchState.filter).map(([key, filter]) => { 
-						const restul = GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
-						return restul;
-					})
-				)
-			);
-		}
-		
-		const queryFilter = getFiltersFromQuery(params.searchState.query, params.fullEntity?.fields ?? [])
-		if(Object.entries(queryFilter).length){
-			query = query.where(
-				GplFilter.or(
-					...Object.entries(queryFilter).map(([key, filter]) => { 
-						return GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
-					})
-				)
-			);
-		}
+        // add filters
+        if (Object.entries(params.searchState.filter).length) {
+            query = query.where(
+                GplFilter.and(
+                    ...Object.entries(params.searchState.filter).map(([key, filter]) => {
+                        const restul = GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>;
+                        return restul;
+                    })
+                )
+            );
+        }
 
-		// add skip
-		query = query.skip((params.searchState.page - 1) * params.searchState.rowsPerPage);
-		// add first
-		query = query.first(params.searchState.rowsPerPage);
-		// add order
-		if(params.searchState.sortBy) {
-			if(params.searchState.order == 'asc'){
-				query = query.orderByAscending(params.searchState.sortBy);
-			} else {
-				query = query.orderByDescending(params.searchState.sortBy);
-			}
-		}
-		
-		return query;	
-	}, [entityName, fields, edges, params.searchState]);
+        const queryFilter = getFiltersFromQuery(params.searchState.query, params.fullEntity?.fields ?? [])
+        if (Object.entries(queryFilter).length) {
+            query = query.where(
+                GplFilter.or(
+                    ...Object.entries(queryFilter).map(([key, filter]) => {
+                        return GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>;
+                    })
+                )
+            );
+        }
 
-	const connectionQuery = useMemo(() => {
-		if(!entityName){
-			return null;
-		}
+        // add skip
+        query = query.skip((params.searchState.page - 1) * params.searchState.rowsPerPage);
+        // add first
+        query = query.first(params.searchState.rowsPerPage);
+        // add order
+        if (params.searchState.sortBy) {
+            if (params.searchState.order == 'asc') {
+                query = query.orderByAscending(params.searchState.sortBy);
+            } else {
+                query = query.orderByDescending(params.searchState.sortBy);
+            }
+        }
 
-		if(!dataQuery){
-			return null;
-		}
+        return query;
+    }, [entityName, fields, edges, params.searchState]);
 
-		let query = LGQuery.fromConnection<any>(entityName)
-			     .select('totalCount');
+    const connectionQuery = useMemo(() => {
+        if (!entityName) {
+            return null;
+        }
 
-		// add filters
-		if(Object.entries(params.searchState.filter).length){
-			query = query.where(
-				GplFilter.and(
-					...Object.entries(params.searchState.filter).map(([key, filter]) => { 
-						const restul = GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
-						return restul;
-					})
-				)
-			);
-		}
-		
-		const queryFilter = getFiltersFromQuery(params.searchState.query, params.fullEntity?.fields ?? [])
-		if(Object.entries(queryFilter).length){
-			query = query.where(
-				GplFilter.or(
-					...Object.entries(queryFilter).map(([key, filter]) => { 
-						return GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>; 
-					})
-				)
-			);
-		}
+        if (!dataQuery) {
+            return null;
+        }
 
-		return query;
-	}, [entityName, fields, edges, params.searchState]);
+        let query = LGQuery.fromConnection<any>(entityName)
+            .select('totalCount');
 
-	const apiType = params.fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
+        // add filters
+        if (Object.entries(params.searchState.filter).length) {
+            query = query.where(
+                GplFilter.and(
+                    ...Object.entries(params.searchState.filter).map(([key, filter]) => {
+                        const restul = GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>;
+                        return restul;
+                    })
+                )
+            );
+        }
 
-	const dataResponse = useLgQuery({
-		apiType,
-		query: useMemo(() => [dataQuery, connectionQuery], [dataQuery, connectionQuery]),
-		skip: dataQuery == null
-	});
-    
+        const queryFilter = getFiltersFromQuery(params.searchState.query, params.fullEntity?.fields ?? [])
+        if (Object.entries(queryFilter).length) {
+            query = query.where(
+                GplFilter.or(
+                    ...Object.entries(queryFilter).map(([key, filter]) => {
+                        return GplFilter.field(key, filter.operator as FilterOperators, filter.value) as GplFilter<any>;
+                    })
+                )
+            );
+        }
+
+        return query;
+    }, [entityName, fields, edges, params.searchState]);
+
+    const apiType = params.fullEntity?.owner == EntityOwner.Admin ? 'admin' : 'user';
+
+    const dataResponse = useLgQuery({
+        apiType,
+        query: useMemo(() => [dataQuery, connectionQuery], [dataQuery, connectionQuery]),
+        skip: dataQuery == null
+    });
+
     const addItem = useCallback((data: any) => {
-		if(!params.fullEntity){
-			return;
-		}
+        if (!params.fullEntity) {
+            return;
+        }
 
-		const query = LGQuery.create(params.fullEntity.name, data)
-							.select('id');
+        const query = LGQuery.create(params.fullEntity.name, data)
+            .select('id');
 
-		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
-       	RunQuery(client, apiType, query)
-		.then((response) => {
-			dataResponse.refetch();
-		});
-			
+        const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+        RunQuery(client, apiType, query)
+            .then((response) => {
+                dataResponse.refetch();
+            });
+
     }, [client, params.fullEntity, dataResponse.refetch]);
 
 
     const addItems = useCallback((data: any[]) => {
-		if(!params.fullEntity){
-			return;
-		}
+        if (!params.fullEntity) {
+            return;
+        }
 
-		const query = LGQuery.create(params.fullEntity.name, data)
-							.select('id');
+        const query = LGQuery.create(params.fullEntity.name, data)
+            .select('id');
 
-		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
-       	RunQuery(client, apiType, query)
-		.then((response) => {
-			dataResponse.refetch();
-		});
+        const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+        RunQuery(client, apiType, query)
+            .then((response) => {
+                dataResponse.refetch();
+            });
     }, [client, params.fullEntity, dataResponse.refetch]);
 
     const updateItem = useCallback((id: string, data: any) => {
 
-		if(!params.fullEntity){
-			return;
-		}
+        if (!params.fullEntity) {
+            return;
+        }
 
-		const query = LGQuery.update(params.fullEntity.name, data)
-							.where(GplFilter.field('id', '', id))
-							.select('id');
+        const query = LGQuery.update(params.fullEntity.name, data)
+            .where(GplFilter.field('id', '', id))
+            .select('id');
 
-		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
-       	RunQuery(client, apiType, query)
-		.then((response) => {
-			dataResponse.refetch();
-		});
+        const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+        RunQuery(client, apiType, query)
+            .then((response) => {
+                dataResponse.refetch();
+            });
 
     }, [client, params.fullEntity, dataResponse.refetch]);
 
     const deleteItem = useCallback((id: string) => {
-		if(!params.fullEntity){
-			return;
-		}
+        if (!params.fullEntity) {
+            return;
+        }
 
-		const query = LGQuery.deleteFrom(params.fullEntity.name)
-							.where(GplFilter.field('id', '', id))
-							.select('id');
+        const query = LGQuery.deleteFrom(params.fullEntity.name)
+            .where(GplFilter.field('id', '', id))
+            .select('id');
 
-		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
-       	RunQuery(client, apiType, query)
-		.then((response) => {
-			dataResponse.refetch();
-		});
+        const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+        RunQuery(client, apiType, query)
+            .then((response) => {
+                dataResponse.refetch();
+            });
 
     }, [client, params.fullEntity, dataResponse.refetch]);
 
     const deleteBulk = useCallback((ids: Array<string>) => {
-        if(!params.fullEntity){
-			return;
-		}
+        if (!params.fullEntity) {
+            return;
+        }
 
-		const query = LGQuery.deleteFrom(params.fullEntity.name)
-							.where(GplFilter.field('id', 'In', ids));
+        const query = LGQuery.deleteFrom(params.fullEntity.name)
+            .where(GplFilter.field('id', 'In', ids));
 
-		const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
-       	RunQuery(client, apiType, query)
-		.then((response) => {
-			dataResponse.refetch();
-		});
+        const apiType = params.fullEntity.owner == EntityOwner.Admin ? 'admin' : 'user';
+        RunQuery(client, apiType, query)
+            .then((response) => {
+                dataResponse.refetch();
+            });
 
     }, [client, params.fullEntity, dataResponse.refetch]);
 
-	const onlyData = useMemo(() => ({
-		data: dataQuery?.getResultData(dataResponse.data) ?? [],
- 		dataConnection: connectionQuery?.getResultData(dataResponse.data) ?? [],
-	}), [dataResponse.data]);
+    const onlyData = useMemo(() => ({
+        data: dataQuery?.getResultData(dataResponse.data) ?? [],
+        dataConnection: connectionQuery?.getResultData(dataResponse.data) ?? [],
+    }), [dataResponse.data]);
 
-	const numberOfPages = useMemo(() => {
+    const numberOfPages = useMemo(() => {
         if (!onlyData.dataConnection) {
             return 1;
         }

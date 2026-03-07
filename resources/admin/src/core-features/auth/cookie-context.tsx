@@ -2,29 +2,38 @@
 
 import type { FC, ReactNode } from 'react';
 import { createContext, useCallback, useEffect, useReducer } from 'react';
-import PropTypes from 'prop-types';
-//import { authApi } from '../../api/auth';
-import type { User, UserRole } from '../../types/user';
+import type { User } from '../../types/user';
 import { Issuer } from '@/lib/utils/auth';
 import { changeRoleQuery, signInQuery, superUserSignUpQuery } from '@/lib/apollo/queries/auth';
-import { useMutation, useQuery, useLazyQuery, gql } from '@apollo/client';
-import { isJwtValid, getJwtSub } from '@/lib/utils/jwt';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
 import { ADMIN_CONTEXT } from '@/lib/apollo/apolloWrapper';
+import { getJwtSub, isJwtValid } from '@/lib/utils/jwt';
 
-
-export const getMeDocument = gql`query getMe($where:AdminUserWhereInput!) {
-    adminUsers(where:$where) {
+export const getMeDocument = gql`query getMe {
+     me { 
           id
           name
           firstName
           lastName
           email
+            roles {
+                id
+                name
+            }
       }
   }`
 
+export const AUTH_MODE = 'cookie';
+export const COOKIE_NAME = 'jwt';
 
-export const STORAGE_KEY = 'accessToken';
-export const AUTH_MODE = 'jwt';
+
+const signOutQuery = gql`
+    mutation SignOut {
+        signOut @rest(type: "User", method: "POST", path: "/admin/logout") {
+            success
+        }
+    }
+`;
 
 interface State {
     isInitialized: boolean;
@@ -105,7 +114,7 @@ const reducer = (state: State, action: Action): State => (
 export interface AuthContextType extends State {
     issuer: Issuer.JWT;
     authMode: typeof AUTH_MODE;
-    signIn: (email: string) => Promise<void>;
+    signIn: (data: any) => Promise<void>;
     changeRole: (role: string) => Promise<void>;
     signUp: (data: any) => Promise<void>;
     signOut: () => Promise<void>;
@@ -116,7 +125,7 @@ export const AuthContext = createContext<AuthContextType>({
     issuer: Issuer.JWT,
     authMode: AUTH_MODE,
     signIn: () => Promise.resolve(),
-    changeRole: (role: string) => Promise.resolve(),
+    changeRole: () => Promise.resolve(),
     signUp: () => Promise.resolve(),
     signOut: () => Promise.resolve()
 });
@@ -132,36 +141,26 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     const [signUpRequest] = useMutation<any>(superUserSignUpQuery);
     const [signInRequest] = useMutation<any>(signInQuery);
     const [changeRoleRequest] = useMutation<any>(changeRoleQuery);
+    const [signOutRequest] = useMutation<any>(signOutQuery);
     const [me] = useLazyQuery<any>(getMeDocument, {
-		context: ADMIN_CONTEXT
-	});
-    
+        context: ADMIN_CONTEXT
+    });
+
     const initialize = useCallback(
         async (): Promise<void> => {
             try {
-                const accessToken = globalThis.localStorage.getItem(STORAGE_KEY);
 
-                if (isJwtValid(accessToken)) {
-                    const meResponse = await me({ variables: { where: { email: getJwtSub(accessToken) } } });
+                const meResponse = await me();
+                const user = meResponse?.data?.me;
 
-                    dispatch({
-                        type: ActionType.INITIALIZE,
-                        payload: {
-                            isAuthenticated: true,
-                            user: meResponse.data.adminUsers[0]
-                        }
-                    });
-                } else {
-                    dispatch({
-                        type: ActionType.INITIALIZE,
-                        payload: {
-                            isAuthenticated: false,
-                            user: null
-                        }
-                    });
-                }
+                dispatch({
+                    type: ActionType.INITIALIZE,
+                    payload: {
+                        isAuthenticated: user != null,
+                        user
+                    }
+                });
             } catch (err) {
-                console.error(err);
                 dispatch({
                     type: ActionType.INITIALIZE,
                     payload: {
@@ -170,16 +169,16 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                     }
                 });
             }
-        }, [dispatch]
+        }, [dispatch, me]
     );
 
     useEffect(() => {
         initialize();
-    }, []);
+    }, [initialize]);
 
     const signIn = useCallback(
         async (data: any): Promise<void> => {
-            const result = await signInRequest({
+            await signInRequest({
                 variables: {
                     input: {
                         ...data
@@ -187,38 +186,32 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                 }
             });
 
-            const accessToken = result.data.signIn.token;
-            localStorage.setItem(STORAGE_KEY, accessToken);
-
-            const meResponse = await me({ variables: { where: { email: getJwtSub(accessToken) } } });
-            const {roles, ...user} = meResponse.data.adminUsers[0];
+            const meResponse = await me();
+            const { roles, ...user } = meResponse.data.me;
 
             dispatch({
                 type: ActionType.SIGN_IN,
                 payload: {
-                    user: user
+                    user
                 }
             });
-        }, [dispatch]);
+        }, [dispatch, me, signInRequest]
+    );
 
     const changeRole = useCallback(
         async (role: string): Promise<void> => {
-
-            const result = await changeRoleRequest({
+            await changeRoleRequest({
                 variables: {
                     input: {
-                        role: role,
+                        role,
                     }
                 }
             });
-
-            const accessToken = result.data.changeRole.token;
-            localStorage.setItem(STORAGE_KEY, accessToken);
-        }, []);
+        }, [changeRoleRequest]
+    );
 
     const signUp = useCallback(
         async (data: any): Promise<void> => {
-
             await signUpRequest({
                 variables: {
                     input: {
@@ -227,14 +220,19 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
                 }
             });
         },
-        [dispatch]
+        [signUpRequest]
     );
 
     const signOut = useCallback(
         async (): Promise<void> => {
-            localStorage.removeItem(STORAGE_KEY);
+            try {
+                await signOutRequest();
+            } catch {
+                // best-effort cookie/session invalidation
+            }
             dispatch({ type: ActionType.SIGN_OUT });
-        }, [dispatch]);
+        }, [dispatch, signOutRequest]
+    );
 
     return (
         <AuthContext.Provider

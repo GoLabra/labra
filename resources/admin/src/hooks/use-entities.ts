@@ -63,9 +63,9 @@ export const useEntities = () => {
     const nameCaptionEntities = useReactiveVar<NameCaptionEntity[]>(nameCaptionEntitiesVar);
     const fullEntitiesMap = useReactiveVar<Record<string, FullEntity>>(fullEntitiesMapVar);
 
-    const { data, loading: loadingNameCaptionEntities } = useQuery(GetEntitiesNameCaption, {context: ADMIN_CONTEXT}); //useGetEntitiesNameCaptionQuery();
+    const { data, loading: loadingNameCaptionEntities } = useQuery(GetEntitiesNameCaption, { context: ADMIN_CONTEXT }); //useGetEntitiesNameCaptionQuery();
 
-    const [loadFullEntity] = useLazyQuery<{entity: Entity}>(GetEntityFirstLevelSchema, {context: ADMIN_CONTEXT}); //useGetEntityFirstLevelSchemaLazyQuery(); 
+    const [loadFullEntity] = useLazyQuery<{ entity: Entity }>(GetEntityFirstLevelSchema, { context: ADMIN_CONTEXT }); //useGetEntityFirstLevelSchemaLazyQuery(); 
 
     // set entities
     useEffect(() => {
@@ -116,15 +116,15 @@ export const useEntities = () => {
 
             fullEntitiesMapVar({
                 ...fullEntitiesMap,
-                [data.entity.name]: { 
+                [data.entity.name]: {
                     name: data.entity.name,
                     caption: data.entity.caption,
                     owner: data.entity.owner,
                     displayField: data.entity.displayField,
                     fields: data.entity?.fields as Array<Field> ?? [],
                     edges: data.entity?.edges?.filter(i => i.name != "refCreatedBy")
-                                            .filter(i => i.name != "refUpdatedBy")
-                                            .filter(i => i.caption != "Ref Updated By") as Array<Edge> ?? [],
+                        .filter(i => i.name != "refUpdatedBy")
+                        .filter(i => i.caption != "Ref Updated By") as Array<Edge> ?? [],
                     loading: false,
                 }
             });
@@ -152,6 +152,7 @@ export const useFullEntity = (props: useFullEntityProps): FullEntity | null => {
     useEffect(() => {
         entities.onLoadFullEntity(props.entityName);
     }, [props.entityName, entities]);
+    const email = 'admin@labrago.eu';
 
     const fullEntitiesMap = entities.fullEntitiesMap[props.entityName];
     return fullEntitiesMap;
@@ -166,7 +167,7 @@ export const useFullEntities = (props: useFullEntitiesProps) => {
     const entities = useEntities();
 
     useEffect(() => {
-        if(props.lazy){
+        if (props.lazy) {
             return;
         }
         entities.entities.forEach(i => entities.onLoadFullEntity(i.name));
