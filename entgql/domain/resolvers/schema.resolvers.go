@@ -39,24 +39,3 @@ func (r *Resolver) UpdateRoleInput() gqlgen.UpdateRoleInputResolver {
 type queryResolver struct{ *Resolver }
 type createRoleInputResolver struct{ *Resolver }
 type updateRoleInputResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *createRoleInputResolver) AdminUserRoleIDs(ctx context.Context, obj *ent.CreateRoleInput, data []string) error {
-	panic(fmt.Errorf("not implemented: AdminUserRoleIDs - adminUserRoleIDs"))
-}
-func (r *updateRoleInputResolver) AddAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error {
-	panic(fmt.Errorf("not implemented: AddAdminUserRoleIDs - addAdminUserRoleIDs"))
-}
-func (r *updateRoleInputResolver) RemoveAdminUserRoleIDs(ctx context.Context, obj *ent.UpdateRoleInput, data []string) error {
-	panic(fmt.Errorf("not implemented: RemoveAdminUserRoleIDs - removeAdminUserRoleIDs"))
-}
-func (r *updateRoleInputResolver) ClearAdminUserRoles(ctx context.Context, obj *ent.UpdateRoleInput, data *bool) error {
-	panic(fmt.Errorf("not implemented: ClearAdminUserRoles - clearAdminUserRoles"))
-}
-*/

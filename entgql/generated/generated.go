@@ -227,6 +227,7 @@ type ComplexityRoot struct {
 		Fields                func(childComplexity int) int
 		Files                 func(childComplexity int, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) int
 		FilesConnection       func(childComplexity int, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) int
+		Me                    func(childComplexity int) int
 		Node                  func(childComplexity int, id string) int
 		Nodes                 func(childComplexity int, ids []string) int
 		Permissions           func(childComplexity int, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) int
@@ -356,6 +357,7 @@ type QueryResolver interface {
 	Fields(ctx context.Context) ([]*entity.Field, error)
 	Files(ctx context.Context, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) ([]*ent.File, error)
 	FilesConnection(ctx context.Context, where *ent.FileWhereInput, orderBy *ent.FileOrder, skip *int, first *int, last *int) (*ent.FileConnection, error)
+	Me(ctx context.Context) (*ent.AdminUser, error)
 	Permissions(ctx context.Context, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) ([]*ent.Permission, error)
 	PermissionsConnection(ctx context.Context, where *ent.PermissionWhereInput, orderBy *ent.PermissionOrder, skip *int, first *int, last *int) (*ent.PermissionConnection, error)
 	Roles(ctx context.Context, where *ent.RoleWhereInput, orderBy *ent.RoleOrder, skip *int, first *int, last *int) ([]*ent.Role, error)
@@ -1416,6 +1418,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.FilesConnection(childComplexity, args["where"].(*ent.FileWhereInput), args["orderBy"].(*ent.FileOrder), args["skip"].(*int), args["first"].(*int), args["last"].(*int)), true
+	case "Query.me":
+		if e.complexity.Query.Me == nil {
+			break
+		}
+
+		return e.complexity.Query.Me(childComplexity), true
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
 			break
@@ -2168,6 +2176,10 @@ input UpdateManyFileInput {
     connect: [FileWhereUniqueInput!]
     delete: [FileWhereUniqueInput!]
     disconnect: [FileWhereUniqueInput!]
+}
+`, BuiltIn: false},
+	{Name: "../graphql/me.graphql", Input: `extend type Query {
+    me: AdminUser!
 }
 `, BuiltIn: false},
 	{Name: "../graphql/permission.graphql", Input: `extend type Query {
@@ -10043,6 +10055,63 @@ func (ec *executionContext) fieldContext_Query_filesConnection(ctx context.Conte
 	if fc.Args, err = ec.field_Query_filesConnection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_me,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().Me(ctx)
+		},
+		nil,
+		ec.marshalNAdminUser2ᚖgithubᚗcomᚋGoLabraᚋlabraᚋentgqlᚋentᚐAdminUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AdminUser_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AdminUser_name(ctx, field)
+			case "email":
+				return ec.fieldContext_AdminUser_email(ctx, field)
+			case "password":
+				return ec.fieldContext_AdminUser_password(ctx, field)
+			case "firstName":
+				return ec.fieldContext_AdminUser_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_AdminUser_lastName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AdminUser_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AdminUser_updatedAt(ctx, field)
+			case "adminCreatedBy":
+				return ec.fieldContext_AdminUser_adminCreatedBy(ctx, field)
+			case "refAdminUpdatedBy":
+				return ec.fieldContext_AdminUser_refAdminUpdatedBy(ctx, field)
+			case "adminUpdatedBy":
+				return ec.fieldContext_AdminUser_adminUpdatedBy(ctx, field)
+			case "roles":
+				return ec.fieldContext_AdminUser_roles(ctx, field)
+			case "defaultRole":
+				return ec.fieldContext_AdminUser_defaultRole(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AdminUser", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -20889,6 +20958,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_filesConnection(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "me":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_me(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
