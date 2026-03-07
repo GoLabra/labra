@@ -83,7 +83,7 @@ func (r *Permission) GetOne(ctx context.Context, where ent.PermissionWhereUnique
 	query := r.client.Permission.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -130,7 +130,7 @@ func (r *Permission) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 	query := tx.Permission.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -267,7 +267,7 @@ func (r *Permission) CreateMany(ctx context.Context, data []ent.CreatePermission
 	}
 	createdItems, err := r.client.Permission.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -279,7 +279,7 @@ func (r *Permission) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
 	}
 	createdItems, err := tx.Permission.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -321,11 +321,11 @@ func (r *Permission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 	query := tx.Permission.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to update: %v", err)
+		return nil, fmt.Errorf("error getting item to update: %w", err)
 	}
 	created_byToDelete := ent.UserWhereUniqueInput{}
 	if data.AdminCreatedBy != nil {
@@ -444,7 +444,7 @@ func (r *Permission) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 
 	updatedInput, err := tx.Permission.UpdateOne(item).SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error updating item: %v", err)
+		return nil, fmt.Errorf("error updating item: %w", err)
 	}
 	if data.AdminCreatedBy != nil && data.AdminCreatedBy.Delete != nil && *data.AdminCreatedBy.Delete {
 		_, err := repository.User.DeleteTx(ctx, tx, created_byToDelete)
@@ -503,21 +503,21 @@ func (r *Permission) Upsert(ctx context.Context, data ent.CreatePermissionInput)
 		var where ent.PermissionWhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 		err = r.client.Permission.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+			return nil, fmt.Errorf("error upserting item: %w", err)
 		}
 		upsertedPermission, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		return upsertedPermission, nil
 	}
 	upsertedPermission, err = r.client.Permission.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upsertedPermission, nil
 }
@@ -527,21 +527,21 @@ func (r *Permission) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.CreatePe
 		var where ent.PermissionWhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 		err = tx.Permission.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+			return nil, fmt.Errorf("error upserting item: %w", err)
 		}
 		upsertedPermission, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		return upsertedPermission, nil
 	}
 	upsertedPermission, err = tx.Permission.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upsertedPermission, nil
 }
@@ -553,7 +553,7 @@ func (r *Permission) UpsertMany(ctx context.Context, data []ent.CreatePermission
 	}
 	err := r.client.Permission.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -565,7 +565,7 @@ func (r *Permission) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
 	}
 	err := tx.Permission.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -574,16 +574,16 @@ func (r *Permission) Delete(ctx context.Context, where ent.PermissionWhereUnique
 	query := r.client.Permission.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = r.client.Permission.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }
@@ -592,16 +592,16 @@ func (r *Permission) DeleteTx(ctx context.Context, tx *ent.Tx, where ent.Permiss
 	query := tx.Permission.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = tx.Permission.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }

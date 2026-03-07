@@ -35,12 +35,15 @@
 					{{- if $.Max}}
 					Max: "{{$.Max}}",
 					{{- end }}
-					{{- if $.Private }}
-					Private: {{$.Private}},
-					{{- end }}
-					{{- if $.DefaultValue }}
-					DefaultValue: "{{$.DefaultValue}}",
-					{{- end }}
+				{{- if $.Private }}
+				Private: {{$.Private}},
+				{{- end }}
+				{{- if $.DefaultValue }}
+				DefaultValue: "{{$.DefaultValue}}",
+				{{- end }}
 				},
+				{{- if $.Private }}
+				entgql.Skip(entgql.SkipType, entgql.SkipMutationUpdateInput),
+				{{- end }}
 			),
 {{- end}}

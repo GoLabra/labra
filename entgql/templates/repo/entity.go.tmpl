@@ -100,7 +100,7 @@ func (r *{{$.Name}}) GetOne(ctx context.Context, where ent.{{$.Name}}WhereUnique
 	query := r.client.{{$.Name}}.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -147,7 +147,7 @@ func (r *{{$.Name}}) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	query := tx.{{$.Name}}.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -230,7 +230,7 @@ func (r *{{$.Name}}) CreateMany(ctx context.Context, data []ent.Create{{$.Name}}
     }
 	createdItems, err := r.client.{{$.Name}}.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -242,7 +242,7 @@ func (r *{{$.Name}}) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
     }
 	createdItems, err := tx.{{$.Name}}.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -300,11 +300,11 @@ func (r *{{$.Name}}) UpdateStateTx(ctx context.Context, tx *ent.Tx, where ent.{{
 	query := tx.{{$.Name}}.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to update state: %v", err)
+		return nil, fmt.Errorf("error getting item to update state: %w", err)
 	}
 	return tx.{{$.Name}}.UpdateOne(item).SetEntityState(state).Save(ctx)
 }
@@ -321,11 +321,11 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	query := tx.{{$.Name}}.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(iCtx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to update: %v", err)
+		return nil, fmt.Errorf("error getting item to update: %w", err)
 	}
 
 	{{- range $e := $.Edges}}
@@ -353,7 +353,7 @@ func (r *{{$.Name}}) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 
 	updatedInput, err := tx.{{$.Name}}.UpdateOne(item).SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error updating item: %v", err)
+		return nil, fmt.Errorf("error updating item: %w", err)
 	}
 
 	{{- range $e := $.Edges}}
@@ -422,36 +422,36 @@ func (r *{{$.Name}}) Upsert(ctx context.Context, data ent.Create{{$.Name}}Input)
 		var where ent.{{$.Name}}WhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 
 		upserted{{$.Name}}, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		if upserted{{$.Name}} != nil {
 			update{{$.Name}}Input := ent.Update{{$.Name}}Input{}
 			err = mapstructure.Decode(data, &update{{$.Name}}Input)
 			if err != nil {
-				return nil, fmt.Errorf("error upserting item: %v", err)
+				return nil, fmt.Errorf("error upserting item: %w", err)
 			}
 			upserted{{$.Name}}, err = r.client.{{$.Name}}.UpdateOne(upserted{{$.Name}}).SetInput(update{{$.Name}}Input).Save(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("error upserting item: %v", err)
+				return nil, fmt.Errorf("error upserting item: %w", err)
 			}
 			return upserted{{$.Name}}, nil
 		}
 
 		err = r.client.{{$.Name}}.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+			return nil, fmt.Errorf("error upserting item: %w", err)
 		}
 		
 		return upserted{{$.Name}}, nil
 	}
 	upserted{{$.Name}}, err = r.client.{{$.Name}}.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upserted{{$.Name}}, nil
 }
@@ -460,28 +460,28 @@ func (r *{{$.Name}}) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.Create{{
 	var where ent.{{$.Name}}WhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 
 		upserted{{$.Name}}, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		if upserted{{$.Name}} != nil {
 			update{{$.Name}}Input := ent.Update{{$.Name}}Input{}
 			err = mapstructure.Decode(data, &update{{$.Name}}Input)
 			if err != nil {
-				return nil, fmt.Errorf("error upserting item: %v", err)
+				return nil, fmt.Errorf("error upserting item: %w", err)
 			}
 			upserted{{$.Name}}, err = tx.{{$.Name}}.UpdateOne(upserted{{$.Name}}).SetInput(update{{$.Name}}Input).Save(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("error upserting item: %v", err)
+				return nil, fmt.Errorf("error upserting item: %w", err)
 			}
 			return upserted{{$.Name}}, nil
 		}
 	upserted{{$.Name}}, err = tx.{{$.Name}}.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upserted{{$.Name}}, nil
 }
@@ -493,7 +493,7 @@ func (r *{{$.Name}}) UpsertMany(ctx context.Context, data []ent.Create{{$.Name}}
 	}
 	err := r.client.{{$.Name}}.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -505,7 +505,7 @@ func (r *{{$.Name}}) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cr
     }
 	err := tx.{{$.Name}}.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -514,16 +514,16 @@ func (r *{{$.Name}}) Delete(ctx context.Context, where ent.{{$.Name}}WhereUnique
 	query := r.client.{{$.Name}}.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = r.client.{{$.Name}}.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }
@@ -532,16 +532,16 @@ func (r *{{$.Name}}) DeleteTx(ctx context.Context, tx *ent.Tx, where ent.{{$.Nam
 	query := tx.{{$.Name}}.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = tx.{{$.Name}}.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }

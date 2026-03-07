@@ -24,6 +24,7 @@ type AdminUser interface {
 	UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.CreateAdminUserInput) (int, error)
 	UpdateMany(ctx context.Context, where ent.AdminUserWhereInput, data ent.UpdateAdminUserInput) (int, error)
 	UpdateManyTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereInput, data ent.UpdateAdminUserInput) (int, error)
+	UpdatePassword(ctx context.Context, where ent.AdminUserWhereUniqueInput, hashedPassword string) (*ent.AdminUser, error)
 	Delete(ctx context.Context, where ent.AdminUserWhereUniqueInput) (*ent.AdminUser, error)
 	DeleteTx(ctx context.Context, tx *ent.Tx, where ent.AdminUserWhereUniqueInput) (*ent.AdminUser, error)
 	DeleteMany(ctx context.Context, where ent.AdminUserWhereInput) (int, error)

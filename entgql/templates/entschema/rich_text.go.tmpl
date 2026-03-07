@@ -13,9 +13,12 @@
 				annotations.Field{
 					Caption:   "{{$.Caption}}",
 					Type: entity.FieldTypeRichText,
-					{{- if $.Private }}
-					Private: {{$.Private}},
-					{{- end }}
+				{{- if $.Private }}
+				Private: {{$.Private}},
+				{{- end }}
 				},
+				{{- if $.Private }}
+				entgql.Skip(entgql.SkipType, entgql.SkipMutationUpdateInput),
+				{{- end }}
 			),
 {{- end}}

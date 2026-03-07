@@ -83,7 +83,7 @@ func (r *AdminUser) GetOne(ctx context.Context, where ent.AdminUserWhereUniqueIn
 	query := r.client.AdminUser.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -130,7 +130,7 @@ func (r *AdminUser) GetOneTx(ctx context.Context, tx *ent.Tx, where ent.AdminUse
 	query := tx.AdminUser.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	return query.First(ctx)
 }
@@ -360,7 +360,7 @@ func (r *AdminUser) CreateMany(ctx context.Context, data []ent.CreateAdminUserIn
 	}
 	createdItems, err := r.client.AdminUser.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -372,7 +372,7 @@ func (r *AdminUser) CreateManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cre
 	}
 	createdItems, err := tx.AdminUser.CreateBulk(createMap...).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error creating items: %v", err)
+		return nil, fmt.Errorf("error creating items: %w", err)
 	}
 	return createdItems, nil
 }
@@ -414,11 +414,11 @@ func (r *AdminUser) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.AdminUse
 	query := tx.AdminUser.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to update: %v", err)
+		return nil, fmt.Errorf("error getting item to update: %w", err)
 	}
 	if data.RefAdminCreatedBy != nil {
 
@@ -690,7 +690,7 @@ func (r *AdminUser) UpdateTx(ctx context.Context, tx *ent.Tx, where ent.AdminUse
 
 	updatedInput, err := tx.AdminUser.UpdateOne(item).SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error updating item: %v", err)
+		return nil, fmt.Errorf("error updating item: %w", err)
 	}
 	if data.AdminCreatedBy != nil && data.AdminCreatedBy.Delete != nil && *data.AdminCreatedBy.Delete {
 		_, err := repository.AdminUser.DeleteTx(ctx, tx, created_byToDelete)
@@ -749,21 +749,21 @@ func (r *AdminUser) Upsert(ctx context.Context, data ent.CreateAdminUserInput) (
 		var where ent.AdminUserWhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 		err = r.client.AdminUser.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+			return nil, fmt.Errorf("error upserting item: %w", err)
 		}
 		upsertedAdminUser, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		return upsertedAdminUser, nil
 	}
 	upsertedAdminUser, err = r.client.AdminUser.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upsertedAdminUser, nil
 }
@@ -773,21 +773,21 @@ func (r *AdminUser) UpsertTx(ctx context.Context, tx *ent.Tx, data ent.CreateAdm
 		var where ent.AdminUserWhereUniqueInput
 		err = mapstructure.Decode(data, &where)
 		if err != nil {
-			return nil, fmt.Errorf("error decoding where condition: %v", err)
+			return nil, fmt.Errorf("error decoding where condition: %w", err)
 		}
 		err = tx.AdminUser.Create().SetInput(data).OnConflict().UpdateNewValues().Exec(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error upserting item: %v", err)
+			return nil, fmt.Errorf("error upserting item: %w", err)
 		}
 		upsertedAdminUser, err = r.GetOne(ctx, where)
 		if err != nil {
-			return nil, fmt.Errorf("error getting upserted item: %v", err)
+			return nil, fmt.Errorf("error getting upserted item: %w", err)
 		}
 		return upsertedAdminUser, nil
 	}
 	upsertedAdminUser, err = tx.AdminUser.Create().SetInput(data).Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error upserting item: %v", err)
+		return nil, fmt.Errorf("error upserting item: %w", err)
 	}
 	return upsertedAdminUser, nil
 }
@@ -799,7 +799,7 @@ func (r *AdminUser) UpsertMany(ctx context.Context, data []ent.CreateAdminUserIn
 	}
 	err := r.client.AdminUser.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -811,7 +811,7 @@ func (r *AdminUser) UpsertManyTx(ctx context.Context, tx *ent.Tx, data []ent.Cre
 	}
 	err := tx.AdminUser.CreateBulk(upsertMap...).OnConflict().UpdateNewValues().Exec(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("error upserting items: %v", err)
+		return 0, fmt.Errorf("error upserting items: %w", err)
 	}
 	return len(data), nil
 }
@@ -820,16 +820,16 @@ func (r *AdminUser) Delete(ctx context.Context, where ent.AdminUserWhereUniqueIn
 	query := r.client.AdminUser.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = r.client.AdminUser.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }
@@ -838,16 +838,16 @@ func (r *AdminUser) DeleteTx(ctx context.Context, tx *ent.Tx, where ent.AdminUse
 	query := tx.AdminUser.Query()
 	query, err := where.Filter(query)
 	if err != nil {
-		return nil, fmt.Errorf("error applying unique where condition: %v", err)
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
 	}
 	item, err := query.First(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error getting item to delete: %v", err)
+		return nil, fmt.Errorf("error getting item to delete: %w", err)
 	}
 
 	err = tx.AdminUser.DeleteOne(item).Exec(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting item: %v", err)
+		return nil, fmt.Errorf("error deleting item: %w", err)
 	}
 	return item, err
 }
@@ -878,4 +878,18 @@ func (r *AdminUser) DeleteManyTx(ctx context.Context, tx *ent.Tx, where ent.Admi
 		return 0, err
 	}
 	return deletedRows, nil
+}
+
+func (r *AdminUser) UpdatePassword(ctx context.Context, where ent.AdminUserWhereUniqueInput, hashedPassword string) (*ent.AdminUser, error) {
+	iCtx := context.WithValue(ctx, constants.IsInternalOperationContextValue, true)
+	query := r.client.AdminUser.Query()
+	query, err := where.Filter(query)
+	if err != nil {
+		return nil, fmt.Errorf("error applying unique where condition: %w", err)
+	}
+	item, err := query.First(iCtx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting admin user: %w", err)
+	}
+	return r.client.AdminUser.UpdateOne(item).SetPassword(hashedPassword).Save(ctx)
 }

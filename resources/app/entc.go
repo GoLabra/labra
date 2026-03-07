@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -142,11 +143,11 @@ func CleanupUserFiles() gen.Hook {
 	return func(next gen.Generator) gen.Generator {
 		return gen.GenerateFunc(func(g *gen.Graph) error {
 			DeleteUserFilesFromDirectory("./domain/resolvers", "go")
-			DeleteUserFilesFromDirectory("./domain/repo", "go")
-			DeleteUserFilesFromDirectory("./domain/svc", "go")
 			DeleteUserFilesFromDirectory("./graphql", "graphql")
-			DeleteUserFilesFromDirectory("./interfaces/repo", "go")
-			DeleteUserFilesFromDirectory("./interfaces/svc", "go")
+			DeleteOrphanedUserFiles(g, "./domain/repo", "go")
+			DeleteOrphanedUserFiles(g, "./domain/svc", "go")
+			DeleteOrphanedUserFiles(g, "./interfaces/repo", "go")
+			DeleteOrphanedUserFiles(g, "./interfaces/svc", "go")
 			return next.Generate(g)
 		})
 	}
@@ -160,6 +161,34 @@ func DeleteUserFilesFromDirectory(directoryName, fileExtension string) {
 	for _, f := range files {
 		if err := os.Remove(f); err != nil {
 			panic(err)
+		}
+	}
+}
+
+func DeleteOrphanedUserFiles(g *gen.Graph, directoryName, fileExtension string) {
+	activeFiles := map[string]bool{}
+	for _, node := range g.Nodes {
+		var entityAnnotation annotations.Entity
+		if err := mapstructure.Decode(node.Annotations[annotations.EntityName], &entityAnnotation); err != nil {
+			continue
+		}
+		if entityAnnotation.Owner != entity.EntityOwnerUser {
+			continue
+		}
+		fileName := "user." + strcase.ToSnake(node.Name) + "." + fileExtension
+		activeFiles[fileName] = true
+	}
+
+	files, err := filepath.Glob(directoryName + string(os.PathSeparator) + "user.*." + fileExtension)
+	if err != nil {
+		panic(err)
+	}
+	for _, f := range files {
+		baseName := filepath.Base(f)
+		if !activeFiles[baseName] {
+			if err := os.Remove(f); err != nil {
+				panic(err)
+			}
 		}
 	}
 }
@@ -302,17 +331,25 @@ func RunNodeTemplates() gen.Hook {
 				}{node, createInputs}); err != nil {
 					return err
 				}
-				if err := runTemplate(errPrefix, "entity.go.tmpl", "repo/*", "./domain/repo/"+baseName+".go", node); err != nil {
-					return err
+				if _, err := os.Stat("./domain/repo/" + baseName + ".go"); errors.Is(err, os.ErrNotExist) {
+					if err := runTemplate(errPrefix, "entity.go.tmpl", "repo/*", "./domain/repo/"+baseName+".go", node); err != nil {
+						return err
+					}
 				}
-				if err := runTemplate(errPrefix, "entity.go.tmpl", "svc/entity.go.tmpl", "./domain/svc/"+baseName+".go", node); err != nil {
-					return err
+				if _, err := os.Stat("./domain/svc/" + baseName + ".go"); errors.Is(err, os.ErrNotExist) {
+					if err := runTemplate(errPrefix, "entity.go.tmpl", "svc/entity.go.tmpl", "./domain/svc/"+baseName+".go", node); err != nil {
+						return err
+					}
 				}
-				if err := runTemplate(errPrefix, "interface.go.tmpl", "svc/interface.go.tmpl", "./interfaces/svc/"+baseName+".go", node); err != nil {
-					return err
+				if _, err := os.Stat("./interfaces/svc/" + baseName + ".go"); errors.Is(err, os.ErrNotExist) {
+					if err := runTemplate(errPrefix, "interface.go.tmpl", "svc/interface.go.tmpl", "./interfaces/svc/"+baseName+".go", node); err != nil {
+						return err
+					}
 				}
-				if err := runTemplate(errPrefix, "interface.go.tmpl", "repo/interface.go.tmpl", "./interfaces/repo/"+baseName+".go", node); err != nil {
-					return err
+				if _, err := os.Stat("./interfaces/repo/" + baseName + ".go"); errors.Is(err, os.ErrNotExist) {
+					if err := runTemplate(errPrefix, "interface.go.tmpl", "repo/interface.go.tmpl", "./interfaces/repo/"+baseName+".go", node); err != nil {
+						return err
+					}
 				}
 				if err := runTemplate(errPrefix, "entity.resolver.go.tmpl", "resolver/entity.resolver.go.tmpl", "./domain/resolvers/"+baseName+".resolvers.go", node); err != nil {
 					return err
