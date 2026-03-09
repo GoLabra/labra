@@ -3,17 +3,16 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
-	"github.com/golang-jwt/jwt"
+	"github.com/GoLabra/labra/jwtrefresh"
+	"github.com/GoLabra/labra/refreshtoken"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,28 +27,25 @@ type User interface {
 
 // TODO: 1. sanitize error messages; 2. move to api; 3. add logs;
 func Login(w http.ResponseWriter, r *http.Request) {
-	var (
-		loginFormData LoginFormData
-	)
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("error reading body: %v", err)
-		return
-	}
-	defer r.Body.Close()
-	err = json.Unmarshal(body, &loginFormData)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Printf("error unmarshaling body: %v", err)
-		return
-	}
-
 	service, ok := r.Context().Value(constants.AdminServiceContextValue).(*svc.Service)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(svc.ErrServiceNotSetInContext)
+		return
+	}
+
+	var loginFormData LoginFormData
+
+	if err := decodeJSONLimited(w, r, &loginFormData, MaxBodyLoginBytes); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("invalid request body: %v", err)
+		return
+	}
+
+	loginFormData.Sanitize()
+	if err := loginFormData.Validate(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("validation failed: %v", err)
 		return
 	}
 
@@ -93,12 +89,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":  time.Now().Add(24 * time.Hour).Unix(),
-		"sub":  user.Email,
-		"role": role.Name,
-	})
-
 	appConfig, ok := r.Context().Value("config").(*config.AppConfig)
 
 	if !ok {
@@ -106,9 +96,39 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	signedToken, err := token.SignedString([]byte(appConfig.SecretKey))
+	adminEntClient, ok := r.Context().Value(constants.AdminEntClientContextValue).(*ent.Client)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("admin ent client not found")
+		return
+	}
+
+	pair, err := jwtrefresh.IssueTokenPair(
+		appConfig.SecretKey,
+		user.Email,
+		role.Name,
+		jwtrefresh.SubjectTypeAdmin,
+		appConfig.AccessTokenTTL,
+		appConfig.RefreshTokenTTL,
+	)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("failed to issue token pair: %v", err)
+		return
+	}
+
+	refreshTokenService := refreshtoken.NewService(refreshtoken.NewRepository(adminEntClient, appConfig.DBDialect))
+	err = refreshTokenService.Save(
+		r.Context(),
+		pair.RefreshToken,
+		user.Email,
+		jwtrefresh.SubjectTypeAdmin,
+		role.Name,
+		pair.RefreshExpiresAt,
+	)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("failed to save refresh token: %v", err)
 		return
 	}
 
@@ -123,10 +143,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	SetCSRFCookie(w, csrf, secure)
 
 	cookieDomain := ""
-	SetJWTCookie(w, r, signedToken, cookieDomain)
+	SetJWTCookieWithTTL(w, r, pair.AccessToken, cookieDomain, jwtrefresh.EffectiveAccessTTL(appConfig.AccessTokenTTL))
 
 	response, _ := json.Marshal(map[string]string{
-		"token": signedToken,
+		"token":         pair.AccessToken,
+		"refresh_token": pair.RefreshToken,
 	})
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
