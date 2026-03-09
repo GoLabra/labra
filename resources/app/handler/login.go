@@ -14,6 +14,7 @@ import (
 	adminSvc "github.com/GoLabra/labra/entgql/domain/svc"
 	adminEnt "github.com/GoLabra/labra/entgql/ent"
 	"github.com/GoLabra/labra/jwtrefresh"
+	"github.com/GoLabra/labra/refreshtoken"
 )
 
 type LoginFormData struct {
@@ -112,10 +113,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = jwtrefresh.SaveRefreshToken(
+	refreshTokenService := refreshtoken.NewService(refreshtoken.NewRepository(entClient, appConfig.DBDialect))
+	err = refreshTokenService.Save(
 		r.Context(),
-		entClient,
-		appConfig.DBDialect,
 		pair.RefreshToken,
 		user.Email,
 		jwtrefresh.SubjectTypeUser,

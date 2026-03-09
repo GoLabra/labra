@@ -2,12 +2,10 @@ package svc
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/GoLabra/labra/entgql/domain/repo"
-	"github.com/GoLabra/labra/tokenrevocation"
 )
 
 type subjectRevocation struct {
@@ -19,13 +17,8 @@ func revokeSubjects(ctx context.Context, repository *repo.Repository, subjects [
 	if len(subjects) == 0 {
 		return nil
 	}
-	if repository == nil || repository.Client == nil {
-		return fmt.Errorf("repository client is not initialized")
-	}
-
-	dialect := repository.Client.DialectName()
-	if strings.TrimSpace(dialect) == "" {
-		return fmt.Errorf("database dialect is not available")
+	if repository == nil || repository.TokenRevocation == nil {
+		return nil
 	}
 
 	seen := make(map[string]struct{}, len(subjects))
@@ -44,7 +37,7 @@ func revokeSubjects(ctx context.Context, repository *repo.Repository, subjects [
 		}
 		seen[key] = struct{}{}
 
-		if err := tokenrevocation.RevokeSubjectTokens(ctx, repository.Client, dialect, email, subjectType, revokedAt); err != nil {
+		if err := repository.TokenRevocation.RevokeSubjectTokens(ctx, email, subjectType, revokedAt); err != nil {
 			return err
 		}
 	}

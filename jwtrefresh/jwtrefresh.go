@@ -1,12 +1,9 @@
 package jwtrefresh
 
 import (
-	"context"
 	"crypto/rand"
 	"crypto/sha256"
-	"database/sql"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -30,8 +27,6 @@ const (
 	DefaultRefreshTokenTTL = 7 * 24 * time.Hour
 )
 
-var ErrRefreshTokenNotFound = errors.New("refresh token not found")
-
 type TokenPair struct {
 	AccessToken      string
 	AccessExpiresAt  time.Time
@@ -43,19 +38,6 @@ type RefreshClaims struct {
 	Subject     string
 	Role        string
 	SubjectType string
-}
-
-type StoredRefreshToken struct {
-	SubjectEmail  string
-	SubjectType   string
-	RoleName      string
-	ExpiresAtUnix int64
-	RevokedAtUnix sql.NullInt64
-}
-
-type SQLExecutor interface {
-	ExecContext(context.Context, string, ...any) (sql.Result, error)
-	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
 }
 
 func EffectiveAccessTTL(ttl time.Duration) time.Duration {
@@ -189,113 +171,6 @@ func HashToken(rawToken string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func EnsureRefreshTokenTable(ctx context.Context, db SQLExecutor) error {
-	const createRefreshTokensTableQuery = `
-CREATE TABLE IF NOT EXISTS refresh_tokens (
-	token_hash VARCHAR(64) PRIMARY KEY,
-	subject_email VARCHAR(254) NOT NULL,
-	subject_type VARCHAR(16) NOT NULL,
-	role_name VARCHAR(128) NOT NULL,
-	expires_at_unix BIGINT NOT NULL,
-	created_at_unix BIGINT NOT NULL,
-	revoked_at_unix BIGINT NULL
-)`
-
-	_, err := db.ExecContext(ctx, createRefreshTokensTableQuery)
-	return err
-}
-
-func SaveRefreshToken(ctx context.Context, db SQLExecutor, dialect, rawToken, subjectEmail, subjectType, roleName string, expiresAt time.Time) error {
-	if err := EnsureRefreshTokenTable(ctx, db); err != nil {
-		return err
-	}
-
-	insertQuery := fmt.Sprintf(
-		"INSERT INTO refresh_tokens (token_hash, subject_email, subject_type, role_name, expires_at_unix, created_at_unix, revoked_at_unix) VALUES (%s, %s, %s, %s, %s, %s, NULL)",
-		bindVar(dialect, 1),
-		bindVar(dialect, 2),
-		bindVar(dialect, 3),
-		bindVar(dialect, 4),
-		bindVar(dialect, 5),
-		bindVar(dialect, 6),
-	)
-
-	_, err := db.ExecContext(
-		ctx,
-		insertQuery,
-		HashToken(rawToken),
-		subjectEmail,
-		subjectType,
-		roleName,
-		expiresAt.Unix(),
-		time.Now().UTC().Unix(),
-	)
-	return err
-}
-
-func LoadRefreshToken(ctx context.Context, db SQLExecutor, dialect, rawToken string) (StoredRefreshToken, error) {
-	var out StoredRefreshToken
-
-	if err := EnsureRefreshTokenTable(ctx, db); err != nil {
-		return out, err
-	}
-
-	query := fmt.Sprintf(
-		"SELECT subject_email, subject_type, role_name, expires_at_unix, revoked_at_unix FROM refresh_tokens WHERE token_hash = %s LIMIT 1",
-		bindVar(dialect, 1),
-	)
-
-	rows, err := db.QueryContext(ctx, query, HashToken(rawToken))
-	if err != nil {
-		return out, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		return out, ErrRefreshTokenNotFound
-	}
-
-	if err := rows.Scan(
-		&out.SubjectEmail,
-		&out.SubjectType,
-		&out.RoleName,
-		&out.ExpiresAtUnix,
-		&out.RevokedAtUnix,
-	); err != nil {
-		return out, err
-	}
-
-	if err := rows.Err(); err != nil {
-		return out, err
-	}
-
-	return out, nil
-}
-
-func RevokeRefreshToken(ctx context.Context, db SQLExecutor, dialect, rawToken string, revokedAt time.Time) (bool, error) {
-	if err := EnsureRefreshTokenTable(ctx, db); err != nil {
-		return false, err
-	}
-
-	query := fmt.Sprintf(
-		"UPDATE refresh_tokens SET revoked_at_unix = %s WHERE token_hash = %s AND revoked_at_unix IS NULL",
-		bindVar(dialect, 1),
-		bindVar(dialect, 2),
-	)
-
-	result, err := db.ExecContext(ctx, query, revokedAt.UTC().Unix(), HashToken(rawToken))
-	if err != nil {
-		return false, err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return false, err
-	}
-
-	return rowsAffected == 1, nil
-}
-
 func claimString(claims jwt.MapClaims, key string) (string, error) {
 	raw, exists := claims[key]
 	if !exists {
@@ -308,13 +183,6 @@ func claimString(claims jwt.MapClaims, key string) (string, error) {
 	}
 
 	return strings.TrimSpace(s), nil
-}
-
-func bindVar(dialect string, position int) string {
-	if strings.EqualFold(strings.TrimSpace(dialect), "postgres") {
-		return fmt.Sprintf("$%d", position)
-	}
-	return "?"
 }
 
 func newTokenID() (string, error) {

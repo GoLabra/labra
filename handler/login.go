@@ -12,6 +12,7 @@ import (
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
 	"github.com/GoLabra/labra/jwtrefresh"
+	"github.com/GoLabra/labra/refreshtoken"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -116,10 +117,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = jwtrefresh.SaveRefreshToken(
+	refreshTokenService := refreshtoken.NewService(refreshtoken.NewRepository(adminEntClient, appConfig.DBDialect))
+	err = refreshTokenService.Save(
 		r.Context(),
-		adminEntClient,
-		appConfig.DBDialect,
 		pair.RefreshToken,
 		user.Email,
 		jwtrefresh.SubjectTypeAdmin,

@@ -7,268 +7,36 @@ package resolvers
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"strings"
-	"time"
 
 	gqlgen "github.com/GoLabra/labra/entgql/generated"
-	"github.com/lucsky/cuid"
 )
 
 // CreateCronSchedule is the resolver for the createCronSchedule field.
 func (r *mutationResolver) CreateCronSchedule(ctx context.Context, data gqlgen.CreateCronScheduleInput) (*gqlgen.CronSchedule, error) {
-	client, iCtx, err := cronDB(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	enabled := true
-	if data.Enabled != nil {
-		enabled = *data.Enabled
-	}
-	timeoutSeconds := 300
-	if data.TimeoutSeconds != nil {
-		timeoutSeconds = *data.TimeoutSeconds
-	}
-	retentionDays := 30
-	if data.RetentionDays != nil {
-		retentionDays = *data.RetentionDays
-	}
-	if timeoutSeconds <= 0 {
-		return nil, errors.New("timeoutSeconds must be greater than 0")
-	}
-	if retentionDays <= 0 {
-		return nil, errors.New("retentionDays must be greater than 0")
-	}
-
-	handlerConfig := map[string]any{}
-	if data.HandlerConfig != nil {
-		handlerConfig = data.HandlerConfig
-	}
-	cfgRaw, err := json.Marshal(handlerConfig)
-	if err != nil {
-		return nil, fmt.Errorf("marshal handlerConfig: %w", err)
-	}
-
-	now := time.Now().UTC()
-	id := cuid.New()
-	query := `INSERT INTO cron_schedules
-		(id, name, expression, handler, handler_config, enabled, description, timeout_seconds, retention_days, created_at, updated_at)
-		VALUES (` + cronBindVar(client.DialectName(), 1) + `, ` + cronBindVar(client.DialectName(), 2) + `, ` + cronBindVar(client.DialectName(), 3) + `, ` + cronBindVar(client.DialectName(), 4) + `, ` + cronBindVar(client.DialectName(), 5) + `, ` + cronBindVar(client.DialectName(), 6) + `, ` + cronBindVar(client.DialectName(), 7) + `, ` + cronBindVar(client.DialectName(), 8) + `, ` + cronBindVar(client.DialectName(), 9) + `, ` + cronBindVar(client.DialectName(), 10) + `, ` + cronBindVar(client.DialectName(), 11) + `)`
-	if _, err := client.ExecContext(iCtx, query, id, data.Name, data.Expression, data.Handler, string(cfgRaw), enabled, data.Description, timeoutSeconds, retentionDays, now, now); err != nil {
-		return nil, err
-	}
-
-	return loadCronScheduleByID(iCtx, client, id)
+	return r.Service.Cron.CreateSchedule(ctx, data)
 }
 
 // UpdateCronSchedule is the resolver for the updateCronSchedule field.
 func (r *mutationResolver) UpdateCronSchedule(ctx context.Context, where gqlgen.CronScheduleWhereUniqueInput, data gqlgen.UpdateCronScheduleInput) (*gqlgen.CronSchedule, error) {
-	client, iCtx, err := cronDB(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	existing, err := loadCronScheduleByWhere(iCtx, client, where)
-	if err != nil {
-		return nil, err
-	}
-	if existing == nil {
-		return nil, nil
-	}
-
-	sets := make([]string, 0, 10)
-	args := make([]any, 0, 10)
-	argIdx := 1
-	addSet := func(field string, value any) {
-		sets = append(sets, field+" = "+cronBindVar(client.DialectName(), argIdx))
-		args = append(args, value)
-		argIdx++
-	}
-
-	if data.Name != nil {
-		addSet("name", *data.Name)
-	}
-	if data.Expression != nil {
-		addSet("expression", *data.Expression)
-	}
-	if data.Handler != nil {
-		addSet("handler", *data.Handler)
-	}
-	if data.TimeoutSeconds != nil {
-		if *data.TimeoutSeconds <= 0 {
-			return nil, errors.New("timeoutSeconds must be greater than 0")
-		}
-		addSet("timeout_seconds", *data.TimeoutSeconds)
-	}
-	if data.RetentionDays != nil {
-		if *data.RetentionDays <= 0 {
-			return nil, errors.New("retentionDays must be greater than 0")
-		}
-		addSet("retention_days", *data.RetentionDays)
-	}
-	if data.Enabled != nil {
-		addSet("enabled", *data.Enabled)
-	}
-	if data.Description != nil {
-		addSet("description", *data.Description)
-	} else if data.ClearDescription != nil && *data.ClearDescription {
-		addSet("description", nil)
-	}
-	if data.HandlerConfig != nil {
-		raw, err := json.Marshal(data.HandlerConfig)
-		if err != nil {
-			return nil, fmt.Errorf("marshal handlerConfig: %w", err)
-		}
-		addSet("handler_config", string(raw))
-	} else if data.ClearHandlerConfig != nil && *data.ClearHandlerConfig {
-		addSet("handler_config", "{}")
-	}
-
-	addSet("updated_at", time.Now().UTC())
-	whereCol, whereVal, err := cronWhere(where)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(sets) == 0 {
-		return existing, nil
-	}
-	query := `UPDATE cron_schedules SET ` + strings.Join(sets, ", ") + ` WHERE ` + whereCol + ` = ` + cronBindVar(client.DialectName(), argIdx)
-	args = append(args, whereVal)
-	if _, err := client.ExecContext(iCtx, query, args...); err != nil {
-		return nil, err
-	}
-
-	return loadCronScheduleByID(iCtx, client, existing.ID)
+	return r.Service.Cron.UpdateSchedule(ctx, where, data)
 }
 
 // DeleteCronSchedule is the resolver for the deleteCronSchedule field.
 func (r *mutationResolver) DeleteCronSchedule(ctx context.Context, where gqlgen.CronScheduleWhereUniqueInput) (*gqlgen.CronSchedule, error) {
-	client, iCtx, err := cronDB(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	existing, err := loadCronScheduleByWhere(iCtx, client, where)
-	if err != nil {
-		return nil, err
-	}
-	if existing == nil {
-		return nil, nil
-	}
-
-	whereCol, whereVal, err := cronWhere(where)
-	if err != nil {
-		return nil, err
-	}
-	query := `DELETE FROM cron_schedules WHERE ` + whereCol + ` = ` + cronBindVar(client.DialectName(), 1)
-	if _, err := client.ExecContext(iCtx, query, whereVal); err != nil {
-		return nil, err
-	}
-
-	return existing, nil
+	return r.Service.Cron.DeleteSchedule(ctx, where)
 }
 
 // CronSchedule is the resolver for the cronSchedule field.
 func (r *queryResolver) CronSchedule(ctx context.Context, where gqlgen.CronScheduleWhereUniqueInput) (*gqlgen.CronSchedule, error) {
-	client, iCtx, err := cronDB(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return loadCronScheduleByWhere(iCtx, client, where)
+	return r.Service.Cron.GetSchedule(ctx, where)
 }
 
 // CronSchedules is the resolver for the cronSchedules field.
 func (r *queryResolver) CronSchedules(ctx context.Context, enabled *bool, limit *int, offset *int) ([]*gqlgen.CronSchedule, error) {
-	client, iCtx, err := cronDB(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	l := 50
-	if limit != nil {
-		l = *limit
-	}
-	if l <= 0 {
-		l = 50
-	}
-	o := 0
-	if offset != nil && *offset > 0 {
-		o = *offset
-	}
-
-	query := `SELECT id, name, expression, handler, handler_config, enabled, description, timeout_seconds, retention_days, created_at, updated_at
-		FROM cron_schedules`
-	args := make([]any, 0, 3)
-	if enabled != nil {
-		query += ` WHERE enabled = ` + cronBindVar(client.DialectName(), 1)
-		args = append(args, *enabled)
-	}
-	query += ` ORDER BY created_at DESC LIMIT ` + cronBindVar(client.DialectName(), len(args)+1) + ` OFFSET ` + cronBindVar(client.DialectName(), len(args)+2)
-	args = append(args, l, o)
-
-	rows, err := client.QueryContext(iCtx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var out []*gqlgen.CronSchedule
-	for rows.Next() {
-		s, err := scanCronSchedule(rows)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, s)
-	}
-	return out, rows.Err()
+	return r.Service.Cron.ListSchedules(ctx, enabled, limit, offset)
 }
 
 // CronJobs is the resolver for the cronJobs field.
 func (r *queryResolver) CronJobs(ctx context.Context, scheduleID *string, limit *int, offset *int) ([]*gqlgen.CronJob, error) {
-	client, iCtx, err := cronDB(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	l := 100
-	if limit != nil {
-		l = *limit
-	}
-	if l <= 0 {
-		l = 100
-	}
-	o := 0
-	if offset != nil && *offset > 0 {
-		o = *offset
-	}
-
-	query := `SELECT id, started_at, completed_at, status, error, records_affected, duration_ms, created_at, cron_schedule_cron_jobs
-		FROM cron_jobs`
-	args := make([]any, 0, 3)
-	if scheduleID != nil && *scheduleID != "" {
-		query += ` WHERE cron_schedule_cron_jobs = ` + cronBindVar(client.DialectName(), 1)
-		args = append(args, *scheduleID)
-	}
-	query += ` ORDER BY created_at DESC LIMIT ` + cronBindVar(client.DialectName(), len(args)+1) + ` OFFSET ` + cronBindVar(client.DialectName(), len(args)+2)
-	args = append(args, l, o)
-
-	rows, err := client.QueryContext(iCtx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var out []*gqlgen.CronJob
-	for rows.Next() {
-		job, err := scanCronJob(rows)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, job)
-	}
-	return out, rows.Err()
+	return r.Service.Cron.ListJobs(ctx, scheduleID, limit, offset)
 }

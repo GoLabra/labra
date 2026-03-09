@@ -18,6 +18,7 @@ type Service struct {
 	User       svc.User
 	AdminUser  svc.AdminUser
 	File       svc.File
+	Cron       svc.Cron
 }
 
 func New(repository *repo.Repository, schemaManager generator.SchemaManager) *Service {
@@ -29,5 +30,6 @@ func New(repository *repo.Repository, schemaManager generator.SchemaManager) *Se
 		AdminUser:  NewAdminUser(repository),
 		Entity:     NewEntity(schemaManager),
 		File:       NewFile(repository),
+		Cron:       NewCron(repository),
 	}
 }

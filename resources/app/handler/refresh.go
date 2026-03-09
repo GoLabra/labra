@@ -13,6 +13,7 @@ import (
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/jwtrefresh"
+	"github.com/GoLabra/labra/refreshtoken"
 )
 
 type RefreshRequest struct {
@@ -62,9 +63,10 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	stored, err := jwtrefresh.LoadRefreshToken(r.Context(), tx, appConfig.DBDialect, refreshToken)
+	refreshTokenService := refreshtoken.NewService(refreshtoken.NewRepository(tx, appConfig.DBDialect))
+	stored, err := refreshTokenService.Load(r.Context(), refreshToken)
 	if err != nil {
-		if errors.Is(err, jwtrefresh.ErrRefreshTokenNotFound) {
+		if errors.Is(err, refreshtoken.ErrRefreshTokenNotFound) {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -82,7 +84,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	revoked, err := jwtrefresh.RevokeRefreshToken(r.Context(), tx, appConfig.DBDialect, refreshToken, time.Now().UTC())
+	revoked, err := refreshTokenService.Revoke(r.Context(), refreshToken, time.Now().UTC())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("failed revoking refresh token: %v", err)
@@ -107,10 +109,8 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = jwtrefresh.SaveRefreshToken(
+	err = refreshTokenService.Save(
 		r.Context(),
-		tx,
-		appConfig.DBDialect,
 		pair.RefreshToken,
 		claims.Subject,
 		claims.SubjectType,

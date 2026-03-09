@@ -12,6 +12,7 @@ import (
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/jwtrefresh"
+	"github.com/GoLabra/labra/refreshtoken"
 )
 
 func TestRefresh_RotatesRefreshToken(t *testing.T) {
@@ -40,10 +41,9 @@ func TestRefresh_RotatesRefreshToken(t *testing.T) {
 		t.Fatalf("failed issuing initial pair: %v", err)
 	}
 
-	err = jwtrefresh.SaveRefreshToken(
+	refreshTokenService := refreshtoken.NewService(refreshtoken.NewRepository(client, cfg.DBDialect))
+	err = refreshTokenService.Save(
 		context.Background(),
-		client,
-		cfg.DBDialect,
 		pair.RefreshToken,
 		"refresh-test@example.com",
 		jwtrefresh.SubjectTypeAdmin,
