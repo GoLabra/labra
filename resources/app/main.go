@@ -122,7 +122,7 @@ func main() {
 	utils.LoadSchema(appConfig)
 
 	adminClient, adminRepository, adminService, adminResolver := InitAdmin(drv)
-	_, repository, service, resolver := InitApp(drv, adminClient, adminRepository, adminService)
+	client, repository, service, resolver := InitApp(drv, adminClient, adminRepository, adminService)
 
 	graphqlSubscriptionClient := subscription.NewGraphqlSubscriptionClient()
 
@@ -164,8 +164,10 @@ func main() {
 			var ctx = r.Context()
 			ctx = context.WithValue(ctx, constants.AdminServiceContextValue, adminService)
 			ctx = context.WithValue(ctx, constants.AdminRepositoryContextValue, adminRepository)
+			ctx = context.WithValue(ctx, constants.AdminEntClientContextValue, adminClient)
 			ctx = context.WithValue(ctx, constants.ServiceContextValue, service)
 			ctx = context.WithValue(ctx, constants.RepositoryContextValue, repository)
+			ctx = context.WithValue(ctx, constants.EntClientContextValue, client)
 			ctx = context.WithValue(ctx, constants.CentrifugeClientContextValue, gocentClient)
 			ctx = context.WithValue(ctx, "config", appConfig)
 			next.ServeHTTP(w, r.WithContext(ctx))
