@@ -2,7 +2,6 @@
 schema:
   - ./graphql/*.graphql
 
-
 exec:
   filename: ./generated/generated.go
   package: gqlgen
@@ -29,6 +28,8 @@ autobind:
 
 # This section declares type mapping between the GraphQL and Go type systems.
 models:
+  Email:
+    model: github.com/GoLabra/labra/entgql/entity.Email
   Node:
     model:
       - ./ent.Noder
@@ -86,4 +87,3 @@ models:
   AppStatus:
     model:
       - github.com/GoLabra/labra/subscription.AppStatus
-

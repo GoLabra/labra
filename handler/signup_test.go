@@ -30,7 +30,7 @@ func TestSignup(t *testing.T) {
 			name: "successful signup with existing super admin role",
 			requestBody: SignupFormData{
 				Email:     "newuser@example.com",
-				Password:  "password123",
+				Password:  "hashed-password",
 				FirstName: "John",
 				LastName:  "Doe",
 			},
@@ -40,7 +40,7 @@ func TestSignup(t *testing.T) {
 					GetOne(gomock.Any(), ent.RoleWhereUniqueInput{Name: stringPtr("SuperAdmin")}).
 					Return(superAdminRole, nil)
 
-				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("hashed-password"), bcrypt.DefaultCost)
 				newUser := CreateTestAdminUser("user-1", "newuser@example.com", string(hashedPassword))
 				newUser.FirstName = "John"
 				newUser.LastName = "Doe"
@@ -66,7 +66,7 @@ func TestSignup(t *testing.T) {
 			name: "successful signup creating super admin role",
 			requestBody: SignupFormData{
 				Email:     "newuser@example.com",
-				Password:  "password123",
+				Password:  "hashed-password",
 				FirstName: "John",
 				LastName:  "Doe",
 			},
@@ -82,7 +82,7 @@ func TestSignup(t *testing.T) {
 					Create(gomock.Any(), ent.CreateRoleInput{Name: "SuperAdmin"}).
 					Return(superAdminRole, nil)
 
-				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("hashed-password"), bcrypt.DefaultCost)
 				newUser := CreateTestAdminUser("user-1", "newuser@example.com", string(hashedPassword))
 				newUser.FirstName = "John"
 				newUser.LastName = "Doe"
@@ -127,7 +127,7 @@ func TestSignup(t *testing.T) {
 			name: "service not in context",
 			requestBody: SignupFormData{
 				Email:     "newuser@example.com",
-				Password:  "password123",
+				Password:  "hashed-password",
 				FirstName: "John",
 				LastName:  "Doe",
 			},
@@ -147,7 +147,7 @@ func TestSignup(t *testing.T) {
 			name: "error getting super admin role",
 			requestBody: SignupFormData{
 				Email:     "newuser@example.com",
-				Password:  "password123",
+				Password:  "hashed-password",
 				FirstName: "John",
 				LastName:  "Doe",
 			},
@@ -173,7 +173,7 @@ func TestSignup(t *testing.T) {
 			name: "error creating user",
 			requestBody: SignupFormData{
 				Email:     "newuser@example.com",
-				Password:  "password123",
+				Password:  "hashed-password",
 				FirstName: "John",
 				LastName:  "Doe",
 			},
