@@ -143,7 +143,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 
 func extractRefreshTokenFromRequest(w http.ResponseWriter, r *http.Request) (string, error) {
 	var payload RefreshRequest
-	err := decodeJSONLimited(w, r, &payload, MaxBodyLoginBytes)
+	err := decodeRefreshJSON(r, &payload)
 	if err != nil && !errors.Is(err, io.EOF) {
 		return "", err
 	}
@@ -165,6 +165,20 @@ func extractRefreshTokenFromRequest(w http.ResponseWriter, r *http.Request) (str
 	}
 
 	return token, nil
+}
+
+func decodeRefreshJSON(r *http.Request, dst any) error {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	if len(body) == 0 {
+		return io.EOF
+	}
+
+	return json.Unmarshal(body, dst)
 }
 
 func extractBearerToken(authorizationHeader string) string {
