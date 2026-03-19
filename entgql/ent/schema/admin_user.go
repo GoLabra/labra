@@ -182,5 +182,13 @@ func (AdminUser) Edges() []ent.Edge {
 					RelationType: entity.RelationTypeOne,
 				},
 			),
+		edge.To("refresh_tokens", AdminRefreshToken.Type).
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+				annotations.Edge{
+					Caption:      "Refresh Tokens",
+					RelationType: entity.RelationTypeO2M,
+				},
+			),
 	}
 }

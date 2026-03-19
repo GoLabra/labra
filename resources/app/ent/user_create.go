@@ -6,6 +6,7 @@ import (
 	"app/ent/adminuser"
 	"app/ent/role"
 	"app/ent/user"
+	"app/ent/userrefreshtoken"
 	"context"
 	"errors"
 	"fmt"
@@ -188,6 +189,21 @@ func (_c *UserCreate) SetNillableDefaultRoleID(id *string) *UserCreate {
 // SetDefaultRole sets the "default_role" edge to the Role entity.
 func (_c *UserCreate) SetDefaultRole(v *Role) *UserCreate {
 	return _c.SetDefaultRoleID(v.ID)
+}
+
+// AddRefreshTokenIDs adds the "refresh_tokens" edge to the UserRefreshToken entity by IDs.
+func (_c *UserCreate) AddRefreshTokenIDs(ids ...int) *UserCreate {
+	_c.mutation.AddRefreshTokenIDs(ids...)
+	return _c
+}
+
+// AddRefreshTokens adds the "refresh_tokens" edges to the UserRefreshToken entity.
+func (_c *UserCreate) AddRefreshTokens(v ...*UserRefreshToken) *UserCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRefreshTokenIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -424,6 +440,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.user_default_role = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RefreshTokensIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   user.RefreshTokensTable,
+			Columns: []string{user.RefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userrefreshtoken.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

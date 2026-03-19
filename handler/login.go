@@ -2,17 +2,14 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/domain/svc"
 	"github.com/GoLabra/labra/entgql/ent"
-	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -89,21 +86,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":  time.Now().Add(24 * time.Hour).Unix(),
-		"sub":  user.Email,
-		"role": role.Name,
-	})
-
 	appConfig, ok := r.Context().Value("config").(*config.AppConfig)
-
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	signedToken, err := token.SignedString([]byte(appConfig.SecretKey))
+	accessToken, refreshToken, accessTTL, refreshTTL, err := issueAdminSession(iCtx, appConfig, user, role)
 	if err != nil {
+		log.Printf("error issuing session: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -119,12 +110,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	SetCSRFCookie(w, csrf, secure)
 
 	cookieDomain := ""
-	SetJWTCookie(w, r, signedToken, cookieDomain)
+	SetJWTCookieWithTTL(w, r, accessToken, cookieDomain, accessTTL)
+	SetRefreshTokenCookie(w, r, refreshToken, cookieDomain, refreshTTL)
 
-	response, _ := json.Marshal(map[string]string{
-		"token": signedToken,
-	})
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	writeTokenResponse(w, accessToken)
 }

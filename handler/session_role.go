@@ -1,14 +1,11 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	"github.com/GoLabra/labra/entgql/ent"
-	"github.com/golang-jwt/jwt"
 )
 
 type ChangeSessionRoleRequest struct {
@@ -29,12 +26,6 @@ func ChangeSessionRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":  time.Now().Add(24 * time.Hour).Unix(),
-		"sub":  user.Email,
-		"role": role.Name,
-	})
-
 	appConfig, ok := r.Context().Value("config").(*config.AppConfig)
 
 	if !ok {
@@ -42,15 +33,12 @@ func ChangeSessionRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	signedToken, err := token.SignedString([]byte(appConfig.SecretKey))
+	signedToken, err := issueAccessToken(appConfig, user.Email, role.Name)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	response, _ := json.Marshal(map[string]string{
-		"token": signedToken,
-	})
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	SetJWTCookieWithTTL(w, r, signedToken, "", accessTokenTTL(appConfig))
+	writeTokenResponse(w, signedToken)
 }

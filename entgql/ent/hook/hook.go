@@ -9,6 +9,18 @@ import (
 	"github.com/GoLabra/labra/entgql/ent"
 )
 
+// The AdminRefreshTokenFunc type is an adapter to allow the use of ordinary
+// function as AdminRefreshToken mutator.
+type AdminRefreshTokenFunc func(context.Context, *ent.AdminRefreshTokenMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AdminRefreshTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AdminRefreshTokenMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminRefreshTokenMutation", m)
+}
+
 // The AdminUserFunc type is an adapter to allow the use of ordinary
 // function as AdminUser mutator.
 type AdminUserFunc func(context.Context, *ent.AdminUserMutation) (ent.Value, error)

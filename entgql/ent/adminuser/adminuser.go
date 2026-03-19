@@ -40,6 +40,8 @@ const (
 	EdgeRoles = "roles"
 	// EdgeDefaultRole holds the string denoting the default_role edge name in mutations.
 	EdgeDefaultRole = "default_role"
+	// EdgeRefreshTokens holds the string denoting the refresh_tokens edge name in mutations.
+	EdgeRefreshTokens = "refresh_tokens"
 	// Table holds the table name of the adminuser in the database.
 	Table = "admin_users"
 	// RefAdminCreatedByTable is the table that holds the ref_admin_created_by relation/edge.
@@ -70,6 +72,13 @@ const (
 	DefaultRoleInverseTable = "roles"
 	// DefaultRoleColumn is the table column denoting the default_role relation/edge.
 	DefaultRoleColumn = "admin_user_default_role"
+	// RefreshTokensTable is the table that holds the refresh_tokens relation/edge.
+	RefreshTokensTable = "admin_refresh_tokens"
+	// RefreshTokensInverseTable is the table name for the AdminRefreshToken entity.
+	// It exists in this package in order to avoid circular dependency with the "adminrefreshtoken" package.
+	RefreshTokensInverseTable = "admin_refresh_tokens"
+	// RefreshTokensColumn is the table column denoting the refresh_tokens relation/edge.
+	RefreshTokensColumn = "admin_user_refresh_tokens"
 )
 
 // Columns holds all SQL columns for adminuser fields.

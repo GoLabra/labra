@@ -6,6 +6,7 @@ import (
 	"app/ent/role"
 	"app/ent/user"
 	"fmt"
+	"strconv"
 )
 
 // AddEdges sets the value of a field with the given name. It returns an error if
@@ -48,6 +49,25 @@ func (m *UserMutation) AddEdges(name string, values []string) error {
 	case user.EdgeRoles:
 		m.AddRoleIDs(values...)
 		return nil
+	case user.EdgeRefreshTokens:
+		ids := make([]int, 0, len(values))
+		for _, value := range values {
+			id, err := strconv.Atoi(value)
+			if err != nil {
+				return err
+			}
+			ids = append(ids, id)
+		}
+		m.AddRefreshTokenIDs(ids...)
+		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
+}
+
+// AddEdges sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
+func (m *UserRefreshTokenMutation) AddEdges(name string, values []string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown UserRefreshToken edge %s", name)
 }

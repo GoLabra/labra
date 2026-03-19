@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
@@ -18,6 +19,14 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+	originalPersist := persistAdminRefreshSession
+	persistAdminRefreshSession = func(ctx context.Context, adminUserID, tokenHash string, expiresAt time.Time) error {
+		return nil
+	}
+	defer func() {
+		persistAdminRefreshSession = originalPersist
+	}()
+
 	tests := []struct {
 		name           string
 		requestBody    LoginFormData
@@ -207,6 +216,9 @@ func TestLogin(t *testing.T) {
 				}
 				if response["token"] == "" {
 					t.Error("expected token in response")
+				}
+				if len(w.Result().Cookies()) == 0 {
+					t.Error("expected auth cookies to be set")
 				}
 			}
 		})

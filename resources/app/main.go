@@ -206,6 +206,7 @@ func main() {
 	})
 	router.Group(func(router chi.Router) {
 		router.With(loginLimiter.Middleware).Post("/login", handler.Login)
+		router.With(loginLimiter.Middleware).Post("/refresh", handler.Refresh)
 		router.Handle("/playground", adminHandler.Playground("GraphQL playground", "/query"))
 	})
 
@@ -243,6 +244,7 @@ func main() {
 	})
 	router.Group(func(router chi.Router) {
 		router.With(loginLimiter.Middleware).Post("/admin/login", adminHandler.Login)
+		router.With(loginLimiter.Middleware).Post("/admin/refresh", adminHandler.Refresh)
 		router.With(signupLimiter.Middleware).Post("/admin/signup", adminHandler.Signup)
 		router.Mount("/labradmin", http.StripPrefix("/labradmin", adminHandler.ServeAdmin()))
 		router.Handle("/admin/playground", adminHandler.Playground("GraphQL playground", "/admin/query"))
@@ -303,7 +305,7 @@ func skipDiffOnAdminEntities(next schema.Differ) schema.Differ {
 
 		changes = slices.DeleteFunc(changes, func(c atlas.Change) bool {
 			m, ok := c.(*atlas.ModifyTable)
-			if ok && (m.T.Name == "admin_users" || m.T.Name == "files" || m.T.Name == "roles") {
+			if ok && (m.T.Name == "admin_users" || m.T.Name == "admin_refresh_tokens" || m.T.Name == "files" || m.T.Name == "roles") {
 				return true
 			}
 			return false

@@ -1,0 +1,25 @@
+extend type Query {
+    userRefreshTokens(where: UserRefreshTokenWhereInput, orderBy: UserRefreshTokenOrder, skip: Int, first: Int, last: Int): [UserRefreshToken!]
+    userRefreshTokensConnection(where: UserRefreshTokenWhereInput, orderBy: UserRefreshTokenOrder, skip: Int, first: Int, last: Int): UserRefreshTokenConnection!
+}
+
+input CreateOneUserRefreshTokenInput {
+    connect: UserRefreshTokenWhereUniqueInput
+}
+
+input CreateManyUserRefreshTokenInput {
+    connect: [UserRefreshTokenWhereUniqueInput!]
+}
+
+
+input UpdateOneUserRefreshTokenInput {
+    connect: UserRefreshTokenWhereUniqueInput
+    delete: Boolean
+    unset: Boolean
+}
+
+input UpdateManyUserRefreshTokenInput {
+    connect: [UserRefreshTokenWhereUniqueInput!]
+    delete: [UserRefreshTokenWhereUniqueInput!]
+    disconnect: [UserRefreshTokenWhereUniqueInput!]
+}

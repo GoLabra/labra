@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/GoLabra/labra/entgql/ent/adminrefreshtoken"
 	"github.com/GoLabra/labra/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/entgql/ent/file"
 	"github.com/GoLabra/labra/entgql/ent/permission"
@@ -77,11 +78,12 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			adminuser.Table:  adminuser.ValidColumn,
-			file.Table:       file.ValidColumn,
-			permission.Table: permission.ValidColumn,
-			role.Table:       role.ValidColumn,
-			user.Table:       user.ValidColumn,
+			adminrefreshtoken.Table: adminrefreshtoken.ValidColumn,
+			adminuser.Table:         adminuser.ValidColumn,
+			file.Table:              file.ValidColumn,
+			permission.Table:        permission.ValidColumn,
+			role.Table:              role.ValidColumn,
+			user.Table:              user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

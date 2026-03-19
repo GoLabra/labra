@@ -4,6 +4,7 @@ package ent
 
 import (
 	"app/ent/user"
+	"app/ent/userrefreshtoken"
 	"fmt"
 )
 
@@ -52,4 +53,15 @@ func (m *UserMutation) SetEdge(name, value string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
+}
+
+// SetEdge sets the value of a field with the given name. It returns an error if
+// the edge is not defined in the schema
+func (m *UserRefreshTokenMutation) SetEdge(name, value string) error {
+	switch name {
+	case userrefreshtoken.EdgeUser:
+		m.SetUserID(value)
+		return nil
+	}
+	return fmt.Errorf("unknown UserRefreshToken edge %s", name)
 }

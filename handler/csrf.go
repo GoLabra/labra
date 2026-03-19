@@ -35,7 +35,11 @@ func csrfRequired(r *http.Request) bool {
 		return false
 	}
 
-	_, err := r.Cookie("jwt")
+	if _, err := r.Cookie(jwtCookieName); err == nil {
+		return true
+	}
+
+	_, err := r.Cookie(refreshTokenCookieName)
 	return err == nil
 }
 

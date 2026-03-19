@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/GoLabra/labra/entgql/ent/adminrefreshtoken"
 	"github.com/GoLabra/labra/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/entgql/ent/file"
 	"github.com/GoLabra/labra/entgql/ent/permission"
@@ -17,6 +18,26 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	adminrefreshtokenFields := schema.AdminRefreshToken{}.Fields()
+	_ = adminrefreshtokenFields
+	// adminrefreshtokenDescTokenHash is the schema descriptor for token_hash field.
+	adminrefreshtokenDescTokenHash := adminrefreshtokenFields[1].Descriptor()
+	// adminrefreshtoken.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	adminrefreshtoken.TokenHashValidator = adminrefreshtokenDescTokenHash.Validators[0].(func(string) error)
+	// adminrefreshtokenDescCreatedAt is the schema descriptor for created_at field.
+	adminrefreshtokenDescCreatedAt := adminrefreshtokenFields[5].Descriptor()
+	// adminrefreshtoken.DefaultCreatedAt holds the default value on creation for the created_at field.
+	adminrefreshtoken.DefaultCreatedAt = adminrefreshtokenDescCreatedAt.Default.(func() time.Time)
+	// adminrefreshtokenDescUpdatedAt is the schema descriptor for updated_at field.
+	adminrefreshtokenDescUpdatedAt := adminrefreshtokenFields[6].Descriptor()
+	// adminrefreshtoken.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	adminrefreshtoken.DefaultUpdatedAt = adminrefreshtokenDescUpdatedAt.Default.(func() time.Time)
+	// adminrefreshtoken.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	adminrefreshtoken.UpdateDefaultUpdatedAt = adminrefreshtokenDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// adminrefreshtokenDescID is the schema descriptor for id field.
+	adminrefreshtokenDescID := adminrefreshtokenFields[0].Descriptor()
+	// adminrefreshtoken.DefaultID holds the default value on creation for the id field.
+	adminrefreshtoken.DefaultID = adminrefreshtokenDescID.Default.(func() string)
 	adminuserFields := schema.AdminUser{}.Fields()
 	_ = adminuserFields
 	// adminuserDescEmail is the schema descriptor for email field.

@@ -6,6 +6,8 @@ import (
 	"app/ent/role"
 	"app/ent/schema"
 	"app/ent/user"
+	"app/ent/userrefreshtoken"
+	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -32,4 +34,20 @@ func init() {
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
 	user.DefaultID = userDescID.Default.(func() string)
+	userrefreshtokenFields := schema.UserRefreshToken{}.Fields()
+	_ = userrefreshtokenFields
+	// userrefreshtokenDescTokenHash is the schema descriptor for token_hash field.
+	userrefreshtokenDescTokenHash := userrefreshtokenFields[0].Descriptor()
+	// userrefreshtoken.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	userrefreshtoken.TokenHashValidator = userrefreshtokenDescTokenHash.Validators[0].(func(string) error)
+	// userrefreshtokenDescCreatedAt is the schema descriptor for created_at field.
+	userrefreshtokenDescCreatedAt := userrefreshtokenFields[4].Descriptor()
+	// userrefreshtoken.DefaultCreatedAt holds the default value on creation for the created_at field.
+	userrefreshtoken.DefaultCreatedAt = userrefreshtokenDescCreatedAt.Default.(func() time.Time)
+	// userrefreshtokenDescUpdatedAt is the schema descriptor for updated_at field.
+	userrefreshtokenDescUpdatedAt := userrefreshtokenFields[5].Descriptor()
+	// userrefreshtoken.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	userrefreshtoken.DefaultUpdatedAt = userrefreshtokenDescUpdatedAt.Default.(func() time.Time)
+	// userrefreshtoken.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	userrefreshtoken.UpdateDefaultUpdatedAt = userrefreshtokenDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

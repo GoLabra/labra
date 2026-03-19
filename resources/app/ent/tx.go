@@ -22,6 +22,8 @@ type Tx struct {
 	Role *RoleClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserRefreshToken is the client for interacting with the UserRefreshToken builders.
+	UserRefreshToken *UserRefreshTokenClient
 
 	// lazily loaded.
 	client     *Client
@@ -157,6 +159,7 @@ func (tx *Tx) init() {
 	tx.File = NewFileClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserRefreshToken = NewUserRefreshTokenClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

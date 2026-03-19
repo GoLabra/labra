@@ -7,6 +7,7 @@ import (
 	"app/ent/file"
 	"app/ent/role"
 	"app/ent/user"
+	"app/ent/userrefreshtoken"
 	"context"
 	"errors"
 	"fmt"
@@ -76,10 +77,11 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			adminuser.Table: adminuser.ValidColumn,
-			file.Table:      file.ValidColumn,
-			role.Table:      role.ValidColumn,
-			user.Table:      user.ValidColumn,
+			adminuser.Table:        adminuser.ValidColumn,
+			file.Table:             file.ValidColumn,
+			role.Table:             role.ValidColumn,
+			user.Table:             user.ValidColumn,
+			userrefreshtoken.Table: userrefreshtoken.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

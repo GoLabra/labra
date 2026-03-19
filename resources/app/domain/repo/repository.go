@@ -33,6 +33,7 @@ type Repository struct {
 	File              adminInterfaces.File
 	Role              adminInterfaces.Role
 	User              repo.User
+	UserRefreshToken              repo.UserRefreshToken
 }
 
 func New(client *ent.Client, adminClient *adminEnt.Client) *Repository {
@@ -43,6 +44,7 @@ func New(client *ent.Client, adminClient *adminEnt.Client) *Repository {
         File:              adminRepo.NewFile(adminClient),
         Role:              adminRepo.NewRole(adminClient),
         User:              NewUser(client),
+        UserRefreshToken:              NewUserRefreshToken(client),
 	}
 }
 

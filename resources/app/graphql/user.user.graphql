@@ -21,6 +21,7 @@ extend input CreateUserInput {
     adminUpdatedBy: CreateOneAdminUserInput
     roles: CreateManyRoleInput
     defaultRole: CreateOneRoleInput
+    refreshTokens: CreateManyUserRefreshTokenWithoutUserInput
 }
 extend input UpdateUserInput {
     refCreatedBy: UpdateManyUserInput
@@ -31,6 +32,7 @@ extend input UpdateUserInput {
     adminUpdatedBy: UpdateOneAdminUserInput
     roles: UpdateManyRoleInput
     defaultRole: UpdateOneRoleInput
+    refreshTokens: UpdateManyUserRefreshTokenWithoutUserInput
 }
 
 input CreateOneUserInput {
@@ -56,4 +58,21 @@ input UpdateManyUserInput {
     connect: [UserWhereUniqueInput!]
     delete: [UserWhereUniqueInput!]
     disconnect: [UserWhereUniqueInput!]
+}
+input CreateManyUserRefreshTokenWithoutUserInput {
+    connect: [UserRefreshTokenWhereUniqueInput!]
+    create: [CreateUserRefreshTokenWithoutUserInput!]
+}
+input CreateOneUserRefreshTokenWithoutUserInput {
+    connect: UserRefreshTokenWhereUniqueInput
+    create: CreateUserRefreshTokenWithoutUserInput
+}
+input CreateUserRefreshTokenWithoutUserInput {
+    createdAt: Time!
+    expiresAt: Time!
+    revokedAt: Time
+    tokenHash: String!
+    updatedAt: Time!
+    usedAt: Time
+    user: CreateOneUserInput
 }

@@ -2,8 +2,31 @@
 
 package ent
 
-import admin "github.com/GoLabra/labra/entgql/ent"
+import (
+	"time"
 
+	admin "github.com/GoLabra/labra/entgql/ent"
+)
+
+type CreateManyUserRefreshTokenWithoutUserInput struct {
+	Connect []UserRefreshTokenWhereUniqueInput
+	Create  []CreateUserRefreshTokenWithoutUserInput
+}
+
+type CreateOneUserRefreshTokenWithoutUserInput struct {
+	Connect *UserRefreshTokenWhereUniqueInput
+	Create  *CreateUserRefreshTokenWithoutUserInput
+}
+
+type CreateUserRefreshTokenWithoutUserInput struct {
+	CreatedAt *time.Time
+	ExpiresAt time.Time
+	RevokedAt *time.Time
+	TokenHash string
+	UpdatedAt *time.Time
+	UsedAt    *time.Time
+	user      CreateOneUserInput
+}
 type CreateManyUserInput struct {
 	Create  []*CreateUserInput      `json:"create,omitempty"`
 	Connect []*UserWhereUniqueInput `json:"connect,omitempty"`
@@ -27,6 +50,25 @@ type UpdateOneUserInput struct {
 	Unset   *bool                 `json:"unset,omitempty"`
 	Delete  *bool                 `json:"delete,omitempty"`
 }
+type CreateManyUserRefreshTokenInput struct {
+	Connect []*UserRefreshTokenWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type CreateOneUserRefreshTokenInput struct {
+	Connect *UserRefreshTokenWhereUniqueInput `json:"connect,omitempty"`
+}
+
+type UpdateManyUserRefreshTokenInput struct {
+	Connect    []*UserRefreshTokenWhereUniqueInput `json:"connect,omitempty"`
+	Disconnect []*UserRefreshTokenWhereUniqueInput `json:"disconnect,omitempty"`
+	Delete     []*UserRefreshTokenWhereUniqueInput `json:"delete,omitempty"`
+}
+
+type UpdateOneUserRefreshTokenInput struct {
+	Connect *UserRefreshTokenWhereUniqueInput `json:"connect,omitempty"`
+	Unset   *bool                             `json:"unset,omitempty"`
+	Delete  *bool                             `json:"delete,omitempty"`
+}
 
 // CreateUserInput represents a mutation input for creating users.
 type CreateUserInput struct {
@@ -48,6 +90,8 @@ type CreateUserInput struct {
 	RoleIDs          []string
 	DefaultRole      *admin.CreateOneRoleInput
 	DefaultRoleID    *string
+	RefreshTokens    *CreateManyUserRefreshTokenWithoutUserInput
+	RefreshTokenIDs  []int
 }
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
@@ -77,6 +121,9 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 	}
 	if v := i.DefaultRoleID; v != nil {
 		m.SetDefaultRoleID(*v)
+	}
+	if v := i.RefreshTokenIDs; len(v) > 0 {
+		m.AddRefreshTokenIDs(v...)
 	}
 }
 
@@ -116,6 +163,10 @@ type UpdateUserInput struct {
 	ClearDefaultRole      bool
 	DefaultRole           *admin.UpdateOneRoleInput
 	DefaultRoleID         *string
+	ClearRefreshTokens    bool
+	RefreshTokens         *UpdateManyUserRefreshTokenInput
+	AddRefreshTokenIDs    []int
+	RemoveRefreshTokenIDs []int
 }
 
 // Mutate applies the UpdateUserInput on the UserMutation builder.
@@ -179,6 +230,15 @@ func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	}
 	if v := i.DefaultRoleID; v != nil {
 		m.SetDefaultRoleID(*v)
+	}
+	if i.ClearRefreshTokens {
+		m.ClearRefreshTokens()
+	}
+	if v := i.AddRefreshTokenIDs; len(v) > 0 {
+		m.AddRefreshTokenIDs(v...)
+	}
+	if v := i.RemoveRefreshTokenIDs; len(v) > 0 {
+		m.RemoveRefreshTokenIDs(v...)
 	}
 }
 

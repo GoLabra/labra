@@ -8,6 +8,31 @@ import (
 )
 
 var (
+	// AdminRefreshTokensColumns holds the columns for the "admin_refresh_tokens" table.
+	AdminRefreshTokensColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "token_hash", Type: field.TypeString, Unique: true},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "used_at", Type: field.TypeTime, Nullable: true},
+		{Name: "revoked_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "admin_user_refresh_tokens", Type: field.TypeString},
+	}
+	// AdminRefreshTokensTable holds the schema information for the "admin_refresh_tokens" table.
+	AdminRefreshTokensTable = &schema.Table{
+		Name:       "admin_refresh_tokens",
+		Columns:    AdminRefreshTokensColumns,
+		PrimaryKey: []*schema.Column{AdminRefreshTokensColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_refresh_tokens_admin_users_refresh_tokens",
+				Columns:    []*schema.Column{AdminRefreshTokensColumns[7]},
+				RefColumns: []*schema.Column{AdminUsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// AdminUsersColumns holds the columns for the "admin_users" table.
 	AdminUsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -263,6 +288,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AdminRefreshTokensTable,
 		AdminUsersTable,
 		FilesTable,
 		PermissionsTable,
@@ -274,6 +300,7 @@ var (
 )
 
 func init() {
+	AdminRefreshTokensTable.ForeignKeys[0].RefTable = AdminUsersTable
 	AdminUsersTable.ForeignKeys[0].RefTable = AdminUsersTable
 	AdminUsersTable.ForeignKeys[1].RefTable = AdminUsersTable
 	AdminUsersTable.ForeignKeys[2].RefTable = RolesTable
