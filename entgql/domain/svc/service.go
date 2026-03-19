@@ -12,22 +12,24 @@ var (
 
 type Service struct {
 	// Node                  svc.Node
-	Entity     *Entity
-	Permission svc.Permission
-	Role       svc.Role
-	User       svc.User
-	AdminUser  svc.AdminUser
-	File       svc.File
+	Entity            *Entity
+	Permission        svc.Permission
+	Role              svc.Role
+	User              svc.User
+	AdminUser         svc.AdminUser
+	AdminRefreshToken svc.AdminRefreshToken
+	File              svc.File
 }
 
 func New(repository *repo.Repository, schemaManager generator.SchemaManager) *Service {
 	return &Service{
 		// Node:                  NewNode(repository),
-		Permission: NewPermission(repository),
-		Role:       NewRole(repository),
-		User:       NewUser(repository),
-		AdminUser:  NewAdminUser(repository),
-		Entity:     NewEntity(schemaManager),
-		File:       NewFile(repository),
+		Permission:        NewPermission(repository),
+		Role:              NewRole(repository),
+		User:              NewUser(repository),
+		AdminUser:         NewAdminUser(repository),
+		AdminRefreshToken: NewAdminRefreshToken(repository),
+		Entity:            NewEntity(schemaManager),
+		File:              NewFile(repository),
 	}
 }

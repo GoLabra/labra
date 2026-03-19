@@ -14,6 +14,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AdminRefreshToken is the client for interacting with the AdminRefreshToken builders.
+	AdminRefreshToken *AdminRefreshTokenClient
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
 	// File is the client for interacting with the File builders.
@@ -155,6 +157,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AdminRefreshToken = NewAdminRefreshTokenClient(tx.config)
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.File = NewFileClient(tx.config)
 	tx.Permission = NewPermissionClient(tx.config)
@@ -169,7 +172,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AdminUser.QueryXXX(), the query will be executed
+// applies a query, for example: AdminRefreshToken.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

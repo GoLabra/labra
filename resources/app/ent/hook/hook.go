@@ -56,6 +56,18 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
 }
 
+// The UserRefreshTokenFunc type is an adapter to allow the use of ordinary
+// function as UserRefreshToken mutator.
+type UserRefreshTokenFunc func(context.Context, *ent.UserRefreshTokenMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserRefreshTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserRefreshTokenMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserRefreshTokenMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

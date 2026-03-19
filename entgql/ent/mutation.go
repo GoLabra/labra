@@ -11,6 +11,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/GoLabra/labra/entgql/ent/adminrefreshtoken"
 	"github.com/GoLabra/labra/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/entgql/ent/file"
 	"github.com/GoLabra/labra/entgql/ent/permission"
@@ -28,12 +29,761 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAdminUser  = "AdminUser"
-	TypeFile       = "File"
-	TypePermission = "Permission"
-	TypeRole       = "Role"
-	TypeUser       = "User"
+	TypeAdminRefreshToken = "AdminRefreshToken"
+	TypeAdminUser         = "AdminUser"
+	TypeFile              = "File"
+	TypePermission        = "Permission"
+	TypeRole              = "Role"
+	TypeUser              = "User"
 )
+
+// AdminRefreshTokenMutation represents an operation that mutates the AdminRefreshToken nodes in the graph.
+type AdminRefreshTokenMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *string
+	token_hash        *string
+	expires_at        *time.Time
+	used_at           *time.Time
+	revoked_at        *time.Time
+	created_at        *time.Time
+	updated_at        *time.Time
+	clearedFields     map[string]struct{}
+	admin_user        *string
+	clearedadmin_user bool
+	done              bool
+	oldValue          func(context.Context) (*AdminRefreshToken, error)
+	predicates        []predicate.AdminRefreshToken
+}
+
+var _ ent.Mutation = (*AdminRefreshTokenMutation)(nil)
+
+// adminrefreshtokenOption allows management of the mutation configuration using functional options.
+type adminrefreshtokenOption func(*AdminRefreshTokenMutation)
+
+// newAdminRefreshTokenMutation creates new mutation for the AdminRefreshToken entity.
+func newAdminRefreshTokenMutation(c config, op Op, opts ...adminrefreshtokenOption) *AdminRefreshTokenMutation {
+	m := &AdminRefreshTokenMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAdminRefreshToken,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAdminRefreshTokenID sets the ID field of the mutation.
+func withAdminRefreshTokenID(id string) adminrefreshtokenOption {
+	return func(m *AdminRefreshTokenMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AdminRefreshToken
+		)
+		m.oldValue = func(ctx context.Context) (*AdminRefreshToken, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AdminRefreshToken.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAdminRefreshToken sets the old AdminRefreshToken of the mutation.
+func withAdminRefreshToken(node *AdminRefreshToken) adminrefreshtokenOption {
+	return func(m *AdminRefreshTokenMutation) {
+		m.oldValue = func(context.Context) (*AdminRefreshToken, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AdminRefreshTokenMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AdminRefreshTokenMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AdminRefreshToken entities.
+func (m *AdminRefreshTokenMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AdminRefreshTokenMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AdminRefreshTokenMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AdminRefreshToken.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTokenHash sets the "token_hash" field.
+func (m *AdminRefreshTokenMutation) SetTokenHash(s string) {
+	m.token_hash = &s
+}
+
+// TokenHash returns the value of the "token_hash" field in the mutation.
+func (m *AdminRefreshTokenMutation) TokenHash() (r string, exists bool) {
+	v := m.token_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenHash returns the old "token_hash" field's value of the AdminRefreshToken entity.
+// If the AdminRefreshToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminRefreshTokenMutation) OldTokenHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenHash: %w", err)
+	}
+	return oldValue.TokenHash, nil
+}
+
+// ResetTokenHash resets all changes to the "token_hash" field.
+func (m *AdminRefreshTokenMutation) ResetTokenHash() {
+	m.token_hash = nil
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (m *AdminRefreshTokenMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
+}
+
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *AdminRefreshTokenMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiresAt returns the old "expires_at" field's value of the AdminRefreshToken entity.
+// If the AdminRefreshToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminRefreshTokenMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
+	}
+	return oldValue.ExpiresAt, nil
+}
+
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *AdminRefreshTokenMutation) ResetExpiresAt() {
+	m.expires_at = nil
+}
+
+// SetUsedAt sets the "used_at" field.
+func (m *AdminRefreshTokenMutation) SetUsedAt(t time.Time) {
+	m.used_at = &t
+}
+
+// UsedAt returns the value of the "used_at" field in the mutation.
+func (m *AdminRefreshTokenMutation) UsedAt() (r time.Time, exists bool) {
+	v := m.used_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUsedAt returns the old "used_at" field's value of the AdminRefreshToken entity.
+// If the AdminRefreshToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminRefreshTokenMutation) OldUsedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUsedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUsedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUsedAt: %w", err)
+	}
+	return oldValue.UsedAt, nil
+}
+
+// ClearUsedAt clears the value of the "used_at" field.
+func (m *AdminRefreshTokenMutation) ClearUsedAt() {
+	m.used_at = nil
+	m.clearedFields[adminrefreshtoken.FieldUsedAt] = struct{}{}
+}
+
+// UsedAtCleared returns if the "used_at" field was cleared in this mutation.
+func (m *AdminRefreshTokenMutation) UsedAtCleared() bool {
+	_, ok := m.clearedFields[adminrefreshtoken.FieldUsedAt]
+	return ok
+}
+
+// ResetUsedAt resets all changes to the "used_at" field.
+func (m *AdminRefreshTokenMutation) ResetUsedAt() {
+	m.used_at = nil
+	delete(m.clearedFields, adminrefreshtoken.FieldUsedAt)
+}
+
+// SetRevokedAt sets the "revoked_at" field.
+func (m *AdminRefreshTokenMutation) SetRevokedAt(t time.Time) {
+	m.revoked_at = &t
+}
+
+// RevokedAt returns the value of the "revoked_at" field in the mutation.
+func (m *AdminRefreshTokenMutation) RevokedAt() (r time.Time, exists bool) {
+	v := m.revoked_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRevokedAt returns the old "revoked_at" field's value of the AdminRefreshToken entity.
+// If the AdminRefreshToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminRefreshTokenMutation) OldRevokedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRevokedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRevokedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRevokedAt: %w", err)
+	}
+	return oldValue.RevokedAt, nil
+}
+
+// ClearRevokedAt clears the value of the "revoked_at" field.
+func (m *AdminRefreshTokenMutation) ClearRevokedAt() {
+	m.revoked_at = nil
+	m.clearedFields[adminrefreshtoken.FieldRevokedAt] = struct{}{}
+}
+
+// RevokedAtCleared returns if the "revoked_at" field was cleared in this mutation.
+func (m *AdminRefreshTokenMutation) RevokedAtCleared() bool {
+	_, ok := m.clearedFields[adminrefreshtoken.FieldRevokedAt]
+	return ok
+}
+
+// ResetRevokedAt resets all changes to the "revoked_at" field.
+func (m *AdminRefreshTokenMutation) ResetRevokedAt() {
+	m.revoked_at = nil
+	delete(m.clearedFields, adminrefreshtoken.FieldRevokedAt)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AdminRefreshTokenMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AdminRefreshTokenMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AdminRefreshToken entity.
+// If the AdminRefreshToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminRefreshTokenMutation) OldCreatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ClearCreatedAt clears the value of the "created_at" field.
+func (m *AdminRefreshTokenMutation) ClearCreatedAt() {
+	m.created_at = nil
+	m.clearedFields[adminrefreshtoken.FieldCreatedAt] = struct{}{}
+}
+
+// CreatedAtCleared returns if the "created_at" field was cleared in this mutation.
+func (m *AdminRefreshTokenMutation) CreatedAtCleared() bool {
+	_, ok := m.clearedFields[adminrefreshtoken.FieldCreatedAt]
+	return ok
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AdminRefreshTokenMutation) ResetCreatedAt() {
+	m.created_at = nil
+	delete(m.clearedFields, adminrefreshtoken.FieldCreatedAt)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AdminRefreshTokenMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AdminRefreshTokenMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AdminRefreshToken entity.
+// If the AdminRefreshToken object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminRefreshTokenMutation) OldUpdatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *AdminRefreshTokenMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[adminrefreshtoken.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *AdminRefreshTokenMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[adminrefreshtoken.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AdminRefreshTokenMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, adminrefreshtoken.FieldUpdatedAt)
+}
+
+// SetAdminUserID sets the "admin_user" edge to the AdminUser entity by id.
+func (m *AdminRefreshTokenMutation) SetAdminUserID(id string) {
+	m.admin_user = &id
+}
+
+// ClearAdminUser clears the "admin_user" edge to the AdminUser entity.
+func (m *AdminRefreshTokenMutation) ClearAdminUser() {
+	m.clearedadmin_user = true
+}
+
+// AdminUserCleared reports if the "admin_user" edge to the AdminUser entity was cleared.
+func (m *AdminRefreshTokenMutation) AdminUserCleared() bool {
+	return m.clearedadmin_user
+}
+
+// AdminUserID returns the "admin_user" edge ID in the mutation.
+func (m *AdminRefreshTokenMutation) AdminUserID() (id string, exists bool) {
+	if m.admin_user != nil {
+		return *m.admin_user, true
+	}
+	return
+}
+
+// AdminUserIDs returns the "admin_user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AdminUserID instead. It exists only for internal usage by the builders.
+func (m *AdminRefreshTokenMutation) AdminUserIDs() (ids []string) {
+	if id := m.admin_user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAdminUser resets all changes to the "admin_user" edge.
+func (m *AdminRefreshTokenMutation) ResetAdminUser() {
+	m.admin_user = nil
+	m.clearedadmin_user = false
+}
+
+// Where appends a list predicates to the AdminRefreshTokenMutation builder.
+func (m *AdminRefreshTokenMutation) Where(ps ...predicate.AdminRefreshToken) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AdminRefreshTokenMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AdminRefreshTokenMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AdminRefreshToken, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AdminRefreshTokenMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AdminRefreshTokenMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AdminRefreshToken).
+func (m *AdminRefreshTokenMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AdminRefreshTokenMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.token_hash != nil {
+		fields = append(fields, adminrefreshtoken.FieldTokenHash)
+	}
+	if m.expires_at != nil {
+		fields = append(fields, adminrefreshtoken.FieldExpiresAt)
+	}
+	if m.used_at != nil {
+		fields = append(fields, adminrefreshtoken.FieldUsedAt)
+	}
+	if m.revoked_at != nil {
+		fields = append(fields, adminrefreshtoken.FieldRevokedAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, adminrefreshtoken.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, adminrefreshtoken.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AdminRefreshTokenMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case adminrefreshtoken.FieldTokenHash:
+		return m.TokenHash()
+	case adminrefreshtoken.FieldExpiresAt:
+		return m.ExpiresAt()
+	case adminrefreshtoken.FieldUsedAt:
+		return m.UsedAt()
+	case adminrefreshtoken.FieldRevokedAt:
+		return m.RevokedAt()
+	case adminrefreshtoken.FieldCreatedAt:
+		return m.CreatedAt()
+	case adminrefreshtoken.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AdminRefreshTokenMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case adminrefreshtoken.FieldTokenHash:
+		return m.OldTokenHash(ctx)
+	case adminrefreshtoken.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
+	case adminrefreshtoken.FieldUsedAt:
+		return m.OldUsedAt(ctx)
+	case adminrefreshtoken.FieldRevokedAt:
+		return m.OldRevokedAt(ctx)
+	case adminrefreshtoken.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case adminrefreshtoken.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown AdminRefreshToken field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminRefreshTokenMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case adminrefreshtoken.FieldTokenHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenHash(v)
+		return nil
+	case adminrefreshtoken.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
+		return nil
+	case adminrefreshtoken.FieldUsedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUsedAt(v)
+		return nil
+	case adminrefreshtoken.FieldRevokedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRevokedAt(v)
+		return nil
+	case adminrefreshtoken.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case adminrefreshtoken.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AdminRefreshToken field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AdminRefreshTokenMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AdminRefreshTokenMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminRefreshTokenMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AdminRefreshToken numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AdminRefreshTokenMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(adminrefreshtoken.FieldUsedAt) {
+		fields = append(fields, adminrefreshtoken.FieldUsedAt)
+	}
+	if m.FieldCleared(adminrefreshtoken.FieldRevokedAt) {
+		fields = append(fields, adminrefreshtoken.FieldRevokedAt)
+	}
+	if m.FieldCleared(adminrefreshtoken.FieldCreatedAt) {
+		fields = append(fields, adminrefreshtoken.FieldCreatedAt)
+	}
+	if m.FieldCleared(adminrefreshtoken.FieldUpdatedAt) {
+		fields = append(fields, adminrefreshtoken.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AdminRefreshTokenMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AdminRefreshTokenMutation) ClearField(name string) error {
+	switch name {
+	case adminrefreshtoken.FieldUsedAt:
+		m.ClearUsedAt()
+		return nil
+	case adminrefreshtoken.FieldRevokedAt:
+		m.ClearRevokedAt()
+		return nil
+	case adminrefreshtoken.FieldCreatedAt:
+		m.ClearCreatedAt()
+		return nil
+	case adminrefreshtoken.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminRefreshToken nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AdminRefreshTokenMutation) ResetField(name string) error {
+	switch name {
+	case adminrefreshtoken.FieldTokenHash:
+		m.ResetTokenHash()
+		return nil
+	case adminrefreshtoken.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
+	case adminrefreshtoken.FieldUsedAt:
+		m.ResetUsedAt()
+		return nil
+	case adminrefreshtoken.FieldRevokedAt:
+		m.ResetRevokedAt()
+		return nil
+	case adminrefreshtoken.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case adminrefreshtoken.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminRefreshToken field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AdminRefreshTokenMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.admin_user != nil {
+		edges = append(edges, adminrefreshtoken.EdgeAdminUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AdminRefreshTokenMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case adminrefreshtoken.EdgeAdminUser:
+		if id := m.admin_user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AdminRefreshTokenMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AdminRefreshTokenMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AdminRefreshTokenMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedadmin_user {
+		edges = append(edges, adminrefreshtoken.EdgeAdminUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AdminRefreshTokenMutation) EdgeCleared(name string) bool {
+	switch name {
+	case adminrefreshtoken.EdgeAdminUser:
+		return m.clearedadmin_user
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AdminRefreshTokenMutation) ClearEdge(name string) error {
+	switch name {
+	case adminrefreshtoken.EdgeAdminUser:
+		m.ClearAdminUser()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminRefreshToken unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AdminRefreshTokenMutation) ResetEdge(name string) error {
+	switch name {
+	case adminrefreshtoken.EdgeAdminUser:
+		m.ResetAdminUser()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminRefreshToken edge %s", name)
+}
 
 // AdminUserMutation represents an operation that mutates the AdminUser nodes in the graph.
 type AdminUserMutation struct {
@@ -64,6 +814,9 @@ type AdminUserMutation struct {
 	clearedroles                bool
 	default_role                *string
 	cleareddefault_role         bool
+	refresh_tokens              map[string]struct{}
+	removedrefresh_tokens       map[string]struct{}
+	clearedrefresh_tokens       bool
 	done                        bool
 	oldValue                    func(context.Context) (*AdminUser, error)
 	predicates                  []predicate.AdminUser
@@ -743,6 +1496,60 @@ func (m *AdminUserMutation) ResetDefaultRole() {
 	m.cleareddefault_role = false
 }
 
+// AddRefreshTokenIDs adds the "refresh_tokens" edge to the AdminRefreshToken entity by ids.
+func (m *AdminUserMutation) AddRefreshTokenIDs(ids ...string) {
+	if m.refresh_tokens == nil {
+		m.refresh_tokens = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.refresh_tokens[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRefreshTokens clears the "refresh_tokens" edge to the AdminRefreshToken entity.
+func (m *AdminUserMutation) ClearRefreshTokens() {
+	m.clearedrefresh_tokens = true
+}
+
+// RefreshTokensCleared reports if the "refresh_tokens" edge to the AdminRefreshToken entity was cleared.
+func (m *AdminUserMutation) RefreshTokensCleared() bool {
+	return m.clearedrefresh_tokens
+}
+
+// RemoveRefreshTokenIDs removes the "refresh_tokens" edge to the AdminRefreshToken entity by IDs.
+func (m *AdminUserMutation) RemoveRefreshTokenIDs(ids ...string) {
+	if m.removedrefresh_tokens == nil {
+		m.removedrefresh_tokens = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.refresh_tokens, ids[i])
+		m.removedrefresh_tokens[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRefreshTokens returns the removed IDs of the "refresh_tokens" edge to the AdminRefreshToken entity.
+func (m *AdminUserMutation) RemovedRefreshTokensIDs() (ids []string) {
+	for id := range m.removedrefresh_tokens {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RefreshTokensIDs returns the "refresh_tokens" edge IDs in the mutation.
+func (m *AdminUserMutation) RefreshTokensIDs() (ids []string) {
+	for id := range m.refresh_tokens {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRefreshTokens resets all changes to the "refresh_tokens" edge.
+func (m *AdminUserMutation) ResetRefreshTokens() {
+	m.refresh_tokens = nil
+	m.clearedrefresh_tokens = false
+	m.removedrefresh_tokens = nil
+}
+
 // Where appends a list predicates to the AdminUserMutation builder.
 func (m *AdminUserMutation) Where(ps ...predicate.AdminUser) {
 	m.predicates = append(m.predicates, ps...)
@@ -999,7 +1806,7 @@ func (m *AdminUserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AdminUserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.ref_admin_created_by != nil {
 		edges = append(edges, adminuser.EdgeRefAdminCreatedBy)
 	}
@@ -1017,6 +1824,9 @@ func (m *AdminUserMutation) AddedEdges() []string {
 	}
 	if m.default_role != nil {
 		edges = append(edges, adminuser.EdgeDefaultRole)
+	}
+	if m.refresh_tokens != nil {
+		edges = append(edges, adminuser.EdgeRefreshTokens)
 	}
 	return edges
 }
@@ -1055,13 +1865,19 @@ func (m *AdminUserMutation) AddedIDs(name string) []ent.Value {
 		if id := m.default_role; id != nil {
 			return []ent.Value{*id}
 		}
+	case adminuser.EdgeRefreshTokens:
+		ids := make([]ent.Value, 0, len(m.refresh_tokens))
+		for id := range m.refresh_tokens {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AdminUserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.removedref_admin_created_by != nil {
 		edges = append(edges, adminuser.EdgeRefAdminCreatedBy)
 	}
@@ -1070,6 +1886,9 @@ func (m *AdminUserMutation) RemovedEdges() []string {
 	}
 	if m.removedroles != nil {
 		edges = append(edges, adminuser.EdgeRoles)
+	}
+	if m.removedrefresh_tokens != nil {
+		edges = append(edges, adminuser.EdgeRefreshTokens)
 	}
 	return edges
 }
@@ -1096,13 +1915,19 @@ func (m *AdminUserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case adminuser.EdgeRefreshTokens:
+		ids := make([]ent.Value, 0, len(m.removedrefresh_tokens))
+		for id := range m.removedrefresh_tokens {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AdminUserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.clearedref_admin_created_by {
 		edges = append(edges, adminuser.EdgeRefAdminCreatedBy)
 	}
@@ -1120,6 +1945,9 @@ func (m *AdminUserMutation) ClearedEdges() []string {
 	}
 	if m.cleareddefault_role {
 		edges = append(edges, adminuser.EdgeDefaultRole)
+	}
+	if m.clearedrefresh_tokens {
+		edges = append(edges, adminuser.EdgeRefreshTokens)
 	}
 	return edges
 }
@@ -1140,6 +1968,8 @@ func (m *AdminUserMutation) EdgeCleared(name string) bool {
 		return m.clearedroles
 	case adminuser.EdgeDefaultRole:
 		return m.cleareddefault_role
+	case adminuser.EdgeRefreshTokens:
+		return m.clearedrefresh_tokens
 	}
 	return false
 }
@@ -1182,6 +2012,9 @@ func (m *AdminUserMutation) ResetEdge(name string) error {
 		return nil
 	case adminuser.EdgeDefaultRole:
 		m.ResetDefaultRole()
+		return nil
+	case adminuser.EdgeRefreshTokens:
+		m.ResetRefreshTokens()
 		return nil
 	}
 	return fmt.Errorf("unknown AdminUser edge %s", name)

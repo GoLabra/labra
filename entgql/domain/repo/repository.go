@@ -26,23 +26,25 @@ type Txer interface {
 
 type Repository struct {
 	// Node                  repo.Node
-	Tx         Txer
-	Permission repo.Permission
-	Role       repo.Role
-	User       repo.User
-	AdminUser  repo.AdminUser
-	File       repo.File
+	Tx                Txer
+	Permission        repo.Permission
+	Role              repo.Role
+	User              repo.User
+	AdminUser         repo.AdminUser
+	AdminRefreshToken repo.AdminRefreshToken
+	File              repo.File
 }
 
 func New(client *ent.Client) *Repository {
 	return &Repository{
 		// Node:                  NewNode(client),
-		Tx:         NewTx(client),
-		Permission: NewPermission(client),
-		Role:       NewRole(client),
-		User:       NewUser(client),
-		AdminUser:  NewAdminUser(client),
-		File:       NewFile(client),
+		Tx:                NewTx(client),
+		Permission:        NewPermission(client),
+		Role:              NewRole(client),
+		User:              NewUser(client),
+		AdminUser:         NewAdminUser(client),
+		AdminRefreshToken: NewAdminRefreshToken(client),
+		File:              NewFile(client),
 	}
 }
 

@@ -19,4 +19,8 @@ input UserWhereUniqueInput {
   id: ID
   email: String
 }
+input UserRefreshTokenWhereUniqueInput {
+  id: ID
+  tokenHash: String
+}
 

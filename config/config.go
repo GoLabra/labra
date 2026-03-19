@@ -23,6 +23,8 @@ type Config struct {
 	CentrifugoApiAddress string `env:"CENTRIFUGO_API_ADDRESS,required"`
 	FileStorageProvider  string `env:"FILE_STORAGE_PROVIDER" envDefault:"local"`
 	FileStoragePath      string `env:"FILE_STORAGE_PATH" envDefault:"./storage"`
+	AccessTokenTTLMin    int    `env:"ACCESS_TOKEN_TTL_MINUTES" envDefault:"15"`
+	RefreshTokenTTLHours int    `env:"REFRESH_TOKEN_TTL_HOURS" envDefault:"168"`
 
 	// Environment specifies which Infisical environment to fetch secrets from (dev, staging, prod)
 	Environment string `env:"APP_ENVIRONMENT" envDefault:"dev"`

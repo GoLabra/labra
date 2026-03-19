@@ -32,6 +32,8 @@ const (
 	EdgeRoles = "roles"
 	// EdgeDefaultRole holds the string denoting the default_role edge name in mutations.
 	EdgeDefaultRole = "default_role"
+	// EdgeRefreshTokens holds the string denoting the refresh_tokens edge name in mutations.
+	EdgeRefreshTokens = "refresh_tokens"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// RefCreatedByTable is the table that holds the ref_created_by relation/edge.
@@ -76,6 +78,13 @@ const (
 	DefaultRoleInverseTable = "roles"
 	// DefaultRoleColumn is the table column denoting the default_role relation/edge.
 	DefaultRoleColumn = "user_default_role"
+	// RefreshTokensTable is the table that holds the refresh_tokens relation/edge.
+	RefreshTokensTable = "user_refresh_tokens"
+	// RefreshTokensInverseTable is the table name for the UserRefreshToken entity.
+	// It exists in this package in order to avoid circular dependency with the "userrefreshtoken" package.
+	RefreshTokensInverseTable = "user_refresh_tokens"
+	// RefreshTokensColumn is the table column denoting the refresh_tokens relation/edge.
+	RefreshTokensColumn = "user_refresh_token_user"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -219,6 +228,20 @@ func ByDefaultRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDefaultRoleStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByRefreshTokensCount orders the results by refresh_tokens count.
+func ByRefreshTokensCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRefreshTokensStep(), opts...)
+	}
+}
+
+// ByRefreshTokens orders the results by refresh_tokens terms.
+func ByRefreshTokens(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRefreshTokensStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRefCreatedByStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -273,5 +296,12 @@ func newDefaultRoleStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DefaultRoleInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, DefaultRoleTable, DefaultRoleColumn),
+	)
+}
+func newRefreshTokensStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RefreshTokensInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, RefreshTokensTable, RefreshTokensColumn),
 	)
 }

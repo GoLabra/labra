@@ -51,15 +51,18 @@ type UserEdges struct {
 	Roles []*Role `json:"roles,omitempty"`
 	// DefaultRole holds the value of the default_role edge.
 	DefaultRole *Role `json:"default_role,omitempty"`
+	// RefreshTokens holds the value of the refresh_tokens edge.
+	RefreshTokens []*UserRefreshToken `json:"refresh_tokens,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [9]bool
 	// totalCount holds the count of the edges above.
 	totalCount [6]map[string]int
 
-	namedRefCreatedBy map[string][]*User
-	namedRefUpdatedBy map[string][]*User
-	namedRoles        map[string][]*Role
+	namedRefCreatedBy  map[string][]*User
+	namedRefUpdatedBy  map[string][]*User
+	namedRoles         map[string][]*Role
+	namedRefreshTokens map[string][]*UserRefreshToken
 }
 
 // RefCreatedByOrErr returns the RefCreatedBy value or an error if the edge
@@ -142,6 +145,15 @@ func (e UserEdges) DefaultRoleOrErr() (*Role, error) {
 		return nil, &NotFoundError{label: role.Label}
 	}
 	return nil, &NotLoadedError{edge: "default_role"}
+}
+
+// RefreshTokensOrErr returns the RefreshTokens value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) RefreshTokensOrErr() ([]*UserRefreshToken, error) {
+	if e.loadedTypes[8] {
+		return e.RefreshTokens, nil
+	}
+	return nil, &NotLoadedError{edge: "refresh_tokens"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -282,6 +294,11 @@ func (_m *User) QueryDefaultRole() *RoleQuery {
 	return NewUserClient(_m.config).QueryDefaultRole(_m)
 }
 
+// QueryRefreshTokens queries the "refresh_tokens" edge of the User entity.
+func (_m *User) QueryRefreshTokens() *UserRefreshTokenQuery {
+	return NewUserClient(_m.config).QueryRefreshTokens(_m)
+}
+
 // Update returns a builder for updating this User.
 // Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -382,6 +399,30 @@ func (_m *User) appendNamedRoles(name string, edges ...*Role) {
 		_m.Edges.namedRoles[name] = []*Role{}
 	} else {
 		_m.Edges.namedRoles[name] = append(_m.Edges.namedRoles[name], edges...)
+	}
+}
+
+// NamedRefreshTokens returns the RefreshTokens named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (_m *User) NamedRefreshTokens(name string) ([]*UserRefreshToken, error) {
+	if _m.Edges.namedRefreshTokens == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := _m.Edges.namedRefreshTokens[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (_m *User) appendNamedRefreshTokens(name string, edges ...*UserRefreshToken) {
+	if _m.Edges.namedRefreshTokens == nil {
+		_m.Edges.namedRefreshTokens = make(map[string][]*UserRefreshToken)
+	}
+	if len(edges) == 0 {
+		_m.Edges.namedRefreshTokens[name] = []*UserRefreshToken{}
+	} else {
+		_m.Edges.namedRefreshTokens[name] = append(_m.Edges.namedRefreshTokens[name], edges...)
 	}
 }
 

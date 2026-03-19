@@ -88,6 +88,31 @@ var (
 			},
 		},
 	}
+	// UserRefreshTokensColumns holds the columns for the "user_refresh_tokens" table.
+	UserRefreshTokensColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "token_hash", Type: field.TypeString, Unique: true},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "used_at", Type: field.TypeTime, Nullable: true},
+		{Name: "revoked_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_refresh_token_user", Type: field.TypeString},
+	}
+	// UserRefreshTokensTable holds the schema information for the "user_refresh_tokens" table.
+	UserRefreshTokensTable = &schema.Table{
+		Name:       "user_refresh_tokens",
+		Columns:    UserRefreshTokensColumns,
+		PrimaryKey: []*schema.Column{UserRefreshTokensColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_refresh_tokens_users_user",
+				Columns:    []*schema.Column{UserRefreshTokensColumns[7]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// UserRolesColumns holds the columns for the "user_roles" table.
 	UserRolesColumns = []*schema.Column{
 		{Name: "user_id", Type: field.TypeString},
@@ -119,6 +144,7 @@ var (
 		FilesTable,
 		RolesTable,
 		UsersTable,
+		UserRefreshTokensTable,
 		UserRolesTable,
 	}
 )
@@ -129,6 +155,7 @@ func init() {
 	UsersTable.ForeignKeys[2].RefTable = AdminUsersTable
 	UsersTable.ForeignKeys[3].RefTable = AdminUsersTable
 	UsersTable.ForeignKeys[4].RefTable = RolesTable
+	UserRefreshTokensTable.ForeignKeys[0].RefTable = UsersTable
 	UserRolesTable.ForeignKeys[0].RefTable = UsersTable
 	UserRolesTable.ForeignKeys[1].RefTable = RolesTable
 }

@@ -15,6 +15,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/GoLabra/labra/entgql/ent/adminrefreshtoken"
 	"github.com/GoLabra/labra/entgql/ent/adminuser"
 	"github.com/GoLabra/labra/entgql/ent/file"
 	"github.com/GoLabra/labra/entgql/ent/permission"
@@ -29,6 +30,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AdminRefreshToken is the client for interacting with the AdminRefreshToken builders.
+	AdminRefreshToken *AdminRefreshTokenClient
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
 	// File is the client for interacting with the File builders.
@@ -50,6 +53,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AdminRefreshToken = NewAdminRefreshTokenClient(c.config)
 	c.AdminUser = NewAdminUserClient(c.config)
 	c.File = NewFileClient(c.config)
 	c.Permission = NewPermissionClient(c.config)
@@ -145,13 +149,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		AdminUser:  NewAdminUserClient(cfg),
-		File:       NewFileClient(cfg),
-		Permission: NewPermissionClient(cfg),
-		Role:       NewRoleClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		AdminRefreshToken: NewAdminRefreshTokenClient(cfg),
+		AdminUser:         NewAdminUserClient(cfg),
+		File:              NewFileClient(cfg),
+		Permission:        NewPermissionClient(cfg),
+		Role:              NewRoleClient(cfg),
+		User:              NewUserClient(cfg),
 	}, nil
 }
 
@@ -169,20 +174,21 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		AdminUser:  NewAdminUserClient(cfg),
-		File:       NewFileClient(cfg),
-		Permission: NewPermissionClient(cfg),
-		Role:       NewRoleClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		AdminRefreshToken: NewAdminRefreshTokenClient(cfg),
+		AdminUser:         NewAdminUserClient(cfg),
+		File:              NewFileClient(cfg),
+		Permission:        NewPermissionClient(cfg),
+		Role:              NewRoleClient(cfg),
+		User:              NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AdminUser.
+//		AdminRefreshToken.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -204,26 +210,28 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AdminUser.Use(hooks...)
-	c.File.Use(hooks...)
-	c.Permission.Use(hooks...)
-	c.Role.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AdminRefreshToken, c.AdminUser, c.File, c.Permission, c.Role, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AdminUser.Intercept(interceptors...)
-	c.File.Intercept(interceptors...)
-	c.Permission.Intercept(interceptors...)
-	c.Role.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AdminRefreshToken, c.AdminUser, c.File, c.Permission, c.Role, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AdminRefreshTokenMutation:
+		return c.AdminRefreshToken.mutate(ctx, m)
 	case *AdminUserMutation:
 		return c.AdminUser.mutate(ctx, m)
 	case *FileMutation:
@@ -236,6 +244,155 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AdminRefreshTokenClient is a client for the AdminRefreshToken schema.
+type AdminRefreshTokenClient struct {
+	config
+}
+
+// NewAdminRefreshTokenClient returns a client for the AdminRefreshToken from the given config.
+func NewAdminRefreshTokenClient(c config) *AdminRefreshTokenClient {
+	return &AdminRefreshTokenClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `adminrefreshtoken.Hooks(f(g(h())))`.
+func (c *AdminRefreshTokenClient) Use(hooks ...Hook) {
+	c.hooks.AdminRefreshToken = append(c.hooks.AdminRefreshToken, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `adminrefreshtoken.Intercept(f(g(h())))`.
+func (c *AdminRefreshTokenClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AdminRefreshToken = append(c.inters.AdminRefreshToken, interceptors...)
+}
+
+// Create returns a builder for creating a AdminRefreshToken entity.
+func (c *AdminRefreshTokenClient) Create() *AdminRefreshTokenCreate {
+	mutation := newAdminRefreshTokenMutation(c.config, OpCreate)
+	return &AdminRefreshTokenCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AdminRefreshToken entities.
+func (c *AdminRefreshTokenClient) CreateBulk(builders ...*AdminRefreshTokenCreate) *AdminRefreshTokenCreateBulk {
+	return &AdminRefreshTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AdminRefreshTokenClient) MapCreateBulk(slice any, setFunc func(*AdminRefreshTokenCreate, int)) *AdminRefreshTokenCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AdminRefreshTokenCreateBulk{err: fmt.Errorf("calling to AdminRefreshTokenClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AdminRefreshTokenCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AdminRefreshTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AdminRefreshToken.
+func (c *AdminRefreshTokenClient) Update() *AdminRefreshTokenUpdate {
+	mutation := newAdminRefreshTokenMutation(c.config, OpUpdate)
+	return &AdminRefreshTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AdminRefreshTokenClient) UpdateOne(_m *AdminRefreshToken) *AdminRefreshTokenUpdateOne {
+	mutation := newAdminRefreshTokenMutation(c.config, OpUpdateOne, withAdminRefreshToken(_m))
+	return &AdminRefreshTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AdminRefreshTokenClient) UpdateOneID(id string) *AdminRefreshTokenUpdateOne {
+	mutation := newAdminRefreshTokenMutation(c.config, OpUpdateOne, withAdminRefreshTokenID(id))
+	return &AdminRefreshTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AdminRefreshToken.
+func (c *AdminRefreshTokenClient) Delete() *AdminRefreshTokenDelete {
+	mutation := newAdminRefreshTokenMutation(c.config, OpDelete)
+	return &AdminRefreshTokenDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AdminRefreshTokenClient) DeleteOne(_m *AdminRefreshToken) *AdminRefreshTokenDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AdminRefreshTokenClient) DeleteOneID(id string) *AdminRefreshTokenDeleteOne {
+	builder := c.Delete().Where(adminrefreshtoken.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AdminRefreshTokenDeleteOne{builder}
+}
+
+// Query returns a query builder for AdminRefreshToken.
+func (c *AdminRefreshTokenClient) Query() *AdminRefreshTokenQuery {
+	return &AdminRefreshTokenQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAdminRefreshToken},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AdminRefreshToken entity by its id.
+func (c *AdminRefreshTokenClient) Get(ctx context.Context, id string) (*AdminRefreshToken, error) {
+	return c.Query().Where(adminrefreshtoken.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AdminRefreshTokenClient) GetX(ctx context.Context, id string) *AdminRefreshToken {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAdminUser queries the admin_user edge of a AdminRefreshToken.
+func (c *AdminRefreshTokenClient) QueryAdminUser(_m *AdminRefreshToken) *AdminUserQuery {
+	query := (&AdminUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminrefreshtoken.Table, adminrefreshtoken.FieldID, id),
+			sqlgraph.To(adminuser.Table, adminuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, adminrefreshtoken.AdminUserTable, adminrefreshtoken.AdminUserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AdminRefreshTokenClient) Hooks() []Hook {
+	return c.hooks.AdminRefreshToken
+}
+
+// Interceptors returns the client interceptors.
+func (c *AdminRefreshTokenClient) Interceptors() []Interceptor {
+	return c.inters.AdminRefreshToken
+}
+
+func (c *AdminRefreshTokenClient) mutate(ctx context.Context, m *AdminRefreshTokenMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AdminRefreshTokenCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AdminRefreshTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AdminRefreshTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AdminRefreshTokenDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AdminRefreshToken mutation op: %q", m.Op())
 	}
 }
 
@@ -436,6 +593,22 @@ func (c *AdminUserClient) QueryDefaultRole(_m *AdminUser) *RoleQuery {
 			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, adminuser.DefaultRoleTable, adminuser.DefaultRoleColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRefreshTokens queries the refresh_tokens edge of a AdminUser.
+func (c *AdminUserClient) QueryRefreshTokens(_m *AdminUser) *AdminRefreshTokenQuery {
+	query := (&AdminRefreshTokenClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(adminuser.Table, adminuser.FieldID, id),
+			sqlgraph.To(adminrefreshtoken.Table, adminrefreshtoken.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, adminuser.RefreshTokensTable, adminuser.RefreshTokensColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -1323,10 +1496,10 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AdminUser, File, Permission, Role, User []ent.Hook
+		AdminRefreshToken, AdminUser, File, Permission, Role, User []ent.Hook
 	}
 	inters struct {
-		AdminUser, File, Permission, Role, User []ent.Interceptor
+		AdminRefreshToken, AdminUser, File, Permission, Role, User []ent.Interceptor
 	}
 )
 

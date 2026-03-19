@@ -8,13 +8,13 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
+	"strings"
 
 	"github.com/GoLabra/labra/config"
 	"github.com/GoLabra/labra/constants"
 	adminSvc "github.com/GoLabra/labra/entgql/domain/svc"
 	adminEnt "github.com/GoLabra/labra/entgql/ent"
-	"github.com/golang-jwt/jwt"
+	sharedHandler "github.com/GoLabra/labra/handler"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -86,29 +86,28 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":  time.Now().Add(24 * time.Hour).Unix(),
-		"sub":  user.Email,
-		"role": role.Name,
-	})
-
 	appConfig, ok := r.Context().Value("config").(*config.AppConfig)
-
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	signedToken, err := token.SignedString([]byte(appConfig.SecretKey))
+	accessToken, refreshToken, accessTTL, refreshTTL, err := issueUserSession(iCtx, appConfig, user, role)
 	if err != nil {
+		log.Printf("error issuing session: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response, _ := json.Marshal(map[string]string{
-		"token": signedToken,
-	})
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	secure := r.TLS != nil || strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https")
+
+	csrf, err := sharedHandler.NewCSRFToken()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	sharedHandler.SetCSRFCookie(w, csrf, secure)
+	sharedHandler.SetJWTCookieWithTTL(w, r, accessToken, "", accessTTL)
+	sharedHandler.SetRefreshTokenCookie(w, r, refreshToken, "", refreshTTL)
+	writeTokenResponse(w, accessToken)
 }

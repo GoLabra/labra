@@ -7,6 +7,7 @@ import (
 	"app/ent/predicate"
 	"app/ent/role"
 	"app/ent/user"
+	"app/ent/userrefreshtoken"
 	"context"
 	"database/sql/driver"
 	"fmt"
@@ -21,24 +22,26 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx                   *QueryContext
-	order                 []user.OrderOption
-	inters                []Interceptor
-	predicates            []predicate.User
-	withRefCreatedBy      *UserQuery
-	withCreatedBy         *UserQuery
-	withRefUpdatedBy      *UserQuery
-	withUpdatedBy         *UserQuery
-	withAdminCreatedBy    *AdminUserQuery
-	withAdminUpdatedBy    *AdminUserQuery
-	withRoles             *RoleQuery
-	withDefaultRole       *RoleQuery
-	withFKs               bool
-	modifiers             []func(*sql.Selector)
-	loadTotal             []func(context.Context, []*User) error
-	withNamedRefCreatedBy map[string]*UserQuery
-	withNamedRefUpdatedBy map[string]*UserQuery
-	withNamedRoles        map[string]*RoleQuery
+	ctx                    *QueryContext
+	order                  []user.OrderOption
+	inters                 []Interceptor
+	predicates             []predicate.User
+	withRefCreatedBy       *UserQuery
+	withCreatedBy          *UserQuery
+	withRefUpdatedBy       *UserQuery
+	withUpdatedBy          *UserQuery
+	withAdminCreatedBy     *AdminUserQuery
+	withAdminUpdatedBy     *AdminUserQuery
+	withRoles              *RoleQuery
+	withDefaultRole        *RoleQuery
+	withRefreshTokens      *UserRefreshTokenQuery
+	withFKs                bool
+	modifiers              []func(*sql.Selector)
+	loadTotal              []func(context.Context, []*User) error
+	withNamedRefCreatedBy  map[string]*UserQuery
+	withNamedRefUpdatedBy  map[string]*UserQuery
+	withNamedRoles         map[string]*RoleQuery
+	withNamedRefreshTokens map[string]*UserRefreshTokenQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -251,6 +254,28 @@ func (_q *UserQuery) QueryDefaultRole() *RoleQuery {
 	return query
 }
 
+// QueryRefreshTokens chains the current query on the "refresh_tokens" edge.
+func (_q *UserQuery) QueryRefreshTokens() *UserRefreshTokenQuery {
+	query := (&UserRefreshTokenClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(userrefreshtoken.Table, userrefreshtoken.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.RefreshTokensTable, user.RefreshTokensColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first User entity from the query.
 // Returns a *NotFoundError when no User was found.
 func (_q *UserQuery) First(ctx context.Context) (*User, error) {
@@ -451,6 +476,7 @@ func (_q *UserQuery) Clone() *UserQuery {
 		withAdminUpdatedBy: _q.withAdminUpdatedBy.Clone(),
 		withRoles:          _q.withRoles.Clone(),
 		withDefaultRole:    _q.withDefaultRole.Clone(),
+		withRefreshTokens:  _q.withRefreshTokens.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -545,6 +571,17 @@ func (_q *UserQuery) WithDefaultRole(opts ...func(*RoleQuery)) *UserQuery {
 	return _q
 }
 
+// WithRefreshTokens tells the query-builder to eager-load the nodes that are connected to
+// the "refresh_tokens" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithRefreshTokens(opts ...func(*UserRefreshTokenQuery)) *UserQuery {
+	query := (&UserRefreshTokenClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRefreshTokens = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -624,7 +661,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [8]bool{
+		loadedTypes = [9]bool{
 			_q.withRefCreatedBy != nil,
 			_q.withCreatedBy != nil,
 			_q.withRefUpdatedBy != nil,
@@ -633,6 +670,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			_q.withAdminUpdatedBy != nil,
 			_q.withRoles != nil,
 			_q.withDefaultRole != nil,
+			_q.withRefreshTokens != nil,
 		}
 	)
 	if _q.withCreatedBy != nil || _q.withUpdatedBy != nil || _q.withAdminCreatedBy != nil || _q.withAdminUpdatedBy != nil || _q.withDefaultRole != nil {
@@ -713,6 +751,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := _q.withRefreshTokens; query != nil {
+		if err := _q.loadRefreshTokens(ctx, query, nodes,
+			func(n *User) { n.Edges.RefreshTokens = []*UserRefreshToken{} },
+			func(n *User, e *UserRefreshToken) { n.Edges.RefreshTokens = append(n.Edges.RefreshTokens, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range _q.withNamedRefCreatedBy {
 		if err := _q.loadRefCreatedBy(ctx, query, nodes,
 			func(n *User) { n.appendNamedRefCreatedBy(name) },
@@ -731,6 +776,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := _q.loadRoles(ctx, query, nodes,
 			func(n *User) { n.appendNamedRoles(name) },
 			func(n *User, e *Role) { n.appendNamedRoles(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range _q.withNamedRefreshTokens {
+		if err := _q.loadRefreshTokens(ctx, query, nodes,
+			func(n *User) { n.appendNamedRefreshTokens(name) },
+			func(n *User, e *UserRefreshToken) { n.appendNamedRefreshTokens(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1025,6 +1077,37 @@ func (_q *UserQuery) loadDefaultRole(ctx context.Context, query *RoleQuery, node
 	}
 	return nil
 }
+func (_q *UserQuery) loadRefreshTokens(ctx context.Context, query *UserRefreshTokenQuery, nodes []*User, init func(*User), assign func(*User, *UserRefreshToken)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.UserRefreshToken(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.RefreshTokensColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_refresh_token_user
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_refresh_token_user" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_refresh_token_user" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (_q *UserQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -1149,6 +1232,20 @@ func (_q *UserQuery) WithNamedRoles(name string, opts ...func(*RoleQuery)) *User
 		_q.withNamedRoles = make(map[string]*RoleQuery)
 	}
 	_q.withNamedRoles[name] = query
+	return _q
+}
+
+// WithNamedRefreshTokens tells the query-builder to eager-load the nodes that are connected to the "refresh_tokens"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithNamedRefreshTokens(name string, opts ...func(*UserRefreshTokenQuery)) *UserQuery {
+	query := (&UserRefreshTokenClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedRefreshTokens == nil {
+		_q.withNamedRefreshTokens = make(map[string]*UserRefreshTokenQuery)
+	}
+	_q.withNamedRefreshTokens[name] = query
 	return _q
 }
 

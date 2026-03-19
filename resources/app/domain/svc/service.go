@@ -19,6 +19,7 @@ type Service struct {
 	File              adminInterfaces.File
 	Role              adminInterfaces.Role
 	User              svc.User
+	UserRefreshToken              svc.UserRefreshToken
 }
 
 func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service {
@@ -28,5 +29,6 @@ func New(repository *repo.Repository, adminRepo *adminRepo.Repository) *Service 
         File:              adminSvc.NewFile(adminRepo),
         Role:              adminSvc.NewRole(adminRepo),
 		User:              NewUser(repository),
+		UserRefreshToken:              NewUserRefreshToken(repository),
 	}
 }

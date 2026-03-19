@@ -140,5 +140,14 @@ func (User) Edges() []ent.Edge {
 					RelationType: entity.RelationTypeOne,
 				},
 			),
+		edge.From("refresh_tokens", UserRefreshToken.Type).
+			Ref("user").
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+				annotations.Edge{
+					Caption:      "Refresh Tokens",
+					RelationType: entity.RelationTypeOne,
+				},
+			),
 	}
 }
